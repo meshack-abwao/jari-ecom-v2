@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { api } from '../api/client';
+import { authAPI } from '../api/client';
 
 const AuthContext = createContext(null);
 
@@ -10,8 +10,8 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const token = localStorage.getItem('jv2_token');
     if (token) {
-      api.getMe()
-        .then(setUser)
+      authAPI.getMe()
+        .then((response) => setUser(response.data?.user || response.data))
         .catch(() => localStorage.removeItem('jv2_token'))
         .finally(() => setLoading(false));
     } else {
@@ -20,17 +20,27 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = async (email, password) => {
-    const { token, user } = await api.login(email, password);
-    localStorage.setItem('jv2_token', token);
-    setUser(user);
-    return user;
+    const response = await authAPI.login({ email, password });
+    const data = response.data;
+    if (data.success && data.token) {
+      localStorage.setItem('jv2_token', data.token);
+      setUser(data.user);
+      return data.user;
+    } else {
+      throw new Error(data.error || 'Login failed');
+    }
   };
 
-  const register = async (data) => {
-    const { token, user } = await api.register(data);
-    localStorage.setItem('jv2_token', token);
-    setUser(user);
-    return user;
+  const register = async (userData) => {
+    const response = await authAPI.register(userData);
+    const data = response.data;
+    if (data.success && data.token) {
+      localStorage.setItem('jv2_token', data.token);
+      setUser(data.user);
+      return data.user;
+    } else {
+      throw new Error(data.error || 'Registration failed');
+    }
   };
 
   const logout = () => {
