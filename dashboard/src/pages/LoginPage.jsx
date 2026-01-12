@@ -18,7 +18,8 @@ export default function LoginPage() {
       await login(email, password);
       navigate('/');
     } catch (err) {
-      setError(err.message);
+      console.error('Login error:', err);
+      setError(err.message || 'Invalid email or password');
     } finally {
       setLoading(false);
     }
@@ -26,99 +27,54 @@ export default function LoginPage() {
 
   return (
     <div style={styles.container}>
-      <div className="jv2-card" style={styles.card}>
-        <h1 style={styles.title}>Jari.Ecom</h1>
-        <p style={styles.subtitle}>Sign in to your dashboard</p>
+      <div style={styles.formCard} className="glass-card">
+        <div style={styles.header}>
+          <img src="https://jarisolutions.com/wp-content/uploads/2024/09/cropped-cropped-jari-solutions-logo-180x180.png" alt="Jari" style={styles.logo} />
+          <h1 style={styles.title}>Jari.Ecom</h1>
+          <p style={styles.subtitle}>Sign in to your dashboard</p>
+        </div>
 
         {error && <div style={styles.error}>{error}</div>}
 
         <form onSubmit={handleSubmit} style={styles.form}>
-          <div>
-            <label className="jv2-label">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="jv2-input"
-              placeholder="you@example.com"
-              required
-            />
+          <div style={styles.formGroup}>
+            <label style={styles.label}>Email</label>
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" required className="dashboard-input" />
           </div>
 
-          <div>
-            <label className="jv2-label">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="jv2-input"
-              placeholder="••••••••"
-              required
-            />
+          <div style={styles.formGroup}>
+            <label style={styles.label}>Password</label>
+            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required className="dashboard-input" />
           </div>
 
-          <button type="submit" disabled={loading} className="jv2-btn jv2-btn-primary" style={{ width: '100%' }}>
+          <button type="submit" disabled={loading} className="btn btn-primary" style={styles.submitBtn}>
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
 
         <p style={styles.footer}>
-          Don't have an account? <Link to="/register" style={styles.link}>Register</Link>
+          Don't have an account? <Link to="/register" style={styles.link}>Create one</Link>
         </p>
       </div>
+
+      <div style={styles.bgGlow}></div>
     </div>
   );
 }
 
 const styles = {
-  container: {
-    minHeight: '100vh',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20
-  },
-  card: {
-    width: '100%',
-    maxWidth: 400,
-    padding: 40
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 800,
-    textAlign: 'center',
-    marginBottom: 8,
-    background: 'linear-gradient(135deg, #ff9f0a, #ff375f)',
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent'
-  },
-  subtitle: {
-    textAlign: 'center',
-    color: 'var(--jv2-text-muted)',
-    marginBottom: 32
-  },
-  error: {
-    padding: 12,
-    background: 'rgba(255,55,95,0.1)',
-    border: '1px solid rgba(255,55,95,0.3)',
-    borderRadius: 8,
-    color: '#ff375f',
-    fontSize: 14,
-    marginBottom: 20
-  },
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 20
-  },
-  footer: {
-    textAlign: 'center',
-    marginTop: 24,
-    fontSize: 14,
-    color: 'var(--jv2-text-muted)'
-  },
-  link: {
-    color: 'var(--jv2-primary)',
-    textDecoration: 'none'
-  }
+  container: { minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', position: 'relative', overflow: 'hidden', background: 'var(--bg-primary)' },
+  formCard: { width: '100%', maxWidth: '420px', padding: '40px 36px', position: 'relative', zIndex: 1 },
+  header: { textAlign: 'center', marginBottom: '32px' },
+  logo: { width: '64px', height: '64px', borderRadius: '16px', marginBottom: '16px' },
+  title: { fontSize: '28px', fontWeight: '700', marginBottom: '8px', background: 'var(--gradient-accent)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' },
+  subtitle: { fontSize: '14px', color: 'var(--text-muted)' },
+  error: { padding: '12px 16px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '10px', color: '#ef4444', fontSize: '13px', marginBottom: '20px', textAlign: 'center' },
+  form: { display: 'flex', flexDirection: 'column', gap: '20px' },
+  formGroup: { display: 'flex', flexDirection: 'column', gap: '8px' },
+  label: { fontSize: '12px', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' },
+  submitBtn: { marginTop: '8px', padding: '14px', fontSize: '15px' },
+  footer: { textAlign: 'center', marginTop: '28px', fontSize: '14px', color: 'var(--text-muted)' },
+  link: { color: 'var(--accent-color)', textDecoration: 'none', fontWeight: '600' },
+  bgGlow: { position: 'fixed', width: '800px', height: '800px', background: 'radial-gradient(circle, var(--accent-glow) 0%, transparent 70%)', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', borderRadius: '50%', filter: 'blur(100px)', pointerEvents: 'none', opacity: 0.4 },
 };

@@ -1,63 +1,113 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+import axios from 'axios';
 
-async function request(path, options = {}) {
-  const token = localStorage.getItem('jv2_token');
-  
-  const res = await fetch(`${API_URL}${path}`, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
-      ...options.headers
-    }
-  });
-  
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'Request failed');
-  return data;
-}
-
-export const api = {
-  // Auth
-  login: (email, password) => request('/api/auth/login', {
-    method: 'POST',
-    body: JSON.stringify({ email, password })
-  }),
-  
-  register: (data) => request('/api/auth/register', {
-    method: 'POST',
-    body: JSON.stringify(data)
-  }),
-  
-  getMe: () => request('/api/auth/me'),
-  
-  // Store
-  getStore: () => request('/api/store'),
-  updateStore: (config) => request('/api/store', {
-    method: 'PUT',
-    body: JSON.stringify({ config })
-  }),
-  getThemes: () => request('/api/store/themes'),
-  getTemplates: () => request('/api/store/templates'),
-  
-  // Products
-  getProducts: () => request('/api/products'),
-  getProduct: (id) => request(`/api/products/${id}`),
-  createProduct: (data) => request('/api/products', {
-    method: 'POST',
-    body: JSON.stringify(data)
-  }),
-  updateProduct: (id, data) => request(`/api/products/${id}`, {
-    method: 'PUT',
-    body: JSON.stringify(data)
-  }),
-  deleteProduct: (id) => request(`/api/products/${id}`, { method: 'DELETE' }),
-  
-  // Orders
-  getOrders: () => request('/api/orders'),
-  getOrderStats: () => request('/api/orders/stats'),
-  updateOrder: (id, data) => request(`/api/orders/${id}`, {
-    method: 'PUT',
-    body: JSON.stringify(data)
-  })
+// ===========================================
+// API CONFIGURATION
+// ===========================================
+const getApiUrl = () => {
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  return 'http://localhost:3000';
 };
+
+const API_BASE_URL = getApiUrl();
+
+console.log('🔗 API Base URL:', API_BASE_URL);
+
+const api = axios.create({
+  baseURL: `${API_BASE_URL}/api`,
+  headers: { 'Content-Type': 'application/json' },
+  timeout: 15000,
+});
+
+// Request interceptor - adds auth token
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('jv2_token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// Response interceptor - handles errors
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    console.error('❌ API Error:', error.response?.status, error.message);
+    if (error.response?.status === 401) {
+      localStorage.removeItem('jv2_token');
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
+// ===========================================
+// AUTH API
+// ===========================================
+export const authAPI = {
+  login: (credentials) => api.post('/auth/login', credentials),
+  register: (userData) => api.post('/auth/register', userData),
+  getMe: () => api.get('/auth/me'),
+};
+
+// ===========================================
+// PRODUCTS API
+// ===========================================
+export const productsAPI = {
+  getAll: () => api.get('/products'),
+  get: (id) => api.get(`/products/${id}`),
+  create: (productData) => api.post('/products', productData),
+  update: (id, productData) => api.put(`/products/${id}`, productData),
+  delete: (id) => api.delete(`/products/${id}`),
+};
+
+// ===========================================
+// ORDERS API
+// ===========================================
+export const ordersAPI = {
+  getAll: () => api.get('/orders'),
+  getStats: () => api.get('/orders/stats'),
+  create: (orderData) => api.post('/orders', orderData),
+  updateStatus: (id, status) => api.put(`/orders/${id}`, { status }),
+};
+
+// ===========================================
+// SETTINGS API
+// ===========================================
+export const settingsAPI = {
+  getAll: () => api.get('/store'),
+  update: (settingsData) => api.put('/store', { config: settingsData }),
+  getThemes: () => api.get('/store/themes'),
+  getTemplates: () => api.get('/store/templates'),
+  getAddOns: () => api.get('/store/add-ons'),
+  activateAddOn: (id, paymentData) => api.post(`/store/add-ons/${id}/activate`, paymentData),
+};
+
+// ===========================================
+// LEGACY API (for backwards compatibility)
+// ===========================================
+export const legacyApi = {
+  login: (email, password) => api.post('/auth/login', { email, password }).then(r => r.data),
+  register: (data) => api.post('/auth/register', data).then(r => r.data),
+  getMe: () => api.get('/auth/me').then(r => r.data),
+  getStore: () => api.get('/store').then(r => r.data),
+  updateStore: (config) => api.put('/store', { config }).then(r => r.data),
+  getThemes: () => api.get('/store/themes').then(r => r.data),
+  getTemplates: () => api.get('/store/templates').then(r => r.data),
+  getProducts: () => api.get('/products').then(r => r.data.products || []),
+  getProduct: (id) => api.get(`/products/${id}`).then(r => r.data),
+  createProduct: (data) => api.post('/products', data).then(r => r.data),
+  updateProduct: (id, data) => api.put(`/products/${id}`, data).then(r => r.data),
+  deleteProduct: (id) => api.delete(`/products/${id}`).then(r => r.data),
+  getOrders: () => api.get('/orders').then(r => r.data.orders || []),
+  getOrderStats: () => api.get('/orders/stats').then(r => r.data),
+  updateOrder: (id, data) => api.put(`/orders/${id}`, data).then(r => r.data),
+};
+
+export default api;

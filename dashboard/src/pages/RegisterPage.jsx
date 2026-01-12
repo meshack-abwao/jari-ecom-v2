@@ -1,23 +1,34 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
+import { authAPI } from '../api/client';
 
 export default function RegisterPage() {
-  const [form, setForm] = useState({ email: '', password: '', businessName: '', instagram: '' });
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    businessName: '',
+    instagramHandle: '',
+    phone: '',
+    affiliateCode: '',
+  });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { register } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
+
     try {
-      await register(form);
-      navigate('/');
+      const response = await authAPI.register(formData);
+      if (response.data.success) {
+        navigate('/login');
+      } else {
+        setError(response.data.error || 'Registration failed');
+      }
     } catch (err) {
-      setError(err.message);
+      setError(err.response?.data?.error || 'Network error. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -25,126 +36,77 @@ export default function RegisterPage() {
 
   return (
     <div style={styles.container}>
-      <div className="jv2-card" style={styles.card}>
-        <h1 style={styles.title}>Jari.Ecom</h1>
-        <p style={styles.subtitle}>Create your store in minutes</p>
+      <div style={styles.formCard} className="glass-card">
+        <div style={styles.header}>
+          <img src="https://jarisolutions.com/wp-content/uploads/2024/09/cropped-cropped-jari-solutions-logo-180x180.png" alt="Jari" style={styles.logo} />
+          <h1 style={styles.title}>Join Jari.Ecom</h1>
+          <p style={styles.subtitle}>Start selling in under 5 minutes</p>
+        </div>
 
         {error && <div style={styles.error}>{error}</div>}
 
         <form onSubmit={handleSubmit} style={styles.form}>
-          <div>
-            <label className="jv2-label">Business Name</label>
-            <input
-              type="text"
-              value={form.businessName}
-              onChange={(e) => setForm({ ...form, businessName: e.target.value })}
-              className="jv2-input"
-              placeholder="My Fashion Store"
-              required
-            />
+          <div style={styles.formGroup}>
+            <label style={styles.label}>Business Name</label>
+            <input type="text" value={formData.businessName} onChange={(e) => setFormData({ ...formData, businessName: e.target.value })} placeholder="Jari Solutions" required className="dashboard-input" />
           </div>
 
-          <div>
-            <label className="jv2-label">Email</label>
-            <input
-              type="email"
-              value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-              className="jv2-input"
-              placeholder="you@example.com"
-              required
-            />
+          <div style={styles.formGroup}>
+            <label style={styles.label}>Email</label>
+            <input type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} placeholder="you@example.com" required className="dashboard-input" />
           </div>
 
-          <div>
-            <label className="jv2-label">Password</label>
-            <input
-              type="password"
-              value={form.password}
-              onChange={(e) => setForm({ ...form, password: e.target.value })}
-              className="jv2-input"
-              placeholder="••••••••"
-              required
-              minLength={6}
-            />
+          <div style={styles.formGroup}>
+            <label style={styles.label}>Password</label>
+            <input type="password" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} placeholder="••••••••" required minLength="6" className="dashboard-input" />
           </div>
 
-          <div>
-            <label className="jv2-label">Instagram Handle (optional)</label>
-            <input
-              type="text"
-              value={form.instagram}
-              onChange={(e) => setForm({ ...form, instagram: e.target.value })}
-              className="jv2-input"
-              placeholder="@yourhandle"
-            />
-            <p style={{ fontSize: 12, color: 'var(--jv2-text-muted)', marginTop: 6 }}>
-              This becomes your store URL
-            </p>
+          <div style={styles.formGroup}>
+            <label style={styles.label}>Instagram Handle</label>
+            <input type="text" value={formData.instagramHandle} onChange={(e) => setFormData({ ...formData, instagramHandle: e.target.value })} placeholder="@yourhandle" required className="dashboard-input" />
           </div>
 
-          <button type="submit" disabled={loading} className="jv2-btn jv2-btn-primary" style={{ width: '100%' }}>
-            {loading ? 'Creating...' : 'Create Store'}
+          <div style={styles.formGroup}>
+            <label style={styles.label}>Phone Number</label>
+            <input type="tel" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} placeholder="254712345678" required className="dashboard-input" />
+          </div>
+
+          <div style={styles.formGroup}>
+            <label style={styles.label}>Affiliate Code <span style={styles.optional}>(Optional)</span></label>
+            <input type="text" value={formData.affiliateCode} onChange={(e) => setFormData({ ...formData, affiliateCode: e.target.value.toUpperCase() })} placeholder="PARTNER123" className="dashboard-input" />
+            <p style={styles.hint}>Have a referral code? Enter it for special benefits</p>
+          </div>
+
+          <button type="submit" disabled={loading} className="btn btn-primary" style={styles.submitBtn}>
+            {loading ? 'Creating Account...' : 'Create Account'}
           </button>
         </form>
 
         <p style={styles.footer}>
-          Already have an account? <Link to="/login" style={styles.link}>Sign in</Link>
+          Already have an account? <Link to="/login" style={styles.link}>Login</Link>
         </p>
       </div>
+
+      <div style={styles.bgGlow}></div>
     </div>
   );
 }
 
 const styles = {
-  container: {
-    minHeight: '100vh',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20
-  },
-  card: {
-    width: '100%',
-    maxWidth: 420,
-    padding: 40
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 800,
-    textAlign: 'center',
-    marginBottom: 8,
-    background: 'linear-gradient(135deg, #ff9f0a, #ff375f)',
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent'
-  },
-  subtitle: {
-    textAlign: 'center',
-    color: 'var(--jv2-text-muted)',
-    marginBottom: 32
-  },
-  error: {
-    padding: 12,
-    background: 'rgba(255,55,95,0.1)',
-    border: '1px solid rgba(255,55,95,0.3)',
-    borderRadius: 8,
-    color: '#ff375f',
-    fontSize: 14,
-    marginBottom: 20
-  },
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 20
-  },
-  footer: {
-    textAlign: 'center',
-    marginTop: 24,
-    fontSize: 14,
-    color: 'var(--jv2-text-muted)'
-  },
-  link: {
-    color: 'var(--jv2-primary)',
-    textDecoration: 'none'
-  }
+  container: { minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', position: 'relative', overflow: 'hidden', background: 'var(--bg-primary)' },
+  formCard: { width: '100%', maxWidth: '460px', padding: '36px 32px', position: 'relative', zIndex: 1 },
+  header: { textAlign: 'center', marginBottom: '28px' },
+  logo: { width: '56px', height: '56px', borderRadius: '14px', marginBottom: '14px' },
+  title: { fontSize: '26px', fontWeight: '700', marginBottom: '6px', background: 'var(--gradient-accent)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' },
+  subtitle: { fontSize: '14px', color: 'var(--text-muted)' },
+  error: { padding: '12px 16px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '10px', color: '#ef4444', fontSize: '13px', marginBottom: '16px' },
+  form: { display: 'flex', flexDirection: 'column', gap: '16px' },
+  formGroup: { display: 'flex', flexDirection: 'column', gap: '6px' },
+  label: { fontSize: '11px', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' },
+  optional: { fontSize: '10px', fontWeight: '400', color: 'var(--text-muted)', textTransform: 'none' },
+  hint: { fontSize: '11px', color: 'var(--text-muted)' },
+  submitBtn: { marginTop: '8px', padding: '14px', fontSize: '15px' },
+  footer: { textAlign: 'center', marginTop: '24px', fontSize: '14px', color: 'var(--text-muted)' },
+  link: { color: 'var(--accent-color)', textDecoration: 'none', fontWeight: '600' },
+  bgGlow: { position: 'fixed', width: '800px', height: '800px', background: 'radial-gradient(circle, var(--accent-glow) 0%, transparent 70%)', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', borderRadius: '50%', filter: 'blur(100px)', pointerEvents: 'none', opacity: 0.4 },
 };

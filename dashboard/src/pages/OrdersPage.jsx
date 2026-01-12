@@ -1,15 +1,6 @@
 import { useState, useEffect } from 'react';
-import { api } from '../api/client';
-import { Clock, CheckCircle, XCircle, Truck } from 'lucide-react';
-
-const statusConfig = {
-  pending: { color: '#ff9f0a', icon: Clock, label: 'Pending' },
-  confirmed: { color: '#0a84ff', icon: CheckCircle, label: 'Confirmed' },
-  processing: { color: '#bf5af2', icon: Clock, label: 'Processing' },
-  shipped: { color: '#00d4ff', icon: Truck, label: 'Shipped' },
-  delivered: { color: '#30d158', icon: CheckCircle, label: 'Delivered' },
-  cancelled: { color: '#ff375f', icon: XCircle, label: 'Cancelled' }
-};
+import { ordersAPI } from '../api/client';
+import { Clock, CheckCircle, XCircle, DollarSign, Package, Truck } from 'lucide-react';
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState([]);
@@ -17,96 +8,101 @@ export default function OrdersPage() {
 
   useEffect(() => { loadOrders(); }, []);
 
-  const loadOrders = () => {
-    api.getOrders()
-      .then(setOrders)
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  };
-
-  const updateStatus = async (id, status) => {
+  const loadOrders = async () => {
     try {
-      await api.updateOrder(id, { status });
-      loadOrders();
-    } catch (err) {
-      alert(err.message);
-    }
+      const response = await ordersAPI.getAll();
+      setOrders(response.data?.orders || []);
+    } catch (error) { console.error('Failed to load orders:', error); }
+    finally { setLoading(false); }
   };
 
-  if (loading) return <div style={{ padding: 40 }}>Loading...</div>;
+  const updateStatus = async (orderId, newStatus) => {
+    try {
+      await ordersAPI.updateStatus(orderId, newStatus);
+      await loadOrders();
+    } catch (error) { alert('Failed to update order status'); }
+  };
+
+  const getStatusStyle = (status) => {
+    const styles = {
+      pending: { bg: 'rgba(251, 191, 36, 0.15)', color: '#f59e0b', icon: <Clock size={14} /> },
+      paid: { bg: 'rgba(59, 130, 246, 0.15)', color: '#3b82f6', icon: <DollarSign size={14} /> },
+      processing: { bg: 'rgba(168, 85, 247, 0.15)', color: '#a855f7', icon: <Package size={14} /> },
+      shipped: { bg: 'rgba(6, 182, 212, 0.15)', color: '#06b6d4', icon: <Truck size={14} /> },
+      delivered: { bg: 'rgba(34, 197, 94, 0.15)', color: '#22c55e', icon: <CheckCircle size={14} /> },
+      completed: { bg: 'rgba(34, 197, 94, 0.15)', color: '#22c55e', icon: <CheckCircle size={14} /> },
+      cancelled: { bg: 'rgba(239, 68, 68, 0.15)', color: '#ef4444', icon: <XCircle size={14} /> },
+    };
+    return styles[status] || styles.pending;
+  };
+
+  if (loading) return <div style={styles.loadingContainer}><div style={styles.spinner}></div><p>Loading orders...</p></div>;
 
   return (
-    <div>
-      <div className="jv2-page-header">
-        <h1 className="jv2-page-title">Orders</h1>
-        <p className="jv2-page-subtitle">Manage customer orders</p>
+    <div className="fade-in">
+      <div style={styles.header}>
+        <div>
+          <h1 style={styles.title}>Orders</h1>
+          <p style={styles.subtitle}>Manage and track your orders</p>
+        </div>
       </div>
 
       {orders.length === 0 ? (
-        <div className="jv2-card" style={{ textAlign: 'center', padding: 60 }}>
-          <div style={{ fontSize: 64, marginBottom: 16 }}>📋</div>
-          <h3 style={{ marginBottom: 8 }}>No orders yet</h3>
-          <p style={{ color: 'var(--jv2-text-muted)' }}>Orders will appear here when customers make purchases</p>
+        <div style={styles.empty} className="glass-card">
+          <div style={styles.emptyIcon}>📦</div>
+          <h3 style={styles.emptyTitle}>No orders yet</h3>
+          <p style={styles.emptyDesc}>Orders will appear here when customers make purchases</p>
         </div>
       ) : (
-        <div className="jv2-card" style={{ padding: 0, overflow: 'hidden' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <div style={styles.tableContainer} className="glass-card">
+          <table style={styles.table}>
             <thead>
-              <tr style={{ borderBottom: '1px solid var(--jv2-border)' }}>
-                <th style={thStyle}>Order</th>
-                <th style={thStyle}>Customer</th>
-                <th style={thStyle}>Product</th>
-                <th style={thStyle}>Total</th>
-                <th style={thStyle}>Status</th>
-                <th style={thStyle}>Actions</th>
+              <tr style={styles.tableHeader}>
+                <th style={styles.th}>Order</th>
+                <th style={styles.th}>Product</th>
+                <th style={styles.th}>Customer</th>
+                <th style={styles.th}>Phone</th>
+                <th style={styles.th}>Location</th>
+                <th style={styles.th}>Amount</th>
+                <th style={styles.th}>Payment</th>
+                <th style={styles.th}>Status</th>
+                <th style={styles.th}>Date</th>
+                <th style={styles.th}>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {orders.map((o) => {
-                const cfg = statusConfig[o.status] || statusConfig.pending;
-                const Icon = cfg.icon;
+              {orders.map((order) => {
+                const statusStyle = getStatusStyle(order.status);
                 return (
-                  <tr key={o.id} style={{ borderBottom: '1px solid var(--jv2-border)' }}>
-                    <td style={tdStyle}>
-                      <span style={{ fontFamily: 'monospace', fontSize: 13, color: 'var(--jv2-primary)' }}>
-                        {o.order_number}
+                  <tr key={order.id} style={styles.tableRow}>
+                    <td style={styles.td}><span style={styles.orderId}>{order.order_number}</span></td>
+                    <td style={styles.td}>
+                      <div style={styles.productCell}>
+                        {order.product_image && <img src={order.product_image} alt="" style={styles.productThumb} />}
+                        <span>{order.product_name || 'Product'}</span>
+                      </div>
+                    </td>
+                    <td style={styles.td}>{order.customer_name}</td>
+                    <td style={styles.td}>{order.customer_phone}</td>
+                    <td style={styles.td}>{order.customer_location}</td>
+                    <td style={styles.td}><span style={styles.amount}>KES {parseInt(order.total_amount).toLocaleString()}</span></td>
+                    <td style={styles.td}><span style={styles.payment}>{(order.payment_method || 'N/A').toUpperCase()}</span></td>
+                    <td style={styles.td}>
+                      <span style={{ ...styles.statusBadge, background: statusStyle.bg, color: statusStyle.color }}>
+                        {statusStyle.icon} {order.status}
                       </span>
                     </td>
-                    <td style={tdStyle}>
-                      <div>{o.customer?.name}</div>
-                      <div style={{ fontSize: 12, color: 'var(--jv2-text-muted)' }}>{o.customer?.phone}</div>
+                    <td style={styles.td}>
+                      {new Date(order.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                     </td>
-                    <td style={tdStyle}>{o.product_name || 'N/A'}</td>
-                    <td style={tdStyle}>
-                      <span style={{ fontWeight: 700 }}>KES {Number(o.items?.[0]?.total || 0).toLocaleString()}</span>
-                    </td>
-                    <td style={tdStyle}>
-                      <span style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: 6,
-                        padding: '6px 12px',
-                        background: `${cfg.color}20`,
-                        color: cfg.color,
-                        borderRadius: 20,
-                        fontSize: 12,
-                        fontWeight: 600
-                      }}>
-                        <Icon size={14} /> {cfg.label}
-                      </span>
-                    </td>
-                    <td style={tdStyle}>
-                      <select
-                        value={o.status}
-                        onChange={(e) => updateStatus(o.id, e.target.value)}
-                        className="jv2-input"
-                        style={{ padding: '8px 12px', width: 'auto' }}
-                      >
+                    <td style={styles.td}>
+                      <select value={order.status} onChange={(e) => updateStatus(order.id, e.target.value)} style={styles.statusSelect} className="dashboard-select">
                         <option value="pending">Pending</option>
-                        <option value="confirmed">Confirmed</option>
+                        <option value="paid">Paid</option>
                         <option value="processing">Processing</option>
                         <option value="shipped">Shipped</option>
                         <option value="delivered">Delivered</option>
+                        <option value="completed">Completed</option>
                         <option value="cancelled">Cancelled</option>
                       </select>
                     </td>
@@ -121,16 +117,30 @@ export default function OrdersPage() {
   );
 }
 
-const thStyle = {
-  padding: 16,
-  textAlign: 'left',
-  fontSize: 12,
-  fontWeight: 600,
-  color: 'var(--jv2-text-muted)',
-  textTransform: 'uppercase'
-};
-
-const tdStyle = {
-  padding: 16,
-  fontSize: 14
+const styles = {
+  loadingContainer: { display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', color: 'var(--text-muted)' },
+  spinner: { width: '40px', height: '40px', border: '3px solid var(--border-color)', borderTopColor: 'var(--accent-color)', borderRadius: '50%', animation: 'spin 1s linear infinite', marginBottom: '16px' },
+  
+  header: { marginBottom: '32px' },
+  title: { fontSize: '34px', fontWeight: '700', marginBottom: '6px', color: 'var(--text-primary)', letterSpacing: '-0.025em' },
+  subtitle: { fontSize: '15px', color: 'var(--text-muted)' },
+  
+  empty: { padding: '80px 40px', textAlign: 'center' },
+  emptyIcon: { fontSize: '64px', marginBottom: '20px' },
+  emptyTitle: { fontSize: '20px', fontWeight: '600', marginBottom: '8px', color: 'var(--text-primary)' },
+  emptyDesc: { fontSize: '14px', color: 'var(--text-muted)' },
+  
+  tableContainer: { padding: '0', overflowX: 'auto' },
+  table: { width: '100%', borderCollapse: 'collapse', minWidth: '900px' },
+  tableHeader: { borderBottom: '1px solid var(--border-color)' },
+  th: { padding: '14px 16px', textAlign: 'left', fontSize: '11px', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', whiteSpace: 'nowrap' },
+  tableRow: { borderBottom: '1px solid var(--border-color)', transition: 'background 0.2s' },
+  td: { padding: '14px 16px', fontSize: '13px', color: 'var(--text-secondary)', whiteSpace: 'nowrap' },
+  orderId: { fontFamily: 'monospace', fontSize: '12px', color: 'var(--accent-color)' },
+  productCell: { display: 'flex', alignItems: 'center', gap: '10px' },
+  productThumb: { width: '36px', height: '36px', borderRadius: '6px', objectFit: 'cover' },
+  amount: { fontWeight: '600', color: 'var(--text-primary)' },
+  payment: { fontSize: '11px', fontWeight: '600', color: 'var(--text-muted)' },
+  statusBadge: { display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '5px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: '600', textTransform: 'capitalize' },
+  statusSelect: { padding: '6px 10px', fontSize: '12px', borderRadius: '6px', minWidth: '100px' },
 };
