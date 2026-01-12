@@ -1,0 +1,74 @@
+{
+  "themes": [
+    {
+      "slug": "warm-sunset",
+      "name": "Warm Sunset",
+      "colors": {
+        "primary": "#ff9f0a",
+        "secondary": "#ff375f",
+        "gradient": "linear-gradient(135deg, #ff9f0a 0%, #ff375f 100%)"
+      },
+      "is_premium": false
+    },
+    {
+      "slug": "cool-ocean",
+      "name": "Cool Ocean",
+      "colors": {
+        "primary": "#0a84ff",
+        "secondary": "#00d4ff",
+        "gradient": "linear-gradient(135deg, #0a84ff 0%, #00d4ff 100%)"
+      },
+      "is_premium": false
+    },
+    {
+      "slug": "royal-purple",
+      "name": "Royal Purple",
+      "colors": {
+        "primary": "#bf5af2",
+        "secondary": "#667eea",
+        "gradient": "linear-gradient(135deg, #667eea 0%, #bf5af2 100%)"
+      },
+      "is_premium": false
+    },
+    {
+      "slug": "fresh-mint",
+      "name": "Fresh Mint",
+      "colors": {
+        "primary": "#11998e",
+        "secondary": "#38ef7d",
+        "gradient": "linear-gradient(135deg, #11998e 0%, #38ef7d 100%)"
+      },
+      "is_premium": false
+    },
+    {
+      "slug": "midnight",
+      "name": "Midnight Dark",
+      "colors": {
+        "primary": "#34495e",
+        "secondary": "#2c3e50",
+        "gradient": "linear-gradient(135deg, #2c3e50 0%, #34495e 100%)"
+      },
+      "is_premium": false
+    },
+    {
+      "slug": "rose-gold",
+      "name": "Rose Gold",
+      "colors": {
+        "primary": "#ed6ea0",
+        "secondary": "#ec8c69",
+        "gradient": "linear-gradient(135deg, #ed6ea0 0%, #ec8c69 100%)"
+      },
+      "is_premium": true
+    },
+    {
+      "slug": "cosmic",
+      "name": "Cosmic Purple",
+      "colors": {
+        "primary": "#C850C0",
+        "secondary": "#4158D0",
+        "gradient": "linear-gradient(135deg, #4158D0 0%, #C850C0 100%)"
+      },
+      "is_premium": true
+    }
+  ]
+}

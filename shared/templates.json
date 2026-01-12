@@ -1,0 +1,64 @@
+{
+  "templates": [
+    {
+      "slug": "quick-decision",
+      "name": "Quick Decision",
+      "description": "Single product impulse buy - minimal friction checkout",
+      "price": 250,
+      "fields": {
+        "required": ["name", "price"],
+        "optional": ["description", "stock", "category"]
+      },
+      "features": ["instant-checkout", "quantity-selector"],
+      "best_for": ["fashion", "accessories", "single-product"]
+    },
+    {
+      "slug": "portfolio-booking",
+      "name": "Portfolio + Booking",
+      "description": "Service showcase with packages and booking calendar",
+      "price": 500,
+      "fields": {
+        "required": ["name", "price"],
+        "optional": ["packages", "availability", "duration", "location"]
+      },
+      "features": ["package-selector", "date-picker", "lead-capture"],
+      "best_for": ["photographers", "consultants", "services"]
+    },
+    {
+      "slug": "visual-menu",
+      "name": "Visual Menu",
+      "description": "Food ordering with dietary info and prep times",
+      "price": 600,
+      "fields": {
+        "required": ["name", "price"],
+        "optional": ["dietary_tags", "prep_time", "calories", "ingredients", "allergens"]
+      },
+      "features": ["dietary-filters", "prep-time-display", "add-to-cart"],
+      "best_for": ["restaurants", "cafes", "food-delivery"]
+    },
+    {
+      "slug": "deep-dive",
+      "name": "Deep Dive Evaluator",
+      "description": "Detailed product pages for high-ticket items",
+      "price": 800,
+      "fields": {
+        "required": ["name", "price"],
+        "optional": ["specifications", "warranty", "return_policy", "trust_badges", "comparison"]
+      },
+      "features": ["specs-table", "warranty-display", "trust-signals", "comparison-chart"],
+      "best_for": ["electronics", "furniture", "high-value"]
+    },
+    {
+      "slug": "catalog",
+      "name": "Catalog Navigator",
+      "description": "Multi-product homepage with categories and filters",
+      "price": 400,
+      "fields": {
+        "required": ["name", "price"],
+        "optional": ["category", "tags", "featured"]
+      },
+      "features": ["category-filter", "search", "featured-section"],
+      "best_for": ["multi-product", "inventory", "wholesale"]
+    }
+  ]
+}
