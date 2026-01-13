@@ -1363,6 +1363,19 @@ body {
         margin-bottom: var(--space-lg);
         padding: 0 4px;
     }
+    
+    /* Stories section - edge-to-edge on mobile when inside product-info */
+    .stories-section {
+        padding: var(--space-md) 0;  /* Vertical padding only */
+        margin: 0 calc(-1 * var(--space-xl));  /* Break out of product-info padding (20px) */
+        padding-left: var(--space-xl);  /* Match parent's left padding */
+        background: transparent;
+        border-bottom: none;
+    }
+    
+    .stories-row {
+        padding-right: var(--space-xl);  /* Right padding so last item isn't cut off */
+    }
 }
 
 /* ===========================================
