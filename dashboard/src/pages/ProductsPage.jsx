@@ -26,7 +26,7 @@ const TEMPLATES = {
     price: 600,
     description: 'For restaurants and food businesses',
     icon: '🍽️',
-    fields: ['basic', 'gallery', 'dietary', 'testimonials']
+    fields: ['basic', 'gallery', 'stories', 'dietary', 'testimonials']
   },
   'deep-dive': {
     name: 'Deep Dive',
@@ -68,7 +68,7 @@ const getInitialFormData = () => ({
   storyTitle: 'See it in Action',
   
   // Testimonials (all templates)
-  testimonials: [{ text: '', author: '', rating: 5 }],
+  testimonials: [{ text: '', author: '', rating: 5, image: '', role: '' }],
   
   // Packages (portfolio-booking)
   packages: [{ name: '', description: '', price: '', duration: '' }],
@@ -78,6 +78,7 @@ const getInitialFormData = () => ({
   dietaryTags: [],
   prepTime: '',
   calories: '',
+  ingredients: '',
   allergens: '',
   
   // Specifications (deep-dive)
@@ -191,6 +192,7 @@ export default function ProductsPage() {
             dietaryTags: formData.dietaryTags,
             prepTime: formData.prepTime,
             calories: formData.calories,
+            ingredients: formData.ingredients,
             allergens: formData.allergens,
           }),
           
@@ -258,8 +260,8 @@ export default function ProductsPage() {
       
       // Testimonials
       testimonials: data.testimonials?.length > 0 
-        ? data.testimonials 
-        : [{ text: '', author: '', rating: 5 }],
+        ? data.testimonials.map(t => ({ text: t.text || '', author: t.author || '', rating: t.rating || 5, image: t.image || '', role: t.role || '' }))
+        : [{ text: '', author: '', rating: 5, image: '', role: '' }],
       
       // Policies
       deliveryInfo: policies.delivery || '',
@@ -275,6 +277,7 @@ export default function ProductsPage() {
       dietaryTags: data.dietaryTags || [],
       prepTime: data.prepTime || '',
       calories: data.calories || '',
+      ingredients: data.ingredients || '',
       allergens: data.allergens || '',
       
       specifications: data.specifications?.length > 0
@@ -581,6 +584,17 @@ export default function ProductsPage() {
                               placeholder="Customer name"
                               className="dashboard-input"
                             />
+                            <input
+                              type="text"
+                              value={testimonial.role || ''}
+                              onChange={e => {
+                                const newT = [...formData.testimonials];
+                                newT[idx] = { ...newT[idx], role: e.target.value };
+                                updateField('testimonials', newT);
+                              }}
+                              placeholder="Role (e.g. Regular Customer)"
+                              className="dashboard-input"
+                            />
                             <select
                               value={testimonial.rating}
                               onChange={e => {
@@ -593,6 +607,18 @@ export default function ProductsPage() {
                               {[5,4,3,2,1].map(n => <option key={n} value={n}>{n} Stars</option>)}
                             </select>
                           </div>
+                          <input
+                            type="url"
+                            value={testimonial.image || ''}
+                            onChange={e => {
+                              const newT = [...formData.testimonials];
+                              newT[idx] = { ...newT[idx], image: e.target.value };
+                              updateField('testimonials', newT);
+                            }}
+                            placeholder="Avatar image URL (optional)"
+                            className="dashboard-input"
+                            style={{ marginTop: '8px' }}
+                          />
                           <textarea
                             value={testimonial.text}
                             onChange={e => {
@@ -618,7 +644,7 @@ export default function ProductsPage() {
                       ))}
                       <button
                         type="button"
-                        onClick={() => updateField('testimonials', [...formData.testimonials, { text: '', author: '', rating: 5 }])}
+                        onClick={() => updateField('testimonials', [...formData.testimonials, { text: '', author: '', rating: 5, image: '', role: '' }])}
                         style={styles.addBtn}
                       >
                         + Add Testimonial
@@ -744,6 +770,17 @@ export default function ProductsPage() {
                           onChange={e => updateField('dietaryTags', e.target.value.split(',').map(t => t.trim()).filter(Boolean))}
                           placeholder="Vegetarian, Gluten-Free, Halal (comma separated)"
                           className="dashboard-input"
+                        />
+                      </div>
+                      <div style={styles.formGroup}>
+                        <label style={styles.label}>INGREDIENTS</label>
+                        <textarea
+                          value={formData.ingredients}
+                          onChange={e => updateField('ingredients', e.target.value)}
+                          placeholder="Fresh beef, lettuce, tomato, special sauce..."
+                          rows={3}
+                          className="dashboard-input"
+                          style={{ resize: 'vertical' }}
                         />
                       </div>
                       <div style={styles.formGroup}>
