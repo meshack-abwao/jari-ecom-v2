@@ -470,14 +470,14 @@ body {
 }
 
 .thumbnail {
-    width: var(--size-avatar);
-    height: var(--size-avatar);
-    min-width: var(--size-avatar);
-    border-radius: var(--space-sm);
+    width: clamp(48px, 12vw, 56px);   /* V1: clamp(48px, 12vw, 60px) - slightly smaller */
+    height: clamp(48px, 12vw, 56px);
+    min-width: 48px;
+    border-radius: 8px;               /* V1: 8px */
     overflow: hidden;
     cursor: pointer;
-    border: 3px solid transparent;
-    transition: all 0.3s;
+    border: 2px solid transparent;    /* V1: 2px (was 3px) */
+    transition: all 0.2s ease;        /* V1: 0.2s ease */
     flex-shrink: 0;
 }
 
