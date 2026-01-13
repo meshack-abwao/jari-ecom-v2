@@ -526,20 +526,22 @@ body {
    =========================================== */
 .product-info {
     padding: 24px;
+    text-align: left;
 }
 
 .product-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 12px;
+    margin-bottom: 16px;
 }
 
 .product-name {
-    font-size: var(--fs-heading);
+    font-size: var(--fs-heading-xl);
     font-weight: 700;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
     flex: 1;
+    line-height: 1.2;
 }
 
 .product-actions {
@@ -656,11 +658,12 @@ body {
 }
 
 .price {
-    font-size: var(--fs-display);
+    font-size: var(--fs-display-xl);
     font-weight: 800;
     background: var(--gradient-primary);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    background-clip: text;
     letter-spacing: -0.02em;
 }
 
@@ -1772,7 +1775,8 @@ body {
     white-space: pre-wrap;
 }
 
-.modal-content .modal-close {
+/* Full-width close button for policy modals (different from X icon) */
+.modal-content .modal-close-btn {
     position: relative;
     top: auto;
     right: auto;
