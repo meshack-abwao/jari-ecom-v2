@@ -445,20 +445,24 @@ function renderMenuTestimonials(testimonials) {
   if (filtered.length === 0) return '';
   
   return `
-    <div class="testimonials-section">
+    <section class="testimonials-section">
       <h3 class="testimonials-title">Customer Reviews</h3>
       <div class="testimonials-grid">
         ${filtered.map(t => `
           <div class="testimonial-card">
-            ${t.image ? `<img src="${t.image}" alt="${t.author}" class="testimonial-avatar">` : ''}
-            <p class="testimonial-text">"${t.text}"</p>
-            <p class="testimonial-author"><strong>${t.author || 'Customer'}</strong></p>
-            ${t.role ? `<p class="testimonial-role">${t.role}</p>` : ''}
-            <div class="testimonial-stars">${'★'.repeat(t.rating || 5)}${'☆'.repeat(5 - (t.rating || 5))}</div>
+            ${t.image ? 
+              `<div class="testimonial-avatar-wrapper"><img src="${t.image}" alt="${t.author}" class="testimonial-avatar"></div>` : 
+              `<div class="testimonial-avatar-placeholder">${(t.author || 'C').charAt(0).toUpperCase()}</div>`}
+            <p class="testimonial-quote">"${t.text}"</p>
+            <div class="testimonial-author">
+              <span class="testimonial-name">${t.author || 'Happy Customer'}</span>
+              ${t.role ? `<span class="testimonial-role">${t.role}</span>` : ''}
+            </div>
+            <div class="testimonial-rating">★★★★★</div>
           </div>
         `).join('')}
       </div>
-    </div>
+    </section>
   `;
 }
 
