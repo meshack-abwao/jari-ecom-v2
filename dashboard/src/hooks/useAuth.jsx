@@ -22,7 +22,8 @@ export function AuthProvider({ children }) {
   const login = async (email, password) => {
     const response = await authAPI.login({ email, password });
     const data = response.data;
-    if (data.success && data.token) {
+    // API returns { token, user } directly (no success wrapper)
+    if (data.token) {
       localStorage.setItem('jv2_token', data.token);
       setUser(data.user);
       return data.user;
@@ -34,7 +35,8 @@ export function AuthProvider({ children }) {
   const register = async (userData) => {
     const response = await authAPI.register(userData);
     const data = response.data;
-    if (data.success && data.token) {
+    // API returns { token, user } directly (no success wrapper)
+    if (data.token) {
       localStorage.setItem('jv2_token', data.token);
       setUser(data.user);
       return data.user;
