@@ -346,6 +346,13 @@ function renderVisualMenu(product) {
   const stories = media.stories || [];
   const showBackButton = products.length > 1;
   
+  // Dietary tag icons (V1 style)
+  const dietaryIcons = {
+    'vegetarian': '🥬', 'vegan': '🌱', 'spicy': '🌶️', 'hot': '🔥',
+    'gluten-free': '🌾', 'halal': '☪️', 'contains-nuts': '🥜',
+    'dairy-free': '🥛', 'nut-free': '🥜', 'organic': '🌿'
+  };
+  
   return `
     ${showBackButton ? '<button class="back-btn" id="backBtn">← Back to Menu</button>' : ''}
     <div class="product-container template-menu">
@@ -353,20 +360,23 @@ function renderVisualMenu(product) {
         ${renderMenuGallery(media.images || [])}
         
         <div class="product-info">
-          <div class="product-header">
-            <h2 class="product-name">${data.name || 'Menu Item'}</h2>
-            <div class="price">KES <span id="displayPrice">${parseInt(data.price || 0).toLocaleString()}</span></div>
-            <div class="product-actions">
-              <button class="action-btn" id="shareBtn" title="Share">
+          <h2 class="product-name">${data.name || 'Menu Item'}</h2>
+          <div class="price-row">
+            <div class="price"><span class="currency">KES</span> <span id="displayPrice">${parseInt(data.price || 0).toLocaleString()}</span></div>
+            <div class="social-actions">
+              <button class="social-btn share-btn" id="shareBtn" title="Share">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
               </button>
-              <button class="action-btn" id="likeBtn" title="Save">❤️</button>
+              <button class="social-btn like-btn" id="likeBtn" title="Save">🤍</button>
             </div>
           </div>
           
           ${dietaryTags.length > 0 ? `
             <div class="dietary-tags">
-              ${dietaryTags.map(tag => `<span class="dietary-tag">${tag}</span>`).join('')}
+              ${dietaryTags.map(tag => {
+                const icon = dietaryIcons[tag.toLowerCase()] || '•';
+                return `<span class="dietary-tag">${icon} ${tag}</span>`;
+              }).join('')}
             </div>
           ` : ''}
           

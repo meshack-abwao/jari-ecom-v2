@@ -2269,6 +2269,36 @@ body {
     gap: 8px;
 }
 
+.social-btn {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: var(--bg-muted);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 20px;
+    color: var(--text-secondary);
+}
+
+.social-btn:hover {
+    transform: scale(1.1);
+    background: var(--bg-card);
+}
+
+.social-btn:active {
+    transform: scale(0.95);
+}
+
+.social-btn svg {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+}
+
 /* ===========================================
    DIETARY/TRUST TAGS
    =========================================== */
