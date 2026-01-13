@@ -1931,7 +1931,7 @@ body {
     
     /* Expand the product container for desktop */
     .product-container {
-        max-width: 1000px;
+        max-width: 1100px;
     }
     
     /* Template 3: Visual Menu - Remove overflow to enable sticky */
@@ -1939,70 +1939,98 @@ body {
         overflow: visible !important;
     }
     
-    /* Template 3: Visual Menu - Unified Card with Sticky Image Inside */
+    /* Template 3: Visual Menu - Two Column Layout */
     .template-menu .product-card.food-card {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 0;
+        gap: 40px;
         align-items: start;
-        border-radius: 24px;
+        border-radius: 0;
         overflow: visible !important;
-        background: white;
-        box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+        background: transparent;
+        box-shadow: none;
         max-height: none;
     }
     
-    /* Left column: Sticky Image Gallery - V1 style */
-    .template-menu .menu-gallery {
+    /* Left column: Gallery Section - Sticky */
+    .template-menu .gallery-column {
         position: sticky;
         top: 20px;
         align-self: start;
-        border-radius: 24px 0 0 24px;
+    }
+    
+    .template-menu .menu-gallery {
+        border-radius: 16px;
         overflow: hidden;
-        height: fit-content;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.08);
     }
     
     .template-menu .menu-gallery .main-image-container {
-        height: 400px;
+        height: 450px;
         border-radius: 0;
     }
     
-    .template-menu .menu-gallery .thumbnail-strip {
-        padding: 16px 20px;
+    /* Thumbnails below main image - inside gallery column */
+    .template-menu .thumbnail-strip {
+        padding: 16px;
         justify-content: flex-start;
         background: white;
         gap: 10px;
+        border-radius: 0 0 16px 16px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.06);
     }
     
-    .template-menu .menu-gallery .thumbnail {
-        width: 60px;
-        height: 60px;
-        min-width: 60px;
+    .template-menu .thumbnail {
+        width: 56px;
+        height: 56px;
+        min-width: 56px;
+        border-radius: 8px;
     }
     
-    /* Right column: Product Info - scrolls naturally */
+    /* Right column: Product Info */
     .template-menu .food-card .product-info {
-        padding: 32px;
+        padding: 0;
         overflow: visible;
         max-height: none;
+        background: transparent;
     }
     
     .template-menu .food-card .product-name {
-        font-size: 28px;
-        margin-bottom: 12px;
+        font-size: 32px;
+        font-weight: 700;
+        margin-bottom: 16px;
     }
     
     .template-menu .food-card .price {
-        font-size: 32px;
+        font-size: 36px;
+        margin-bottom: 20px;
     }
     
     .template-menu .food-card .product-description {
         font-size: 15px;
         line-height: 1.7;
+        color: #666;
+    }
+    
+    /* Tags/Badges row */
+    .template-menu .badge-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 20px 0;
+    }
+    
+    /* Story bubbles on desktop - horizontal row */
+    .template-menu .stories-strip {
+        justify-content: flex-start;
+        margin: 24px 0;
     }
     
     .template-menu .ingredients-section {
-        margin: 20px 0;
+        margin: 24px 0;
+        background: #f8f8f8;
+        padding: 20px;
+        border-radius: 12px;
     }
     
     /* Testimonials: Centered grid below card */

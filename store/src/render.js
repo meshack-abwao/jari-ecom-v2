@@ -433,26 +433,28 @@ function renderVisualMenu(product) {
 // Menu-specific gallery (uses menu-gallery class for desktop CSS targeting)
 function renderMenuGallery(images) {
   if (!images || images.length === 0) {
-    return `<div class="menu-gallery"><div class="main-image-container"><div class="image-placeholder" style="height:100%;display:flex;align-items:center;justify-content:center;">📸</div></div></div>`;
+    return `<div class="gallery-column"><div class="menu-gallery"><div class="main-image-container"><div class="image-placeholder" style="height:100%;display:flex;align-items:center;justify-content:center;">📸</div></div></div></div>`;
   }
   
   const showNav = images.length > 1;
   
   return `
-    <div class="menu-gallery">
-      <div class="main-image-container">
-        <img src="${images[0]}" alt="Product" class="main-image" id="mainImage">
-        ${showNav ? `
-          <button class="gallery-nav prev" id="galleryPrev">‹</button>
-          <button class="gallery-nav next" id="galleryNext">›</button>
-        ` : ''}
+    <div class="gallery-column">
+      <div class="menu-gallery">
+        <div class="main-image-container">
+          <img src="${images[0]}" alt="Product" class="main-image" id="mainImage">
+          ${showNav ? `
+            <button class="gallery-nav prev" id="galleryPrev">‹</button>
+            <button class="gallery-nav next" id="galleryNext">›</button>
+          ` : ''}
+        </div>
       </div>
+      ${showNav ? `
+        <div class="thumbnail-strip">
+          ${images.map((img, i) => `<img src="${img}" alt="" class="thumbnail ${i === 0 ? 'active' : ''}" data-index="${i}">`).join('')}
+        </div>
+      ` : ''}
     </div>
-    ${showNav ? `
-      <div class="thumbnail-strip">
-        ${images.map((img, i) => `<img src="${img}" alt="" class="thumbnail ${i === 0 ? 'active' : ''}" data-index="${i}">`).join('')}
-      </div>
-    ` : ''}
   `;
 }
 
