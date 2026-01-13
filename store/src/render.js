@@ -43,7 +43,7 @@ function renderHeroCTAs(hero) {
 }
 
 // ===========================================
-// FOOTER - Powered by + Store Policies
+// FOOTER - Simple V1-style
 // ===========================================
 export function renderFooter() {
   const { store } = state;
@@ -52,21 +52,14 @@ export function renderFooter() {
   
   return `
     <footer class="store-footer">
-      <div class="powered-by">
-        <span>Powered by</span>
-        <a href="https://jarisolutionsecom.store" target="_blank" rel="noopener" class="powered-link">
-          <span class="powered-logo">🛍️</span>
-          <span class="powered-name">Jari.Ecom</span>
-        </a>
-      </div>
+      <p class="powered-by">Powered by <a href="https://jarisolutionsecom.store" target="_blank" rel="noopener">jarisolutionsecom.store</a></p>
       ${hasAnyPolicy ? `
-        <div class="store-policies">
+        <div class="policy-links">
           ${policies.privacy ? `<button class="store-policy-link" data-store-policy="privacy">Privacy Policy</button>` : ''}
           ${policies.terms ? `<button class="store-policy-link" data-store-policy="terms">Terms of Service</button>` : ''}
           ${policies.refund ? `<button class="store-policy-link" data-store-policy="refund">Refund Policy</button>` : ''}
         </div>
       ` : ''}
-      <p class="copyright">© ${new Date().getFullYear()} ${store.name || 'Store'}. All rights reserved.</p>
     </footer>
     ${renderStorePolicyModals(policies)}
   `;
@@ -350,22 +343,34 @@ function renderVisualMenu(product) {
   const testimonials = data.testimonials || [];
   const policies = data.policies || {};
   const dietaryTags = data.dietaryTags || [];
+  const stories = media.stories || [];
   const showBackButton = products.length > 1;
   
   return `
     ${showBackButton ? '<button class="back-btn" id="backBtn">← Back to Menu</button>' : ''}
-    <div class="product-container">
-      <div class="product-card">
-        ${renderGallery(media.images || [])}
+    <div class="product-container template-menu">
+      <div class="product-card food-card">
+        ${renderMenuGallery(media.images || [])}
         
         <div class="product-info">
-          <h2 class="product-name">${data.name || 'Menu Item'}</h2>
+          <div class="product-header">
+            <h2 class="product-name">${data.name || 'Menu Item'}</h2>
+            <div class="price">KES <span id="displayPrice">${parseInt(data.price || 0).toLocaleString()}</span></div>
+            <div class="product-actions">
+              <button class="action-btn" id="shareBtn" title="Share">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+              </button>
+              <button class="action-btn" id="likeBtn" title="Save">❤️</button>
+            </div>
+          </div>
           
           ${dietaryTags.length > 0 ? `
             <div class="dietary-tags">
               ${dietaryTags.map(tag => `<span class="dietary-tag">${tag}</span>`).join('')}
             </div>
           ` : ''}
+          
+          ${stories.length > 0 ? renderStories(stories, data.storyTitle || 'INDULGE') : ''}
           
           <p class="product-description">${data.description || ''}</p>
           
@@ -374,22 +379,76 @@ function renderVisualMenu(product) {
             ${data.calories ? `<span class="meta-item">🔥 ${data.calories}</span>` : ''}
           </div>
           
-          ${data.allergens ? `<p class="allergens-notice">⚠️ Allergens: ${data.allergens}</p>` : ''}
-          ${testimonials.length > 0 ? renderTestimonials(testimonials) : ''}
+          ${data.ingredients ? `
+            <div class="ingredients-section">
+              <h4 class="ingredients-title">Ingredients</h4>
+              <p class="ingredients-list">${data.ingredients}</p>
+            </div>
+          ` : ''}
           
-          <div class="price-display">
-            <span class="price-label">Price</span>
-            <div class="price">KES <span id="displayPrice">${parseInt(data.price || 0).toLocaleString()}</span></div>
-          </div>
+          ${data.allergens ? `<p class="allergens-notice">⚠️ Allergens: ${data.allergens}</p>` : ''}
           
           ${renderQuantitySection(data.price || 0, data.stock || 999)}
           
-          <button class="buy-btn" id="buyBtn"><span class="btn-text">🍽️ Order Now</span><span class="btn-arrow">→</span></button>
+          <button class="buy-btn" id="buyBtn"><span class="btn-text">Add to Order</span><span class="btn-arrow">→</span></button>
           ${renderProductPolicyLinks(policies)}
         </div>
       </div>
+      
+      ${testimonials.length > 0 ? renderMenuTestimonials(testimonials) : ''}
     </div>
+    ${renderStoryViewer(stories)}
     ${renderProductPolicyModals(policies)}
+  `;
+}
+
+// Menu-specific gallery (uses menu-gallery class for desktop CSS targeting)
+function renderMenuGallery(images) {
+  if (!images || images.length === 0) {
+    return `<div class="menu-gallery"><div class="main-image-container"><div class="image-placeholder" style="height:100%;display:flex;align-items:center;justify-content:center;">📸</div></div></div>`;
+  }
+  
+  const showNav = images.length > 1;
+  
+  return `
+    <div class="menu-gallery">
+      <div class="main-image-container">
+        <img src="${images[0]}" alt="Product" class="main-image" id="mainImage">
+        ${showNav ? `
+          <button class="gallery-nav prev" id="galleryPrev">‹</button>
+          <button class="gallery-nav next" id="galleryNext">›</button>
+        ` : ''}
+      </div>
+      ${showNav ? `
+        <div class="thumbnail-strip">
+          ${images.map((img, i) => `<img src="${img}" alt="" class="thumbnail ${i === 0 ? 'active' : ''}" data-index="${i}">`).join('')}
+        </div>
+      ` : ''}
+    </div>
+  `;
+}
+
+// Menu-specific testimonials (outside the card, centered)
+function renderMenuTestimonials(testimonials) {
+  if (!testimonials || testimonials.length === 0) return '';
+  const filtered = testimonials.filter(t => t.text?.trim());
+  if (filtered.length === 0) return '';
+  
+  return `
+    <div class="testimonials-section">
+      <h3 class="testimonials-title">Customer Reviews</h3>
+      <div class="testimonials-grid">
+        ${filtered.map(t => `
+          <div class="testimonial-card">
+            ${t.image ? `<img src="${t.image}" alt="${t.author}" class="testimonial-avatar">` : ''}
+            <p class="testimonial-text">"${t.text}"</p>
+            <p class="testimonial-author"><strong>${t.author || 'Customer'}</strong></p>
+            ${t.role ? `<p class="testimonial-role">${t.role}</p>` : ''}
+            <div class="testimonial-stars">${'★'.repeat(t.rating || 5)}${'☆'.repeat(5 - (t.rating || 5))}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
   `;
 }
 
