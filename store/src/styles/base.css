@@ -1376,11 +1376,13 @@ body {
 
 /* ===========================================
    STORIES SECTION (Template-specific)
+   Apple Design: Soft edges, subtle contrast
    =========================================== */
 .stories-section {
-    padding: 16px;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
+    padding: 16px 20px;
+    background: rgba(0,0,0,0.02);
+    border-radius: 16px;
+    margin: 16px 0;
 }
 
 .stories-title {
@@ -1934,8 +1936,10 @@ body {
         max-width: 1100px;
     }
     
-    /* Template 3: Visual Menu - Remove overflow to enable sticky */
-    .template-menu .product-container {
+    /* Template 3: Visual Menu - Remove ALL overflow restrictions for sticky */
+    .template-menu,
+    .template-menu .product-container,
+    .template-menu .product-card.food-card {
         overflow: visible !important;
     }
     
@@ -1946,7 +1950,6 @@ body {
         gap: 40px;
         align-items: start;
         border-radius: 0;
-        overflow: visible !important;
         background: transparent;
         box-shadow: none;
         max-height: none;
@@ -2022,7 +2025,15 @@ body {
         margin: 20px 0;
     }
     
-    /* Story bubbles on desktop - horizontal row */
+    /* Story bubbles on desktop - Apple soft style */
+    .template-menu .stories-section {
+        background: rgba(0,0,0,0.02);
+        border-radius: 16px;
+        padding: 20px 24px;
+        margin: 24px 0;
+        border: none;
+    }
+    
     .template-menu .stories-strip {
         justify-content: flex-start;
         margin: 24px 0;
@@ -2030,9 +2041,9 @@ body {
     
     .template-menu .ingredients-section {
         margin: 24px 0;
-        background: #f8f8f8;
-        padding: 20px;
-        border-radius: 12px;
+        background: rgba(0,0,0,0.02);
+        padding: 20px 24px;
+        border-radius: 16px;
     }
     
     /* Testimonials: Centered grid below card */
