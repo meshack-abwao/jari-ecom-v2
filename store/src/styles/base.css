@@ -47,8 +47,8 @@
     --size-icon-md: 40px;
     --size-icon-lg: 56px;
     --size-avatar: 56px;
-    --size-story: 68px;
-    --size-story-mobile: 60px;
+    --size-story: 60px;           /* V1 parity: was 68px */
+    --size-story-mobile: 54px;    /* V1 parity: was 60px */
     --size-logo: 64px;       /* V1: 64px (was 72px) */
     --size-spinner: 50px;
     
@@ -1433,7 +1433,7 @@ body {
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    border: 3px solid white;
+    border: 2px solid white;      /* V1: thinner border (was 3px) */
     object-fit: cover;
 }
 
