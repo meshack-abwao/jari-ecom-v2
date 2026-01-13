@@ -141,15 +141,16 @@ export function initCheckout() {
 // OPEN CHECKOUT
 // ===========================================
 export function openCheckout() {
-  const { currentProduct, quantity } = state;
+  const { currentProduct, quantity, selectedPrice } = state;
   if (!currentProduct) return;
   
   const data = currentProduct.data || {};
-  const price = Number(data.price || 0);
+  // Use selectedPrice if set (from package/ticket selection), otherwise use base price
+  const price = selectedPrice || Number(data.price || 0);
   const total = price * quantity;
   
   // Update summary
-  document.getElementById('summaryProduct').textContent = currentProduct.name;
+  document.getElementById('summaryProduct').textContent = data.name || 'Product';
   document.getElementById('summaryQty').textContent = quantity;
   document.getElementById('summaryPrice').textContent = price.toLocaleString();
   document.getElementById('summaryTotal').textContent = total.toLocaleString();
@@ -247,9 +248,10 @@ async function completeOrder() {
   
   goToStep('stepLoading');
   
-  const { store, currentProduct, quantity } = state;
+  const { store, currentProduct, quantity, selectedPrice } = state;
   const data = currentProduct.data || {};
-  const price = Number(data.price || 0);
+  // Use selectedPrice if set (from package/ticket selection), otherwise use base price
+  const price = selectedPrice || Number(data.price || 0);
   const total = price * quantity;
   
   const orderData = {
@@ -260,7 +262,7 @@ async function completeOrder() {
     },
     items: [{
       product_id: currentProduct.id,
-      product_name: currentProduct.name,
+      product_name: data.name || 'Product',
       quantity: quantity,
       unit_price: price,
       total: total

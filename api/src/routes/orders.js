@@ -34,7 +34,7 @@ router.get('/', auth, async (req, res, next) => {
       [storeResult.rows[0].id]
     );
     
-    res.json(result.rows);
+    res.json({ success: true, orders: result.rows });
   } catch (err) {
     next(err);
   }

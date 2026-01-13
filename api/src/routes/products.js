@@ -27,7 +27,7 @@ router.get('/', auth, async (req, res, next) => {
       [storeId]
     );
     
-    res.json(result.rows);
+    res.json({ success: true, products: result.rows });
   } catch (err) {
     next(err);
   }

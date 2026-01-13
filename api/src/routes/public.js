@@ -22,6 +22,8 @@ router.get('/:slug', async (req, res, next) => {
     }
     
     const store = storeResult.rows[0];
+    const config = store.config || {};
+    const profile = store.profile || {};
     
     // Get active products
     const productsResult = await db.query(
@@ -32,12 +34,13 @@ router.get('/:slug', async (req, res, next) => {
       [store.id]
     );
     
-    // Get theme if specified
+    // Get theme if specified (check multiple field names)
     let theme = null;
-    if (store.config?.theme) {
+    const themeSlug = config.theme_slug || config.themeSlug || config.theme || config.theme_color;
+    if (themeSlug) {
       const themeResult = await db.query(
         'SELECT * FROM themes WHERE slug = $1',
-        [store.config.theme]
+        [themeSlug]
       );
       if (themeResult.rows.length > 0) {
         theme = themeResult.rows[0];
@@ -53,15 +56,42 @@ router.get('/:slug', async (req, res, next) => {
       };
     }
     
+    // Build store response with support for both snake_case and camelCase config keys
     res.json({
       store: {
         slug: store.slug,
-        name: store.config?.name || store.profile?.business_name || 'Store',
-        tagline: store.config?.tagline || '',
-        logo: store.config?.logo || null,
-        hero: store.config?.hero || null,
-        features: store.config?.features || {},
-        policies: store.config?.policies || {}
+        // Name - check multiple fields
+        name: config.store_name || config.storeName || config.name || profile.business_name || 'Store',
+        tagline: config.tagline || '',
+        // Logo
+        logo_text: config.logo_text || config.logoText || (config.store_name || profile.business_name || 'S').charAt(0),
+        logo_url: config.logo_url || config.logoUrl || null,
+        // Hero section
+        hero: {
+          title: config.hero_title || config.heroTitle || config.store_name || profile.business_name || '',
+          subtitle: config.hero_subtitle || config.heroSubtitle || config.tagline || '',
+          photo_url: config.hero_photo_url || config.heroPhotoUrl || null,
+          background_url: config.header_bg_url || config.headerBgUrl || null,
+          cta_primary: {
+            text: config.hero_cta_primary_text || config.heroCtaPrimaryText || '',
+            link: config.hero_cta_primary_link || config.heroCtaPrimaryLink || '',
+          },
+          cta_secondary: {
+            text: config.hero_cta_secondary_text || config.heroCtaSecondaryText || '',
+            link: config.hero_cta_secondary_link || config.heroCtaSecondaryLink || '',
+          },
+        },
+        // Testimonials
+        show_testimonials: config.show_testimonials !== false,
+        testimonials: config.testimonials || [],
+        // Policies
+        policies: {
+          privacy: config.privacy_policy || config.privacyPolicy || '',
+          terms: config.terms_of_service || config.termsOfService || '',
+          refund: config.refund_policy || config.refundPolicy || '',
+        },
+        // Font
+        font_family: config.font_family || config.fontFamily || 'Inter',
       },
       theme,
       products: productsResult.rows

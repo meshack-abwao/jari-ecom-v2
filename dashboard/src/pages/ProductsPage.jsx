@@ -1,89 +1,228 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { productsAPI, settingsAPI } from '../api/client';
-import { Plus, Edit, Trash2, X, Eye, EyeOff, ExternalLink, Image, Tag } from 'lucide-react';
+import { Plus, Edit, Trash2, X, Eye, EyeOff, ExternalLink, Tag, ChevronDown, ChevronUp } from 'lucide-react';
 
-const TEMPLATE_CONFIG = {
-  'quick-decision': { name: 'Quick Decision', price: 250, description: 'Perfect for single products or quick impulse buys' },
-  'portfolio-booking': { name: 'Portfolio + Booking', price: 500, description: 'For service providers with packages and booking' },
-  'visual-menu': { name: 'Visual Menu', price: 600, description: 'For restaurants and food businesses' },
-  'deep-dive': { name: 'Deep Dive', price: 800, description: 'For high-ticket items needing detailed specs' },
-  'event-landing': { name: 'Event Landing', price: 700, description: 'For events, workshops, and courses' },
+// ===========================================
+// TEMPLATE DEFINITIONS
+// ===========================================
+const TEMPLATES = {
+  'quick-decision': {
+    name: 'Quick Decision',
+    price: 250,
+    description: 'Perfect for single products or impulse buys',
+    icon: '⚡',
+    fields: ['basic', 'gallery', 'stories', 'testimonials']
+  },
+  'portfolio-booking': {
+    name: 'Portfolio + Booking',
+    price: 500,
+    description: 'For service providers with packages',
+    icon: '📋',
+    fields: ['basic', 'gallery', 'stories', 'packages', 'testimonials']
+  },
+  'visual-menu': {
+    name: 'Visual Menu',
+    price: 600,
+    description: 'For restaurants and food businesses',
+    icon: '🍽️',
+    fields: ['basic', 'gallery', 'dietary', 'testimonials']
+  },
+  'deep-dive': {
+    name: 'Deep Dive',
+    price: 800,
+    description: 'For high-ticket items needing specs',
+    icon: '🔍',
+    fields: ['basic', 'gallery', 'stories', 'specifications', 'warranty', 'testimonials']
+  },
+  'event-landing': {
+    name: 'Event Landing',
+    price: 700,
+    description: 'For events, workshops, courses',
+    icon: '🎪',
+    fields: ['basic', 'gallery', 'eventDetails', 'tickets', 'testimonials']
+  },
 };
 
+// ===========================================
+// INITIAL FORM DATA
+// ===========================================
+const getInitialFormData = () => ({
+  // Basic (all templates)
+  name: '',
+  description: '',
+  price: '',
+  stock: 999,
+  category: '',
+  
+  // Gallery (most templates)
+  images: ['', '', '', '', '', ''],
+  
+  // Stories (quick-decision, portfolio, deep-dive)
+  stories: [
+    { url: '', type: 'image', caption: '' },
+    { url: '', type: 'image', caption: '' },
+    { url: '', type: 'image', caption: '' },
+    { url: '', type: 'image', caption: '' },
+  ],
+  storyTitle: 'See it in Action',
+  
+  // Testimonials (all templates)
+  testimonials: [{ text: '', author: '', rating: 5 }],
+  
+  // Packages (portfolio-booking)
+  packages: [{ name: '', description: '', price: '', duration: '' }],
+  bookingNote: '',
+  
+  // Dietary (visual-menu)
+  dietaryTags: [],
+  prepTime: '',
+  calories: '',
+  allergens: '',
+  
+  // Specifications (deep-dive)
+  specifications: [{ label: '', value: '' }],
+  warranty: '',
+  trustBadges: [],
+  
+  // Event (event-landing)
+  eventDate: '',
+  eventTime: '',
+  venue: '',
+  venueAddress: '',
+  tickets: [{ name: '', price: '', description: '', available: 100 }],
+  
+  // Policies (all)
+  deliveryInfo: '',
+  returnPolicy: '',
+  paymentInfo: '',
+});
+
+// ===========================================
+// MAIN COMPONENT
+// ===========================================
 export default function ProductsPage() {
   const [searchParams] = useSearchParams();
-  const initialTemplate = searchParams.get('template') || 'quick-decision';
-  
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [storeUrl, setStoreUrl] = useState('');
-  const [selectedTemplate, setSelectedTemplate] = useState(initialTemplate);
-  const [categories, setCategories] = useState([]);
-  const [showCategoryModal, setShowCategoryModal] = useState(false);
-  const [newCategoryName, setNewCategoryName] = useState('');
-  const [newCategoryEmoji, setNewCategoryEmoji] = useState('📦');
+  const [storeSlug, setStoreSlug] = useState('');
   
-  const [formData, setFormData] = useState({
-    name: '', description: '', price: '', imageUrl: '', stockQuantity: 1000, isActive: true,
-    templateType: initialTemplate, category: '',
-    galleryImages: ['', '', '', '', '', ''],
-    storyMedia: [{ url: '', type: 'image' }, { url: '', type: 'image' }, { url: '', type: 'image' }, { url: '', type: 'image' }],
-    storyTitle: 'See it in Action',
-    testimonials: [{ name: '', role: '', quote: '', avatar: '' }],
+  const [selectedTemplate, setSelectedTemplate] = useState(searchParams.get('template') || 'quick-decision');
+  const [formData, setFormData] = useState(getInitialFormData());
+  const [expandedSections, setExpandedSections] = useState({
+    basic: true, gallery: false, stories: false, testimonials: false,
+    packages: false, dietary: false, specifications: false, eventDetails: false, tickets: false, policies: false
   });
 
-  useEffect(() => { loadProducts(); loadStoreUrl(); loadCategories(); }, []);
+  useEffect(() => { loadProducts(); loadStoreInfo(); }, []);
 
+  // ===========================================
+  // DATA LOADING
+  // ===========================================
   const loadProducts = async () => {
     try {
       const response = await productsAPI.getAll();
-      setProducts(response.data?.products || []);
-    } catch (error) { console.error('Failed to load products:', error); }
-    finally { setLoading(false); }
+      const prods = response.data?.products || response.data || [];
+      setProducts(Array.isArray(prods) ? prods : []);
+    } catch (error) { 
+      console.error('Failed to load products:', error);
+      setProducts([]);
+    } finally { 
+      setLoading(false); 
+    }
   };
 
-  const loadStoreUrl = async () => {
+  const loadStoreInfo = async () => {
     try {
       const response = await settingsAPI.getAll();
-      const subdomain = response.data?.settings?.subdomain;
-      if (subdomain) {
-        const baseUrl = import.meta.env.VITE_STORE_URL || 'https://jariecommstore.netlify.app';
-        setStoreUrl(`${baseUrl}/s/${subdomain}`);
+      const store = response.data;
+      if (store?.slug) {
+        setStoreSlug(store.slug);
+        const baseUrl = window.location.hostname === 'localhost' 
+          ? 'http://localhost:5173' 
+          : 'https://jariecomstore.netlify.app';
+        setStoreUrl(`${baseUrl}?store=${store.slug}`);
       }
-    } catch (error) { console.error('Failed to load store URL:', error); }
+    } catch (error) { 
+      console.error('Failed to load store info:', error); 
+    }
   };
 
-  const loadCategories = async () => {
-    try {
-      const response = await settingsAPI.getAll();
-      setCategories(response.data?.settings?.categories || []);
-    } catch (error) { console.error('Failed to load categories:', error); }
-  };
-
-  const viewProduct = (productId) => { if (storeUrl) window.open(`${storeUrl}?product=${productId}`, '_blank'); };
-  const viewCollections = () => { if (storeUrl) window.open(storeUrl, '_blank'); };
-
+  // ===========================================
+  // FORM HANDLERS
+  // ===========================================
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const submitData = {
-        ...formData,
-        templateType: selectedTemplate,
-        galleryImages: formData.galleryImages.filter(url => url?.trim()),
-        storyMedia: formData.storyMedia.filter(s => s.url?.trim()),
-        testimonials: formData.testimonials.filter(t => t.name?.trim() && t.quote?.trim()),
+      // Build V2 JSONB structure
+      const productPayload = {
+        template: selectedTemplate,
+        status: 'active',
+        data: {
+          name: formData.name,
+          description: formData.description,
+          price: parseFloat(formData.price) || 0,
+          stock: parseInt(formData.stock) || 999,
+          category: formData.category,
+          
+          // Stories title
+          storyTitle: formData.storyTitle,
+          
+          // Testimonials (filtered)
+          testimonials: formData.testimonials.filter(t => t.text?.trim() && t.author?.trim()),
+          
+          // Policies
+          policies: {
+            delivery: formData.deliveryInfo,
+            returns: formData.returnPolicy,
+            payment: formData.paymentInfo,
+          },
+          
+          // Template-specific data
+          ...(selectedTemplate === 'portfolio-booking' && {
+            packages: formData.packages.filter(p => p.name?.trim()),
+            bookingNote: formData.bookingNote,
+          }),
+          
+          ...(selectedTemplate === 'visual-menu' && {
+            dietaryTags: formData.dietaryTags,
+            prepTime: formData.prepTime,
+            calories: formData.calories,
+            allergens: formData.allergens,
+          }),
+          
+          ...(selectedTemplate === 'deep-dive' && {
+            specifications: formData.specifications.filter(s => s.label?.trim()),
+            warranty: formData.warranty,
+            trustBadges: formData.trustBadges,
+          }),
+          
+          ...(selectedTemplate === 'event-landing' && {
+            eventDate: formData.eventDate,
+            eventTime: formData.eventTime,
+            venue: formData.venue,
+            venueAddress: formData.venueAddress,
+            tickets: formData.tickets.filter(t => t.name?.trim()),
+          }),
+        },
+        media: {
+          images: formData.images.filter(url => url?.trim()),
+          stories: formData.stories.filter(s => s.url?.trim()),
+        },
       };
-      
+
       if (editingProduct) {
-        await productsAPI.update(editingProduct.id, submitData);
+        await productsAPI.update(editingProduct.id, productPayload);
       } else {
-        await productsAPI.create(submitData);
+        await productsAPI.create(productPayload);
       }
+      
       resetForm();
       loadProducts();
+      alert('✅ Product saved successfully!');
     } catch (error) {
       console.error('Failed to save product:', error);
       alert('Failed to save product. Please try again.');
@@ -92,21 +231,67 @@ export default function ProductsPage() {
 
   const handleEdit = (product) => {
     setEditingProduct(product);
-    setSelectedTemplate(product.template_type || 'quick-decision');
+    setSelectedTemplate(product.template || 'quick-decision');
+    
+    const data = product.data || {};
+    const media = product.media || {};
+    const policies = data.policies || {};
+    
     setFormData({
-      name: product.name || '',
-      description: product.description || '',
-      price: product.price || '',
-      imageUrl: product.image_url || '',
-      stockQuantity: product.stock_quantity || 1000,
-      isActive: product.is_active !== false,
-      templateType: product.template_type || 'quick-decision',
-      category: product.category || '',
-      galleryImages: parseArray(product.gallery_images, 6),
-      storyMedia: parseStoryMedia(product.story_media),
-      storyTitle: product.story_title || 'See it in Action',
-      testimonials: parseTestimonials(product.testimonials),
+      ...getInitialFormData(),
+      // Basic
+      name: data.name || '',
+      description: data.description || '',
+      price: data.price || '',
+      stock: data.stock || 999,
+      category: data.category || '',
+      
+      // Media
+      images: [...(media.images || []), '', '', '', '', '', ''].slice(0, 6),
+      stories: [...(media.stories || []), 
+        { url: '', type: 'image', caption: '' },
+        { url: '', type: 'image', caption: '' },
+        { url: '', type: 'image', caption: '' },
+        { url: '', type: 'image', caption: '' }
+      ].slice(0, 4),
+      storyTitle: data.storyTitle || 'See it in Action',
+      
+      // Testimonials
+      testimonials: data.testimonials?.length > 0 
+        ? data.testimonials 
+        : [{ text: '', author: '', rating: 5 }],
+      
+      // Policies
+      deliveryInfo: policies.delivery || '',
+      returnPolicy: policies.returns || '',
+      paymentInfo: policies.payment || '',
+      
+      // Template-specific
+      packages: data.packages?.length > 0 
+        ? data.packages 
+        : [{ name: '', description: '', price: '', duration: '' }],
+      bookingNote: data.bookingNote || '',
+      
+      dietaryTags: data.dietaryTags || [],
+      prepTime: data.prepTime || '',
+      calories: data.calories || '',
+      allergens: data.allergens || '',
+      
+      specifications: data.specifications?.length > 0
+        ? data.specifications
+        : [{ label: '', value: '' }],
+      warranty: data.warranty || '',
+      trustBadges: data.trustBadges || [],
+      
+      eventDate: data.eventDate || '',
+      eventTime: data.eventTime || '',
+      venue: data.venue || '',
+      venueAddress: data.venueAddress || '',
+      tickets: data.tickets?.length > 0
+        ? data.tickets
+        : [{ name: '', price: '', description: '', available: 100 }],
     });
+    
     setShowModal(true);
   };
 
@@ -115,196 +300,708 @@ export default function ProductsPage() {
     try {
       await productsAPI.delete(id);
       setProducts(products.filter(p => p.id !== id));
-    } catch (error) { alert('Failed to delete product.'); loadProducts(); }
+    } catch (error) { 
+      console.error('Delete failed:', error);
+      alert('Failed to delete product.'); 
+    }
   };
 
-  const toggleActive = async (product) => {
+  const toggleStatus = async (product) => {
+    const newStatus = product.status === 'active' ? 'draft' : 'active';
     try {
-      await productsAPI.update(product.id, { ...product, isActive: !product.is_active });
-      setProducts(products.map(p => p.id === product.id ? { ...p, is_active: !p.is_active } : p));
-    } catch (error) { alert('Failed to update product.'); }
+      await productsAPI.update(product.id, { status: newStatus });
+      setProducts(products.map(p => p.id === product.id ? { ...p, status: newStatus } : p));
+    } catch (error) { 
+      alert('Failed to update status.'); 
+    }
   };
 
   const resetForm = () => {
-    setFormData({
-      name: '', description: '', price: '', imageUrl: '', stockQuantity: 1000, isActive: true,
-      templateType: 'quick-decision', category: '',
-      galleryImages: ['', '', '', '', '', ''],
-      storyMedia: [{ url: '', type: 'image' }, { url: '', type: 'image' }, { url: '', type: 'image' }, { url: '', type: 'image' }],
-      storyTitle: 'See it in Action',
-      testimonials: [{ name: '', role: '', quote: '', avatar: '' }],
-    });
+    setFormData(getInitialFormData());
     setEditingProduct(null);
     setSelectedTemplate('quick-decision');
     setShowModal(false);
+    setExpandedSections({ basic: true, gallery: false, stories: false, testimonials: false,
+      packages: false, dietary: false, specifications: false, eventDetails: false, tickets: false, policies: false });
   };
 
-  const parseArray = (json, length) => {
-    try { const arr = Array.isArray(json) ? json : JSON.parse(json || '[]'); return [...arr, ...Array(length).fill('')].slice(0, length); }
-    catch { return Array(length).fill(''); }
+  const toggleSection = (section) => {
+    setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
   };
 
-  const parseStoryMedia = (json) => {
-    const defaults = [{ url: '', type: 'image' }, { url: '', type: 'image' }, { url: '', type: 'image' }, { url: '', type: 'image' }];
-    try { const arr = Array.isArray(json) ? json : JSON.parse(json || '[]'); return [...arr, ...defaults].slice(0, 4).map(s => ({ url: s?.url || '', type: s?.type || 'image' })); }
-    catch { return defaults; }
-  };
+  const updateField = (field, value) => setFormData(prev => ({ ...prev, [field]: value }));
 
-  const parseTestimonials = (json) => {
-    const def = [{ name: '', role: '', quote: '', avatar: '' }];
-    try { const arr = Array.isArray(json) ? json : JSON.parse(json || '[]'); return arr.length > 0 ? arr : def; }
-    catch { return def; }
-  };
+  // ===========================================
+  // RENDER HELPERS
+  // ===========================================
+  const SectionHeader = ({ section, title, icon }) => (
+    <div style={styles.sectionHeader} onClick={() => toggleSection(section)}>
+      <span>{icon} {title}</span>
+      {expandedSections[section] ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+    </div>
+  );
 
-  const addCategory = () => {
-    if (!newCategoryName.trim()) return;
-    setCategories([...categories, { name: newCategoryName.trim(), emoji: newCategoryEmoji }]);
-    setNewCategoryName(''); setNewCategoryEmoji('📦');
-  };
+  const templateConfig = TEMPLATES[selectedTemplate];
+  const showField = (field) => templateConfig?.fields?.includes(field);
 
-  const saveCategories = async () => {
-    try {
-      await settingsAPI.update({ categories });
-      alert('Categories saved!');
-      setShowCategoryModal(false);
-    } catch (error) { alert('Failed to save categories'); }
-  };
+  // ===========================================
+  // LOADING STATE
+  // ===========================================
+  if (loading) {
+    return (
+      <div style={styles.loadingContainer}>
+        <div style={styles.spinner}></div>
+        <p>Loading products...</p>
+      </div>
+    );
+  }
 
-  if (loading) return <div style={styles.loadingContainer}><div style={styles.spinner}></div><p>Loading products...</p></div>;
-
+  // ===========================================
+  // MAIN RENDER
+  // ===========================================
   return (
     <div className="fade-in">
+      {/* Header */}
       <div style={styles.header}>
         <div>
           <h1 style={styles.title}>Products</h1>
-          <p style={styles.subtitle}>Manage your product catalog</p>
+          <p style={styles.subtitle}>Manage your product catalog ({products.length} products)</p>
         </div>
         <div style={styles.headerActions}>
-          <button onClick={() => setShowCategoryModal(true)} style={styles.categoryBtn}><Tag size={18} /> Categories</button>
-          {products.length > 0 && storeUrl && (
-            <button onClick={viewCollections} style={styles.viewCollectionsBtn}><Eye size={18} /> View Store</button>
+          {storeUrl && (
+            <button onClick={() => window.open(storeUrl, '_blank')} style={styles.viewBtn}>
+              <Eye size={18} /> View Store
+            </button>
           )}
-          <button onClick={() => setShowModal(true)} className="btn btn-primary"><Plus size={20} /> Add Product</button>
+          <button onClick={() => setShowModal(true)} className="btn btn-primary">
+            <Plus size={20} /> Add Product
+          </button>
         </div>
       </div>
-
-      {/* Category Modal */}
-      {showCategoryModal && (
-        <div style={styles.modalOverlay} onClick={() => setShowCategoryModal(false)}>
-          <div style={styles.categoryModal} className="glass-card" onClick={(e) => e.stopPropagation()}>
-            <div style={styles.modalHeader}><h2 style={styles.modalTitle}>Manage Categories</h2><button onClick={() => setShowCategoryModal(false)} style={styles.closeBtn}><X size={24} /></button></div>
-            <div style={styles.formGroup}>
-              <label style={styles.label}>ADD CATEGORY</label>
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <input type="text" value={newCategoryEmoji} onChange={(e) => setNewCategoryEmoji(e.target.value)} placeholder="📦" style={{ width: '60px', textAlign: 'center' }} className="dashboard-input" />
-                <input type="text" value={newCategoryName} onChange={(e) => setNewCategoryName(e.target.value)} placeholder="Category name" style={{ flex: 1 }} className="dashboard-input" onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addCategory())} />
-                <button onClick={addCategory} className="btn btn-primary" style={{ padding: '10px 16px' }}><Plus size={18} /></button>
-              </div>
-            </div>
-            <div style={styles.formGroup}>
-              <label style={styles.label}>CATEGORIES ({categories.length})</label>
-              {categories.length === 0 ? <p style={styles.hint}>No categories yet</p> : (
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                  {categories.map((cat, idx) => (
-                    <div key={idx} style={styles.categoryTag}><span>{cat.emoji} {cat.name}</span><button onClick={() => setCategories(categories.filter((_, i) => i !== idx))} style={styles.categoryRemoveBtn}>×</button></div>
-                  ))}
-                </div>
-              )}
-            </div>
-            <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
-              <button onClick={() => setShowCategoryModal(false)} style={styles.cancelBtn}>Cancel</button>
-              <button onClick={saveCategories} className="btn btn-primary" style={{ flex: 1 }}>Save</button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Product Modal */}
       {showModal && (
         <div style={styles.modalOverlay} onClick={resetForm}>
-          <div style={styles.modal} className="glass-card" onClick={(e) => e.stopPropagation()}>
-            <div style={styles.modalHeader}><h2 style={styles.modalTitle}>{editingProduct ? 'Edit Product' : 'Add Product'}</h2><button onClick={resetForm} style={styles.closeBtn}><X size={24} /></button></div>
+          <div style={styles.modal} className="glass-card" onClick={e => e.stopPropagation()}>
+            <div style={styles.modalHeader}>
+              <h2 style={styles.modalTitle}>
+                {editingProduct ? 'Edit Product' : 'Add Product'}
+              </h2>
+              <button onClick={resetForm} style={styles.closeBtn}><X size={24} /></button>
+            </div>
+
             <form onSubmit={handleSubmit} style={styles.form}>
               {/* Template Selector */}
-              <div style={styles.templateSelector}>
-                <label style={styles.label}>TEMPLATE</label>
+              <div style={styles.templateSection}>
+                <label style={styles.label}>SELECT TEMPLATE</label>
                 <div style={styles.templateGrid}>
-                  {Object.entries(TEMPLATE_CONFIG).map(([key, config]) => (
-                    <div key={key} onClick={() => setSelectedTemplate(key)} style={{ ...styles.templateCard, border: selectedTemplate === key ? '2px solid var(--accent-color)' : '1px solid var(--border-color)', background: selectedTemplate === key ? 'var(--accent-light)' : 'var(--bg-tertiary)' }}>
-                      <div style={styles.templateCardHeader}><span style={styles.templateName}>{config.name}</span><span style={styles.templatePrice}>KES {config.price}</span></div>
-                      <p style={styles.templateDesc}>{config.description}</p>
+                  {Object.entries(TEMPLATES).map(([key, config]) => (
+                    <div
+                      key={key}
+                      onClick={() => setSelectedTemplate(key)}
+                      style={{
+                        ...styles.templateCard,
+                        border: selectedTemplate === key ? '2px solid var(--accent-color)' : '1px solid var(--border-color)',
+                        background: selectedTemplate === key ? 'var(--accent-light)' : 'var(--bg-tertiary)',
+                      }}
+                    >
+                      <div style={styles.templateIcon}>{config.icon}</div>
+                      <div style={styles.templateInfo}>
+                        <span style={styles.templateName}>{config.name}</span>
+                        <span style={styles.templatePrice}>KES {config.price}</span>
+                      </div>
                     </div>
                   ))}
                 </div>
+                <p style={styles.templateDesc}>{templateConfig?.description}</p>
               </div>
 
-              {/* Basic Fields */}
-              <div style={styles.formGroup}><label style={styles.label}>PRODUCT NAME</label><input type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="Premium Ankara Dress" required className="dashboard-input" /></div>
-              
-              {categories.length > 0 && (
-                <div style={styles.formGroup}>
-                  <label style={styles.label}>CATEGORY</label>
-                  <select value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })} className="dashboard-input dashboard-select">
-                    <option value="">-- No Category --</option>
-                    {categories.map((cat, idx) => <option key={idx} value={cat.name}>{cat.emoji} {cat.name}</option>)}
-                  </select>
+              {/* BASIC INFO */}
+              <div style={styles.section}>
+                <SectionHeader section="basic" title="Basic Information" icon="📝" />
+                {expandedSections.basic && (
+                  <div style={styles.sectionContent}>
+                    <div style={styles.formGroup}>
+                      <label style={styles.label}>PRODUCT NAME *</label>
+                      <input
+                        type="text"
+                        value={formData.name}
+                        onChange={e => updateField('name', e.target.value)}
+                        placeholder="e.g. Premium Ankara Dress"
+                        required
+                        className="dashboard-input"
+                      />
+                    </div>
+                    <div style={styles.formGroup}>
+                      <label style={styles.label}>DESCRIPTION</label>
+                      <textarea
+                        value={formData.description}
+                        onChange={e => updateField('description', e.target.value)}
+                        placeholder="Describe your product..."
+                        rows={3}
+                        className="dashboard-input"
+                      />
+                    </div>
+                    <div style={styles.formRow}>
+                      <div style={styles.formGroup}>
+                        <label style={styles.label}>PRICE (KES) *</label>
+                        <input
+                          type="number"
+                          value={formData.price}
+                          onChange={e => updateField('price', e.target.value)}
+                          placeholder="2500"
+                          required
+                          className="dashboard-input"
+                        />
+                      </div>
+                      <div style={styles.formGroup}>
+                        <label style={styles.label}>STOCK</label>
+                        <input
+                          type="number"
+                          value={formData.stock}
+                          onChange={e => updateField('stock', e.target.value)}
+                          placeholder="999"
+                          className="dashboard-input"
+                        />
+                      </div>
+                    </div>
+                    <div style={styles.formGroup}>
+                      <label style={styles.label}>CATEGORY</label>
+                      <input
+                        type="text"
+                        value={formData.category}
+                        onChange={e => updateField('category', e.target.value)}
+                        placeholder="e.g. Dresses, Electronics, Food"
+                        className="dashboard-input"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* GALLERY */}
+              {showField('gallery') && (
+                <div style={styles.section}>
+                  <SectionHeader section="gallery" title="Gallery Images" icon="🖼️" />
+                  {expandedSections.gallery && (
+                    <div style={styles.sectionContent}>
+                      <p style={styles.hint}>Add up to 6 product images (paste URLs)</p>
+                      <div style={styles.imageGrid}>
+                        {formData.images.map((url, idx) => (
+                          <div key={idx} style={styles.imageInput}>
+                            <input
+                              type="url"
+                              value={url}
+                              onChange={e => {
+                                const newImages = [...formData.images];
+                                newImages[idx] = e.target.value;
+                                updateField('images', newImages);
+                              }}
+                              placeholder={`Image ${idx + 1} URL`}
+                              className="dashboard-input"
+                            />
+                            {url && <img src={url} alt="" style={styles.imagePreview} />}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
-              <div style={styles.formGroup}><label style={styles.label}>DESCRIPTION</label><textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="Beautiful handcrafted dress..." rows="3" className="dashboard-input" /></div>
-
-              <div style={styles.formRow}>
-                <div style={styles.formGroup}><label style={styles.label}>PRICE (KES)</label><input type="number" value={formData.price} onChange={(e) => setFormData({ ...formData, price: e.target.value })} placeholder="2500" required className="dashboard-input" /></div>
-                <div style={styles.formGroup}><label style={styles.label}>STOCK</label><input type="number" value={formData.stockQuantity} onChange={(e) => setFormData({ ...formData, stockQuantity: e.target.value })} placeholder="1000" className="dashboard-input" /></div>
-              </div>
-
-              <div style={styles.formGroup}><label style={styles.label}>MAIN IMAGE URL</label><input type="url" value={formData.imageUrl} onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })} placeholder="https://example.com/image.jpg" className="dashboard-input" /></div>
-
-              {/* Gallery */}
-              <div style={styles.imagesSection}>
-                <label style={styles.label}>GALLERY IMAGES (Up to 6)</label>
-                <div style={styles.galleryGrid}>
-                  {formData.galleryImages.map((img, idx) => (
-                    <input key={idx} type="url" value={img} onChange={(e) => { const newImgs = [...formData.galleryImages]; newImgs[idx] = e.target.value; setFormData({ ...formData, galleryImages: newImgs }); }} placeholder={`Image ${idx + 1}`} className="dashboard-input" />
-                  ))}
-                </div>
-              </div>
-
-              {/* Story Media */}
-              <div style={styles.storySection}>
-                <label style={styles.label}>STORY MEDIA (Instagram-style circles)</label>
-                <input type="text" value={formData.storyTitle} onChange={(e) => setFormData({ ...formData, storyTitle: e.target.value })} placeholder="See it in Action" className="dashboard-input" style={{ marginBottom: '12px' }} />
-                <div style={styles.storyGrid}>
-                  {formData.storyMedia.map((story, idx) => (
-                    <div key={idx} style={styles.storyInput}>
-                      <input type="url" value={story.url} onChange={(e) => { const newStories = [...formData.storyMedia]; newStories[idx] = { ...newStories[idx], url: e.target.value }; setFormData({ ...formData, storyMedia: newStories }); }} placeholder={`Story ${idx + 1} URL`} className="dashboard-input" />
-                      <select value={story.type} onChange={(e) => { const newStories = [...formData.storyMedia]; newStories[idx] = { ...newStories[idx], type: e.target.value }; setFormData({ ...formData, storyMedia: newStories }); }} className="dashboard-input dashboard-select" style={{ marginTop: '4px' }}>
-                        <option value="image">Image</option>
-                        <option value="video">Video</option>
-                      </select>
+              {/* STORIES */}
+              {showField('stories') && (
+                <div style={styles.section}>
+                  <SectionHeader section="stories" title="Story Highlights" icon="📱" />
+                  {expandedSections.stories && (
+                    <div style={styles.sectionContent}>
+                      <div style={styles.formGroup}>
+                        <label style={styles.label}>STORY SECTION TITLE</label>
+                        <input
+                          type="text"
+                          value={formData.storyTitle}
+                          onChange={e => updateField('storyTitle', e.target.value)}
+                          placeholder="See it in Action"
+                          className="dashboard-input"
+                        />
+                      </div>
+                      <p style={styles.hint}>Instagram-style story circles (up to 4)</p>
+                      <div style={styles.storiesGrid}>
+                        {formData.stories.map((story, idx) => (
+                          <div key={idx} style={styles.storyInput}>
+                            <input
+                              type="url"
+                              value={story.url}
+                              onChange={e => {
+                                const newStories = [...formData.stories];
+                                newStories[idx] = { ...newStories[idx], url: e.target.value };
+                                updateField('stories', newStories);
+                              }}
+                              placeholder={`Story ${idx + 1} URL`}
+                              className="dashboard-input"
+                            />
+                            <select
+                              value={story.type}
+                              onChange={e => {
+                                const newStories = [...formData.stories];
+                                newStories[idx] = { ...newStories[idx], type: e.target.value };
+                                updateField('stories', newStories);
+                              }}
+                              className="dashboard-input"
+                              style={{ marginTop: '4px' }}
+                            >
+                              <option value="image">Image</option>
+                              <option value="video">Video</option>
+                            </select>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  ))}
+                  )}
                 </div>
-              </div>
+              )}
 
-              {/* Testimonials */}
-              <div style={styles.testimonialsSection}>
-                <label style={styles.label}>TESTIMONIALS</label>
-                {formData.testimonials.map((testimonial, idx) => (
-                  <div key={idx} style={styles.testimonialCard}>
-                    <div style={styles.formRow}>
-                      <input type="text" value={testimonial.name} onChange={(e) => { const newTest = [...formData.testimonials]; newTest[idx] = { ...newTest[idx], name: e.target.value }; setFormData({ ...formData, testimonials: newTest }); }} placeholder="Name" className="dashboard-input" />
-                      <input type="text" value={testimonial.role} onChange={(e) => { const newTest = [...formData.testimonials]; newTest[idx] = { ...newTest[idx], role: e.target.value }; setFormData({ ...formData, testimonials: newTest }); }} placeholder="Role (optional)" className="dashboard-input" />
+              {/* TESTIMONIALS */}
+              {showField('testimonials') && (
+                <div style={styles.section}>
+                  <SectionHeader section="testimonials" title="Testimonials" icon="⭐" />
+                  {expandedSections.testimonials && (
+                    <div style={styles.sectionContent}>
+                      {formData.testimonials.map((testimonial, idx) => (
+                        <div key={idx} style={styles.testimonialCard}>
+                          <div style={styles.formRow}>
+                            <input
+                              type="text"
+                              value={testimonial.author}
+                              onChange={e => {
+                                const newT = [...formData.testimonials];
+                                newT[idx] = { ...newT[idx], author: e.target.value };
+                                updateField('testimonials', newT);
+                              }}
+                              placeholder="Customer name"
+                              className="dashboard-input"
+                            />
+                            <select
+                              value={testimonial.rating}
+                              onChange={e => {
+                                const newT = [...formData.testimonials];
+                                newT[idx] = { ...newT[idx], rating: parseInt(e.target.value) };
+                                updateField('testimonials', newT);
+                              }}
+                              className="dashboard-input"
+                            >
+                              {[5,4,3,2,1].map(n => <option key={n} value={n}>{n} Stars</option>)}
+                            </select>
+                          </div>
+                          <textarea
+                            value={testimonial.text}
+                            onChange={e => {
+                              const newT = [...formData.testimonials];
+                              newT[idx] = { ...newT[idx], text: e.target.value };
+                              updateField('testimonials', newT);
+                            }}
+                            placeholder="Their review..."
+                            rows={2}
+                            className="dashboard-input"
+                            style={{ marginTop: '8px' }}
+                          />
+                          {formData.testimonials.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() => updateField('testimonials', formData.testimonials.filter((_, i) => i !== idx))}
+                              style={styles.removeBtn}
+                            >
+                              Remove
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                      <button
+                        type="button"
+                        onClick={() => updateField('testimonials', [...formData.testimonials, { text: '', author: '', rating: 5 }])}
+                        style={styles.addBtn}
+                      >
+                        + Add Testimonial
+                      </button>
                     </div>
-                    <textarea value={testimonial.quote} onChange={(e) => { const newTest = [...formData.testimonials]; newTest[idx] = { ...newTest[idx], quote: e.target.value }; setFormData({ ...formData, testimonials: newTest }); }} placeholder="Their testimonial..." rows="2" className="dashboard-input" style={{ marginTop: '8px' }} />
+                  )}
+                </div>
+              )}
+
+              {/* SERVICE PACKAGES (portfolio-booking) */}
+              {showField('packages') && (
+                <div style={styles.section}>
+                  <SectionHeader section="packages" title="Service Packages" icon="📦" />
+                  {expandedSections.packages && (
+                    <div style={styles.sectionContent}>
+                      {formData.packages.map((pkg, idx) => (
+                        <div key={idx} style={styles.packageCard}>
+                          <div style={styles.formRow}>
+                            <input
+                              type="text"
+                              value={pkg.name}
+                              onChange={e => {
+                                const newP = [...formData.packages];
+                                newP[idx] = { ...newP[idx], name: e.target.value };
+                                updateField('packages', newP);
+                              }}
+                              placeholder="Package name"
+                              className="dashboard-input"
+                            />
+                            <input
+                              type="number"
+                              value={pkg.price}
+                              onChange={e => {
+                                const newP = [...formData.packages];
+                                newP[idx] = { ...newP[idx], price: e.target.value };
+                                updateField('packages', newP);
+                              }}
+                              placeholder="Price (KES)"
+                              className="dashboard-input"
+                            />
+                          </div>
+                          <input
+                            type="text"
+                            value={pkg.duration}
+                            onChange={e => {
+                              const newP = [...formData.packages];
+                              newP[idx] = { ...newP[idx], duration: e.target.value };
+                              updateField('packages', newP);
+                            }}
+                            placeholder="Duration (e.g. 1 hour, 3 days)"
+                            className="dashboard-input"
+                            style={{ marginTop: '8px' }}
+                          />
+                          <textarea
+                            value={pkg.description}
+                            onChange={e => {
+                              const newP = [...formData.packages];
+                              newP[idx] = { ...newP[idx], description: e.target.value };
+                              updateField('packages', newP);
+                            }}
+                            placeholder="What's included..."
+                            rows={2}
+                            className="dashboard-input"
+                            style={{ marginTop: '8px' }}
+                          />
+                        </div>
+                      ))}
+                      <button
+                        type="button"
+                        onClick={() => updateField('packages', [...formData.packages, { name: '', description: '', price: '', duration: '' }])}
+                        style={styles.addBtn}
+                      >
+                        + Add Package
+                      </button>
+                      <div style={{ marginTop: '16px' }}>
+                        <label style={styles.label}>BOOKING NOTE</label>
+                        <input
+                          type="text"
+                          value={formData.bookingNote}
+                          onChange={e => updateField('bookingNote', e.target.value)}
+                          placeholder="e.g. Booking requires 50% deposit"
+                          className="dashboard-input"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* DIETARY INFO (visual-menu) */}
+              {showField('dietary') && (
+                <div style={styles.section}>
+                  <SectionHeader section="dietary" title="Food Details" icon="🍽️" />
+                  {expandedSections.dietary && (
+                    <div style={styles.sectionContent}>
+                      <div style={styles.formRow}>
+                        <div style={styles.formGroup}>
+                          <label style={styles.label}>PREP TIME</label>
+                          <input
+                            type="text"
+                            value={formData.prepTime}
+                            onChange={e => updateField('prepTime', e.target.value)}
+                            placeholder="e.g. 15-20 mins"
+                            className="dashboard-input"
+                          />
+                        </div>
+                        <div style={styles.formGroup}>
+                          <label style={styles.label}>CALORIES</label>
+                          <input
+                            type="text"
+                            value={formData.calories}
+                            onChange={e => updateField('calories', e.target.value)}
+                            placeholder="e.g. 450 kcal"
+                            className="dashboard-input"
+                          />
+                        </div>
+                      </div>
+                      <div style={styles.formGroup}>
+                        <label style={styles.label}>DIETARY TAGS</label>
+                        <input
+                          type="text"
+                          value={formData.dietaryTags.join(', ')}
+                          onChange={e => updateField('dietaryTags', e.target.value.split(',').map(t => t.trim()).filter(Boolean))}
+                          placeholder="Vegetarian, Gluten-Free, Halal (comma separated)"
+                          className="dashboard-input"
+                        />
+                      </div>
+                      <div style={styles.formGroup}>
+                        <label style={styles.label}>ALLERGENS</label>
+                        <input
+                          type="text"
+                          value={formData.allergens}
+                          onChange={e => updateField('allergens', e.target.value)}
+                          placeholder="e.g. Contains nuts, dairy"
+                          className="dashboard-input"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* SPECIFICATIONS (deep-dive) */}
+              {showField('specifications') && (
+                <div style={styles.section}>
+                  <SectionHeader section="specifications" title="Specifications" icon="📋" />
+                  {expandedSections.specifications && (
+                    <div style={styles.sectionContent}>
+                      {formData.specifications.map((spec, idx) => (
+                        <div key={idx} style={styles.specRow}>
+                          <input
+                            type="text"
+                            value={spec.label}
+                            onChange={e => {
+                              const newS = [...formData.specifications];
+                              newS[idx] = { ...newS[idx], label: e.target.value };
+                              updateField('specifications', newS);
+                            }}
+                            placeholder="Spec name (e.g. Material)"
+                            className="dashboard-input"
+                          />
+                          <input
+                            type="text"
+                            value={spec.value}
+                            onChange={e => {
+                              const newS = [...formData.specifications];
+                              newS[idx] = { ...newS[idx], value: e.target.value };
+                              updateField('specifications', newS);
+                            }}
+                            placeholder="Value (e.g. 100% Cotton)"
+                            className="dashboard-input"
+                          />
+                        </div>
+                      ))}
+                      <button
+                        type="button"
+                        onClick={() => updateField('specifications', [...formData.specifications, { label: '', value: '' }])}
+                        style={styles.addBtn}
+                      >
+                        + Add Spec
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* WARRANTY (deep-dive) */}
+              {showField('warranty') && (
+                <div style={styles.section}>
+                  <SectionHeader section="warranty" title="Warranty & Trust" icon="🛡️" />
+                  {expandedSections.warranty && (
+                    <div style={styles.sectionContent}>
+                      <div style={styles.formGroup}>
+                        <label style={styles.label}>WARRANTY INFO</label>
+                        <textarea
+                          value={formData.warranty}
+                          onChange={e => updateField('warranty', e.target.value)}
+                          placeholder="e.g. 1 year manufacturer warranty..."
+                          rows={3}
+                          className="dashboard-input"
+                        />
+                      </div>
+                      <div style={styles.formGroup}>
+                        <label style={styles.label}>TRUST BADGES</label>
+                        <input
+                          type="text"
+                          value={formData.trustBadges.join(', ')}
+                          onChange={e => updateField('trustBadges', e.target.value.split(',').map(t => t.trim()).filter(Boolean))}
+                          placeholder="Original Product, Fast Shipping, Money Back (comma separated)"
+                          className="dashboard-input"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* EVENT DETAILS (event-landing) */}
+              {showField('eventDetails') && (
+                <div style={styles.section}>
+                  <SectionHeader section="eventDetails" title="Event Details" icon="📅" />
+                  {expandedSections.eventDetails && (
+                    <div style={styles.sectionContent}>
+                      <div style={styles.formRow}>
+                        <div style={styles.formGroup}>
+                          <label style={styles.label}>EVENT DATE</label>
+                          <input
+                            type="date"
+                            value={formData.eventDate}
+                            onChange={e => updateField('eventDate', e.target.value)}
+                            className="dashboard-input"
+                          />
+                        </div>
+                        <div style={styles.formGroup}>
+                          <label style={styles.label}>EVENT TIME</label>
+                          <input
+                            type="time"
+                            value={formData.eventTime}
+                            onChange={e => updateField('eventTime', e.target.value)}
+                            className="dashboard-input"
+                          />
+                        </div>
+                      </div>
+                      <div style={styles.formGroup}>
+                        <label style={styles.label}>VENUE NAME</label>
+                        <input
+                          type="text"
+                          value={formData.venue}
+                          onChange={e => updateField('venue', e.target.value)}
+                          placeholder="e.g. KICC Nairobi"
+                          className="dashboard-input"
+                        />
+                      </div>
+                      <div style={styles.formGroup}>
+                        <label style={styles.label}>VENUE ADDRESS</label>
+                        <input
+                          type="text"
+                          value={formData.venueAddress}
+                          onChange={e => updateField('venueAddress', e.target.value)}
+                          placeholder="Full address"
+                          className="dashboard-input"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* TICKETS (event-landing) */}
+              {showField('tickets') && (
+                <div style={styles.section}>
+                  <SectionHeader section="tickets" title="Ticket Tiers" icon="🎟️" />
+                  {expandedSections.tickets && (
+                    <div style={styles.sectionContent}>
+                      {formData.tickets.map((ticket, idx) => (
+                        <div key={idx} style={styles.ticketCard}>
+                          <div style={styles.formRow}>
+                            <input
+                              type="text"
+                              value={ticket.name}
+                              onChange={e => {
+                                const newT = [...formData.tickets];
+                                newT[idx] = { ...newT[idx], name: e.target.value };
+                                updateField('tickets', newT);
+                              }}
+                              placeholder="Tier name (e.g. Early Bird)"
+                              className="dashboard-input"
+                            />
+                            <input
+                              type="number"
+                              value={ticket.price}
+                              onChange={e => {
+                                const newT = [...formData.tickets];
+                                newT[idx] = { ...newT[idx], price: e.target.value };
+                                updateField('tickets', newT);
+                              }}
+                              placeholder="Price (KES)"
+                              className="dashboard-input"
+                            />
+                          </div>
+                          <div style={styles.formRow}>
+                            <input
+                              type="text"
+                              value={ticket.description}
+                              onChange={e => {
+                                const newT = [...formData.tickets];
+                                newT[idx] = { ...newT[idx], description: e.target.value };
+                                updateField('tickets', newT);
+                              }}
+                              placeholder="What's included"
+                              className="dashboard-input"
+                            />
+                            <input
+                              type="number"
+                              value={ticket.available}
+                              onChange={e => {
+                                const newT = [...formData.tickets];
+                                newT[idx] = { ...newT[idx], available: parseInt(e.target.value) };
+                                updateField('tickets', newT);
+                              }}
+                              placeholder="Available qty"
+                              className="dashboard-input"
+                            />
+                          </div>
+                        </div>
+                      ))}
+                      <button
+                        type="button"
+                        onClick={() => updateField('tickets', [...formData.tickets, { name: '', price: '', description: '', available: 100 }])}
+                        style={styles.addBtn}
+                      >
+                        + Add Ticket Tier
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* POLICIES */}
+              <div style={styles.section}>
+                <SectionHeader section="policies" title="Policies (Optional)" icon="📜" />
+                {expandedSections.policies && (
+                  <div style={styles.sectionContent}>
+                    <div style={styles.formGroup}>
+                      <label style={styles.label}>DELIVERY INFO</label>
+                      <textarea
+                        value={formData.deliveryInfo}
+                        onChange={e => updateField('deliveryInfo', e.target.value)}
+                        placeholder="Delivery times, areas covered..."
+                        rows={2}
+                        className="dashboard-input"
+                      />
+                    </div>
+                    <div style={styles.formGroup}>
+                      <label style={styles.label}>RETURN POLICY</label>
+                      <textarea
+                        value={formData.returnPolicy}
+                        onChange={e => updateField('returnPolicy', e.target.value)}
+                        placeholder="Return conditions..."
+                        rows={2}
+                        className="dashboard-input"
+                      />
+                    </div>
+                    <div style={styles.formGroup}>
+                      <label style={styles.label}>PAYMENT INFO</label>
+                      <textarea
+                        value={formData.paymentInfo}
+                        onChange={e => updateField('paymentInfo', e.target.value)}
+                        placeholder="Payment methods accepted..."
+                        rows={2}
+                        className="dashboard-input"
+                      />
+                    </div>
                   </div>
-                ))}
-                <button type="button" onClick={() => setFormData({ ...formData, testimonials: [...formData.testimonials, { name: '', role: '', quote: '', avatar: '' }] })} style={styles.addBtn}>+ Add Testimonial</button>
+                )}
               </div>
 
+              {/* Form Actions */}
               <div style={styles.formActions}>
                 <button type="button" onClick={resetForm} style={styles.cancelBtn}>Cancel</button>
-                <button type="submit" className="btn btn-primary">{editingProduct ? 'Update' : 'Add Product'}</button>
+                <button type="submit" className="btn btn-primary">
+                  {editingProduct ? 'Update Product' : 'Create Product'}
+                </button>
               </div>
             </form>
           </div>
@@ -320,41 +1017,75 @@ export default function ProductsPage() {
         </div>
       ) : (
         <div style={styles.grid}>
-          {products.map((product) => (
-            <div key={product.id} style={styles.card} className="glass-card">
-              <div style={styles.productImage}>
-                {product.image_url ? <img src={product.image_url} alt={product.name} style={styles.image} /> : <div style={styles.placeholder}>📸</div>}
-                <div style={{ ...styles.badge, background: product.is_active ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)', color: product.is_active ? '#22c55e' : '#ef4444' }}>
-                  {product.is_active ? '● Live' : '● Draft'}
-                </div>
-                {product.template_type && <div style={styles.templateBadge}>{TEMPLATE_CONFIG[product.template_type]?.name?.split(' ')[0] || 'Quick'}</div>}
-              </div>
-              <div style={styles.cardContent}>
-                <h3 style={styles.productName}>{product.name}</h3>
-                <p style={styles.productDesc}>{product.description || 'No description'}</p>
-                <div style={styles.productFooter}>
-                  <div>
-                    <p style={styles.price}>KES {parseInt(product.price).toLocaleString()}</p>
-                    <p style={styles.stock}>Stock: {product.stock_quantity}</p>
+          {products.map(product => {
+            const data = product.data || {};
+            const media = product.media || {};
+            const mainImage = media.images?.[0] || null;
+            const isActive = product.status === 'active';
+            const templateInfo = TEMPLATES[product.template] || TEMPLATES['quick-decision'];
+            
+            return (
+              <div key={product.id} style={styles.card} className="glass-card">
+                <div style={styles.productImage}>
+                  {mainImage 
+                    ? <img src={mainImage} alt={data.name} style={styles.image} />
+                    : <div style={styles.placeholder}>📸</div>
+                  }
+                  <div style={{
+                    ...styles.badge,
+                    background: isActive ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)',
+                    color: isActive ? '#22c55e' : '#ef4444',
+                  }}>
+                    {isActive ? '● Live' : '● Draft'}
                   </div>
-                  <div style={styles.actions}>
-                    <button onClick={() => toggleActive(product)} style={{ ...styles.iconBtn, background: product.is_active ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)', color: product.is_active ? '#22c55e' : '#ef4444' }} title={product.is_active ? 'Hide' : 'Show'}>
-                      {product.is_active ? <Eye size={16} /> : <EyeOff size={16} />}
-                    </button>
-                    {storeUrl && <button onClick={() => viewProduct(product.id)} style={styles.iconBtn} title="View"><ExternalLink size={16} /></button>}
-                    <button onClick={() => handleEdit(product)} style={styles.iconBtn} title="Edit"><Edit size={16} /></button>
-                    <button onClick={() => handleDelete(product.id)} style={styles.deleteBtn} title="Delete"><Trash2 size={16} /></button>
+                  <div style={styles.templateBadge}>{templateInfo.icon}</div>
+                </div>
+                <div style={styles.cardContent}>
+                  <h3 style={styles.productName}>{data.name || 'Untitled'}</h3>
+                  <p style={styles.productDesc}>{data.description || 'No description'}</p>
+                  <div style={styles.productFooter}>
+                    <div>
+                      <p style={styles.price}>KES {parseInt(data.price || 0).toLocaleString()}</p>
+                      <p style={styles.stock}>Stock: {data.stock || '∞'}</p>
+                    </div>
+                    <div style={styles.actions}>
+                      <button 
+                        onClick={() => toggleStatus(product)} 
+                        style={{...styles.iconBtn, background: isActive ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)', color: isActive ? '#22c55e' : '#ef4444'}}
+                        title={isActive ? 'Set to Draft' : 'Set to Live'}
+                      >
+                        {isActive ? <Eye size={16} /> : <EyeOff size={16} />}
+                      </button>
+                      {storeUrl && (
+                        <button 
+                          onClick={() => window.open(`${storeUrl}&product=${product.id}`, '_blank')} 
+                          style={styles.iconBtn} 
+                          title="View in Store"
+                        >
+                          <ExternalLink size={16} />
+                        </button>
+                      )}
+                      <button onClick={() => handleEdit(product)} style={styles.iconBtn} title="Edit">
+                        <Edit size={16} />
+                      </button>
+                      <button onClick={() => handleDelete(product.id)} style={styles.deleteBtn} title="Delete">
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
   );
 }
 
+// ===========================================
+// STYLES
+// ===========================================
 const styles = {
   loadingContainer: { display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', color: 'var(--text-muted)' },
   spinner: { width: '40px', height: '40px', border: '3px solid var(--border-color)', borderTopColor: 'var(--accent-color)', borderRadius: '50%', animation: 'spin 1s linear infinite', marginBottom: '16px' },
@@ -363,44 +1094,50 @@ const styles = {
   title: { fontSize: '34px', fontWeight: '700', marginBottom: '6px', color: 'var(--text-primary)', letterSpacing: '-0.025em' },
   subtitle: { fontSize: '15px', color: 'var(--text-muted)' },
   headerActions: { display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' },
-  categoryBtn: { display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 16px', background: 'var(--glass-bg)', border: '1px solid var(--border-color)', borderRadius: '10px', color: 'var(--text-secondary)', fontSize: '13px', fontWeight: '600', cursor: 'pointer' },
-  viewCollectionsBtn: { display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 16px', background: 'var(--accent-light)', border: '1px solid var(--border-color)', borderRadius: '10px', color: 'var(--accent-color)', fontSize: '13px', fontWeight: '600', cursor: 'pointer' },
+  viewBtn: { display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 16px', background: 'var(--accent-light)', border: '1px solid var(--border-color)', borderRadius: '10px', color: 'var(--accent-color)', fontSize: '13px', fontWeight: '600', cursor: 'pointer' },
   
-  modalOverlay: { position: 'fixed', inset: 0, background: 'rgba(0, 0, 0, 0.7)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' },
-  modal: { width: '100%', maxWidth: '700px', maxHeight: '90vh', overflowY: 'auto', padding: '32px' },
-  categoryModal: { width: '100%', maxWidth: '500px', padding: '32px' },
+  modalOverlay: { position: 'fixed', inset: 0, background: 'rgba(0, 0, 0, 0.7)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', zIndex: 1000, padding: '20px', overflowY: 'auto' },
+  modal: { width: '100%', maxWidth: '700px', padding: '32px', margin: '20px 0' },
   modalHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' },
   modalTitle: { fontSize: '24px', fontWeight: '700', color: 'var(--text-primary)' },
   closeBtn: { background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' },
   
-  form: { display: 'flex', flexDirection: 'column', gap: '20px' },
+  form: { display: 'flex', flexDirection: 'column', gap: '16px' },
   formGroup: { display: 'flex', flexDirection: 'column', gap: '8px' },
-  formRow: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' },
+  formRow: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' },
   label: { fontSize: '11px', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' },
-  hint: { fontSize: '12px', color: 'var(--text-muted)' },
+  hint: { fontSize: '12px', color: 'var(--text-muted)', marginBottom: '8px' },
   
-  templateSelector: { padding: '16px', background: 'var(--bg-tertiary)', borderRadius: '12px' },
-  templateGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '10px', marginTop: '10px' },
-  templateCard: { padding: '12px', borderRadius: '10px', cursor: 'pointer', transition: 'all 0.2s' },
-  templateCardHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' },
-  templateName: { fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)' },
-  templatePrice: { fontSize: '11px', fontWeight: '600', color: 'var(--accent-color)' },
-  templateDesc: { fontSize: '11px', color: 'var(--text-muted)', lineHeight: '1.4' },
+  templateSection: { padding: '16px', background: 'var(--bg-tertiary)', borderRadius: '12px', marginBottom: '8px' },
+  templateGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '8px', marginTop: '10px' },
+  templateCard: { padding: '12px', borderRadius: '10px', cursor: 'pointer', transition: 'all 0.2s', textAlign: 'center' },
+  templateIcon: { fontSize: '24px', marginBottom: '6px' },
+  templateInfo: { display: 'flex', flexDirection: 'column', gap: '2px' },
+  templateName: { fontSize: '12px', fontWeight: '600', color: 'var(--text-primary)' },
+  templatePrice: { fontSize: '10px', fontWeight: '600', color: 'var(--accent-color)' },
+  templateDesc: { fontSize: '12px', color: 'var(--text-muted)', marginTop: '10px', textAlign: 'center' },
   
-  imagesSection: { display: 'flex', flexDirection: 'column', gap: '10px' },
-  galleryGrid: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' },
-  storySection: { display: 'flex', flexDirection: 'column', gap: '10px', padding: '16px', background: 'var(--accent-light)', borderRadius: '12px' },
-  storyGrid: { display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px' },
+  section: { border: '1px solid var(--border-color)', borderRadius: '12px', overflow: 'hidden' },
+  sectionHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 16px', background: 'var(--bg-tertiary)', cursor: 'pointer', fontSize: '14px', fontWeight: '600', color: 'var(--text-primary)' },
+  sectionContent: { padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' },
+  
+  imageGrid: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' },
+  imageInput: { display: 'flex', flexDirection: 'column', gap: '4px' },
+  imagePreview: { width: '100%', height: '60px', objectFit: 'cover', borderRadius: '6px' },
+  
+  storiesGrid: { display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px' },
   storyInput: { display: 'flex', flexDirection: 'column' },
-  testimonialsSection: { display: 'flex', flexDirection: 'column', gap: '12px' },
-  testimonialCard: { padding: '12px', background: 'var(--bg-tertiary)', borderRadius: '10px' },
-  addBtn: { padding: '10px', background: 'var(--bg-tertiary)', border: '1px dashed var(--border-color)', borderRadius: '8px', color: 'var(--text-muted)', fontSize: '13px', cursor: 'pointer' },
   
-  formActions: { display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '8px' },
+  testimonialCard: { padding: '12px', background: 'var(--bg-tertiary)', borderRadius: '10px', position: 'relative' },
+  packageCard: { padding: '12px', background: 'var(--bg-tertiary)', borderRadius: '10px', marginBottom: '8px' },
+  ticketCard: { padding: '12px', background: 'var(--bg-tertiary)', borderRadius: '10px', marginBottom: '8px' },
+  specRow: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '8px' },
+  
+  addBtn: { padding: '10px', background: 'var(--bg-tertiary)', border: '1px dashed var(--border-color)', borderRadius: '8px', color: 'var(--text-muted)', fontSize: '13px', cursor: 'pointer', width: '100%' },
+  removeBtn: { position: 'absolute', top: '8px', right: '8px', background: 'rgba(239,68,68,0.1)', border: 'none', color: '#ef4444', fontSize: '11px', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' },
+  
+  formActions: { display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '16px', paddingTop: '16px', borderTop: '1px solid var(--border-color)' },
   cancelBtn: { padding: '12px 24px', borderRadius: '10px', background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', color: 'var(--text-secondary)', fontWeight: '600', cursor: 'pointer' },
-  
-  categoryTag: { display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 12px', background: 'var(--accent-light)', border: '1px solid var(--border-color)', borderRadius: '20px', color: 'var(--text-secondary)', fontSize: '13px' },
-  categoryRemoveBtn: { background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '16px', fontWeight: '700', padding: '0 4px' },
   
   grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' },
   card: { overflow: 'hidden', borderRadius: '14px' },
@@ -408,7 +1145,7 @@ const styles = {
   image: { width: '100%', height: '100%', objectFit: 'cover' },
   placeholder: { width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '40px' },
   badge: { position: 'absolute', top: '10px', right: '10px', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: '600' },
-  templateBadge: { position: 'absolute', top: '10px', left: '10px', padding: '4px 8px', borderRadius: '5px', fontSize: '10px', fontWeight: '700', background: 'var(--accent-color)', color: 'white' },
+  templateBadge: { position: 'absolute', top: '10px', left: '10px', width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' },
   cardContent: { padding: '14px 16px' },
   productName: { fontSize: '15px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
   productDesc: { fontSize: '12px', color: 'var(--text-muted)', marginBottom: '12px', lineHeight: '1.5', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' },

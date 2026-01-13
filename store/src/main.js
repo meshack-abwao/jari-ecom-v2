@@ -108,7 +108,65 @@ function renderProductView(product) {
   initGalleryHandlers(product);
   initStoryHandlers(product);
   initPolicyHandlers();
+  initPackageTicketHandlers(product);
   initCheckout();
+}
+
+// ===========================================
+// PACKAGE & TICKET HANDLERS (Template-specific)
+// ===========================================
+function initPackageTicketHandlers(product) {
+  // Package selection (portfolio-booking template)
+  document.querySelectorAll('.package-select-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const price = Number(btn.dataset.price || 0);
+      setState({ quantity: 1 });
+      
+      // Update price displays
+      const displayPrice = document.getElementById('displayPrice');
+      const totalValue = document.getElementById('totalValue');
+      if (displayPrice) displayPrice.textContent = price.toLocaleString();
+      if (totalValue) totalValue.textContent = price.toLocaleString();
+      
+      // Highlight selected package
+      document.querySelectorAll('.package-card').forEach(card => {
+        card.classList.remove('featured');
+      });
+      btn.closest('.package-card')?.classList.add('featured');
+      
+      // Store selected package price in state for checkout
+      setState({ selectedPrice: price });
+      
+      // Open checkout
+      openCheckout();
+    });
+  });
+  
+  // Ticket selection (event-landing template)
+  document.querySelectorAll('.ticket-select-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const price = Number(btn.dataset.price || 0);
+      setState({ quantity: 1 });
+      
+      // Update price displays
+      const displayPrice = document.getElementById('displayPrice');
+      const totalValue = document.getElementById('totalValue');
+      if (displayPrice) displayPrice.textContent = price.toLocaleString();
+      if (totalValue) totalValue.textContent = price.toLocaleString();
+      
+      // Highlight selected ticket
+      document.querySelectorAll('.ticket-card').forEach(card => {
+        card.classList.remove('featured');
+      });
+      btn.closest('.ticket-card')?.classList.add('featured');
+      
+      // Store selected ticket price in state for checkout
+      setState({ selectedPrice: price });
+      
+      // Open checkout
+      openCheckout();
+    });
+  });
 }
 
 // ===========================================

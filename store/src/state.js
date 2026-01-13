@@ -5,6 +5,7 @@ export const state = {
   products: [],
   currentProduct: null,
   quantity: 1,
+  selectedPrice: null,  // For package/ticket selection
   paymentMethod: null
 };
 
