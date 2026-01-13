@@ -140,10 +140,10 @@
    TESTIMONIALS - Left aligned, clean look
    =========================================== */
 .testimonials-section {
-    margin: 24px 16px;
-    padding: 24px 20px;
+    margin: 24px 0;
+    padding: 24px 16px;
     background: rgba(0,0,0,0.02);
-    border-radius: 16px;
+    border-radius: 0;
     border: none;
 }
 
