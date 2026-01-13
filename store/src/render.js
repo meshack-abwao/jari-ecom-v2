@@ -54,9 +54,9 @@ export function renderFooter() {
     <footer class="store-footer">
       <div class="powered-by">
         <span>Powered by</span>
-        <a href="https://jari.store" target="_blank" rel="noopener" class="powered-link">
+        <a href="https://jarisolutionsecom.store" target="_blank" rel="noopener" class="powered-link">
           <span class="powered-logo">🛍️</span>
-          <span class="powered-name">Jari.Store</span>
+          <span class="powered-name">Jari.Ecom</span>
         </a>
       </div>
       ${hasAnyPolicy ? `
@@ -247,7 +247,12 @@ function renderQuickDecision(product) {
             <h2 class="product-name">${data.name || 'Product'}</h2>
             <div class="product-actions">
               <button class="action-btn" id="likeBtn" title="Save">🤍</button>
-              <button class="action-btn" id="shareBtn" title="Share">📤</button>
+              <button class="action-btn" id="shareBtn" title="Share">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="22" y1="2" x2="11" y2="13"></line>
+                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+              </button>
             </div>
           </div>
           

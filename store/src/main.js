@@ -329,7 +329,12 @@ function initStoryHandlers(product) {
     viewer?.classList.remove('active');
     document.body.style.overflow = '';
     clearTimeout(storyTimer);
-    progressBars.forEach(bar => bar.classList.remove('active'));
+    // Reset all progress bars
+    progressBars.forEach(bar => {
+      bar.classList.remove('active', 'viewed');
+      const fill = bar.querySelector('.story-progress-fill');
+      if (fill) fill.style.width = '0%';
+    });
   }
   
   function showStory(index) {
@@ -343,18 +348,31 @@ function initStoryHandlers(product) {
     
     // Update progress bars
     progressBars.forEach((bar, i) => {
-      bar.classList.remove('active');
+      const fill = bar.querySelector('.story-progress-fill');
+      bar.classList.remove('active', 'viewed');
+      
       if (i < index) {
-        bar.querySelector('.story-progress-fill').style.width = '100%';
+        // Already viewed - full
+        bar.classList.add('viewed');
+        if (fill) fill.style.width = '100%';
       } else if (i === index) {
-        bar.querySelector('.story-progress-fill').style.width = '0%';
-        bar.classList.add('active');
+        // Current - animate
+        if (fill) {
+          fill.style.width = '0%';
+          // Force reflow to restart animation
+          void fill.offsetWidth;
+        }
+        // Small delay to ensure CSS transition kicks in
+        setTimeout(() => {
+          bar.classList.add('active');
+        }, 50);
       } else {
-        bar.querySelector('.story-progress-fill').style.width = '0%';
+        // Not yet viewed - empty
+        if (fill) fill.style.width = '0%';
       }
     });
     
-    // Auto-advance
+    // Auto-advance after 5 seconds
     clearTimeout(storyTimer);
     storyTimer = setTimeout(() => showStory(index + 1), 5000);
   }
@@ -382,6 +400,21 @@ function initStoryHandlers(product) {
   // Close on overlay click
   viewer?.addEventListener('click', (e) => {
     if (e.target === viewer) closeStory();
+  });
+  
+  // Tap left/right to navigate
+  storyImage?.addEventListener('click', (e) => {
+    const rect = storyImage.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const width = rect.width;
+    
+    if (x < width / 3) {
+      // Left third - go back
+      if (currentStoryIndex > 0) showStory(currentStoryIndex - 1);
+    } else {
+      // Right two thirds - go forward
+      showStory(currentStoryIndex + 1);
+    }
   });
 }
 
