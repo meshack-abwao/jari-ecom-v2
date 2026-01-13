@@ -106,6 +106,8 @@ function renderStorePolicyModals(policies) {
 // PRODUCTS GRID (Collections View)
 // ===========================================
 export function renderProductsGrid(products) {
+  const { store } = state;
+  
   if (!products || products.length === 0) {
     return `
       <div class="empty-state">
@@ -116,12 +118,28 @@ export function renderProductsGrid(products) {
     `;
   }
   
+  // Get categories from store config
+  const categories = store.categories || [];
+  const collectionTitle = store.collection_title || 'Shop All Products';
+  const collectionSubtitle = store.collection_subtitle || '';
+  
+  // Build category filter HTML
+  const categoryFilterHTML = categories.length > 0 ? `
+    <div class="category-filters">
+      <button class="category-pill active" data-category="all">All</button>
+      ${categories.map(cat => `
+        <button class="category-pill" data-category="${cat.name}">${cat.emoji} ${cat.name}</button>
+      `).join('')}
+    </div>
+  ` : '';
+  
   return `
     <div class="collections-container">
       <div class="collections-header">
-        <h2>Shop All Products</h2>
-        <p>${products.length} ${products.length === 1 ? 'Product' : 'Products'} Available</p>
+        <h2>${collectionTitle}</h2>
+        <p>${collectionSubtitle || `${products.length} ${products.length === 1 ? 'Product' : 'Products'} Available`}</p>
       </div>
+      ${categoryFilterHTML}
       <div class="collections-grid">
         ${products.map(product => renderProductCard(product)).join('')}
       </div>

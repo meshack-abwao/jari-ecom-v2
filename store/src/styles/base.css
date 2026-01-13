@@ -189,6 +189,41 @@ body {
     letter-spacing: var(--ls-normal);
 }
 
+/* Category Filters - V1 Pattern */
+.category-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-2xl);
+    justify-content: flex-start;
+}
+
+.category-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-sm) var(--space-lg);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    font-size: var(--fs-small);
+    font-weight: 500;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.category-pill:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.category-pill.active {
+    background: var(--gradient-primary);
+    border-color: transparent;
+    color: white;
+}
+
 .collections-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));

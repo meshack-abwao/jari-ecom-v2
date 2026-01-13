@@ -81,6 +81,10 @@ router.get('/:slug', async (req, res, next) => {
             link: config.hero_cta_secondary_link || config.heroCtaSecondaryLink || '',
           },
         },
+        // Categories & Collection
+        categories: config.categories || [],
+        collection_title: config.collection_title || 'Shop All Products',
+        collection_subtitle: config.collection_subtitle || '',
         // Testimonials
         show_testimonials: config.show_testimonials !== false,
         testimonials: config.testimonials || [],

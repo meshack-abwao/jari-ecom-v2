@@ -610,13 +610,20 @@ export default function ProductsPage() {
                     </div>
                     <div style={styles.formGroup}>
                       <label style={styles.label}>CATEGORY</label>
-                      <input
-                        type="text"
+                      <select
                         value={formData.category}
                         onChange={e => updateField('category', e.target.value)}
-                        placeholder="e.g. Dresses, Electronics, Food"
                         className="dashboard-input"
-                      />
+                        style={styles.select}
+                      >
+                        <option value="">Select a category...</option>
+                        {categories.map((cat, idx) => (
+                          <option key={idx} value={cat.name}>{cat.emoji} {cat.name}</option>
+                        ))}
+                      </select>
+                      {categories.length === 0 && (
+                        <p style={styles.hint}>No categories yet. Click "Categories" button to add some.</p>
+                      )}
                     </div>
                   </div>
                 )}
@@ -1343,4 +1350,5 @@ const styles = {
   categoryModal: { width: '100%', maxWidth: '500px', padding: '28px' },
   categoryTag: { display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', background: 'var(--accent-light)', border: '1px solid var(--border-color)', borderRadius: '8px', fontSize: '14px', color: 'var(--text-primary)' },
   categoryRemoveBtn: { background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '18px', cursor: 'pointer', padding: '0 4px', lineHeight: 1 },
+  select: { cursor: 'pointer' },
 };
