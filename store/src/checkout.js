@@ -249,6 +249,23 @@ async function completeOrder() {
   goToStep('stepLoading');
   
   const { store, currentProduct, quantity, selectedPrice } = state;
+  
+  console.log('Checkout state:', { store, currentProduct, quantity, selectedPrice });
+  
+  if (!store || !store.slug) {
+    console.error('Store or slug is missing!', store);
+    alert('Store information missing. Please refresh the page.');
+    goToStep('step3');
+    return;
+  }
+  
+  if (!currentProduct || !currentProduct.id) {
+    console.error('Product or product ID is missing!', currentProduct);
+    alert('Product information missing. Please refresh the page.');
+    goToStep('step3');
+    return;
+  }
+  
   const data = currentProduct.data || {};
   // Use selectedPrice if set (from package/ticket selection), otherwise use base price
   const price = selectedPrice || Number(data.price || 0);

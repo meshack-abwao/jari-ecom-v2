@@ -22,17 +22,24 @@ export async function createOrder(slug, orderData) {
     payment: orderData.payment
   };
   
+  console.log('Creating order with payload:', JSON.stringify(payload, null, 2));
+  console.log('API URL:', API_URL);
+  
   const res = await fetch(`${API_URL}/api/orders`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)
   });
   
+  console.log('Response status:', res.status);
+  
   if (!res.ok) {
     const error = await res.json().catch(() => ({}));
+    console.error('Order API error:', error);
     throw new Error(error.error || 'Order failed');
   }
   
   const result = await res.json();
+  console.log('Order created:', result);
   return { success: true, order_number: result.order_number };
 }
