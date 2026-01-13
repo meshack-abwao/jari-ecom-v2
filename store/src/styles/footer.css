@@ -140,10 +140,11 @@
    TESTIMONIALS - Left aligned, clean look
    =========================================== */
 .testimonials-section {
-    margin: 20px 0;
-    padding: 20px 0;
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
+    margin: 24px 16px;
+    padding: 24px 20px;
+    background: rgba(0,0,0,0.02);
+    border-radius: 16px;
+    border: none;
 }
 
 .testimonials-scroll {
@@ -152,7 +153,6 @@
     overflow-x: auto;
     padding-bottom: 8px;
     -webkit-overflow-scrolling: touch;
-    /* Left-aligned, not centered */
     justify-content: flex-start;
 }
 
@@ -166,23 +166,24 @@
 }
 
 .testimonials-scroll::-webkit-scrollbar-thumb {
-    background: var(--border);
+    background: rgba(0,0,0,0.1);
     border-radius: 2px;
 }
 
 .testimonial-card {
-    min-width: 260px;
-    max-width: 280px;
+    min-width: 240px;
+    max-width: 260px;
     padding: 16px;
-    background: var(--bg-gray);
-    border-radius: var(--radius-sm);
+    background: white;
+    border-radius: 12px;
     flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 
 /* Store testimonials in collections view */
 .store-testimonials .testimonials-scroll {
     justify-content: flex-start;
-    padding: 0 20px;
+    padding: 0;
 }
 
 /* ===========================================
