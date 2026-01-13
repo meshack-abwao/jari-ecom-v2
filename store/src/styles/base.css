@@ -1952,11 +1952,12 @@ body {
         max-height: none;
     }
     
-    /* Left column: Gallery Section - Sticky */
+    /* Left column: Gallery Section - Sticky from current position */
     .template-menu .gallery-column {
         position: sticky;
-        top: 20px;
+        top: 100px;              /* Stick when reaching ~100px from top */
         align-self: start;
+        height: fit-content;
     }
     
     .template-menu .menu-gallery {
@@ -1976,8 +1977,9 @@ body {
         justify-content: flex-start;
         background: white;
         gap: 10px;
-        border-radius: 0 0 16px 16px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        border-radius: 12px;
+        margin-top: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     }
     
     .template-menu .thumbnail {
