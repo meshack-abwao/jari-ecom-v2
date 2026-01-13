@@ -464,13 +464,13 @@ body {
 }
 
 .thumbnail {
-    width: clamp(40px, 10vw, 48px);   /* Smaller thumbnails */
-    height: clamp(40px, 10vw, 48px);
-    min-width: 40px;
-    border-radius: 6px;
+    width: clamp(36px, 9vw, 44px);   /* Smaller thumbnails */
+    height: clamp(36px, 9vw, 44px);
+    min-width: 36px;
+    border-radius: 10px;              /* Apple-style rounded */
     overflow: hidden;
     cursor: pointer;
-    border: 1.5px solid transparent;   /* Thinner premium border */
+    border: 1px solid transparent;    /* Ultra thin border */
     transition: all 0.2s ease;
     flex-shrink: 0;
 }
@@ -925,7 +925,7 @@ body {
 }
 
 /* ===========================================
-   MODAL
+   MODAL - Apple Premium Style
    =========================================== */
 .modal-overlay {
     position: fixed;
@@ -934,7 +934,7 @@ body {
     right: 0;
     bottom: 0;
     background: rgba(0,0,0,0.4);
-    backdrop-filter: blur(4px);
+    backdrop-filter: blur(8px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -952,9 +952,9 @@ body {
 
 .modal-content {
     background: var(--surface);
-    border-radius: var(--radius-lg);
-    padding: 32px 28px;
-    max-width: 480px;
+    border-radius: 20px;
+    padding: 28px 24px;
+    max-width: 420px;
     width: 100%;
     max-height: 90vh;
     overflow-y: auto;
@@ -969,14 +969,14 @@ body {
 
 .modal-close {
     position: absolute;
-    top: 16px;
-    right: 16px;
-    width: 36px;
-    height: 36px;
+    top: 14px;
+    right: 14px;
+    width: 32px;
+    height: 32px;
     border: none;
     background: var(--bg-gray);
     border-radius: 50%;
-    font-size: 18px;
+    font-size: 16px;
     cursor: pointer;
     transition: all 0.3s;
     color: var(--text-secondary);
@@ -988,7 +988,7 @@ body {
 }
 
 /* ===========================================
-   CHECKOUT STEPS
+   CHECKOUT STEPS - Apple Typography
    =========================================== */
 .checkout-step {
     display: none;
@@ -1005,68 +1005,74 @@ body {
 }
 
 .step-title {
-    font-size: var(--fs-heading-xl);
-    font-weight: 800;
-    margin-bottom: 24px;
+    font-size: var(--fs-heading-lg);
+    font-weight: var(--fw-bold);
+    margin-bottom: 20px;
     letter-spacing: -0.02em;
+    color: var(--text-primary);
 }
 
 .order-summary {
     background: var(--bg-gray);
-    padding: 20px;
-    border-radius: var(--radius-sm);
-    margin-bottom: 24px;
+    padding: 16px;
+    border-radius: 14px;
+    margin-bottom: 20px;
 }
 
 .summary-row {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 12px;
-    font-size: var(--fs-body);
+    margin-bottom: 10px;
+    font-size: var(--fs-caption);
 }
 
 .summary-row span:first-child {
     color: var(--text-secondary);
 }
 
+.summary-row span:last-child {
+    font-weight: var(--fw-medium);
+    color: var(--text-primary);
+}
+
 .summary-total {
     display: flex;
     justify-content: space-between;
-    padding-top: 12px;
-    margin-top: 12px;
+    padding-top: 10px;
+    margin-top: 10px;
     border-top: 1px solid var(--border);
-    font-weight: 700;
-    font-size: var(--fs-body-lg);
+    font-weight: var(--fw-semibold);
+    font-size: var(--fs-body);
 }
 
 /* ===========================================
-   CUSTOMER FORM
+   CUSTOMER FORM - Compact Premium
    =========================================== */
 .customer-form {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 14px;
 }
 
 .form-group {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
 }
 
 .form-group label {
-    font-size: var(--fs-label);
-    font-weight: 600;
-    color: var(--text-secondary);
+    font-size: var(--fs-micro);
+    font-weight: var(--fw-semibold);
+    color: var(--text-tertiary);
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
 .form-group input {
-    padding: 14px 16px;
+    padding: 12px 14px;
     border: 1px solid var(--border);
-    border-radius: 10px;
-    font-size: var(--fs-body-lg);
+    border-radius: 12px;
+    font-size: var(--fs-body);
     font-family: inherit;
     transition: all 0.3s;
 }
@@ -1078,21 +1084,21 @@ body {
 }
 
 /* ===========================================
-   PAYMENT OPTIONS
+   PAYMENT OPTIONS - Compact Premium
    =========================================== */
 .payment-options {
     display: grid;
-    gap: 14px;
-    margin-bottom: 28px;
+    gap: 10px;
+    margin-bottom: 20px;
 }
 
 .payment-option {
     display: flex;
     align-items: center;
-    gap: 16px;
-    padding: 20px 22px;
-    border: 2px solid var(--border);
-    border-radius: var(--radius);
+    gap: 12px;
+    padding: 14px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
     background: var(--surface);
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
@@ -1102,8 +1108,8 @@ body {
 .payment-option:hover {
     border-color: var(--color-primary);
     background: rgba(17, 153, 142, 0.02);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
 }
 
 .payment-option:active {
@@ -1112,8 +1118,8 @@ body {
 
 .payment-option.selected {
     border-color: var(--color-primary);
-    background: rgba(17, 153, 142, 0.05);
-    box-shadow: 0 4px 16px rgba(17, 153, 142, 0.15);
+    background: rgba(17, 153, 142, 0.04);
+    box-shadow: 0 2px 8px rgba(17, 153, 142, 0.1);
 }
 
 .payment-option.mpesa {
@@ -1122,12 +1128,12 @@ body {
 
 .payment-option.mpesa:hover,
 .payment-option.mpesa.selected {
-    background: rgba(0, 168, 107, 0.05);
+    background: rgba(0, 168, 107, 0.04);
     border-color: var(--success-green);
 }
 
 .payment-icon {
-    font-size: 36px;
+    font-size: 28px;
 }
 
 .payment-text-container {
@@ -1135,25 +1141,25 @@ body {
 }
 
 .payment-text {
-    font-size: var(--fs-body-lg);
-    font-weight: 600;
-    margin-bottom: 4px;
+    font-size: var(--fs-body);
+    font-weight: var(--fw-semibold);
+    margin-bottom: 2px;
     letter-spacing: -0.01em;
 }
 
 .payment-subtext {
-    font-size: var(--fs-small);
-    color: var(--text-secondary);
+    font-size: var(--fs-micro);
+    color: var(--text-tertiary);
 }
 
 .payment-checkmark {
-    width: 28px;
-    height: 28px;
+    width: 24px;
+    height: 24px;
     background: var(--success-green);
     color: white;
     border-radius: 50%;
-    font-size: var(--fs-body-lg);
-    font-weight: 700;
+    font-size: var(--fs-caption);
+    font-weight: var(--fw-bold);
     display: none;
     align-items: center;
     justify-content: center;

@@ -176,13 +176,45 @@
 }
 
 .testimonial-card {
-    min-width: 240px;
-    max-width: 260px;
-    padding: 16px;
+    min-width: 200px;
+    max-width: 220px;
+    padding: 14px;
     background: white;
-    border-radius: 12px;
+    border-radius: 14px;
     flex-shrink: 0;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    text-align: center;
+}
+
+.testimonial-card .avatar {
+    width: 44px;
+    height: 44px;
+    margin: 0 auto 10px;
+}
+
+.testimonial-card .quote {
+    font-size: var(--fs-caption);
+    font-style: italic;
+    color: var(--text-secondary);
+    line-height: 1.4;
+    margin-bottom: 10px;
+}
+
+.testimonial-card .name {
+    font-size: var(--fs-caption);
+    font-weight: var(--fw-semibold);
+    color: var(--text-primary);
+    margin-bottom: 2px;
+}
+
+.testimonial-card .role {
+    font-size: var(--fs-micro);
+    color: var(--text-tertiary);
+    margin-bottom: 6px;
+}
+
+.testimonial-card .stars {
+    font-size: 12px;
 }
 
 /* Store testimonials in collections view */
