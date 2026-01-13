@@ -15,10 +15,13 @@
     --fs-micro: 10px;
     --fs-tiny: 11px;
     --fs-small: 12px;
+    --fs-body-sm: 13px;   /* V1 parity */
     --fs-label: 13px;
     --fs-body: 15px;
     --fs-body-lg: 17px;
+    --fs-heading-sm: 18px;  /* V1 parity */
     --fs-heading: 20px;
+    --fs-heading-lg: 22px;  /* V1 parity */
     --fs-heading-xl: 24px;
     --fs-display: 28px;
     --fs-display-xl: 32px;
@@ -1260,9 +1263,9 @@ body {
     }
     
     .gallery-nav {
-        width: 36px;
-        height: 36px;
-        font-size: 16px;
+        width: var(--size-icon-sm);
+        height: var(--size-icon-sm);
+        font-size: var(--fs-body);  /* 15px - close to 16 */
     }
     
     /* V1 mobile story sizes */
@@ -2256,22 +2259,22 @@ body {
 }
 
 .testimonial-name {
-    font-size: 14px;
+    font-size: var(--fs-body-sm);  /* V1: 13px not 14px */
     font-weight: 700;
     color: var(--text-primary);
     margin-bottom: 2px;
 }
 
 .testimonial-role {
-    font-size: 12px;
+    font-size: var(--fs-small);  /* V1: 12px */
     color: var(--text-secondary);
 }
 
 .testimonial-rating {
     color: #ffc107;
-    font-size: 14px;
+    font-size: var(--fs-body-sm);  /* V1: 13px not 14px */
     letter-spacing: 2px;
-    margin-top: 8px;
+    margin-top: var(--space-sm);
 }
 
 /* Multiple testimonials - horizontal scroll on mobile */
@@ -2555,7 +2558,7 @@ body {
     border: 2px solid var(--border);
     background: white;
     color: var(--text-secondary);
-    font-size: 14px;
+    font-size: var(--fs-body-sm);  /* V1: 13px */
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
@@ -2636,14 +2639,14 @@ body {
 /* Hero CTA button */
 .header-cta {
     display: inline-block;
-    margin-top: 16px;
-    padding: 12px 28px;
+    margin-top: var(--space-lg);
+    padding: var(--space-md) 28px;
     background: rgba(255,255,255,0.2);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255,255,255,0.3);
     border-radius: 25px;
     color: white;
-    font-size: 14px;
+    font-size: var(--fs-body-sm);  /* V1: 13px */
     font-weight: 600;
     text-decoration: none;
     transition: all 0.3s;
@@ -2836,11 +2839,11 @@ textarea:focus-visible {
 }
 
 .availability-icon {
-    font-size: 20px;
+    font-size: var(--fs-heading);  /* 20px */
 }
 
 .availability-text {
-    font-size: 14px;
+    font-size: var(--fs-body-sm);  /* V1: 13px */
     color: var(--text-secondary);
     flex: 1;
 }
