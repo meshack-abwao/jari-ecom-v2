@@ -88,8 +88,42 @@ function renderCatalogView() {
     });
   });
   
+  // Add category filter handlers
+  initCategoryFilters();
+  
   initStorePolicyHandlers();
   initCheckout();
+}
+
+// ===========================================
+// CATEGORY FILTERS
+// ===========================================
+function initCategoryFilters() {
+  const pills = document.querySelectorAll('.category-pill');
+  const cards = document.querySelectorAll('.collection-card');
+  
+  pills.forEach(pill => {
+    pill.addEventListener('click', () => {
+      const category = pill.dataset.category;
+      
+      // Update active state
+      pills.forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      
+      // Filter cards
+      cards.forEach(card => {
+        const productId = card.dataset.productId;
+        const product = state.products.find(p => p.id === productId);
+        const productCategory = product?.data?.category || '';
+        
+        if (category === 'all' || productCategory === category) {
+          card.style.display = '';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+  });
 }
 
 // ===========================================
