@@ -1,14 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ordersAPI, productsAPI, settingsAPI } from '../api/client';
-import { DollarSign, ShoppingCart, Package, TrendingUp, ExternalLink, Eye, Calendar, LayoutGrid } from 'lucide-react';
+import { DollarSign, ShoppingCart, Package, TrendingUp, ExternalLink, Eye, Calendar, Clock } from 'lucide-react';
 
 export default function DashboardPage() {
-  const [stats, setStats] = useState({ total_orders: 0, pending_revenue: 0, total_revenue: 0 });
+  const [stats, setStats] = useState({ total: 0, pending: 0, delivered: 0, revenue: 0, pending_revenue: 0 });
   const [products, setProducts] = useState([]);
   const [storeUrl, setStoreUrl] = useState('');
   const [loading, setLoading] = useState(true);
-  const [timeFilter, setTimeFilter] = useState('all');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -17,37 +16,21 @@ export default function DashboardPage() {
 
   const loadData = async () => {
     try {
-      const [ordersRes, productsRes, settingsRes] = await Promise.all([
-        ordersAPI.getAll(),
+      const [statsRes, productsRes, settingsRes] = await Promise.all([
+        ordersAPI.getStats(),
         productsAPI.getAll(),
         settingsAPI.getAll()
       ]);
       
-      const orders = ordersRes.data?.orders || [];
-      const prods = productsRes.data?.products || [];
-      const settings = settingsRes.data?.settings || {};
+      setStats(statsRes.data || { total: 0, pending: 0, delivered: 0, revenue: 0, pending_revenue: 0 });
+      setProducts(productsRes.data?.products || []);
       
-      // Calculate stats from orders
-      const totalRevenue = orders
-        .filter(o => o.status === 'completed' || o.status === 'delivered')
-        .reduce((sum, o) => sum + parseFloat(o.total_amount || 0), 0);
-        
-      const pendingRevenue = orders
-        .filter(o => o.status === 'pending')
-        .reduce((sum, o) => sum + parseFloat(o.total_amount || 0), 0);
-      
-      setStats({
-        total_revenue: totalRevenue,
-        pending_revenue: pendingRevenue,
-        total_orders: orders.length,
-      });
-      
-      setProducts(prods);
-      
-      // Build store URL
-      if (settings.subdomain) {
+      // Build store URL from settings
+      const settings = settingsRes.data?.store || settingsRes.data?.settings || {};
+      const slug = settings.slug || settings.subdomain;
+      if (slug) {
         const baseUrl = import.meta.env.VITE_STORE_URL || 'https://jariecommstore.netlify.app';
-        setStoreUrl(`${baseUrl}/s/${settings.subdomain}`);
+        setStoreUrl(`${baseUrl}/?store=${slug}`);
       }
     } catch (error) {
       console.error('Failed to load data:', error);
@@ -58,7 +41,7 @@ export default function DashboardPage() {
 
   const viewProduct = (productId) => {
     if (storeUrl) {
-      window.open(`${storeUrl}?product=${productId}`, '_blank');
+      window.open(`${storeUrl}&product=${productId}`, '_blank');
     }
   };
 
@@ -80,27 +63,27 @@ export default function DashboardPage() {
   const statCards = [
     {
       title: 'Total Revenue',
-      value: `KES ${parseInt(stats?.total_revenue || 0).toLocaleString()}`,
+      value: `KES ${Number(stats.revenue || 0).toLocaleString()}`,
       icon: <DollarSign size={22} />,
       gradient: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
     },
     {
       title: 'Total Orders',
-      value: stats?.total_orders || 0,
+      value: stats.total || 0,
       icon: <ShoppingCart size={22} />,
       gradient: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)',
     },
     {
-      title: 'Active Products',
-      value: products.filter(p => p.is_active).length,
+      title: 'Completed',
+      value: stats.delivered || 0,
       icon: <Package size={22} />,
-      gradient: 'linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%)',
+      gradient: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
     },
     {
       title: 'Pending Revenue',
-      value: `KES ${parseInt(stats?.pending_revenue || 0).toLocaleString()}`,
-      icon: <TrendingUp size={22} />,
-      gradient: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+      value: `KES ${Number(stats.pending_revenue || 0).toLocaleString()}`,
+      icon: <Clock size={22} />,
+      gradient: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
     },
   ];
 
@@ -119,20 +102,6 @@ export default function DashboardPage() {
             </button>
           )}
         </div>
-      </div>
-
-      {/* Time Filter */}
-      <div style={styles.filterContainer}>
-        <Calendar size={16} style={{ color: 'var(--text-muted)' }} />
-        {['Today', 'Week', 'Month', 'All'].map((filter) => (
-          <button
-            key={filter}
-            onClick={() => setTimeFilter(filter.toLowerCase())}
-            className={`filter-btn ${timeFilter === filter.toLowerCase() ? 'active' : ''}`}
-          >
-            {filter}
-          </button>
-        ))}
       </div>
 
       {/* Stats Grid */}
@@ -179,40 +148,46 @@ export default function DashboardPage() {
             <h2 style={styles.sectionTitle}>Recent Products</h2>
             {products.length > 1 && storeUrl && (
               <button onClick={viewStore} style={styles.viewAllBtn}>
-                <Eye size={16} /> View Collections
+                <Eye size={16} /> View Store
               </button>
             )}
           </div>
           <div style={styles.productsList}>
-            {products.slice(0, 4).map((product) => (
-              <div key={product.id} className="glass-card product-card">
-                <div className="product-image">
-                  {product.image_url ? (
-                    <img src={product.image_url} alt={product.name} style={styles.productImg} />
-                  ) : (
-                    <div style={styles.productPlaceholder}>📸</div>
-                  )}
-                </div>
-                <div style={styles.productInfo}>
-                  <h3 className="product-name">{product.name}</h3>
-                  <p className="product-price">KES {parseInt(product.price).toLocaleString()}</p>
-                  <div style={styles.productFooter}>
-                    <span style={{
-                      ...styles.productStatus,
-                      background: product.is_active ? 'rgba(34, 197, 94, 0.15)' : 'rgba(239, 68, 68, 0.15)',
-                      color: product.is_active ? '#22c55e' : '#ef4444',
-                    }}>
-                      {product.is_active ? '● Live' : '● Draft'}
-                    </span>
-                    {storeUrl && (
-                      <button onClick={() => viewProduct(product.id)} style={styles.viewProductBtn}>
-                        <Eye size={14} /> View
-                      </button>
+            {products.slice(0, 4).map((product) => {
+              const data = product.data || {};
+              const media = product.media || {};
+              const imageUrl = media.images?.[0] || null;
+              
+              return (
+                <div key={product.id} className="glass-card product-card">
+                  <div className="product-image">
+                    {imageUrl ? (
+                      <img src={imageUrl} alt={data.name} style={styles.productImg} />
+                    ) : (
+                      <div style={styles.productPlaceholder}>📸</div>
                     )}
                   </div>
+                  <div style={styles.productInfo}>
+                    <h3 className="product-name">{data.name || 'Product'}</h3>
+                    <p className="product-price">KES {Number(data.price || 0).toLocaleString()}</p>
+                    <div style={styles.productFooter}>
+                      <span style={{
+                        ...styles.productStatus,
+                        background: product.status === 'active' ? 'rgba(34, 197, 94, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                        color: product.status === 'active' ? '#22c55e' : '#ef4444',
+                      }}>
+                        {product.status === 'active' ? '● Live' : '● Draft'}
+                      </span>
+                      {storeUrl && (
+                        <button onClick={() => viewProduct(product.id)} style={styles.viewProductBtn}>
+                          <Eye size={14} /> View
+                        </button>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}
@@ -242,8 +217,6 @@ const styles = {
   subtitle: { fontSize: '15px', color: 'var(--text-muted)', fontWeight: '400' },
   headerActions: { display: 'flex', gap: '12px' },
   viewStoreBtn: { display: 'flex', alignItems: 'center', gap: '8px' },
-  
-  filterContainer: { display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' },
   
   statsGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px', marginBottom: '40px' },
   
