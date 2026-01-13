@@ -10,7 +10,8 @@
 :root {
     /* ===========================================
        GOLDEN RATIO TYPOGRAPHY SYSTEM
-       Scale (1.618 ratio): 10 → 11 → 12 → 13 → 15 → 17 → 20 → 24
+       V1 Parity: Scaled down one notch for mobile
+       Scale: 10 → 11 → 12 → 13 → 15 → 17 → 20 → 24
        =========================================== */
     --fs-micro: 10px;
     --fs-tiny: 11px;
@@ -22,7 +23,7 @@
     --fs-heading-sm: 18px;  /* V1 parity */
     --fs-heading: 20px;
     --fs-heading-lg: 22px;  /* V1 parity */
-    --fs-heading-xl: 24px;
+    --fs-heading-xl: 24px;  /* V1 header name */
     --fs-display: 28px;
     --fs-display-xl: 32px;
     
@@ -40,7 +41,7 @@
     --space-5xl: 48px;
     
     /* ===========================================
-       COMPONENT SIZES
+       COMPONENT SIZES (V1 Parity)
        =========================================== */
     --size-icon-sm: 36px;
     --size-icon-md: 40px;
@@ -48,7 +49,7 @@
     --size-avatar: 56px;
     --size-story: 68px;
     --size-story-mobile: 60px;
-    --size-logo: 72px;
+    --size-logo: 64px;       /* V1: 64px (was 72px) */
     --size-spinner: 50px;
     
     /* Theme Colors - Overridden by JS */
@@ -110,11 +111,11 @@ body {
 .error-screen p { color: var(--text-secondary); }
 
 /* ===========================================
-   HEADER
+   HEADER (V1 Parity)
    =========================================== */
 .header {
     background: var(--gradient-primary);
-    padding: var(--space-4xl) var(--space-xl) var(--space-2xl);
+    padding: 48px 20px 32px;  /* V1 exact */
     text-align: center;
     color: white;
     min-height: 32vh;
@@ -125,12 +126,12 @@ body {
 }
 
 .logo {
-    width: var(--size-logo);
+    width: var(--size-logo);      /* 64px V1 */
     height: var(--size-logo);
-    margin: 0 auto var(--space-md);
+    margin: 0 auto 12px;          /* V1 exact */
     background: rgba(255,255,255,0.15);
     backdrop-filter: blur(10px);
-    border-radius: var(--radius-lg);
+    border-radius: 16px;          /* V1: 16px (not radius-lg) */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -138,25 +139,36 @@ body {
     font-weight: 700;
 }
 
+/* Logo with image - V1 ring style */
+.logo-image {
+    width: var(--size-logo);
+    height: var(--size-logo);
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 12px;
+    border: 3px solid rgba(255, 255, 255, 0.3);  /* V1 white ring */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
 .business-name {
-    font-size: var(--fs-heading-lg);
+    font-size: var(--fs-heading-xl);  /* V1: 24px */
     font-weight: 700;
-    margin-bottom: var(--space-xs);
-    letter-spacing: var(--ls-tight);
+    margin-bottom: 4px;               /* V1 exact */
+    letter-spacing: var(--ls-normal); /* V1: -0.01em */
 }
 
 .tagline {
-    font-size: var(--fs-body);
+    font-size: var(--fs-body-sm);     /* V1: 13px */
     font-weight: 400;
-    opacity: 0.85;
+    opacity: 0.9;                     /* V1 exact */
     letter-spacing: var(--ls-normal);
 }
 
 /* ===========================================
-   MAIN CONTAINER
+   MAIN CONTAINER (V1 Parity)
    =========================================== */
 .main {
-    padding: var(--space-3xl) var(--space-lg);  /* V1: 28px 16px - using closest vars */
+    padding: 28px 16px;  /* V1 exact */
     max-width: 1200px;
     margin: 0 auto;
 }
@@ -1292,7 +1304,7 @@ body {
 }
 
 /* ===========================================
-   RESPONSIVE
+   RESPONSIVE - Mobile First (V1 Parity)
    =========================================== */
 @media (max-width: 768px) {
     .collections-grid {
@@ -1306,12 +1318,23 @@ body {
 }
 
 @media (max-width: 600px) {
+    /* Header - V1 mobile */
     .header {
-        padding: 32px 16px 24px;
+        padding: 32px 12px 20px;  /* Reduced padding for edge feel */
+        min-height: 28vh;
+    }
+    
+    .business-name {
+        font-size: var(--fs-heading-lg);  /* 22px on mobile */
+    }
+    
+    /* Main content - tighter mobile spacing */
+    .main {
+        padding: 20px 12px;  /* V1-like edge-to-edge */
     }
     
     .modal-content {
-        padding: 24px 20px;
+        padding: 20px 16px;  /* Tighter modal */
     }
     
     .main-image-container {
@@ -1321,7 +1344,7 @@ body {
     .gallery-nav {
         width: var(--size-icon-sm);
         height: var(--size-icon-sm);
-        font-size: var(--fs-body);  /* 15px - close to 16 */
+        font-size: var(--fs-body);
     }
     
     /* V1 mobile story sizes */
@@ -1333,6 +1356,12 @@ body {
     
     .stories-strip {
         gap: var(--space-md);
+    }
+    
+    /* Category filters - tighter on mobile */
+    .category-filters {
+        margin-bottom: var(--space-lg);
+        padding: 0 4px;
     }
 }
 
