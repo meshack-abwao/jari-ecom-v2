@@ -1,6 +1,6 @@
 import { fetchStore } from './api.js';
 import { state, setState, getSlug, getProductId, setProductId } from './state.js';
-import { renderHeader, renderProductsGrid, renderSingleProduct, renderError } from './render.js';
+import { renderHeader, renderProductsGrid, renderSingleProduct, renderFooter, renderError } from './render.js';
 import { renderCheckoutModal, initCheckout, openCheckout } from './checkout.js';
 
 const app = document.getElementById('app');
@@ -75,6 +75,7 @@ function renderCatalogView() {
     <main class="main">
       ${renderProductsGrid(state.products)}
     </main>
+    ${renderFooter()}
     ${renderCheckoutModal()}
   `;
   
@@ -87,6 +88,7 @@ function renderCatalogView() {
     });
   });
   
+  initStorePolicyHandlers();
   initCheckout();
 }
 
@@ -101,13 +103,15 @@ function renderProductView(product) {
     <main class="main">
       ${renderSingleProduct(product)}
     </main>
+    ${renderFooter()}
     ${renderCheckoutModal()}
   `;
   
   initProductHandlers(product);
   initGalleryHandlers(product);
   initStoryHandlers(product);
-  initPolicyHandlers();
+  initProductPolicyHandlers();
+  initStorePolicyHandlers();
   initPackageTicketHandlers(product);
   initCheckout();
 }
@@ -120,7 +124,8 @@ function initPackageTicketHandlers(product) {
   document.querySelectorAll('.package-select-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const price = Number(btn.dataset.price || 0);
-      setState({ quantity: 1 });
+      const packageName = btn.dataset.name || '';
+      setState({ quantity: 1, selectedPackage: packageName });
       
       // Update price displays
       const displayPrice = document.getElementById('displayPrice');
@@ -146,7 +151,8 @@ function initPackageTicketHandlers(product) {
   document.querySelectorAll('.ticket-select-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const price = Number(btn.dataset.price || 0);
-      setState({ quantity: 1 });
+      const ticketName = btn.dataset.name || '';
+      setState({ quantity: 1, selectedTicket: ticketName });
       
       // Update price displays
       const displayPrice = document.getElementById('displayPrice');
@@ -214,8 +220,8 @@ function initProductHandlers(product) {
   // Share button
   document.getElementById('shareBtn')?.addEventListener('click', async () => {
     const shareData = {
-      title: product.name,
-      text: `Check out ${product.name}!`,
+      title: product.data?.name || 'Product',
+      text: `Check out ${product.data?.name || 'this'}!`,
       url: window.location.href
     };
     
@@ -380,9 +386,9 @@ function initStoryHandlers(product) {
 }
 
 // ===========================================
-// POLICY HANDLERS
+// PRODUCT POLICY HANDLERS (delivery, returns, payment)
 // ===========================================
-function initPolicyHandlers() {
+function initProductPolicyHandlers() {
   // Policy link clicks
   document.querySelectorAll('.policy-link').forEach(link => {
     link.addEventListener('click', () => {
@@ -392,7 +398,7 @@ function initPolicyHandlers() {
     });
   });
   
-  // Close buttons
+  // Close buttons (both X and bottom button)
   document.querySelectorAll('[data-close]').forEach(btn => {
     btn.addEventListener('click', () => {
       const modalId = btn.dataset.close;
@@ -405,6 +411,29 @@ function initPolicyHandlers() {
   document.querySelectorAll('.modal-overlay').forEach(modal => {
     modal.addEventListener('click', (e) => {
       if (e.target === modal) modal.classList.remove('active');
+    });
+  });
+}
+
+// ===========================================
+// STORE POLICY HANDLERS (privacy, terms, refund)
+// ===========================================
+function initStorePolicyHandlers() {
+  // Store policy link clicks (in footer)
+  document.querySelectorAll('.store-policy-link').forEach(link => {
+    link.addEventListener('click', () => {
+      const policy = link.dataset.storePolicy;
+      const modal = document.getElementById(`${policy}PolicyModal`);
+      modal?.classList.add('active');
+    });
+  });
+  
+  // Close buttons
+  document.querySelectorAll('[data-close]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const modalId = btn.dataset.close;
+      const modal = document.getElementById(modalId);
+      modal?.classList.remove('active');
     });
   });
 }

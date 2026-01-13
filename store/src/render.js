@@ -43,6 +43,73 @@ function renderHeroCTAs(hero) {
 }
 
 // ===========================================
+// FOOTER - Powered by + Store Policies
+// ===========================================
+export function renderFooter() {
+  const { store } = state;
+  const policies = store.policies || {};
+  const hasAnyPolicy = policies.privacy || policies.terms || policies.refund;
+  
+  return `
+    <footer class="store-footer">
+      <div class="powered-by">
+        <span>Powered by</span>
+        <a href="https://jari.store" target="_blank" rel="noopener" class="powered-link">
+          <span class="powered-logo">🛍️</span>
+          <span class="powered-name">Jari.Store</span>
+        </a>
+      </div>
+      ${hasAnyPolicy ? `
+        <div class="store-policies">
+          ${policies.privacy ? `<button class="store-policy-link" data-store-policy="privacy">Privacy Policy</button>` : ''}
+          ${policies.terms ? `<button class="store-policy-link" data-store-policy="terms">Terms of Service</button>` : ''}
+          ${policies.refund ? `<button class="store-policy-link" data-store-policy="refund">Refund Policy</button>` : ''}
+        </div>
+      ` : ''}
+      <p class="copyright">© ${new Date().getFullYear()} ${store.name || 'Store'}. All rights reserved.</p>
+    </footer>
+    ${renderStorePolicyModals(policies)}
+  `;
+}
+
+function renderStorePolicyModals(policies) {
+  if (!policies) return '';
+  
+  return `
+    ${policies.privacy ? `
+      <div class="modal-overlay" id="privacyPolicyModal">
+        <div class="modal-content">
+          <button class="modal-close-x" data-close="privacyPolicyModal">✕</button>
+          <h3>🔒 Privacy Policy</h3>
+          <div class="policy-text">${policies.privacy}</div>
+          <button class="btn btn-secondary modal-close-btn" data-close="privacyPolicyModal">Close</button>
+        </div>
+      </div>
+    ` : ''}
+    ${policies.terms ? `
+      <div class="modal-overlay" id="termsPolicyModal">
+        <div class="modal-content">
+          <button class="modal-close-x" data-close="termsPolicyModal">✕</button>
+          <h3>📋 Terms of Service</h3>
+          <div class="policy-text">${policies.terms}</div>
+          <button class="btn btn-secondary modal-close-btn" data-close="termsPolicyModal">Close</button>
+        </div>
+      </div>
+    ` : ''}
+    ${policies.refund ? `
+      <div class="modal-overlay" id="refundPolicyModal">
+        <div class="modal-content">
+          <button class="modal-close-x" data-close="refundPolicyModal">✕</button>
+          <h3>↩️ Refund Policy</h3>
+          <div class="policy-text">${policies.refund}</div>
+          <button class="btn btn-secondary modal-close-btn" data-close="refundPolicyModal">Close</button>
+        </div>
+      </div>
+    ` : ''}
+  `;
+}
+
+// ===========================================
 // PRODUCTS GRID (Collections View)
 // ===========================================
 export function renderProductsGrid(products) {
@@ -78,6 +145,17 @@ function renderProductCard(product) {
   const price = data.price || 0;
   const description = data.description || '';
   const name = data.name || 'Product';
+  const template = product.template || 'quick-decision';
+  
+  // Template badge for visual indication
+  const templateBadges = {
+    'quick-decision': { icon: '⚡', label: 'Quick Buy' },
+    'portfolio-booking': { icon: '📅', label: 'Book Service' },
+    'visual-menu': { icon: '🍽️', label: 'Menu Item' },
+    'deep-dive': { icon: '🔍', label: 'Details' },
+    'event-landing': { icon: '🎟️', label: 'Event' }
+  };
+  const badge = templateBadges[template] || templateBadges['quick-decision'];
   
   return `
     <div class="collection-card" data-product-id="${product.id}">
@@ -86,6 +164,7 @@ function renderProductCard(product) {
           ? `<img src="${mainImage}" alt="${name}" loading="lazy">`
           : '<div class="image-placeholder">📸</div>'
         }
+        <span class="template-badge">${badge.icon} ${badge.label}</span>
       </div>
       <div class="collection-content">
         <h3 class="collection-name">${name}</h3>
@@ -129,17 +208,21 @@ function renderStoreTestimonials() {
 export function renderSingleProduct(product) {
   const template = product.template || 'quick-decision';
   
+  console.log(`[Render] Loading template: ${template} for product:`, product.data?.name);
+  
   switch (template) {
     case 'portfolio-booking': return renderPortfolioBooking(product);
     case 'visual-menu': return renderVisualMenu(product);
     case 'deep-dive': return renderDeepDive(product);
     case 'event-landing': return renderEventLanding(product);
-    default: return renderQuickDecision(product);
+    case 'quick-decision':
+    default: 
+      return renderQuickDecision(product);
   }
 }
 
 // ===========================================
-// TEMPLATE: QUICK DECISION
+// TEMPLATE: QUICK DECISION (Default)
 // ===========================================
 function renderQuickDecision(product) {
   const { products } = state;
@@ -184,13 +267,13 @@ function renderQuickDecision(product) {
             <span class="btn-arrow">→</span>
           </button>
           
-          ${renderPolicyLinks(policies)}
+          ${renderProductPolicyLinks(policies)}
         </div>
       </div>
     </div>
     
     ${renderStoryViewer(stories)}
-    ${renderPolicyModals(policies)}
+    ${renderProductPolicyModals(policies)}
   `;
 }
 
@@ -228,7 +311,7 @@ function renderPortfolioBooking(product) {
                   </div>
                   ${pkg.duration ? `<p class="package-duration">⏱️ ${pkg.duration}</p>` : ''}
                   ${pkg.description ? `<p class="package-description">${pkg.description}</p>` : ''}
-                  <button class="package-select-btn" data-price="${pkg.price}">Select Package</button>
+                  <button class="package-select-btn" data-price="${pkg.price}" data-name="${pkg.name}">Select Package</button>
                 </div>
               `).join('')}
             </div>
@@ -243,12 +326,12 @@ function renderPortfolioBooking(product) {
           ${testimonials.length > 0 ? renderTestimonials(testimonials) : ''}
           
           <button class="buy-btn" id="buyBtn"><span class="btn-text">📅 Book Now</span><span class="btn-arrow">→</span></button>
-          ${renderPolicyLinks(policies)}
+          ${renderProductPolicyLinks(policies)}
         </div>
       </div>
     </div>
     ${renderStoryViewer(media.stories || [])}
-    ${renderPolicyModals(policies)}
+    ${renderProductPolicyModals(policies)}
   `;
 }
 
@@ -297,11 +380,11 @@ function renderVisualMenu(product) {
           ${renderQuantitySection(data.price || 0, data.stock || 999)}
           
           <button class="buy-btn" id="buyBtn"><span class="btn-text">🍽️ Order Now</span><span class="btn-arrow">→</span></button>
-          ${renderPolicyLinks(policies)}
+          ${renderProductPolicyLinks(policies)}
         </div>
       </div>
     </div>
-    ${renderPolicyModals(policies)}
+    ${renderProductPolicyModals(policies)}
   `;
 }
 
@@ -356,12 +439,12 @@ function renderDeepDive(product) {
           ${renderQuantitySection(data.price || 0, data.stock || 999)}
           
           <button class="buy-btn" id="buyBtn"><span class="btn-text">Buy Now</span><span class="btn-arrow">→</span></button>
-          ${renderPolicyLinks(policies)}
+          ${renderProductPolicyLinks(policies)}
         </div>
       </div>
     </div>
     ${renderStoryViewer(media.stories || [])}
-    ${renderPolicyModals(policies)}
+    ${renderProductPolicyModals(policies)}
   `;
 }
 
@@ -413,7 +496,7 @@ function renderEventLanding(product) {
                   </div>
                   ${ticket.description ? `<p class="ticket-description">${ticket.description}</p>` : ''}
                   ${ticket.available ? `<p class="ticket-available">${ticket.available} spots left</p>` : ''}
-                  <button class="ticket-select-btn" data-price="${ticket.price}">Get Tickets</button>
+                  <button class="ticket-select-btn" data-price="${ticket.price}" data-name="${ticket.name}">Get Tickets</button>
                 </div>
               `).join('')}
             </div>
@@ -426,12 +509,12 @@ function renderEventLanding(product) {
           `}
           
           ${testimonials.length > 0 ? renderTestimonials(testimonials) : ''}
-          ${renderPolicyLinks(policies)}
+          ${renderProductPolicyLinks(policies)}
         </div>
       </div>
     </div>
     ${renderStoryViewer(media.stories || [])}
-    ${renderPolicyModals(policies)}
+    ${renderProductPolicyModals(policies)}
   `;
 }
 
@@ -537,7 +620,8 @@ function renderTestimonials(testimonials) {
   `;
 }
 
-function renderPolicyLinks(policies) {
+// Product-level policies (delivery, returns, payment)
+function renderProductPolicyLinks(policies) {
   if (!policies) return '';
   const { delivery, returns, payment } = policies;
   if (!delivery && !returns && !payment) return '';
@@ -551,7 +635,7 @@ function renderPolicyLinks(policies) {
   `;
 }
 
-function renderPolicyModals(policies) {
+function renderProductPolicyModals(policies) {
   if (!policies) return '';
   const { delivery, returns, payment } = policies;
   
@@ -559,27 +643,30 @@ function renderPolicyModals(policies) {
     ${delivery ? `
       <div class="modal-overlay" id="deliveryModal">
         <div class="modal-content">
+          <button class="modal-close-x" data-close="deliveryModal">✕</button>
           <h3>📦 Delivery Information</h3>
           <p>${delivery}</p>
-          <button class="modal-close" data-close="deliveryModal">Close</button>
+          <button class="btn btn-secondary modal-close-btn" data-close="deliveryModal">Close</button>
         </div>
       </div>
     ` : ''}
     ${returns ? `
       <div class="modal-overlay" id="returnsModal">
         <div class="modal-content">
+          <button class="modal-close-x" data-close="returnsModal">✕</button>
           <h3>↩️ Returns Policy</h3>
           <p>${returns}</p>
-          <button class="modal-close" data-close="returnsModal">Close</button>
+          <button class="btn btn-secondary modal-close-btn" data-close="returnsModal">Close</button>
         </div>
       </div>
     ` : ''}
     ${payment ? `
       <div class="modal-overlay" id="paymentModal">
         <div class="modal-content">
+          <button class="modal-close-x" data-close="paymentModal">✕</button>
           <h3>💳 Payment Information</h3>
           <p>${payment}</p>
-          <button class="modal-close" data-close="paymentModal">Close</button>
+          <button class="btn btn-secondary modal-close-btn" data-close="paymentModal">Close</button>
         </div>
       </div>
     ` : ''}
