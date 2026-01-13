@@ -66,6 +66,7 @@
     --radius: 16px;
     --radius-sm: 12px;
     --radius-lg: 20px;
+    --radius-full: 9999px;
 }
 
 body {
@@ -116,7 +117,7 @@ body {
     padding: var(--space-4xl) var(--space-xl) var(--space-2xl);
     text-align: center;
     color: white;
-    min-height: 20vh;
+    min-height: 32vh;
     display: flex;
     flex-direction: column;
     align-items: center;
