@@ -113,35 +113,42 @@ body {
    =========================================== */
 .header {
     background: var(--gradient-primary);
-    padding: var(--space-5xl) var(--space-xl) var(--space-3xl);
+    padding: var(--space-4xl) var(--space-xl) var(--space-2xl);
     text-align: center;
     color: white;
+    min-height: 20vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .logo {
     width: var(--size-logo);
     height: var(--size-logo);
-    margin: 0 auto var(--space-lg);
+    margin: 0 auto var(--space-md);
     background: rgba(255,255,255,0.15);
     backdrop-filter: blur(10px);
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: var(--fs-display);
+    font-size: var(--fs-heading-lg);
     font-weight: 700;
 }
 
 .business-name {
-    font-size: var(--fs-display);
+    font-size: var(--fs-heading-lg);
     font-weight: 700;
-    margin-bottom: 6px;
-    letter-spacing: -0.01em;
+    margin-bottom: var(--space-xs);
+    letter-spacing: var(--ls-tight);
 }
 
 .tagline {
     font-size: var(--fs-body);
-    opacity: 0.9;
+    font-weight: 400;
+    opacity: 0.85;
+    letter-spacing: var(--ls-normal);
 }
 
 /* ===========================================
@@ -163,25 +170,28 @@ body {
 
 .collections-header {
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: var(--space-3xl);
 }
 
 .collections-header h2 {
-    font-size: var(--fs-display);
-    font-weight: 800;
-    margin-bottom: 8px;
-    letter-spacing: -0.02em;
+    font-size: var(--fs-heading-lg);
+    font-weight: 700;
+    margin-bottom: var(--space-xs);
+    letter-spacing: var(--ls-tight);
+    color: var(--text-primary);
 }
 
 .collections-header p {
-    font-size: var(--fs-body-lg);
+    font-size: var(--fs-body);
+    font-weight: 400;
     color: var(--text-secondary);
+    letter-spacing: var(--ls-normal);
 }
 
 .collections-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 24px;
+    gap: var(--space-xl);
 }
 
 /* ===========================================
@@ -193,17 +203,17 @@ body {
     overflow: hidden;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
 }
 
 .collection-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 12px 32px rgba(0,0,0,0.16);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.15);
 }
 
 .collection-image {
     width: 100%;
-    height: 240px;
+    aspect-ratio: 4/3;
     background: var(--gradient-primary);
     display: flex;
     align-items: center;
@@ -224,26 +234,27 @@ body {
 }
 
 .image-placeholder {
-    font-size: 80px;
+    font-size: var(--fs-display);
 }
 
 .collection-content {
-    padding: 24px;
+    padding: var(--space-lg);
 }
 
 .collection-name {
-    font-size: var(--fs-heading);
-    font-weight: 700;
-    margin-bottom: 8px;
-    letter-spacing: -0.01em;
+    font-size: var(--fs-body-lg);
+    font-weight: 600;
+    margin-bottom: var(--space-xs);
+    letter-spacing: var(--ls-normal);
+    color: var(--text-primary);
+    line-height: var(--lh-snug);
 }
 
 .collection-description {
-    font-size: var(--fs-small);
+    font-size: var(--fs-body-sm);
     color: var(--text-secondary);
-    line-height: 1.5;
-    margin-bottom: 16px;
-    min-height: 42px;
+    line-height: var(--lh-normal);
+    margin-bottom: var(--space-md);
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -257,19 +268,17 @@ body {
 }
 
 .collection-price {
-    font-size: var(--fs-heading-xl);
-    font-weight: 800;
-    background: var(--gradient-primary);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    font-size: var(--fs-heading-sm);
+    font-weight: 700;
+    color: var(--color-primary);
 }
 
 .collection-btn {
-    padding: 10px 20px;
+    padding: var(--space-sm) var(--space-lg);
     background: var(--bg-gray);
     border: none;
-    border-radius: var(--radius-sm);
-    font-size: var(--fs-small);
+    border-radius: var(--radius-full);
+    font-size: var(--fs-body-sm);
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s;
@@ -1841,6 +1850,11 @@ body {
         max-width: 1000px;
     }
     
+    /* Template 3: Visual Menu - Remove overflow to enable sticky */
+    .template-menu .product-container {
+        overflow: visible !important;
+    }
+    
     /* Template 3: Visual Menu - Unified Card with Sticky Image Inside */
     .template-menu .product-card.food-card {
         display: grid;
@@ -2889,17 +2903,22 @@ textarea:focus-visible {
    =========================================== */
 .template-badge {
     position: absolute;
-    top: 12px;
-    right: 12px;
-    padding: 6px 12px;
-    background: rgba(0, 0, 0, 0.7);
+    top: var(--space-sm);
+    left: var(--space-sm);
+    width: fit-content;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: var(--space-xs) var(--space-sm);
+    background: rgba(0, 0, 0, 0.75);
     backdrop-filter: blur(10px);
-    border-radius: 20px;
-    font-size: 11px;
+    border-radius: var(--radius-full);
+    font-size: var(--fs-micro);
     font-weight: 600;
     color: white;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: var(--ls-wide);
+    z-index: 10;
 }
 
 .template-badge.quick-decision { background: rgba(255, 159, 10, 0.9); }
