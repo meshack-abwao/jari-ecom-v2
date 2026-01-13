@@ -111,6 +111,14 @@ export default function ProductsPage() {
   const [storeUrl, setStoreUrl] = useState('');
   const [storeSlug, setStoreSlug] = useState('');
   
+  // Categories feature
+  const [categories, setCategories] = useState([]);
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [newCategoryEmoji, setNewCategoryEmoji] = useState('📦');
+  const [collectionTitle, setCollectionTitle] = useState('Shop All Products');
+  const [collectionSubtitle, setCollectionSubtitle] = useState('');
+  
   const [selectedTemplate, setSelectedTemplate] = useState(searchParams.get('template') || 'quick-decision');
   const [formData, setFormData] = useState(getInitialFormData());
   const [expandedSections, setExpandedSections] = useState({
@@ -118,7 +126,49 @@ export default function ProductsPage() {
     packages: false, dietary: false, specifications: false, eventDetails: false, tickets: false, policies: false
   });
 
-  useEffect(() => { loadProducts(); loadStoreInfo(); }, []);
+  useEffect(() => { loadProducts(); loadStoreInfo(); loadCategories(); }, []);
+
+  // ===========================================
+  // CATEGORIES
+  // ===========================================
+  const loadCategories = async () => {
+    try {
+      const response = await settingsAPI.getAll();
+      const store = response.data || {};
+      setCategories(store.categories || []);
+      setCollectionTitle(store.collection_title || 'Shop All Products');
+      setCollectionSubtitle(store.collection_subtitle || '');
+    } catch (error) {
+      console.error('Failed to load categories:', error);
+    }
+  };
+
+  const saveCategories = async () => {
+    try {
+      await settingsAPI.update({
+        categories: categories,
+        collection_title: collectionTitle,
+        collection_subtitle: collectionSubtitle
+      });
+      alert('Categories saved!');
+      setShowCategoryModal(false);
+    } catch (error) {
+      console.error('Failed to save categories:', error);
+      alert('Failed to save categories');
+    }
+  };
+
+  const addCategory = () => {
+    if (!newCategoryName.trim()) return;
+    const newCat = { name: newCategoryName.trim(), emoji: newCategoryEmoji };
+    setCategories([...categories, newCat]);
+    setNewCategoryName('');
+    setNewCategoryEmoji('📦');
+  };
+
+  const removeCategory = (index) => {
+    setCategories(categories.filter((_, i) => i !== index));
+  };
 
   // ===========================================
   // DATA LOADING
@@ -371,6 +421,9 @@ export default function ProductsPage() {
           <p style={styles.subtitle}>Manage your product catalog ({products.length} products)</p>
         </div>
         <div style={styles.headerActions}>
+          <button onClick={() => setShowCategoryModal(true)} style={styles.categoryBtn}>
+            <Tag size={18} /> Categories
+          </button>
           {storeUrl && (
             <button onClick={() => window.open(storeUrl, '_blank')} style={styles.viewBtn}>
               <Eye size={18} /> View Store
@@ -381,6 +434,93 @@ export default function ProductsPage() {
           </button>
         </div>
       </div>
+
+      {/* Category Management Modal */}
+      {showCategoryModal && (
+        <div style={styles.modalOverlay} onClick={() => setShowCategoryModal(false)}>
+          <div style={styles.categoryModal} className="glass-card" onClick={(e) => e.stopPropagation()}>
+            <div style={styles.modalHeader}>
+              <h2 style={styles.modalTitle}>Manage Categories</h2>
+              <button onClick={() => setShowCategoryModal(false)} style={styles.closeBtn}><X size={24} /></button>
+            </div>
+            
+            {/* Collection Header Settings */}
+            <div style={styles.formGroup}>
+              <label style={styles.label}>COLLECTION TITLE</label>
+              <input
+                type="text"
+                value={collectionTitle}
+                onChange={(e) => setCollectionTitle(e.target.value)}
+                placeholder="Shop All Products"
+                className="dashboard-input"
+              />
+              <p style={styles.hint}>e.g., "Our Menu", "Browse Collection", "Shop Now"</p>
+            </div>
+            
+            <div style={styles.formGroup}>
+              <label style={styles.label}>COLLECTION SUBTITLE (Optional)</label>
+              <input
+                type="text"
+                value={collectionSubtitle}
+                onChange={(e) => setCollectionSubtitle(e.target.value)}
+                placeholder="Fresh dishes made with love"
+                className="dashboard-input"
+              />
+            </div>
+            
+            <hr style={{ border: 'none', borderTop: '1px solid var(--border-color)', margin: '20px 0' }} />
+            
+            {/* Add Category */}
+            <div style={styles.formGroup}>
+              <label style={styles.label}>ADD NEW CATEGORY</label>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <input
+                  type="text"
+                  value={newCategoryEmoji}
+                  onChange={(e) => setNewCategoryEmoji(e.target.value)}
+                  placeholder="🔥"
+                  style={{ width: '60px', textAlign: 'center' }}
+                  className="dashboard-input"
+                />
+                <input
+                  type="text"
+                  value={newCategoryName}
+                  onChange={(e) => setNewCategoryName(e.target.value)}
+                  placeholder="Popular"
+                  style={{ flex: 1 }}
+                  className="dashboard-input"
+                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addCategory())}
+                />
+                <button onClick={addCategory} className="btn btn-primary" style={{ padding: '10px 16px' }}>
+                  <Plus size={18} />
+                </button>
+              </div>
+            </div>
+            
+            {/* Category List */}
+            <div style={styles.formGroup}>
+              <label style={styles.label}>CATEGORIES ({categories.length})</label>
+              {categories.length === 0 ? (
+                <p style={styles.hint}>No categories yet. Add some above!</p>
+              ) : (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                  {categories.map((cat, idx) => (
+                    <div key={idx} style={styles.categoryTag}>
+                      <span>{cat.emoji} {cat.name}</span>
+                      <button onClick={() => removeCategory(idx)} style={styles.categoryRemoveBtn}>×</button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            
+            <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
+              <button onClick={() => setShowCategoryModal(false)} style={styles.cancelBtn}>Cancel</button>
+              <button onClick={saveCategories} className="btn btn-primary" style={{ flex: 1 }}>Save Categories</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Product Modal */}
       {showModal && (
@@ -1197,4 +1337,10 @@ const styles = {
   emptyIcon: { fontSize: '64px', marginBottom: '16px' },
   emptyTitle: { fontSize: '20px', fontWeight: '600', marginBottom: '8px', color: 'var(--text-primary)' },
   emptyDesc: { fontSize: '14px', color: 'var(--text-muted)' },
+  
+  // Category styles
+  categoryBtn: { display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 16px', background: 'var(--bg-tertiary)', border: '1px solid var(--border-color)', borderRadius: '10px', color: 'var(--text-secondary)', fontSize: '13px', fontWeight: '600', cursor: 'pointer' },
+  categoryModal: { width: '100%', maxWidth: '500px', padding: '28px' },
+  categoryTag: { display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', background: 'var(--accent-light)', border: '1px solid var(--border-color)', borderRadius: '8px', fontSize: '14px', color: 'var(--text-primary)' },
+  categoryRemoveBtn: { background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '18px', cursor: 'pointer', padding: '0 4px', lineHeight: 1 },
 };
