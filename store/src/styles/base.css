@@ -702,16 +702,18 @@ body {
     display: flex;
     gap: 12px;
     overflow-x: auto;
-    padding-bottom: 8px;
+    padding: 4px 4px 8px 4px;     /* V1: breathing room on sides */
     -webkit-overflow-scrolling: touch;
 }
 
 .testimonial-card {
-    min-width: 280px;
-    padding: 16px;
-    background: var(--bg-gray);
-    border-radius: var(--radius-sm);
+    min-width: 260px;             /* V1: slightly narrower (was 280px) */
+    max-width: 280px;             /* V1: constrain max width */
+    padding: 20px 16px;           /* V1: more padding (was 16px) */
+    background: white;            /* V1: white bg for contrast */
+    border-radius: 16px;          /* V1: larger radius */
     flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);  /* V1: subtle shadow */
 }
 
 .testimonial-stars {
