@@ -23,6 +23,31 @@
     --fs-display: 28px;
     --fs-display-xl: 32px;
     
+    /* ===========================================
+       SPACING SYSTEM (4px base unit)
+       =========================================== */
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 12px;
+    --space-lg: 16px;
+    --space-xl: 20px;
+    --space-2xl: 24px;
+    --space-3xl: 32px;
+    --space-4xl: 40px;
+    --space-5xl: 48px;
+    
+    /* ===========================================
+       COMPONENT SIZES
+       =========================================== */
+    --size-icon-sm: 36px;
+    --size-icon-md: 40px;
+    --size-icon-lg: 56px;
+    --size-avatar: 56px;
+    --size-story: 68px;
+    --size-story-mobile: 60px;
+    --size-logo: 72px;
+    --size-spinner: 50px;
+    
     /* Theme Colors - Overridden by JS */
     --gradient-primary: linear-gradient(135deg, #11998e 0%, #38ef7d 25%, #4158D0 75%, #C850C0 100%);
     --color-primary: #11998e;
@@ -64,8 +89,8 @@ body {
 }
 
 .spinner {
-    width: 50px;
-    height: 50px;
+    width: var(--size-spinner);
+    height: var(--size-spinner);
     border: 4px solid rgba(0,0,0,0.1);
     border-top-color: var(--color-primary);
     border-radius: 50%;
@@ -85,15 +110,15 @@ body {
    =========================================== */
 .header {
     background: var(--gradient-primary);
-    padding: 48px 20px 32px;
+    padding: var(--space-5xl) var(--space-xl) var(--space-3xl);
     text-align: center;
     color: white;
 }
 
 .logo {
-    width: 72px;
-    height: 72px;
-    margin: 0 auto 16px;
+    width: var(--size-logo);
+    height: var(--size-logo);
+    margin: 0 auto var(--space-lg);
     background: rgba(255,255,255,0.15);
     backdrop-filter: blur(10px);
     border-radius: 18px;
@@ -120,7 +145,7 @@ body {
    MAIN CONTAINER
    =========================================== */
 .main {
-    padding: 28px 16px;
+    padding: var(--space-3xl) var(--space-lg);  /* V1: 28px 16px - using closest vars */
     max-width: 1200px;
     margin: 0 auto;
 }
@@ -375,10 +400,10 @@ body {
 }
 
 .thumbnail {
-    width: 56px;
-    height: 56px;
-    min-width: 56px;
-    border-radius: 10px;
+    width: var(--size-avatar);
+    height: var(--size-avatar);
+    min-width: var(--size-avatar);
+    border-radius: var(--space-sm);
     overflow: hidden;
     cursor: pointer;
     border: 3px solid transparent;
@@ -525,7 +550,7 @@ body {
    PRODUCT INFO
    =========================================== */
 .product-info {
-    padding: 24px;
+    padding: var(--space-xl);   /* V1: 20px */
     text-align: left;
 }
 
@@ -1239,6 +1264,17 @@ body {
         height: 36px;
         font-size: 16px;
     }
+    
+    /* V1 mobile story sizes */
+    .story-bubble {
+        width: var(--size-story-mobile);
+        height: var(--size-story-mobile);
+        min-width: var(--size-story-mobile);
+    }
+    
+    .stories-strip {
+        gap: var(--space-md);
+    }
 }
 
 /* ===========================================
@@ -1261,9 +1297,9 @@ body {
 
 .stories-row {
     display: flex;
-    gap: 12px;
+    gap: var(--space-md);
     overflow-x: auto;
-    padding-bottom: 8px;
+    padding-bottom: var(--space-sm);
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     -ms-overflow-style: none;
@@ -1275,21 +1311,21 @@ body {
 }
 
 .story-bubble {
-    width: 64px;
-    height: 64px;
-    min-width: 64px;
+    width: var(--size-story);
+    height: var(--size-story);
+    min-width: var(--size-story);
     border-radius: 50%;
     padding: 3px;
     background: var(--gradient-primary);
     cursor: pointer;
     flex-shrink: 0;
-    transition: transform 0.3s;
+    transition: transform 0.2s ease;  /* V1 timing */
     position: relative;
     overflow: hidden;
 }
 
 .story-bubble:hover {
-    transform: scale(1.08);
+    transform: scale(1.05);  /* V1 exact value */
 }
 
 .story-bubble img {
@@ -2181,27 +2217,27 @@ body {
 }
 
 .testimonial-avatar {
-    width: 56px;
-    height: 56px;
+    width: var(--size-avatar);
+    height: var(--size-avatar);
     border-radius: 50%;
     object-fit: cover;
     border: 3px solid var(--color-primary);
-    margin-bottom: 12px;
+    margin-bottom: var(--space-md);
     display: block;
 }
 
 .testimonial-avatar-placeholder {
-    width: 56px;
-    height: 56px;
+    width: var(--size-avatar);
+    height: var(--size-avatar);
     border-radius: 50%;
     background: var(--gradient-primary);
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    font-size: 22px;
+    font-size: var(--fs-heading-xl);
     font-weight: 700;
-    margin-bottom: 12px;
+    margin-bottom: var(--space-md);
 }
 
 .testimonial-quote {

@@ -2,15 +2,15 @@
    STORE FOOTER - V1 Simple Style
    =========================================== */
 .store-footer {
-    margin-top: 40px;
-    padding: 20px;
+    margin-top: var(--space-4xl);
+    padding: var(--space-xl);
     text-align: center;
 }
 
 .powered-by {
-    font-size: 14px;
+    font-size: var(--fs-tiny);  /* V1: 11px */
     color: var(--text-secondary);
-    margin-bottom: 12px;
+    margin-bottom: var(--space-sm);  /* V1: ~10px */
 }
 
 .powered-by a {
@@ -26,17 +26,17 @@
 .policy-links {
     display: flex;
     justify-content: center;
-    gap: 16px;
+    gap: var(--space-sm) var(--space-lg);  /* V1: 8px 16px */
     flex-wrap: wrap;
 }
 
 .store-policy-link {
-    font-size: 12px;
+    font-size: var(--fs-micro);  /* V1: 10px */
     color: var(--text-secondary);
     background: none;
     border: none;
     cursor: pointer;
-    padding: 4px 8px;
+    padding: var(--space-xs) var(--space-sm);
     transition: color 0.3s;
 }
 
@@ -50,12 +50,12 @@
    =========================================== */
 .template-badge {
     position: absolute;
-    top: 12px;
-    left: 12px;
+    top: var(--space-md);
+    left: var(--space-md);
     background: rgba(0,0,0,0.7);
     color: white;
-    padding: 6px 12px;
-    border-radius: 20px;
+    padding: 6px var(--space-md);
+    border-radius: var(--space-xl);
     font-size: var(--fs-tiny);
     font-weight: 600;
     backdrop-filter: blur(4px);
@@ -67,14 +67,14 @@
    =========================================== */
 .modal-close-x {
     position: absolute;
-    top: 16px;
-    right: 16px;
-    width: 36px;
-    height: 36px;
+    top: var(--space-lg);
+    right: var(--space-lg);
+    width: var(--size-icon-sm);
+    height: var(--size-icon-sm);
     border: none;
     background: var(--bg-gray);
     border-radius: 50%;
-    font-size: 18px;
+    font-size: var(--fs-heading);
     cursor: pointer;
     transition: all 0.3s;
     color: var(--text-secondary);
