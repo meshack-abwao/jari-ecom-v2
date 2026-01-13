@@ -15,13 +15,15 @@ export function renderHeader() {
   
   return `
     <header class="header" style="${headerStyle}">
-      ${heroPhotoUrl 
-        ? `<img src="${heroPhotoUrl}" alt="${store.name}" class="logo-image" style="width:72px;height:72px;border-radius:50%;object-fit:cover;margin-bottom:12px;">`
-        : `<div class="logo">${logoText}</div>`
-      }
-      <h1 class="business-name">${store.hero?.title || store.name || 'Store'}</h1>
-      <p class="tagline">${store.hero?.subtitle || store.tagline || ''}</p>
-      ${renderHeroCTAs(store.hero)}
+      <div class="header-content">
+        ${heroPhotoUrl 
+          ? `<img src="${heroPhotoUrl}" alt="${store.name}" class="logo-image" style="width:72px;height:72px;border-radius:50%;object-fit:cover;margin-bottom:12px;">`
+          : `<div class="logo">${logoText}</div>`
+        }
+        <h1 class="business-name">${store.hero?.title || store.name || 'Store'}</h1>
+        <p class="tagline">${store.hero?.subtitle || store.tagline || ''}</p>
+        ${renderHeroCTAs(store.hero)}
+      </div>
     </header>
   `;
 }
@@ -371,8 +373,19 @@ function renderVisualMenu(product) {
     'dairy-free': '🥛', 'nut-free': '🥜', 'organic': '🌿'
   };
   
+  const storeName = window.storeData?.store?.storeName || 'Menu';
+  
   return `
-    ${showBackButton ? '<button class="back-btn" id="backBtn">← Back to Menu</button>' : ''}
+    ${showBackButton ? `
+    <div class="nav-wrapper">
+      <button class="back-btn" id="backBtn">← Back to Menu</button>
+      <nav class="breadcrumb">
+        <a href="?">${storeName}</a>
+        <span>›</span>
+        <span class="current">${data.name || 'Item'}</span>
+      </nav>
+    </div>
+    ` : ''}
     <div class="product-container template-menu">
       <div class="product-card food-card">
         ${renderMenuGallery(media.images || [])}

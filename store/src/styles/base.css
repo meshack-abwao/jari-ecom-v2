@@ -115,10 +115,16 @@ body {
    =========================================== */
 .header {
     background: var(--gradient-primary);
-    padding: 48px 20px 32px;  /* V1 exact */
+    padding: 48px 20px 40px;  /* Golden ratio bottom: ~1.618x top */
     text-align: center;
     color: white;
-    /* Removed min-height for V1 parity - natural content height */
+}
+
+/* Hero content container - max width for premium look */
+.header-content {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 0 20px;
 }
 
 .logo {
@@ -353,24 +359,60 @@ body {
     overflow-x: hidden;
 }
 
+/* Navigation wrapper - back button + breadcrumb */
+.nav-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
 .back-btn {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 12px 20px;
+    gap: 6px;
+    padding: 10px 16px;
     background: var(--surface);
-    border: 2px solid var(--border);
-    border-radius: var(--radius-sm);
-    font-size: var(--fs-body);
-    font-weight: 600;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    font-size: var(--fs-caption);
+    font-weight: var(--fw-semibold);
     cursor: pointer;
-    margin-bottom: 24px;
     transition: all 0.3s;
+    width: fit-content;
 }
 
 .back-btn:hover {
     background: var(--bg-gray);
     transform: translateX(-4px);
+}
+
+/* Breadcrumb navigation */
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: var(--fs-micro);
+    color: var(--text-tertiary);
+}
+
+.breadcrumb a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.breadcrumb a:hover {
+    color: var(--color-primary);
+}
+
+.breadcrumb span {
+    color: var(--text-tertiary);
+}
+
+.breadcrumb .current {
+    color: var(--text-primary);
+    font-weight: var(--fw-medium);
 }
 
 .product-card {
