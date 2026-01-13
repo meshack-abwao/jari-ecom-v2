@@ -141,17 +141,22 @@
    =========================================== */
 .testimonials-section {
     margin: 24px 0;
-    padding: 24px 16px;
+    padding: 24px 0;
     background: rgba(0,0,0,0.02);
     border-radius: 0;
     border: none;
+}
+
+.testimonials-section h3 {
+    padding: 0 16px;
+    margin-bottom: 16px;
 }
 
 .testimonials-scroll {
     display: flex;
     gap: 12px;
     overflow-x: auto;
-    padding-bottom: 8px;
+    padding: 0 16px 8px 16px;
     -webkit-overflow-scrolling: touch;
     justify-content: flex-start;
 }
