@@ -447,12 +447,12 @@ function renderMenuGallery(images) {
           <button class="gallery-nav next" id="galleryNext">›</button>
         ` : ''}
       </div>
-      ${showNav ? `
-        <div class="thumbnail-strip">
-          ${images.map((img, i) => `<img src="${img}" alt="" class="thumbnail ${i === 0 ? 'active' : ''}" data-index="${i}">`).join('')}
-        </div>
-      ` : ''}
     </div>
+    ${showNav ? `
+      <div class="thumbnail-strip">
+        ${images.map((img, i) => `<img src="${img}" alt="" class="thumbnail ${i === 0 ? 'active' : ''}" data-index="${i}">`).join('')}
+      </div>
+    ` : ''}
   `;
 }
 
