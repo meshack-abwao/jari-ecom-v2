@@ -188,7 +188,7 @@ function renderProductCard(product) {
         <span class="template-badge">${badge.icon} ${badge.label}</span>
         <div class="collection-overlay">
           <h3 class="collection-name">${name}</h3>
-          <p class="collection-price">KES ${parseInt(price).toLocaleString()}</p>
+          <p class="collection-price"><span class="currency">KES</span> <span class="amount">${parseInt(price).toLocaleString()}</span></p>
         </div>
       </div>
       <div class="collection-content">

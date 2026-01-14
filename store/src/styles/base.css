@@ -319,18 +319,33 @@ body {
     font-size: 20px;
     font-weight: 700;
     color: white;
-    margin: 0 0 2px 0;
+    margin: 0 0 4px 0;
     text-shadow: 0 2px 8px rgba(0,0,0,0.4);
     letter-spacing: -0.02em;
     line-height: 1.2;
 }
 
 .collection-overlay .collection-price {
-    font-size: 17px;
-    font-weight: 600;
-    color: white;
+    display: flex;
+    align-items: baseline;
+    gap: 3px;
     margin: 0;
-    opacity: 0.9;
+}
+
+.collection-overlay .collection-price .currency {
+    font-size: 12px;
+    font-weight: 500;
+    background: linear-gradient(135deg, var(--color-primary) 0%, #ffb347 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 0.02em;
+}
+
+.collection-overlay .collection-price .amount {
+    font-size: 18px;
+    font-weight: 700;
+    color: white;
     letter-spacing: -0.01em;
 }
 
@@ -380,17 +395,17 @@ body {
 
 /* CTA Button */
 .collection-btn {
-    width: 100%;
-    padding: 14px 20px;
+    display: inline-block;
+    padding: 12px 24px;
     background: var(--color-primary);
     border: none;
-    border-radius: 14px;
-    font-size: 15px;
-    font-weight: 700;
+    border-radius: 100px;
+    font-size: 14px;
+    font-weight: 600;
     color: white;
     cursor: pointer;
     transition: all 0.25s ease;
-    letter-spacing: -0.01em;
+    letter-spacing: 0;
 }
 
 .collection-btn:hover {
