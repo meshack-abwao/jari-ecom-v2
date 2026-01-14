@@ -906,6 +906,7 @@ body {
     padding: 8px 4px 16px 4px;
     -webkit-overflow-scrolling: touch;
     scroll-snap-type: x mandatory;
+    justify-content: center;
 }
 
 /* Hide scrollbar */
@@ -959,6 +960,8 @@ body {
 .testimonial-avatar {
     width: 36px;
     height: 36px;
+    min-width: 36px;
+    min-height: 36px;
     border-radius: 50%;
     background: linear-gradient(135deg, var(--color-primary) 0%, #ffb347 100%);
     display: flex;
@@ -967,6 +970,14 @@ body {
     font-size: 14px;
     font-weight: 600;
     color: white;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.testimonial-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .testimonial-author-info {
