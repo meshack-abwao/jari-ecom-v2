@@ -538,9 +538,8 @@ function renderDeepDive(product) {
           <div class="social-actions">
             <button class="social-btn share-btn" title="Share" onclick="shareProduct()">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
-                <polyline points="16 6 12 2 8 6"/>
-                <line x1="12" y1="2" x2="12" y2="15"/>
+                <line x1="22" y1="2" x2="11" y2="13"/>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"/>
               </svg>
             </button>
             <button class="social-btn heart-btn" title="Save" onclick="toggleLike(this)">
@@ -550,9 +549,25 @@ function renderDeepDive(product) {
             </button>
           </div>
         </div>
-        <div class="price-row">
-          <span class="price-main">KES ${parseInt(data.price || 0).toLocaleString()}</span>
+        
+        <div class="product-meta">
+          <div class="rating-stars">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="#FFD700"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="#FFD700"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="#FFD700"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="#FFD700"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="#E0E0E0"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <span class="rating-count">4.8</span>
+          </div>
+          <span class="meta-dot">•</span>
+          <span class="stock-badge in-stock">In Stock</span>
         </div>
+        
+        <div class="price-row">
+          <span class="price-main">${parseInt(data.price || 0).toLocaleString()}</span>
+          <span class="price-currency">KES</span>
+        </div>
+        
         ${data.description ? `<p class="product-description">${data.description}</p>` : ''}
       </div>
       
@@ -625,7 +640,6 @@ function renderDeepDive(product) {
     <div class="deep-dive-cta">
       <div class="cta-glass">
         <div class="cta-qty-section">
-          <span class="cta-qty-label">QUANTITY</span>
           <div class="cta-qty-controls">
             <button class="cta-qty-btn minus" onclick="updateQuantity(-1)">−</button>
             <span class="cta-qty-value" id="ctaQtyValue">1</span>
@@ -633,11 +647,11 @@ function renderDeepDive(product) {
           </div>
         </div>
         <div class="cta-price-section">
-          <span class="cta-price-label">TOTAL</span>
-          <span class="cta-price-value" id="ctaTotalPrice">KES ${parseInt(data.price || 0).toLocaleString()}</span>
+          <span class="cta-price-value" id="ctaTotalPrice">${parseInt(data.price || 0).toLocaleString()}</span>
+          <span class="cta-price-currency">KES</span>
         </div>
         <button class="cta-add-btn" id="buyBtn" data-price="${data.price || 0}">
-          Add to Cart →
+          Add →
         </button>
       </div>
     </div>

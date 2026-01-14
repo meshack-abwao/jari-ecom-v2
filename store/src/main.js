@@ -715,7 +715,7 @@ window.updateQuantity = function(delta) {
   const totalPrice = document.getElementById('ctaTotalPrice');
   
   if (qtyValue) qtyValue.textContent = newQty;
-  if (totalPrice) totalPrice.textContent = `KES ${(price * newQty).toLocaleString()}`;
+  if (totalPrice) totalPrice.textContent = (price * newQty).toLocaleString();
 };
 
 function showToast(message) {
