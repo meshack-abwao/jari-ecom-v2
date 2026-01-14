@@ -134,10 +134,10 @@ export default function ProductsPage() {
   const loadCategories = async () => {
     try {
       const response = await settingsAPI.getAll();
-      const store = response.data || {};
-      setCategories(store.categories || []);
-      setCollectionTitle(store.collection_title || 'Shop All Products');
-      setCollectionSubtitle(store.collection_subtitle || '');
+      const config = response.data?.config || {};
+      setCategories(config.categories || []);
+      setCollectionTitle(config.collection_title || 'Shop All Products');
+      setCollectionSubtitle(config.collection_subtitle || '');
     } catch (error) {
       console.error('Failed to load categories:', error);
     }
@@ -239,7 +239,7 @@ export default function ProductsPage() {
           }),
           
           ...(selectedTemplate === 'visual-menu' && {
-            dietaryTags: formData.dietaryTags,
+            dietaryTags: formData.dietaryTags.filter(t => t.trim()),
             prepTime: formData.prepTime,
             calories: formData.calories,
             ingredients: formData.ingredients,
@@ -914,7 +914,7 @@ export default function ProductsPage() {
                         <input
                           type="text"
                           value={formData.dietaryTags.join(', ')}
-                          onChange={e => updateField('dietaryTags', e.target.value.split(',').map(t => t.trim()).filter(Boolean))}
+                          onChange={e => updateField('dietaryTags', e.target.value.split(',').map(t => t.trim()))}
                           placeholder="Vegetarian, Gluten-Free, Halal (comma separated)"
                           className="dashboard-input"
                         />
