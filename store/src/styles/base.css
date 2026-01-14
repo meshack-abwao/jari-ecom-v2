@@ -317,17 +317,12 @@ body {
 /* Gallery dots (IG style) */
 .card-gallery-dots {
     position: absolute;
-    bottom: 12px;
+    bottom: 60px;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
     gap: 6px;
     z-index: 5;
-    padding: 6px 10px;
-    background: rgba(0,0,0,0.3);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border-radius: 100px;
 }
 
 .card-dot {
@@ -340,6 +335,7 @@ body {
 
 .card-dot.active {
     background: white;
+    transform: scale(1.2);
 }
 
 /* Hide dots on desktop hover devices */
@@ -848,154 +844,63 @@ body {
 }
 
 /* ===========================================
-   TESTIMONIALS - Apple Style
+   TESTIMONIALS
    =========================================== */
 .testimonials-section {
-    margin: 32px 0;
-    padding: 40px 24px;
-    background: linear-gradient(180deg, var(--bg-gray) 0%, rgba(255,255,255,0) 100%);
-    border-radius: 24px;
-    position: relative;
-    overflow: hidden;
-}
-
-/* Subtle gradient accent */
-.testimonials-section::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 200px;
-    height: 3px;
-    background: var(--gradient-primary);
-    border-radius: 0 0 4px 4px;
-    opacity: 0.6;
+    margin: 20px 0;
+    padding: 32px 20px;
+    background: var(--bg-gray);
+    border-radius: 20px;
+    border: none;
 }
 
 .testimonials-header {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 4px;
-    margin-bottom: 24px;
-    text-align: center;
+    gap: 8px;
+    margin-bottom: 16px;
 }
 
 .testimonials-header h4 {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--color-primary);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin: 0;
-}
-
-.testimonials-header .section-title {
-    font-size: 22px;
+    font-size: var(--fs-body);
     font-weight: 700;
-    color: var(--text-primary);
-    letter-spacing: -0.02em;
-    margin: 0;
 }
 
 .testimonials-scroll {
     display: flex;
-    gap: 16px;
+    gap: 12px;
     overflow-x: auto;
-    padding: 8px 4px 16px 4px;
+    padding: 4px 4px 8px 4px;     /* V1: breathing room on sides */
     -webkit-overflow-scrolling: touch;
-    scroll-snap-type: x mandatory;
-    justify-content: center;
-}
-
-/* Hide scrollbar */
-.testimonials-scroll::-webkit-scrollbar {
-    display: none;
-}
-.testimonials-scroll {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
 }
 
 .testimonial-card {
-    min-width: 280px;
-    max-width: 300px;
-    padding: 24px;
-    background: white;
-    border-radius: 20px;
+    min-width: 260px;             /* V1: slightly narrower (was 280px) */
+    max-width: 280px;             /* V1: constrain max width */
+    padding: 20px 16px;           /* V1: more padding (was 16px) */
+    background: white;            /* V1: white bg for contrast */
+    border-radius: 16px;          /* V1: larger radius */
     flex-shrink: 0;
-    scroll-snap-align: start;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-    border: 1px solid rgba(0,0,0,0.04);
-    transition: all 0.3s ease;
-}
-
-.testimonial-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);  /* V1: subtle shadow */
 }
 
 .testimonial-stars {
-    color: #ffb800;
-    margin-bottom: 12px;
-    font-size: 14px;
-    letter-spacing: 2px;
+    color: #ffc107;
+    margin-bottom: 8px;
+    font-size: var(--fs-small);
 }
 
 .testimonial-text {
-    font-size: 15px;
+    font-size: var(--fs-small);
     color: var(--text-primary);
-    line-height: 1.6;
-    margin-bottom: 16px;
-    font-weight: 400;
+    line-height: 1.5;
+    margin-bottom: 12px;
 }
 
 .testimonial-author {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.testimonial-avatar {
-    width: 40px;
-    max-width: 40px;
-    min-width: 40px;
-    height: 40px;
-    max-height: 40px;
-    min-height: 40px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--color-primary) 0%, #ffb347 100%);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    font-weight: 600;
-    color: white;
-    overflow: hidden;
-}
-
-.testimonial-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.testimonial-author-info {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-}
-
-.testimonial-author-name {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
-.testimonial-author-label {
-    font-size: 12px;
+    font-size: var(--fs-tiny);
     color: var(--text-secondary);
+    font-weight: 600;
 }
 
 /* ===========================================
@@ -2098,6 +2003,22 @@ body {
 .ticket-select-btn:hover {
     background: var(--gradient-primary);
     transform: translateY(-1px);
+}
+
+/* ===========================================
+   STORE TESTIMONIALS (Collections View)
+   =========================================== */
+.store-testimonials {
+    margin-top: 48px;
+    padding: 32px 0;
+    border-top: 1px solid var(--border);
+}
+
+.store-testimonials .testimonials-title {
+    font-size: var(--fs-heading);
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 24px;
 }
 
 /* ===========================================
@@ -3334,3 +3255,32 @@ textarea:focus-visible {
 .register-btn {
     background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%) !important;
 }
+
+/* ===========================================
+   TEMPLATE BADGES ON CARDS
+   =========================================== */
+.template-badge {
+    position: absolute;
+    top: var(--space-sm);
+    left: var(--space-sm);
+    width: fit-content;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: var(--space-xs) var(--space-sm);
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(10px);
+    border-radius: var(--radius-full);
+    font-size: var(--fs-micro);
+    font-weight: 600;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: var(--ls-wide);
+    z-index: 10;
+}
+
+.template-badge.quick-decision { background: rgba(255, 159, 10, 0.9); }
+.template-badge.portfolio-booking { background: rgba(139, 92, 246, 0.9); }
+.template-badge.visual-menu { background: rgba(46, 204, 113, 0.9); }
+.template-badge.deep-dive { background: rgba(59, 130, 246, 0.9); }
+.template-badge.event-landing { background: rgba(255, 107, 107, 0.9); }
