@@ -223,6 +223,13 @@ function initProductHandlers(product) {
     render();
   });
   
+  // Breadcrumb home link - same as back button
+  document.getElementById('breadcrumbHome')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    setProductId(null);
+    render();
+  });
+  
   // Quantity controls
   const qtyValue = document.getElementById('qtyValue');
   const totalValue = document.getElementById('totalValue');
