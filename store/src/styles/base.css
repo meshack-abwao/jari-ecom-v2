@@ -1973,12 +1973,59 @@ body {
 
 
 /* ===========================================
+   TABLET ENHANCEMENTS - 600px to 1023px
+   Single column but with better proportions
+   =========================================== */
+@media (min-width: 600px) and (max-width: 1023px) {
+    
+    .product-container {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    /* Menu template - centered single column */
+    .template-menu .product-card.food-card {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .template-menu .menu-gallery .main-image-container {
+        height: 400px;
+    }
+    
+    .template-menu .food-card .product-info {
+        padding: 24px;
+    }
+    
+    .template-menu .food-card .product-name {
+        font-size: var(--fs-heading-xl);
+    }
+    
+    .template-menu .food-card .price {
+        font-size: 28px;
+    }
+    
+    /* Testimonials grid for tablet */
+    .testimonials-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+    
+    .testimonial-card {
+        width: 100%;
+        min-width: auto;
+    }
+}
+
+
+/* ===========================================
    DESKTOP LAYOUTS - Two-column & Enhanced Views
    Premium e-commerce patterns from V1
    =========================================== */
 
-/* Desktop breakpoint: 900px+ */
-@media (min-width: 900px) {
+/* Desktop breakpoint: 1024px+ */
+@media (min-width: 1024px) {
     
     /* Expand the product container for desktop */
     .product-container {
@@ -1996,7 +2043,7 @@ body {
     .template-menu .product-card.food-card {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 40px;
+        gap: 48px;
         align-items: start;
         border-radius: 0;
         background: transparent;
