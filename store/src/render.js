@@ -716,15 +716,26 @@ function renderTestimonials(testimonials) {
   
   return `
     <div class="testimonials-section">
-      <h3 class="section-title">⭐ Customer Reviews</h3>
+      <div class="testimonials-header">
+        <h4>Testimonials</h4>
+        <p class="section-title">What Our Customers Say</p>
+      </div>
       <div class="testimonials-scroll">
-        ${filtered.map(t => `
+        ${filtered.map(t => {
+          const initials = (t.author || 'C').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+          return `
           <div class="testimonial-card">
-            <div class="testimonial-stars">${'★'.repeat(t.rating || 5)}${'☆'.repeat(5 - (t.rating || 5))}</div>
+            <div class="testimonial-stars">${'★'.repeat(t.rating || 5)}</div>
             <p class="testimonial-text">"${t.text}"</p>
-            <p class="testimonial-author">— ${t.author || 'Customer'}</p>
+            <div class="testimonial-author">
+              <div class="testimonial-avatar">${initials}</div>
+              <div class="testimonial-author-info">
+                <span class="testimonial-author-name">${t.author || 'Customer'}</span>
+                <span class="testimonial-author-label">Verified Buyer</span>
+              </div>
+            </div>
           </div>
-        `).join('')}
+        `}).join('')}
       </div>
     </div>
   `;
