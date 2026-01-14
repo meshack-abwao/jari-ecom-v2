@@ -953,15 +953,15 @@ body {
 
 .testimonial-author {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
+    text-align: center;
 }
 
 .testimonial-avatar {
-    width: 36px;
-    height: 36px;
-    min-width: 36px;
-    min-height: 36px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     background: linear-gradient(135deg, var(--color-primary) 0%, #ffb347 100%);
     display: flex;
@@ -970,8 +970,8 @@ body {
     font-size: 14px;
     font-weight: 600;
     color: white;
-    flex-shrink: 0;
     overflow: hidden;
+    aspect-ratio: 1 / 1;
 }
 
 .testimonial-avatar img {
@@ -983,6 +983,8 @@ body {
 .testimonial-author-info {
     display: flex;
     flex-direction: column;
+    align-items: center;
+    gap: 2px;
 }
 
 .testimonial-author-name {
