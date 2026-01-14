@@ -1808,381 +1808,315 @@ body {
 }
 
 /* ===========================================
-   DEEP DIVE TEMPLATE - Complete Redesign
+   DEEP DIVE TEMPLATE - Apple-Inspired Clean
    =========================================== */
 
-/* Template container */
 .template-deep-dive {
-    max-width: 600px;
+    max-width: 500px;
     margin: 0 auto;
+    padding-bottom: 100px; /* Space for sticky CTA */
 }
 
-/* Product card - mobile first (stacked) */
-.template-deep-dive .product-card {
-    background: white;
-    border-radius: 20px;
+/* Hero Gallery - Full Width */
+.deep-dive-hero {
+    background: #f5f5f7;
+    border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
 }
 
-/* Gallery wrapper */
-.template-deep-dive .deep-dive-gallery {
-    background: var(--bg-gray);
+.deep-dive-hero .gallery-container {
+    background: transparent;
 }
 
-/* Product info section */
-.template-deep-dive .product-info {
-    padding: 24px 20px;
+.deep-dive-hero .main-image-container {
+    background: #f5f5f7;
 }
 
-/* Header row: name + social actions */
-.template-deep-dive .product-header {
+.deep-dive-hero .thumbnails {
+    background: white;
+    padding: 12px;
+    border-top: 1px solid #e5e5e5;
+}
+
+/* Product Info */
+.deep-dive-info {
+    padding: 20px 4px;
+}
+
+.deep-dive-info .info-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    gap: 16px;
-    margin-bottom: 12px;
+    gap: 12px;
+    margin-bottom: 8px;
 }
 
-.template-deep-dive .product-name {
-    font-size: var(--fs-heading);
+.deep-dive-info .product-name {
+    font-size: 22px;
     font-weight: 700;
     line-height: 1.2;
+    color: var(--text-primary);
     flex: 1;
 }
 
-.template-deep-dive .social-actions {
+.deep-dive-info .social-actions {
     display: flex;
-    gap: 8px;
+    gap: 4px;
     flex-shrink: 0;
 }
 
-/* Trust badges */
-.template-deep-dive .trust-badges {
+.deep-dive-info .social-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #f5f5f7;
+    border: none;
     display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 16px;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #86868b;
+    transition: all 0.2s;
 }
 
-.template-deep-dive .trust-badge {
-    padding: 6px 12px;
-    background: rgba(48, 209, 88, 0.1);
-    color: #30d158;
-    border-radius: 20px;
-    font-size: var(--fs-tiny);
-    font-weight: 600;
+.deep-dive-info .social-btn:hover {
+    background: #e5e5e5;
+    color: #1d1d1f;
 }
 
-/* Price row */
-.template-deep-dive .price-row {
-    margin-bottom: 16px;
-}
-
-.template-deep-dive .price-row .price {
-    font-size: var(--fs-price);
-    font-weight: 800;
-    color: var(--text-primary);
-}
-
-/* Description */
-.template-deep-dive .product-description {
-    font-size: var(--fs-body);
-    color: var(--text-secondary);
-    line-height: 1.6;
-}
-
-/* ===========================================
-   DEEP DIVE - SECTIONS (Shared styles)
-   =========================================== */
-.deep-dive-section {
-    background: white;
-    border-radius: 20px;
-    padding: 24px 20px;
-    margin-top: 16px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
-}
-
-.deep-dive-section .section-title {
-    font-size: var(--fs-body-lg);
+.deep-dive-info .price {
+    font-size: 24px;
     font-weight: 700;
-    margin-bottom: 16px;
     color: var(--text-primary);
-}
-
-/* ===========================================
-   WHY CHOOSE THIS - Card Grid
-   =========================================== */
-.why-choose-section {
-    background: linear-gradient(135deg, rgba(255,159,10,0.03) 0%, rgba(255,55,95,0.03) 100%);
-    border: 1px solid rgba(255,159,10,0.1);
-}
-
-.why-choose-grid {
-    display: grid;
-    gap: 12px;
-}
-
-.why-choose-card {
-    background: white;
-    border-radius: 16px;
-    padding: 20px;
-    text-align: center;
-    border: 1px solid var(--border);
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.why-choose-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-}
-
-.why-choose-icon {
-    font-size: 32px;
-    display: block;
     margin-bottom: 12px;
 }
 
-.why-choose-title {
-    font-size: var(--fs-body);
-    font-weight: 700;
-    margin-bottom: 8px;
-    color: var(--text-primary);
-}
-
-.why-choose-desc {
-    font-size: var(--fs-small);
-    color: var(--text-secondary);
+.deep-dive-info .product-description {
+    font-size: 15px;
+    color: #86868b;
     line-height: 1.5;
 }
 
-/* ===========================================
-   SPECIFICATIONS - Card Grid + Optional Image
-   =========================================== */
-.template-deep-dive .specifications-section {
-    margin: 0;
-    padding: 24px 20px;
-    border: none;
-    background: white;
-    border-radius: 20px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+/* Stories Section */
+.deep-dive-stories {
+    margin-top: 20px;
 }
 
-.specs-content {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+/* Showcase Masonry Gallery */
+.deep-dive-showcase {
+    margin-top: 24px;
 }
 
-.specs-content.has-image {
-    /* With image - stack on mobile */
-}
-
-.specs-image {
-    border-radius: 12px;
-    overflow: hidden;
-    background: var(--bg-gray);
-}
-
-.specs-image img {
-    width: 100%;
-    height: auto;
-    display: block;
-}
-
-.specs-grid {
+.showcase-grid {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
     gap: 8px;
 }
 
-.spec-card {
+.showcase-item {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #f5f5f7;
+    aspect-ratio: 1;
+}
+
+.showcase-item.showcase-large {
+    grid-column: span 2;
+    aspect-ratio: 16/9;
+}
+
+.showcase-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.showcase-caption {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 12px;
+    background: linear-gradient(transparent, rgba(0,0,0,0.6));
+    color: white;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+/* Specifications - Clean Lines */
+.deep-dive-specs {
+    margin-top: 24px;
+}
+
+.specs-title {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+}
+
+.specs-list {
+    border-top: 1px solid #e5e5e5;
+}
+
+.spec-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 14px 16px;
-    background: var(--bg-gray);
-    border-radius: 12px;
-    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid #e5e5e5;
 }
 
-.spec-card .spec-label {
-    font-size: var(--fs-small);
-    color: var(--text-secondary);
-    width: auto;
+.spec-row .spec-label {
+    font-size: 15px;
+    color: #86868b;
 }
 
-.spec-card .spec-value {
-    font-size: var(--fs-small);
-    font-weight: 600;
+.spec-row .spec-value {
+    font-size: 15px;
+    font-weight: 500;
     color: var(--text-primary);
     text-align: right;
 }
 
-/* ===========================================
-   WARRANTY - Premium Card Style
-   =========================================== */
-.template-deep-dive .warranty-section {
-    margin: 0;
-    padding: 0;
-    background: transparent;
-    border: none;
-    border-radius: 0;
-    border-left: none;
-}
-
-.warranty-card {
+/* Warranty - Single Line */
+.deep-dive-warranty {
     display: flex;
-    gap: 16px;
-    padding: 20px;
-    background: linear-gradient(135deg, rgba(48, 209, 88, 0.08) 0%, rgba(48, 209, 88, 0.04) 100%);
-    border: 1px solid rgba(48, 209, 88, 0.2);
-    border-radius: 16px;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+    padding: 14px 16px;
+    background: rgba(48, 209, 88, 0.08);
+    border-radius: 12px;
 }
 
-.warranty-icon {
-    font-size: 32px;
+.deep-dive-warranty .warranty-icon {
+    font-size: 20px;
     flex-shrink: 0;
 }
 
-.warranty-content {
-    flex: 1;
-}
-
-.warranty-title {
-    font-size: var(--fs-body);
-    font-weight: 700;
+.deep-dive-warranty .warranty-text {
+    font-size: 14px;
     color: #30d158;
-    margin-bottom: 8px;
+    font-weight: 500;
 }
 
-.warranty-text {
-    font-size: var(--fs-small);
-    color: var(--text-secondary);
-    line-height: 1.6;
+/* Testimonials */
+.deep-dive-testimonials {
+    margin-top: 24px;
 }
 
-/* ===========================================
-   DEEP DIVE - STICKY CTA
-   =========================================== */
+/* Sticky CTA */
 .deep-dive-cta {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
     background: white;
-    border-radius: 20px;
-    padding: 20px;
-    margin-top: 16px;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.1);
-    position: sticky;
-    bottom: 16px;
+    padding: 12px 16px;
+    padding-bottom: calc(12px + env(safe-area-inset-bottom));
+    box-shadow: 0 -4px 24px rgba(0,0,0,0.1);
     z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
-.cta-inner {
-    max-width: 100%;
+.deep-dive-cta .quantity-section {
+    flex-shrink: 0;
+}
+
+.deep-dive-cta .quantity-controls {
+    padding: 8px 12px;
+    gap: 12px;
+}
+
+.deep-dive-cta .quantity-btn {
+    width: 32px;
+    height: 32px;
+}
+
+.deep-dive-cta .buy-btn {
+    flex: 1;
+    margin: 0;
+}
+
+/* Policy Links below CTA */
+.template-deep-dive .policy-links {
+    margin-top: 16px;
+    padding: 0 4px;
 }
 
 /* ===========================================
-   DEEP DIVE - DESKTOP LAYOUT (900px+)
-   Gallery LEFT, Info RIGHT
+   DEEP DIVE - DESKTOP (768px+)
    =========================================== */
-@media (min-width: 900px) {
+@media (min-width: 768px) {
     .template-deep-dive {
-        max-width: 1000px;
+        max-width: 700px;
+        padding-bottom: 40px;
     }
     
-    .template-deep-dive .product-card {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0;
-        border-radius: 24px;
-    }
-    
-    /* Gallery on LEFT */
-    .template-deep-dive .deep-dive-gallery {
-        order: 1;
-        border-radius: 24px 0 0 24px;
-    }
-    
-    .template-deep-dive .deep-dive-gallery .main-image-container {
+    .deep-dive-hero .main-image-container {
         height: 400px;
     }
     
-    /* Info on RIGHT */
-    .template-deep-dive .product-info {
-        order: 2;
-        padding: 40px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
+    .deep-dive-info {
+        padding: 24px 0;
     }
     
-    .template-deep-dive .product-name {
+    .deep-dive-info .product-name {
         font-size: 28px;
     }
     
-    .template-deep-dive .price-row .price {
-        font-size: 32px;
+    .deep-dive-info .price {
+        font-size: 28px;
     }
     
-    /* Sections - wider */
-    .deep-dive-section {
-        padding: 32px;
-    }
-    
-    /* Why Choose - horizontal on desktop */
-    .why-choose-grid {
+    .showcase-grid {
         grid-template-columns: repeat(3, 1fr);
-        gap: 16px;
-    }
-    
-    /* Specs with image - side by side */
-    .specs-content.has-image {
-        flex-direction: row;
-        align-items: flex-start;
-    }
-    
-    .specs-content.has-image .specs-image {
-        flex: 0 0 280px;
-    }
-    
-    .specs-content.has-image .specs-grid {
-        flex: 1;
-    }
-    
-    /* Specs grid - 2 columns */
-    .specs-grid {
-        grid-template-columns: repeat(2, 1fr);
         gap: 12px;
     }
     
-    /* CTA - not sticky on desktop */
+    .showcase-item.showcase-large {
+        grid-column: span 2;
+    }
+    
+    /* CTA - Not Sticky on Desktop */
     .deep-dive-cta {
         position: relative;
         bottom: auto;
-        max-width: 500px;
-        margin: 32px auto 0;
+        left: auto;
+        right: auto;
+        margin-top: 24px;
+        border-radius: 16px;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+        padding: 16px 20px;
+        padding-bottom: 16px;
     }
 }
 
 /* ===========================================
-   DEEP DIVE - LARGE DESKTOP (1100px+)
+   DEEP DIVE - LARGE DESKTOP (1000px+)
    =========================================== */
-@media (min-width: 1100px) {
+@media (min-width: 1000px) {
     .template-deep-dive {
-        max-width: 1100px;
+        max-width: 900px;
     }
     
-    .template-deep-dive .product-info {
-        padding: 48px 56px;
+    .deep-dive-hero .main-image-container {
+        height: 500px;
     }
     
-    .template-deep-dive .product-name {
+    .deep-dive-info .product-name {
         font-size: 32px;
     }
+    
+    .showcase-grid {
+        gap: 16px;
+    }
 }
-
-/* ===========================================
-   OLD SPECS TABLE (keep for backward compat)
-   =========================================== */
 
 /* ===========================================
    EVENT DETAILS (Event-Landing Template)
@@ -3124,42 +3058,6 @@ input:focus-visible,
 textarea:focus-visible {
     outline: 2px solid var(--color-primary);
     outline-offset: 2px;
-}
-
-/* ===========================================
-   GUARANTEES SECTION (Deep Dive)
-   =========================================== */
-.guarantees-section {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    margin: 24px 0;
-}
-
-.guarantee-item {
-    display: flex;
-    gap: 16px;
-    padding: 20px;
-    background: var(--bg-gray);
-    border-radius: 16px;
-}
-
-.guarantee-icon {
-    font-size: 24px;
-    flex-shrink: 0;
-}
-
-.guarantee-content h4 {
-    font-size: var(--fs-body);
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: 2px;
-}
-
-.guarantee-content p {
-    font-size: var(--fs-small);
-    color: var(--text-secondary);
-    line-height: 1.5;
 }
 
 /* ===========================================
