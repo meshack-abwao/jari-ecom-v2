@@ -206,16 +206,28 @@ function renderStoreTestimonials() {
   if (testimonials.length === 0) return '';
   
   return `
-    <div class="store-testimonials">
-      <h3 class="testimonials-title">What Our Customers Say</h3>
+    <div class="testimonials-section">
+      <div class="testimonials-header">
+        <h4>Testimonials</h4>
+        <p class="section-title">What Our Customers Say</p>
+      </div>
       <div class="testimonials-scroll">
-        ${testimonials.map(t => `
+        ${testimonials.map(t => {
+          const name = t.name || t.author || 'Customer';
+          const initials = name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+          return `
           <div class="testimonial-card">
-            <div class="testimonial-stars">★★★★★</div>
+            <div class="testimonial-stars">${'★'.repeat(t.rating || 5)}</div>
             <p class="testimonial-text">"${t.quote || t.text}"</p>
-            <p class="testimonial-author">— ${t.name || t.author || 'Customer'}${t.role ? `, ${t.role}` : ''}</p>
+            <div class="testimonial-author">
+              <div class="testimonial-avatar">${initials}</div>
+              <div class="testimonial-author-info">
+                <span class="testimonial-author-name">${name}</span>
+                <span class="testimonial-author-label">${t.role || 'Verified Buyer'}</span>
+              </div>
+            </div>
           </div>
-        `).join('')}
+        `}).join('')}
       </div>
     </div>
   `;
