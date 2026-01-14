@@ -356,6 +356,9 @@ body {
 /* Content section below image */
 .collection-content {
     padding: 16px 20px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 }
 
 .collection-description {
@@ -369,6 +372,7 @@ body {
     -webkit-box-orient: vertical;
     overflow: hidden;
     letter-spacing: 0.01em;
+    width: 100%;
 }
 
 /* Tags row */
@@ -406,6 +410,7 @@ body {
     cursor: pointer;
     transition: all 0.25s ease;
     letter-spacing: 0;
+    align-self: flex-end;
 }
 
 .collection-btn:hover {

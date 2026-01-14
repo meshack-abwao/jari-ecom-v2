@@ -160,6 +160,7 @@ function renderProductCard(product) {
   const name = data.name || 'Product';
   const template = product.template || 'quick-decision';
   const badges = data.badges || [];
+  const specifications = data.specifications || [];
   
   // Template badge for visual indication
   const templateBadges = {
@@ -171,12 +172,21 @@ function renderProductCard(product) {
   };
   const badge = templateBadges[template] || templateBadges['quick-decision'];
   
-  // Render tags/badges if available
-  const tagsHTML = badges.length > 0 ? `
-    <div class="collection-tags">
-      ${badges.slice(0, 3).map(b => `<span class="collection-tag">${b.icon || ''} ${b.text || b}</span>`).join('')}
-    </div>
-  ` : '';
+  // Build tags HTML - use badges if available, or specs for deep-dive
+  let tagsHTML = '';
+  if (badges.length > 0) {
+    tagsHTML = `
+      <div class="collection-tags">
+        ${badges.slice(0, 3).map(b => `<span class="collection-tag">${b.icon || ''} ${b.text || b}</span>`).join('')}
+      </div>
+    `;
+  } else if (template === 'deep-dive' && specifications.length > 0) {
+    tagsHTML = `
+      <div class="collection-tags">
+        ${specifications.slice(0, 2).map(s => `<span class="collection-tag">${s.label}: ${s.value}</span>`).join('')}
+      </div>
+    `;
+  }
   
   return `
     <div class="collection-card" data-product-id="${product.id}">
@@ -194,7 +204,7 @@ function renderProductCard(product) {
       <div class="collection-content">
         <p class="collection-description">${description.substring(0, 100)}${description.length > 100 ? '...' : ''}</p>
         ${tagsHTML}
-        <button class="collection-btn">View Details →</button>
+        <button class="collection-btn">Get This Now</button>
       </div>
     </div>
   `;
