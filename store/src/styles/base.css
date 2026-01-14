@@ -953,10 +953,8 @@ body {
 
 .testimonial-author {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 8px;
-    text-align: center;
+    gap: 12px;
 }
 
 .testimonial-avatar {
@@ -986,7 +984,6 @@ body {
 .testimonial-author-info {
     display: flex;
     flex-direction: column;
-    align-items: center;
     gap: 2px;
 }
 
