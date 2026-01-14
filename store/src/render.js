@@ -203,8 +203,9 @@ function renderStoreTestimonials() {
         ${testimonials.map(t => {
           const name = t.name || t.author || 'Customer';
           const initials = name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
-          const avatarContent = t.avatar 
-            ? `<img src="${t.avatar}" alt="${name}">`
+          const avatarUrl = t.avatar || t.image;
+          const avatarContent = avatarUrl 
+            ? `<img src="${avatarUrl}" alt="${name}">`
             : initials;
           return `
           <div class="testimonial-card">
@@ -727,8 +728,9 @@ function renderTestimonials(testimonials) {
         ${filtered.map(t => {
           const name = t.author || 'Customer';
           const initials = name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
-          const avatarContent = t.avatar 
-            ? `<img src="${t.avatar}" alt="${name}">`
+          const avatarUrl = t.avatar || t.image;
+          const avatarContent = avatarUrl 
+            ? `<img src="${avatarUrl}" alt="${name}">`
             : initials;
           return `
           <div class="testimonial-card">
