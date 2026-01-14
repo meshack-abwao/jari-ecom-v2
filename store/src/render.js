@@ -487,7 +487,7 @@ function renderMenuTestimonials(testimonials) {
         ${filtered.map(t => `
           <div class="testimonial-card">
             ${t.image ? 
-              `<div class="testimonial-avatar-wrapper"><img src="${t.image}" alt="${t.author}" class="testimonial-avatar"></div>` : 
+              `<div class="testimonial-avatar-wrapper"><img src="${t.image}" alt="${t.author}"></div>` : 
               `<div class="testimonial-avatar-placeholder">${(t.author || 'C').charAt(0).toUpperCase()}</div>`}
             <p class="testimonial-quote">"${t.text}"</p>
             <div class="testimonial-author">

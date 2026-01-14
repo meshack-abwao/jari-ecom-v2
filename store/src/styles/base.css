@@ -2671,6 +2671,14 @@ body {
     padding: 3px;
     background: var(--gradient-primary);
     margin-bottom: var(--space-md);
+    overflow: hidden;
+}
+
+.testimonial-avatar-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
 }
 
 .testimonial-avatar-placeholder {
