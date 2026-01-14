@@ -513,18 +513,42 @@ function renderDeepDive(product) {
   const specifications = data.specifications || [];
   const testimonials = data.testimonials || [];
   const trustBadges = data.trustBadges || [];
+  const whyChoose = data.whyChoose || [];
   const policies = data.policies || {};
   const showBackButton = products.length > 1;
   
+  // Filter valid specs (both label and value filled)
+  const validSpecs = specifications.filter(s => s.label && s.value);
+  // Filter valid whyChoose (at least title filled)
+  const validWhyChoose = whyChoose.filter(w => w.title);
+  
   return `
     ${showBackButton ? '<button class="back-btn" id="backBtn">← Back to All Products</button>' : ''}
-    <div class="product-container">
+    <div class="product-container template-deep-dive">
       <div class="product-card">
-        ${renderGallery(media.images || [])}
-        ${(media.stories || []).length > 0 ? renderStories(media.stories, data.storyTitle) : ''}
+        <!-- GALLERY SECTION -->
+        <div class="deep-dive-gallery">
+          ${renderGallery(media.images || [])}
+        </div>
         
+        <!-- PRODUCT INFO SECTION -->
         <div class="product-info">
-          <h2 class="product-name">${data.name || 'Product'}</h2>
+          <!-- Header: Name + Trust Badges -->
+          <div class="product-header">
+            <h2 class="product-name">${data.name || 'Product'}</h2>
+            <div class="social-actions">
+              <button class="social-btn share-btn" title="Share">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/>
+                </svg>
+              </button>
+              <button class="social-btn heart-btn" title="Save">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                </svg>
+              </button>
+            </div>
+          </div>
           
           ${trustBadges.length > 0 ? `
             <div class="trust-badges">
@@ -532,28 +556,89 @@ function renderDeepDive(product) {
             </div>
           ` : ''}
           
-          <p class="product-description">${data.description || ''}</p>
-          
-          ${specifications.length > 0 ? `
-            <div class="specifications-section">
-              <h3 class="section-title">📋 Specifications</h3>
-              <table class="specs-table">
-                ${specifications.map(spec => `<tr><td class="spec-label">${spec.label}</td><td class="spec-value">${spec.value}</td></tr>`).join('')}
-              </table>
-            </div>
-          ` : ''}
-          
-          ${data.warranty ? `<div class="warranty-section"><h3 class="section-title">🛡️ Warranty</h3><p>${data.warranty}</p></div>` : ''}
-          ${testimonials.length > 0 ? renderTestimonials(testimonials) : ''}
-          
-          <div class="price-display">
-            <span class="price-label">Price</span>
-            <div class="price">KES <span id="displayPrice">${parseInt(data.price || 0).toLocaleString()}</span></div>
+          <!-- Price Row -->
+          <div class="price-row">
+            <div class="price">KES ${parseInt(data.price || 0).toLocaleString()}</div>
           </div>
           
+          <!-- Description -->
+          ${data.description ? `<p class="product-description">${data.description}</p>` : ''}
+        </div>
+      </div>
+      
+      <!-- STORIES (if present) -->
+      ${(media.stories || []).length > 0 ? `
+        <div class="deep-dive-section">
+          ${renderStories(media.stories, data.storyTitle)}
+        </div>
+      ` : ''}
+      
+      <!-- WHY CHOOSE THIS (if filled) -->
+      ${validWhyChoose.length > 0 ? `
+        <div class="deep-dive-section why-choose-section">
+          <h3 class="section-title">Why Choose ${data.name || 'This Product'}?</h3>
+          <div class="why-choose-grid">
+            ${validWhyChoose.map(item => `
+              <div class="why-choose-card">
+                ${item.icon ? `<span class="why-choose-icon">${item.icon}</span>` : ''}
+                <h4 class="why-choose-title">${item.title}</h4>
+                ${item.description ? `<p class="why-choose-desc">${item.description}</p>` : ''}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      ` : ''}
+      
+      <!-- SPECIFICATIONS (if filled) -->
+      ${validSpecs.length > 0 ? `
+        <div class="deep-dive-section specifications-section">
+          <h3 class="section-title">Specifications</h3>
+          <div class="specs-content ${media.specsImage ? 'has-image' : ''}">
+            ${media.specsImage ? `
+              <div class="specs-image">
+                <img src="${media.specsImage}" alt="Product specifications">
+              </div>
+            ` : ''}
+            <div class="specs-grid">
+              ${validSpecs.map(spec => `
+                <div class="spec-card">
+                  <span class="spec-label">${spec.label}</span>
+                  <span class="spec-value">${spec.value}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      ` : ''}
+      
+      <!-- WARRANTY (if filled) -->
+      ${data.warranty ? `
+        <div class="deep-dive-section warranty-section">
+          <div class="warranty-card">
+            <span class="warranty-icon">🛡️</span>
+            <div class="warranty-content">
+              <h4 class="warranty-title">Warranty & Guarantee</h4>
+              <p class="warranty-text">${data.warranty}</p>
+            </div>
+          </div>
+        </div>
+      ` : ''}
+      
+      <!-- TESTIMONIALS (if filled) -->
+      ${testimonials.length > 0 ? `
+        <div class="deep-dive-section">
+          ${renderTestimonials(testimonials)}
+        </div>
+      ` : ''}
+      
+      <!-- STICKY CTA SECTION -->
+      <div class="deep-dive-cta">
+        <div class="cta-inner">
           ${renderQuantitySection(data.price || 0, data.stock || 999)}
-          
-          <button class="buy-btn" id="buyBtn"><span class="btn-text">Buy Now</span><span class="btn-arrow">→</span></button>
+          <button class="buy-btn" id="buyBtn">
+            <span class="btn-text">Add to Cart</span>
+            <span class="btn-arrow">→</span>
+          </button>
           ${renderProductPolicyLinks(policies)}
         </div>
       </div>

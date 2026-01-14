@@ -85,6 +85,8 @@ const getInitialFormData = () => ({
   specifications: [{ label: '', value: '' }],
   warranty: '',
   trustBadges: [],
+  whyChoose: [{ icon: '', title: '', description: '' }],
+  specsImage: '',
   
   // Event (event-landing)
   eventDate: '',
@@ -123,7 +125,7 @@ export default function ProductsPage() {
   const [formData, setFormData] = useState(getInitialFormData());
   const [expandedSections, setExpandedSections] = useState({
     basic: true, gallery: false, stories: false, testimonials: false,
-    packages: false, dietary: false, specifications: false, eventDetails: false, tickets: false, policies: false
+    packages: false, dietary: false, specifications: false, whyChoose: false, warranty: false, eventDetails: false, tickets: false, policies: false
   });
 
   useEffect(() => { loadProducts(); loadStoreInfo(); loadCategories(); }, []);
@@ -250,6 +252,7 @@ export default function ProductsPage() {
             specifications: formData.specifications.filter(s => s.label?.trim()),
             warranty: formData.warranty,
             trustBadges: formData.trustBadges,
+            whyChoose: (formData.whyChoose || []).filter(w => w.title?.trim()),
           }),
           
           ...(selectedTemplate === 'event-landing' && {
@@ -263,6 +266,7 @@ export default function ProductsPage() {
         media: {
           images: formData.images.filter(url => url?.trim()),
           stories: formData.stories.filter(s => s.url?.trim()),
+          ...(formData.specsImage?.trim() && { specsImage: formData.specsImage }),
         },
       };
 
@@ -335,6 +339,10 @@ export default function ProductsPage() {
         : [{ label: '', value: '' }],
       warranty: data.warranty || '',
       trustBadges: data.trustBadges || [],
+      whyChoose: data.whyChoose?.length > 0
+        ? data.whyChoose
+        : [{ icon: '', title: '', description: '' }],
+      specsImage: media.specsImage || '',
       
       eventDate: data.eventDate || '',
       eventTime: data.eventTime || '',
@@ -983,6 +991,78 @@ export default function ProductsPage() {
                         style={styles.addBtn}
                       >
                         + Add Spec
+                      </button>
+                      
+                      <div style={{ ...styles.formGroup, marginTop: '20px', paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+                        <label style={styles.label}>SPECS IMAGE (OPTIONAL)</label>
+                        <p style={styles.hint}>Add a diagram, size chart, or detail shot</p>
+                        <input
+                          type="url"
+                          value={formData.specsImage || ''}
+                          onChange={e => updateField('specsImage', e.target.value)}
+                          placeholder="https://example.com/specs-diagram.jpg"
+                          className="dashboard-input"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* WHY CHOOSE THIS (deep-dive) */}
+              {showField('specifications') && (
+                <div style={styles.section}>
+                  <SectionHeader section="whyChoose" title="Why Choose This?" icon="🏆" />
+                  {expandedSections.whyChoose && (
+                    <div style={styles.sectionContent}>
+                      <p style={styles.hint}>Add 2-3 key reasons why customers should buy this product</p>
+                      {(formData.whyChoose || [{ icon: '', title: '', description: '' }]).map((item, idx) => (
+                        <div key={idx} style={{ ...styles.whyChooseItem, marginBottom: '16px', padding: '16px', background: 'rgba(255,255,255,0.02)', borderRadius: '12px' }}>
+                          <div style={{ display: 'flex', gap: '12px', marginBottom: '12px' }}>
+                            <input
+                              type="text"
+                              value={item.icon || ''}
+                              onChange={e => {
+                                const newW = [...(formData.whyChoose || [])];
+                                newW[idx] = { ...newW[idx], icon: e.target.value };
+                                updateField('whyChoose', newW);
+                              }}
+                              placeholder="🏆"
+                              style={{ width: '60px' }}
+                              className="dashboard-input"
+                            />
+                            <input
+                              type="text"
+                              value={item.title || ''}
+                              onChange={e => {
+                                const newW = [...(formData.whyChoose || [])];
+                                newW[idx] = { ...newW[idx], title: e.target.value };
+                                updateField('whyChoose', newW);
+                              }}
+                              placeholder="Premium Quality"
+                              style={{ flex: 1 }}
+                              className="dashboard-input"
+                            />
+                          </div>
+                          <textarea
+                            value={item.description || ''}
+                            onChange={e => {
+                              const newW = [...(formData.whyChoose || [])];
+                              newW[idx] = { ...newW[idx], description: e.target.value };
+                              updateField('whyChoose', newW);
+                            }}
+                            placeholder="Short description of this benefit..."
+                            rows={2}
+                            className="dashboard-input"
+                          />
+                        </div>
+                      ))}
+                      <button
+                        type="button"
+                        onClick={() => updateField('whyChoose', [...(formData.whyChoose || []), { icon: '', title: '', description: '' }])}
+                        style={styles.addBtn}
+                      >
+                        + Add Reason
                       </button>
                     </div>
                   )}
