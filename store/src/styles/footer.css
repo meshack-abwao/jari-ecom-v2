@@ -1,5 +1,5 @@
 /* ===========================================
-   STORE FOOTER - V1 Simple Style
+   STORE FOOTER - Clean & Simple
    =========================================== */
 .store-footer {
     margin-top: var(--space-4xl);
@@ -8,9 +8,9 @@
 }
 
 .powered-by {
-    font-size: var(--fs-tiny);  /* V1: 11px */
+    font-size: var(--fs-tiny);
     color: var(--text-secondary);
-    margin-bottom: var(--space-sm);  /* V1: ~10px */
+    margin-bottom: var(--space-sm);
 }
 
 .powered-by a {
@@ -26,12 +26,12 @@
 .policy-links {
     display: flex;
     justify-content: center;
-    gap: var(--space-sm) var(--space-lg);  /* V1: 8px 16px */
+    gap: var(--space-sm) var(--space-lg);
     flex-wrap: wrap;
 }
 
 .store-policy-link {
-    font-size: var(--fs-micro);  /* V1: 10px */
+    font-size: var(--fs-micro);
     color: var(--text-secondary);
     background: none;
     border: none;
@@ -46,24 +46,7 @@
 }
 
 /* ===========================================
-   TEMPLATE BADGE (on collection cards)
-   =========================================== */
-.template-badge {
-    position: absolute;
-    top: var(--space-md);
-    left: var(--space-md);
-    background: rgba(0,0,0,0.7);
-    color: white;
-    padding: 6px var(--space-md);
-    border-radius: var(--space-xl);
-    font-size: var(--fs-tiny);
-    font-weight: 600;
-    backdrop-filter: blur(4px);
-    z-index: 5;
-}
-
-/* ===========================================
-   POLICY MODAL IMPROVEMENTS
+   POLICY MODAL
    =========================================== */
 .modal-close-x {
     position: absolute;
@@ -88,11 +71,6 @@
     transform: rotate(90deg);
 }
 
-.modal-close-btn {
-    width: 100%;
-    margin-top: 16px;
-}
-
 .policy-text {
     font-size: var(--fs-body);
     color: var(--text-secondary);
@@ -103,7 +81,6 @@
     padding-right: 8px;
 }
 
-/* Custom scrollbar for policy text */
 .policy-text::-webkit-scrollbar {
     width: 6px;
 }
@@ -116,299 +93,4 @@
 .policy-text::-webkit-scrollbar-thumb {
     background: var(--border);
     border-radius: 3px;
-}
-
-.policy-text::-webkit-scrollbar-thumb:hover {
-    background: var(--text-secondary);
-}
-
-/* ===========================================
-   SHARE BUTTON (Instagram-style)
-   =========================================== */
-.action-btn svg {
-    width: 20px;
-    height: 20px;
-    stroke: var(--text-secondary);
-    transition: stroke 0.3s;
-}
-
-.action-btn:hover svg {
-    stroke: var(--color-primary);
-}
-
-/* ===========================================
-   TESTIMONIALS - Left aligned, clean look
-   =========================================== */
-.testimonials-section {
-    margin: 24px 0;
-    padding: 24px 0;
-    background: rgba(0,0,0,0.02);
-    border-radius: 0;
-    border: none;
-}
-
-.testimonials-section h3 {
-    padding: 0 16px;
-    margin-bottom: 16px;
-}
-
-.testimonials-scroll {
-    display: flex;
-    gap: 12px;
-    overflow-x: auto;
-    padding: 0 16px 8px 16px;
-    -webkit-overflow-scrolling: touch;
-    justify-content: flex-start;
-}
-
-/* Hide scrollbar but keep functionality */
-.testimonials-scroll::-webkit-scrollbar {
-    height: 4px;
-}
-
-.testimonials-scroll::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.testimonials-scroll::-webkit-scrollbar-thumb {
-    background: rgba(0,0,0,0.1);
-    border-radius: 2px;
-}
-
-.testimonial-card {
-    min-width: 200px;
-    max-width: 220px;
-    padding: 14px;
-    background: white;
-    border-radius: 14px;
-    flex-shrink: 0;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-    text-align: center;
-}
-
-.testimonial-card .avatar {
-    width: 44px;
-    height: 44px;
-    margin: 0 auto 10px;
-}
-
-.testimonial-card .quote {
-    font-size: var(--fs-caption);
-    font-style: italic;
-    color: var(--text-secondary);
-    line-height: 1.4;
-    margin-bottom: 10px;
-}
-
-.testimonial-card .name {
-    font-size: var(--fs-caption);
-    font-weight: var(--fw-semibold);
-    color: var(--text-primary);
-    margin-bottom: 2px;
-}
-
-.testimonial-card .role {
-    font-size: var(--fs-micro);
-    color: var(--text-tertiary);
-    margin-bottom: 6px;
-}
-
-.testimonial-card .stars {
-    font-size: 12px;
-}
-
-/* Store testimonials in collections view */
-.store-testimonials .testimonials-scroll {
-    justify-content: flex-start;
-    padding: 0;
-}
-
-/* ===========================================
-   STORY PROGRESS - Better timing
-   =========================================== */
-.story-progress {
-    display: flex;
-    gap: 4px;
-    padding: 12px 16px;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 10;
-}
-
-.story-progress-bar {
-    flex: 1;
-    height: 3px;
-    background: rgba(255,255,255,0.3);
-    border-radius: 2px;
-    overflow: hidden;
-}
-
-.story-progress-fill {
-    height: 100%;
-    background: white;
-    width: 0%;
-    transition: none;
-}
-
-.story-progress-bar.active .story-progress-fill {
-    width: 100%;
-    transition: width 5s linear;
-}
-
-.story-progress-bar.viewed .story-progress-fill {
-    width: 100%;
-    transition: none;
-}
-
-/* ===========================================
-   DESKTOP VIEW - Two column layout
-   =========================================== */
-@media (min-width: 768px) {
-    /* Product container becomes side-by-side */
-    .product-container {
-        max-width: 900px;
-    }
-    
-    .product-card {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0;
-    }
-    
-    /* Gallery on left */
-    .product-gallery {
-        border-radius: var(--radius-lg) 0 0 var(--radius-lg);
-    }
-    
-    .main-image-container {
-        height: 500px;
-    }
-    
-    /* Stories below gallery */
-    .stories-section {
-        grid-column: 1;
-    }
-    
-    /* Info on right */
-    .product-info {
-        padding: 32px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        max-height: 600px;
-        overflow-y: auto;
-    }
-    
-    /* Collections grid - larger cards */
-    .collections-grid {
-        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-        gap: 28px;
-    }
-    
-    .collection-image {
-        height: 280px;
-    }
-    
-    /* Larger header on desktop */
-    .header {
-        padding: 60px 40px 48px;
-    }
-    
-    .business-name {
-        font-size: var(--fs-display-xl);
-    }
-    
-    .logo {
-        width: 88px;
-        height: 88px;
-        font-size: 36px;
-    }
-}
-
-@media (min-width: 1024px) {
-    .product-container {
-        max-width: 1000px;
-    }
-    
-    .main-image-container {
-        height: 550px;
-    }
-    
-    .product-info {
-        padding: 40px;
-    }
-    
-    .collections-grid {
-        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-        gap: 32px;
-    }
-}
-
-/* ===========================================
-   TEMPLATE-SPECIFIC DESKTOP LAYOUTS
-   =========================================== */
-
-/* Portfolio-Booking: Package cards in grid on desktop */
-@media (min-width: 768px) {
-    .packages-section {
-        margin: 24px 0;
-    }
-    
-    .package-card {
-        transition: transform 0.3s, box-shadow 0.3s;
-    }
-    
-    .package-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-    }
-}
-
-/* Deep-Dive: Specs table wider on desktop */
-@media (min-width: 768px) {
-    .specifications-section {
-        margin: 24px 0;
-    }
-    
-    .specs-table td {
-        padding: 14px 0;
-    }
-    
-    .warranty-section {
-        padding: 20px;
-    }
-}
-
-/* Event-Landing: Ticket cards with hover effect */
-@media (min-width: 768px) {
-    .tickets-section {
-        margin: 24px 0;
-    }
-    
-    .ticket-card {
-        transition: transform 0.3s, box-shadow 0.3s;
-    }
-    
-    .ticket-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-    }
-    
-    .event-details {
-        padding: 24px;
-    }
-}
-
-/* Visual-Menu: Cleaner desktop look */
-@media (min-width: 768px) {
-    .dietary-tags {
-        margin-bottom: 16px;
-    }
-    
-    .menu-meta {
-        gap: 24px;
-        margin-bottom: 16px;
-    }
 }

@@ -3337,32 +3337,3 @@ textarea:focus-visible {
 .register-btn {
     background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%) !important;
 }
-
-/* ===========================================
-   TEMPLATE BADGES ON CARDS
-   =========================================== */
-.template-badge {
-    position: absolute;
-    top: var(--space-sm);
-    left: var(--space-sm);
-    width: fit-content;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: var(--space-xs) var(--space-sm);
-    background: rgba(0, 0, 0, 0.75);
-    backdrop-filter: blur(10px);
-    border-radius: var(--radius-full);
-    font-size: var(--fs-micro);
-    font-weight: 600;
-    color: white;
-    text-transform: uppercase;
-    letter-spacing: var(--ls-wide);
-    z-index: 10;
-}
-
-.template-badge.quick-decision { background: rgba(255, 159, 10, 0.9); }
-.template-badge.portfolio-booking { background: rgba(139, 92, 246, 0.9); }
-.template-badge.visual-menu { background: rgba(46, 204, 113, 0.9); }
-.template-badge.deep-dive { background: rgba(59, 130, 246, 0.9); }
-.template-badge.event-landing { background: rgba(255, 107, 107, 0.9); }
