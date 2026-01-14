@@ -675,7 +675,14 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 16px;
+    gap: 16px;
+    margin-bottom: 8px;
+}
+
+.product-header .social-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
 }
 
 .product-name {
@@ -2636,6 +2643,44 @@ body {
 .price-row .social-actions {
     display: flex;
     gap: 8px;
+}
+
+/* ===========================================
+   PRICE META ROW - Visual Menu Layout
+   =========================================== */
+.price-meta-row {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.price-meta-row .price {
+    font-size: 28px;
+    font-weight: 800;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.price-meta-row .price .currency {
+    font-size: 0.618em;
+    font-weight: 600;
+}
+
+.menu-meta-inline {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.menu-meta-inline .meta-item {
+    font-size: 14px;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
 .social-btn {

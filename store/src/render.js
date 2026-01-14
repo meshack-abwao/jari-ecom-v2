@@ -394,14 +394,20 @@ function renderVisualMenu(product) {
         ${renderMenuGallery(media.images || [])}
         
         <div class="product-info">
-          <h2 class="product-name">${data.name || 'Menu Item'}</h2>
-          <div class="price-row">
-            <div class="price"><span class="currency">KES</span> <span id="displayPrice">${parseInt(data.price || 0).toLocaleString()}</span></div>
+          <div class="product-header">
+            <h2 class="product-name">${data.name || 'Menu Item'}</h2>
             <div class="social-actions">
               <button class="social-btn share-btn" id="shareBtn" title="Share">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
               </button>
               <button class="social-btn like-btn" id="likeBtn" title="Save">🤍</button>
+            </div>
+          </div>
+          <div class="price-meta-row">
+            <div class="price"><span class="currency">KES</span> <span id="displayPrice">${parseInt(data.price || 0).toLocaleString()}</span></div>
+            <div class="menu-meta-inline">
+              ${data.prepTime ? `<span class="meta-item">⏱️ ${data.prepTime}</span>` : ''}
+              ${data.calories ? `<span class="meta-item">🔥 ${data.calories}</span>` : ''}
             </div>
           </div>
           
@@ -417,11 +423,6 @@ function renderVisualMenu(product) {
           ${stories.length > 0 ? renderStories(stories, data.storyTitle || 'INDULGE') : ''}
           
           <p class="product-description">${data.description || ''}</p>
-          
-          <div class="menu-meta">
-            ${data.prepTime ? `<span class="meta-item">⏱️ ${data.prepTime}</span>` : ''}
-            ${data.calories ? `<span class="meta-item">🔥 ${data.calories}</span>` : ''}
-          </div>
           
           ${data.ingredients ? `
             <div class="ingredients-section">
