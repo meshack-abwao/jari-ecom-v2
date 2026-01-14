@@ -377,14 +377,7 @@ function renderVisualMenu(product) {
   
   return `
     ${showBackButton ? `
-    <div class="nav-wrapper">
-      <nav class="breadcrumb">
-        <a href="?" id="breadcrumbHome">${storeName}</a>
-        <span>›</span>
-        <span class="current">${data.name || 'Item'}</span>
-      </nav>
-      <button class="back-btn" id="backBtn">← Back to Menu</button>
-    </div>
+    <button class="back-btn" id="backBtn">← Back to Menu</button>
     ` : ''}
     <div class="product-container template-menu">
       <div class="product-card food-card">
