@@ -2670,7 +2670,7 @@ body {
     border-radius: 50%;
     padding: 3px;
     background: var(--gradient-primary);
-    margin-bottom: var(--space-md);
+    margin: 0 auto var(--space-md);
     overflow: hidden;
 }
 
@@ -2692,7 +2692,7 @@ body {
     color: white;
     font-size: var(--fs-heading-xl);
     font-weight: 700;
-    margin-bottom: var(--space-md);
+    margin: 0 auto var(--space-md);
 }
 
 .testimonial-quote {
@@ -2701,6 +2701,7 @@ body {
     color: var(--text-secondary);
     font-style: italic;
     margin: 0 0 12px 0;
+    text-align: center;
 }
 
 .testimonial-quote::before {
@@ -2726,9 +2727,14 @@ body {
 
 .testimonial-rating {
     color: #ffc107;
-    font-size: var(--fs-body-sm);  /* V1: 13px not 14px */
+    font-size: var(--fs-body-sm);
     letter-spacing: 2px;
     margin-top: var(--space-sm);
+    text-align: center;
+}
+
+.testimonial-author {
+    text-align: center;
 }
 
 /* Multiple testimonials - horizontal scroll on mobile */
