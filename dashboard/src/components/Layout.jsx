@@ -254,7 +254,7 @@ const styles = {
   userEmail: { fontSize: '13px', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
   greeting: { padding: '16px', background: 'var(--greeting-bg)', border: '1px solid var(--greeting-border)', borderRadius: '12px', fontSize: '13px', lineHeight: '1.5', color: 'var(--text-secondary)', fontWeight: '500' },
   themeToggle: { display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderRadius: '12px', cursor: 'pointer', fontSize: '14px', fontWeight: '600', color: 'var(--text-secondary)', transition: 'all 0.3s', border: 'none' },
-  nav: { display: 'flex', flexDirection: 'column', gap: '4px', flex: 1 },
+  nav: { display: 'flex', flexDirection: 'column', gap: '4px', flex: 1, justifyContent: 'center' },
   logoutBtn: { display: 'flex', alignItems: 'center', gap: '12px', padding: '14px 16px', borderRadius: '12px', background: 'rgba(220, 38, 38, 0.1)', border: '1px solid rgba(220, 38, 38, 0.2)', color: '#dc2626', fontSize: '15px', fontWeight: '600', cursor: 'pointer', transition: 'all 0.3s' },
   modalOverlay: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0, 0, 0, 0.7)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' },
   modal: { width: '100%', maxWidth: '650px', maxHeight: '90vh', overflowY: 'auto', padding: '32px' },
