@@ -194,7 +194,7 @@ function renderProductCard(product) {
       <div class="collection-content">
         <p class="collection-description">${description.substring(0, 100)}${description.length > 100 ? '...' : ''}</p>
         ${tagsHTML}
-        <button class="collection-btn">Get This Now</button>
+        <button class="collection-btn">View Details →</button>
       </div>
     </div>
   `;
