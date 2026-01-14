@@ -8,10 +8,21 @@ export default function DashboardPage() {
   const [products, setProducts] = useState([]);
   const [storeUrl, setStoreUrl] = useState('');
   const [loading, setLoading] = useState(true);
+  const [greeting, setGreeting] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
     loadData();
+    // Set dynamic greeting
+    const hour = new Date().getHours();
+    const greetings = {
+      morning: ["Good morning! Ready to grow?", "Rise and shine! Let's sell.", "Morning! Your store awaits."],
+      afternoon: ["Good afternoon! How's business?", "Afternoon check-in time!", "Hey there! Sales looking good?"],
+      evening: ["Good evening! Nice work today.", "Evening! Let's review the day.", "Winding down? Great progress!"]
+    };
+    const period = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening';
+    const options = greetings[period];
+    setGreeting(options[Math.floor(Math.random() * options.length)]);
   }, []);
 
   const loadData = async () => {
@@ -92,7 +103,7 @@ export default function DashboardPage() {
       <div style={styles.header}>
         <div>
           <h1 style={styles.title}>Overview</h1>
-          <p style={styles.subtitle}>Let's review what's working!</p>
+          <p style={styles.subtitle}>{greeting}</p>
         </div>
         <div style={styles.headerActions}>
           {storeUrl && (

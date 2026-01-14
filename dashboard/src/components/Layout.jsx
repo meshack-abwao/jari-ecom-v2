@@ -87,19 +87,6 @@ export default function Layout() {
     navigate('/login');
   };
 
-  // Dynamic, friendly greetings
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    const greetings = {
-      morning: ["Good morning! Ready to grow?", "Rise and shine! Let's sell.", "Morning! Your store awaits."],
-      afternoon: ["Good afternoon! How's business?", "Afternoon check-in time!", "Hey there! Sales looking good?"],
-      evening: ["Good evening! Nice work today.", "Evening! Let's review the day.", "Winding down? Great progress!"]
-    };
-    const period = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening';
-    const options = greetings[period];
-    return options[Math.floor(Math.random() * options.length)];
-  };
-
   const closeMobileMenu = () => {
     setMobileMenuOpen(false);
     document.body.style.overflow = '';
@@ -212,18 +199,6 @@ export default function Layout() {
           </div>
         </div>
 
-        <div style={styles.greeting}>{getGreeting()}</div>
-
-        {/* Theme Toggle with Animation */}
-        <button onClick={toggleTheme} style={styles.themeToggle} className="glass-card theme-toggle-btn">
-          <div className={`toggle-track ${theme === 'dark' ? 'dark' : 'light'}`}>
-            <div className="toggle-thumb">
-              {theme === 'dark' ? <Moon size={14} /> : <Sun size={14} />}
-            </div>
-          </div>
-          <span>{theme === 'dark' ? 'Dark Mode' : 'Light Mode'}</span>
-        </button>
-
         <nav style={styles.nav}>
           <NavLink to="/" end className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
             <Home size={20} /><span>Overview</span>
@@ -247,6 +222,16 @@ export default function Layout() {
             <Settings size={20} /><span>Settings</span>
           </NavLink>
         </nav>
+
+        {/* Theme Toggle - Bottom */}
+        <button onClick={toggleTheme} style={styles.themeToggle} className="glass-card theme-toggle-btn">
+          <div className={`toggle-track ${theme === 'dark' ? 'dark' : 'light'}`}>
+            <div className="toggle-thumb">
+              {theme === 'dark' ? <Moon size={14} /> : <Sun size={14} />}
+            </div>
+          </div>
+          <span>{theme === 'dark' ? 'Dark Mode' : 'Light Mode'}</span>
+        </button>
 
         <button onClick={handleLogout} style={styles.logoutBtn}>
           <LogOut size={20} /><span>Logout</span>

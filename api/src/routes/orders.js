@@ -86,7 +86,7 @@ router.get('/stats', auth, async (req, res, next) => {
          COUNT(*) FILTER (WHERE status = 'paid')::int as paid,
          COUNT(*) FILTER (WHERE status IN ('delivered', 'completed'))::int as delivered,
          COUNT(*) FILTER (WHERE status = 'cancelled')::int as cancelled,
-         COALESCE(SUM((items->0->>'total')::numeric) FILTER (WHERE status IN ('delivered', 'completed', 'paid')), 0) as revenue,
+         COALESCE(SUM((items->0->>'total')::numeric), 0) as revenue,
          COALESCE(SUM((items->0->>'total')::numeric) FILTER (WHERE status = 'pending'), 0) as pending_revenue
        FROM orders 
        WHERE store_id = $1`,
