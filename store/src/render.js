@@ -159,6 +159,7 @@ function renderProductCard(product) {
   const description = data.description || '';
   const name = data.name || 'Product';
   const template = product.template || 'quick-decision';
+  const badges = data.badges || [];
   
   // Template badge for visual indication
   const templateBadges = {
@@ -170,6 +171,13 @@ function renderProductCard(product) {
   };
   const badge = templateBadges[template] || templateBadges['quick-decision'];
   
+  // Render tags/badges if available
+  const tagsHTML = badges.length > 0 ? `
+    <div class="collection-tags">
+      ${badges.slice(0, 3).map(b => `<span class="collection-tag">${b.icon || ''} ${b.text || b}</span>`).join('')}
+    </div>
+  ` : '';
+  
   return `
     <div class="collection-card" data-product-id="${product.id}">
       <div class="collection-image">
@@ -178,14 +186,15 @@ function renderProductCard(product) {
           : '<div class="image-placeholder">📸</div>'
         }
         <span class="template-badge">${badge.icon} ${badge.label}</span>
+        <div class="collection-overlay">
+          <h3 class="collection-name">${name}</h3>
+          <p class="collection-price">KES ${parseInt(price).toLocaleString()}</p>
+        </div>
       </div>
       <div class="collection-content">
-        <h3 class="collection-name">${name}</h3>
-        <p class="collection-description">${description.substring(0, 80)}${description.length > 80 ? '...' : ''}</p>
-        <div class="collection-footer">
-          <p class="collection-price">KES ${parseInt(price).toLocaleString()}</p>
-          <button class="collection-btn">View Details →</button>
-        </div>
+        <p class="collection-description">${description.substring(0, 100)}${description.length > 100 ? '...' : ''}</p>
+        ${tagsHTML}
+        <button class="collection-btn">Get This Now</button>
       </div>
     </div>
   `;
