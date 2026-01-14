@@ -158,17 +158,6 @@ function renderProductCard(product) {
   const price = data.price || 0;
   const description = data.description || '';
   const name = data.name || 'Product';
-  const template = product.template || 'quick-decision';
-  
-  // Template badge for visual indication
-  const templateBadges = {
-    'quick-decision': { icon: '⚡', label: 'Quick Buy' },
-    'portfolio-booking': { icon: '📅', label: 'Book Service' },
-    'visual-menu': { icon: '🍽️', label: 'Menu Item' },
-    'deep-dive': { icon: '🔍', label: 'Details' },
-    'event-landing': { icon: '🎟️', label: 'Event' }
-  };
-  const badge = templateBadges[template] || templateBadges['quick-decision'];
   
   // Build gallery HTML
   const hasMultiple = cardImages.length > 1;
@@ -183,7 +172,6 @@ function renderProductCard(product) {
     <div class="collection-card" data-product-id="${product.id}">
       <div class="collection-image">
         ${galleryHTML}
-        <span class="template-badge">${badge.icon} ${badge.label}</span>
         <div class="collection-overlay">
           <h3 class="collection-name">${name}</h3>
           <p class="collection-price"><span class="currency">KES</span> <span class="amount">${parseInt(price).toLocaleString()}</span></p>
@@ -206,16 +194,31 @@ function renderStoreTestimonials() {
   if (testimonials.length === 0) return '';
   
   return `
-    <div class="store-testimonials">
-      <h3 class="testimonials-title">What Our Customers Say</h3>
+    <div class="testimonials-section">
+      <div class="testimonials-header">
+        <h4>Testimonials</h4>
+        <p class="section-title">What Our Customers Say</p>
+      </div>
       <div class="testimonials-scroll">
-        ${testimonials.map(t => `
+        ${testimonials.map(t => {
+          const name = t.name || t.author || 'Customer';
+          const initials = name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+          const avatarContent = t.avatar 
+            ? `<img src="${t.avatar}" alt="${name}">`
+            : initials;
+          return `
           <div class="testimonial-card">
-            <div class="testimonial-stars">★★★★★</div>
+            <div class="testimonial-stars">${'★'.repeat(t.rating || 5)}</div>
             <p class="testimonial-text">"${t.quote || t.text}"</p>
-            <p class="testimonial-author">— ${t.name || t.author || 'Customer'}${t.role ? `, ${t.role}` : ''}</p>
+            <div class="testimonial-author">
+              <div class="testimonial-avatar">${avatarContent}</div>
+              <div class="testimonial-author-info">
+                <span class="testimonial-author-name">${name}</span>
+                <span class="testimonial-author-label">${t.role || 'Verified Buyer'}</span>
+              </div>
+            </div>
           </div>
-        `).join('')}
+        `}).join('')}
       </div>
     </div>
   `;
@@ -716,15 +719,30 @@ function renderTestimonials(testimonials) {
   
   return `
     <div class="testimonials-section">
-      <h3 class="section-title">⭐ Customer Reviews</h3>
+      <div class="testimonials-header">
+        <h4>Testimonials</h4>
+        <p class="section-title">What Our Customers Say</p>
+      </div>
       <div class="testimonials-scroll">
-        ${filtered.map(t => `
+        ${filtered.map(t => {
+          const name = t.author || 'Customer';
+          const initials = name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+          const avatarContent = t.avatar 
+            ? `<img src="${t.avatar}" alt="${name}">`
+            : initials;
+          return `
           <div class="testimonial-card">
-            <div class="testimonial-stars">${'★'.repeat(t.rating || 5)}${'☆'.repeat(5 - (t.rating || 5))}</div>
+            <div class="testimonial-stars">${'★'.repeat(t.rating || 5)}</div>
             <p class="testimonial-text">"${t.text}"</p>
-            <p class="testimonial-author">— ${t.author || 'Customer'}</p>
+            <div class="testimonial-author">
+              <div class="testimonial-avatar">${avatarContent}</div>
+              <div class="testimonial-author-info">
+                <span class="testimonial-author-name">${name}</span>
+                <span class="testimonial-author-label">Verified Buyer</span>
+              </div>
+            </div>
           </div>
-        `).join('')}
+        `}).join('')}
       </div>
     </div>
   `;
