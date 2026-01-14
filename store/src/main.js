@@ -194,6 +194,7 @@ function renderProductView(product) {
   initProductHandlers(product);
   initGalleryHandlers(product);
   initStoryHandlers(product);
+  initShowcaseHandlers();
   initProductPolicyHandlers();
   initStorePolicyHandlers();
   initPackageTicketHandlers(product);
@@ -560,6 +561,183 @@ function initStorePolicyHandlers() {
       modal?.classList.remove('active');
     });
   });
+}
+
+// ===========================================
+// SHOWCASE VIEWER (Deep Dive Template)
+// ===========================================
+let showcaseData = [];
+let showcaseHasVideo = false;
+let currentShowcaseIndex = 0;
+
+function initShowcaseHandlers() {
+  const showcase = document.querySelector('.deep-dive-showcase');
+  if (!showcase) return;
+  
+  // Collect showcase data
+  showcaseData = [];
+  const videoItem = showcase.querySelector('.showcase-video');
+  if (videoItem) {
+    showcaseHasVideo = true;
+    showcaseData.push({
+      type: 'video',
+      src: videoItem.dataset.src || videoItem.querySelector('video')?.src,
+      caption: ''
+    });
+  }
+  
+  showcase.querySelectorAll('.showcase-item:not(.showcase-video)').forEach(item => {
+    const img = item.querySelector('img');
+    showcaseData.push({
+      type: 'image',
+      src: img?.src || '',
+      caption: item.dataset.caption || ''
+    });
+  });
+  
+  // Click handlers for showcase items
+  showcase.querySelectorAll('.showcase-item').forEach((item, idx) => {
+    item.addEventListener('click', () => {
+      if (item.classList.contains('showcase-video')) {
+        openShowcaseViewer(0);
+      } else {
+        // If video exists, idx includes the video item, so we just use idx
+        // If no video, use the data-index attribute
+        const viewerIndex = showcaseHasVideo ? idx : parseInt(item.dataset.index || idx);
+        openShowcaseViewer(viewerIndex);
+      }
+    });
+  });
+}
+
+function openShowcaseViewer(index) {
+  const viewer = document.getElementById('showcaseViewer');
+  if (!viewer || showcaseData.length === 0) return;
+  
+  currentShowcaseIndex = index;
+  viewer.classList.add('active');
+  document.body.style.overflow = 'hidden';
+  showShowcaseItem(index);
+}
+
+function showShowcaseItem(index) {
+  const item = showcaseData[index];
+  if (!item) return;
+  
+  const img = document.getElementById('showcaseViewerImg');
+  const video = document.getElementById('showcaseViewerVideo');
+  const caption = document.getElementById('showcaseViewerCaption');
+  const counter = document.getElementById('showcaseCurrentIndex');
+  
+  // Reset
+  if (img) img.style.display = 'none';
+  if (video) {
+    video.style.display = 'none';
+    video.pause();
+  }
+  
+  if (item.type === 'video') {
+    if (video) {
+      video.src = item.src;
+      video.style.display = 'block';
+    }
+  } else {
+    if (img) {
+      img.src = item.src;
+      img.style.display = 'block';
+    }
+  }
+  
+  if (caption) caption.textContent = item.caption || '';
+  if (counter) counter.textContent = index + 1;
+}
+
+window.closeShowcaseViewer = function() {
+  const viewer = document.getElementById('showcaseViewer');
+  const video = document.getElementById('showcaseViewerVideo');
+  
+  viewer?.classList.remove('active');
+  document.body.style.overflow = '';
+  if (video) video.pause();
+};
+
+window.navigateShowcase = function(direction) {
+  const newIndex = currentShowcaseIndex + direction;
+  if (newIndex >= 0 && newIndex < showcaseData.length) {
+    currentShowcaseIndex = newIndex;
+    showShowcaseItem(newIndex);
+  }
+};
+
+// ===========================================
+// GLOBAL FUNCTIONS FOR DEEP DIVE TEMPLATE
+// ===========================================
+window.shareProduct = async function() {
+  const shareData = {
+    title: state.currentProduct?.data?.name || 'Product',
+    text: `Check out ${state.currentProduct?.data?.name || 'this product'}!`,
+    url: window.location.href
+  };
+  
+  if (navigator.share) {
+    try {
+      await navigator.share(shareData);
+    } catch (err) {
+      // User cancelled
+    }
+  } else {
+    // Fallback: copy link
+    await navigator.clipboard.writeText(window.location.href);
+    showToast('Link copied!');
+  }
+};
+
+window.toggleLike = function(btn) {
+  btn.classList.toggle('liked');
+  const svg = btn.querySelector('svg');
+  if (svg) {
+    svg.style.fill = btn.classList.contains('liked') ? '#ff375f' : 'none';
+    svg.style.stroke = btn.classList.contains('liked') ? '#ff375f' : 'currentColor';
+  }
+};
+
+window.updateQuantity = function(delta) {
+  const product = state.currentProduct;
+  if (!product) return;
+  
+  const price = Number(product.data?.price || 0);
+  const stock = Number(product.data?.stock || 999);
+  const newQty = Math.max(1, Math.min(stock, state.quantity + delta));
+  
+  setState({ quantity: newQty });
+  
+  const qtyValue = document.getElementById('ctaQtyValue');
+  const totalPrice = document.getElementById('ctaTotalPrice');
+  
+  if (qtyValue) qtyValue.textContent = newQty;
+  if (totalPrice) totalPrice.textContent = `KES ${(price * newQty).toLocaleString()}`;
+};
+
+function showToast(message) {
+  // Create simple toast
+  const toast = document.createElement('div');
+  toast.className = 'toast-notification';
+  toast.textContent = message;
+  toast.style.cssText = `
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 24px;
+    font-size: 14px;
+    z-index: 9999;
+    animation: toastFade 2s ease forwards;
+  `;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 2000);
 }
 
 // ===========================================

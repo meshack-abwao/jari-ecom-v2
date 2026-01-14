@@ -85,6 +85,8 @@ const getInitialFormData = () => ({
   specifications: [{ label: '', value: '' }],
   warranty: '',
   showcaseImages: [{ url: '', caption: '' }],
+  showcaseVideo: '',
+  showcaseTitle: 'Gallery',
   
   // Event (event-landing)
   eventDate: '',
@@ -249,6 +251,7 @@ export default function ProductsPage() {
           ...(selectedTemplate === 'deep-dive' && {
             specifications: formData.specifications.filter(s => s.label?.trim()),
             warranty: formData.warranty,
+            showcaseTitle: formData.showcaseTitle || 'Gallery',
           }),
           
           ...(selectedTemplate === 'event-landing' && {
@@ -264,6 +267,7 @@ export default function ProductsPage() {
           stories: formData.stories.filter(s => s.url?.trim()),
           ...(selectedTemplate === 'deep-dive' && {
             showcaseImages: (formData.showcaseImages || []).filter(img => img.url?.trim()),
+            showcaseVideo: formData.showcaseVideo || '',
           }),
         },
       };
@@ -339,6 +343,8 @@ export default function ProductsPage() {
       showcaseImages: media.showcaseImages?.length > 0
         ? media.showcaseImages
         : [{ url: '', caption: '' }],
+      showcaseVideo: media.showcaseVideo || '',
+      showcaseTitle: data.showcaseTitle || 'Gallery',
       
       eventDate: data.eventDate || '',
       eventTime: data.eventTime || '',
@@ -1011,7 +1017,32 @@ export default function ProductsPage() {
                   <SectionHeader section="showcase" title="Showcase Gallery" icon="🖼️" />
                   {expandedSections.showcase && (
                     <div style={styles.sectionContent}>
-                      <p style={styles.hint}>Add detail shots, lifestyle images, in-use photos - the more the better!</p>
+                      <div style={styles.formGroup}>
+                        <label style={styles.label}>GALLERY TITLE</label>
+                        <input
+                          type="text"
+                          value={formData.showcaseTitle || 'Gallery'}
+                          onChange={e => updateField('showcaseTitle', e.target.value)}
+                          placeholder="e.g., Gallery, In Detail, See It In Action"
+                          className="dashboard-input"
+                        />
+                        <p style={styles.hint}>Bold headline for the showcase section</p>
+                      </div>
+                      <div style={styles.formGroup}>
+                        <label style={styles.label}>SHOWCASE VIDEO (OPTIONAL)</label>
+                        <input
+                          type="url"
+                          value={formData.showcaseVideo || ''}
+                          onChange={e => updateField('showcaseVideo', e.target.value)}
+                          placeholder="https://video-url.com/product-video.mp4"
+                          className="dashboard-input"
+                        />
+                        <p style={styles.hint}>Add a product video - it will appear first in the gallery</p>
+                      </div>
+                      <div style={styles.formGroup}>
+                        <label style={styles.label}>SHOWCASE IMAGES</label>
+                        <p style={styles.hint}>Add detail shots, lifestyle images, in-use photos - the more the better!</p>
+                      </div>
                       {(formData.showcaseImages || [{ url: '', caption: '' }]).map((item, idx) => (
                         <div key={idx} style={{ display: 'flex', gap: '12px', marginBottom: '12px' }}>
                           <input

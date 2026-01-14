@@ -504,7 +504,7 @@ function renderMenuTestimonials(testimonials) {
 }
 
 // ===========================================
-// TEMPLATE: DEEP DIVE
+// TEMPLATE: DEEP DIVE (v2 Apple-Inspired)
 // ===========================================
 function renderDeepDive(product) {
   const { products } = state;
@@ -513,6 +513,7 @@ function renderDeepDive(product) {
   const specifications = data.specifications || [];
   const testimonials = data.testimonials || [];
   const showcaseImages = media.showcaseImages || [];
+  const showcaseVideo = media.showcaseVideo || null;
   const policies = data.policies || {};
   const showBackButton = products.length > 1;
   
@@ -532,23 +533,26 @@ function renderDeepDive(product) {
       
       <!-- PRODUCT INFO -->
       <div class="deep-dive-info">
-        <div class="info-header">
+        <div class="info-row">
           <h1 class="product-name">${data.name || 'Product'}</h1>
           <div class="social-actions">
-            <button class="social-btn share-btn" title="Share">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            <button class="social-btn share-btn" title="Share" onclick="shareProduct()">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                <polyline points="16 6 12 2 8 6"/>
+                <line x1="12" y1="2" x2="12" y2="15"/>
               </svg>
             </button>
-            <button class="social-btn heart-btn" title="Save">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <button class="social-btn heart-btn" title="Save" onclick="toggleLike(this)">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
               </svg>
             </button>
           </div>
         </div>
-        <div class="price">KES ${parseInt(data.price || 0).toLocaleString()}</div>
+        <div class="price-row">
+          <span class="price-main">KES ${parseInt(data.price || 0).toLocaleString()}</span>
+        </div>
         ${data.description ? `<p class="product-description">${data.description}</p>` : ''}
       </div>
       
@@ -559,14 +563,25 @@ function renderDeepDive(product) {
         </div>
       ` : ''}
       
-      <!-- SHOWCASE MASONRY GALLERY (if images) -->
-      ${validShowcase.length > 0 ? `
+      <!-- SHOWCASE MASONRY GALLERY -->
+      ${(validShowcase.length > 0 || showcaseVideo) ? `
         <div class="deep-dive-showcase">
+          <h2 class="showcase-title">${data.showcaseTitle || 'Gallery'}</h2>
           <div class="showcase-grid">
+            ${showcaseVideo ? `
+              <div class="showcase-item showcase-large showcase-video" data-type="video" data-src="${showcaseVideo}">
+                <video src="${showcaseVideo}" playsinline muted loop></video>
+                <div class="showcase-play-overlay">
+                  <div class="play-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
+                  </div>
+                </div>
+              </div>
+            ` : ''}
             ${validShowcase.map((img, i) => `
-              <div class="showcase-item ${i === 0 ? 'showcase-large' : ''}">
+              <div class="showcase-item ${!showcaseVideo && i === 0 ? 'showcase-large' : ''}" data-index="${i}" data-caption="${img.caption || ''}">
                 <img src="${img.url}" alt="${img.caption || ''}" loading="lazy">
-                ${img.caption ? `<span class="showcase-caption">${img.caption}</span>` : ''}
+                ${img.caption ? `<div class="showcase-overlay"><span class="showcase-caption">${img.caption}</span></div>` : '<div class="showcase-tap-hint"></div>'}
               </div>
             `).join('')}
           </div>
@@ -591,7 +606,7 @@ function renderDeepDive(product) {
       <!-- WARRANTY (single line) -->
       ${data.warranty ? `
         <div class="deep-dive-warranty">
-          <span class="warranty-icon">🛡️</span>
+          <span class="warranty-icon">✓</span>
           <span class="warranty-text">${data.warranty}</span>
         </div>
       ` : ''}
@@ -603,19 +618,71 @@ function renderDeepDive(product) {
         </div>
       ` : ''}
       
-      <!-- STICKY CTA -->
-      <div class="deep-dive-cta">
-        ${renderQuantitySection(data.price || 0, data.stock || 999)}
-        <button class="buy-btn" id="buyBtn">
-          <span class="btn-text">Add to Cart</span>
-          <span class="btn-arrow">→</span>
-        </button>
-      </div>
-      
       ${renderProductPolicyLinks(policies)}
     </div>
+    
+    <!-- FLOATING GLASS CTA -->
+    <div class="deep-dive-cta">
+      <div class="cta-glass">
+        <div class="cta-qty-section">
+          <span class="cta-qty-label">QUANTITY</span>
+          <div class="cta-qty-controls">
+            <button class="cta-qty-btn minus" onclick="updateQuantity(-1)">−</button>
+            <span class="cta-qty-value" id="ctaQtyValue">1</span>
+            <button class="cta-qty-btn plus" onclick="updateQuantity(1)">+</button>
+          </div>
+        </div>
+        <div class="cta-price-section">
+          <span class="cta-price-label">TOTAL</span>
+          <span class="cta-price-value" id="ctaTotalPrice">KES ${parseInt(data.price || 0).toLocaleString()}</span>
+        </div>
+        <button class="cta-add-btn" id="buyBtn" data-price="${data.price || 0}">
+          Add to Cart →
+        </button>
+      </div>
+    </div>
+    
     ${renderStoryViewer(media.stories || [])}
+    ${renderShowcaseViewer(validShowcase, showcaseVideo)}
     ${renderProductPolicyModals(policies)}
+  `;
+}
+
+// Showcase Fullscreen Viewer (Premium Modal)
+function renderShowcaseViewer(showcaseImages, showcaseVideo) {
+  const hasContent = (showcaseImages && showcaseImages.length > 0) || showcaseVideo;
+  if (!hasContent) return '';
+  
+  const totalItems = (showcaseVideo ? 1 : 0) + (showcaseImages?.length || 0);
+  
+  return `
+    <div class="showcase-viewer" id="showcaseViewer">
+      <div class="showcase-viewer-backdrop"></div>
+      <div class="showcase-viewer-container">
+        <button class="showcase-close" onclick="closeShowcaseViewer()">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+        <div class="showcase-viewer-media">
+          <img class="showcase-viewer-img" id="showcaseViewerImg" src="" alt="" style="display:none;">
+          <video class="showcase-viewer-video" id="showcaseViewerVideo" playsinline controls style="display:none;"></video>
+        </div>
+        <div class="showcase-viewer-info">
+          <p class="showcase-viewer-caption" id="showcaseViewerCaption"></p>
+          <div class="showcase-viewer-nav">
+            <button class="showcase-nav-arrow prev" onclick="navigateShowcase(-1)">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
+            <span class="showcase-nav-count"><span id="showcaseCurrentIndex">1</span> / ${totalItems}</span>
+            <button class="showcase-nav-arrow next" onclick="navigateShowcase(1)">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   `;
 }
 
