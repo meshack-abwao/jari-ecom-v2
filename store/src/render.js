@@ -154,13 +154,11 @@ function renderProductCard(product) {
   const data = product.data || {};
   const media = product.media || {};
   const images = media.images || [];
-  const mainImage = images[0] || null;
+  const cardImages = images.slice(0, 2); // Max 2 images
   const price = data.price || 0;
   const description = data.description || '';
   const name = data.name || 'Product';
   const template = product.template || 'quick-decision';
-  const badges = data.badges || [];
-  const specifications = data.specifications || [];
   
   // Template badge for visual indication
   const templateBadges = {
@@ -172,29 +170,19 @@ function renderProductCard(product) {
   };
   const badge = templateBadges[template] || templateBadges['quick-decision'];
   
-  // Build tags HTML - use badges if available, or specs for deep-dive
-  let tagsHTML = '';
-  if (badges.length > 0) {
-    tagsHTML = `
-      <div class="collection-tags">
-        ${badges.slice(0, 3).map(b => `<span class="collection-tag">${b.icon || ''} ${b.text || b}</span>`).join('')}
-      </div>
-    `;
-  } else if (template === 'deep-dive' && specifications.length > 0) {
-    tagsHTML = `
-      <div class="collection-tags">
-        ${specifications.slice(0, 2).map(s => `<span class="collection-tag">${s.label}: ${s.value}</span>`).join('')}
-      </div>
-    `;
-  }
+  // Build gallery HTML
+  const hasMultiple = cardImages.length > 1;
+  const galleryHTML = cardImages.length > 0 
+    ? `<div class="card-gallery" data-index="0">
+        ${cardImages.map((img, i) => `<img src="${img}" alt="${name}" class="card-gallery-img ${i === 0 ? 'active' : ''}" data-img-index="${i}" loading="lazy">`).join('')}
+        ${hasMultiple ? `<div class="card-gallery-dots">${cardImages.map((_, i) => `<span class="card-dot ${i === 0 ? 'active' : ''}" data-dot="${i}"></span>`).join('')}</div>` : ''}
+       </div>`
+    : '<div class="image-placeholder">📸</div>';
   
   return `
     <div class="collection-card" data-product-id="${product.id}">
       <div class="collection-image">
-        ${mainImage 
-          ? `<img src="${mainImage}" alt="${name}" loading="lazy">`
-          : '<div class="image-placeholder">📸</div>'
-        }
+        ${galleryHTML}
         <span class="template-badge">${badge.icon} ${badge.label}</span>
         <div class="collection-overlay">
           <h3 class="collection-name">${name}</h3>
@@ -203,7 +191,6 @@ function renderProductCard(product) {
       </div>
       <div class="collection-content">
         <p class="collection-description">${description.substring(0, 100)}${description.length > 100 ? '...' : ''}</p>
-        ${tagsHTML}
         <button class="collection-btn">Get This Now</button>
       </div>
     </div>

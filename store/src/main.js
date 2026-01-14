@@ -81,12 +81,17 @@ function renderCatalogView() {
   
   // Add click handlers for product cards
   document.querySelectorAll('.collection-card').forEach(card => {
-    card.addEventListener('click', () => {
+    card.addEventListener('click', (e) => {
+      // Don't navigate if swiping on gallery
+      if (e.target.closest('.card-gallery-dots')) return;
       const id = card.dataset.productId;
       setProductId(id);
       render();
     });
   });
+  
+  // Init card gallery swipe (mobile)
+  initCardGallerySwipe();
   
   // Add category filter handlers
   initCategoryFilters();
@@ -121,6 +126,51 @@ function initCategoryFilters() {
         } else {
           card.style.display = 'none';
         }
+      });
+    });
+  });
+}
+
+// ===========================================
+// CARD GALLERY SWIPE (Mobile)
+// ===========================================
+function initCardGallerySwipe() {
+  document.querySelectorAll('.card-gallery').forEach(gallery => {
+    const images = gallery.querySelectorAll('.card-gallery-img');
+    const dots = gallery.querySelectorAll('.card-dot');
+    if (images.length < 2) return;
+    
+    let startX = 0;
+    let currentIndex = 0;
+    
+    const showImage = (index) => {
+      images.forEach((img, i) => img.classList.toggle('active', i === index));
+      dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
+      currentIndex = index;
+    };
+    
+    gallery.addEventListener('touchstart', (e) => {
+      startX = e.touches[0].clientX;
+    }, { passive: true });
+    
+    gallery.addEventListener('touchend', (e) => {
+      const diff = startX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 50) {
+        if (diff > 0 && currentIndex < images.length - 1) {
+          showImage(currentIndex + 1);
+        } else if (diff < 0 && currentIndex > 0) {
+          showImage(currentIndex - 1);
+        }
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    });
+    
+    // Dot click
+    dots.forEach((dot, i) => {
+      dot.addEventListener('click', (e) => {
+        e.stopPropagation();
+        showImage(i);
       });
     });
   });
