@@ -2130,7 +2130,7 @@ body {
     /* Thumbnails below main image - inside gallery column */
     .template-menu .thumbnail-strip {
         padding: 16px;
-        justify-content: flex-start;
+        justify-content: center;
         background: white;
         gap: 10px;
         border-radius: 12px;
