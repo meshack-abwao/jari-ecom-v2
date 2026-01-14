@@ -191,14 +191,6 @@ export default function Layout() {
           </div>
         </div>
 
-        <div style={styles.userCard} className="glass-card">
-          <div style={styles.avatar}>{user?.business_name?.charAt(0) || 'U'}</div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <p style={styles.userName}>{user?.business_name || 'User'}</p>
-            <p style={styles.userEmail}>{user?.instagram_handle || user?.email}</p>
-          </div>
-        </div>
-
         <nav style={styles.nav}>
           <NavLink to="/" end className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
             <Home size={20} /><span>Overview</span>
@@ -232,6 +224,14 @@ export default function Layout() {
           </div>
           <span>{theme === 'dark' ? 'Dark Mode' : 'Light Mode'}</span>
         </button>
+
+        <div style={styles.userCard} className="glass-card">
+          <div style={styles.avatar}>{user?.business_name?.charAt(0) || 'U'}</div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <p style={styles.userName}>{user?.business_name || 'User'}</p>
+            <p style={styles.userEmail}>{user?.instagram_handle || user?.email}</p>
+          </div>
+        </div>
 
         <button onClick={handleLogout} style={styles.logoutBtn}>
           <LogOut size={20} /><span>Logout</span>
