@@ -42,10 +42,10 @@ export default function DashboardPage() {
       setFilteredStats(statsData);
       setProducts(productsRes.data?.products || []);
       
-      // Build store URL from settings
-      const settings = settingsRes.data?.store || settingsRes.data?.settings || {};
-      const slug = settings.slug || settings.subdomain;
-      const id = settings.id;
+      // Build store URL from settings - API returns store object directly
+      const store = settingsRes.data;
+      const slug = store?.slug;
+      const id = store?.id;
       
       if (id) {
         setStoreId(id);
