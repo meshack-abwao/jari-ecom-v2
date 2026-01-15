@@ -16,7 +16,7 @@ export default function DashboardPage() {
   const [copiedLink, setCopiedLink] = useState(null);
   const [filteredStats, setFilteredStats] = useState({ total: 0, pending: 0, delivered: 0, revenue: 0, pending_revenue: 0 });
   const [topProducts, setTopProducts] = useState([]);
-  const [topProductsView, setTopProductsView] = useState('orders'); // 'orders' or 'revenue'
+  const [topProductsView, setTopProductsView] = useState('revenue'); // 'orders' or 'revenue' - default to revenue (ODI)
   const [showAnalysis, setShowAnalysis] = useState(null); // which stat card analysis to show
   const navigate = useNavigate();
 
@@ -425,29 +425,7 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Quick Actions */}
-      <div style={styles.section}>
-        <h2 style={styles.sectionTitle}>Quick Actions</h2>
-        <div style={styles.actionsGrid}>
-          <div onClick={() => navigate('/products')} className="glass-card action-card">
-            <div className="action-icon">📦</div>
-            <h3 className="action-title">Add Product</h3>
-            <p className="action-desc">Start selling something new</p>
-          </div>
-          <div onClick={() => navigate('/orders')} className="glass-card action-card">
-            <div className="action-icon">📋</div>
-            <h3 className="action-title">View Orders</h3>
-            <p className="action-desc">Manage your orders</p>
-          </div>
-          <div onClick={() => navigate('/ads')} className="glass-card action-card">
-            <div className="action-icon">📢</div>
-            <h3 className="action-title">Boost Ads</h3>
-            <p className="action-desc">Track & share your store</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Top Products */}
+      {/* Top Products - Moved above Quick Actions (ODI priority) */}
       {topProducts.length > 0 && (
         <div style={styles.section}>
           <div style={styles.sectionHeader}>
@@ -504,6 +482,28 @@ export default function DashboardPage() {
           </div>
         </div>
       )}
+
+      {/* Quick Actions */}
+      <div style={styles.section}>
+        <h2 style={styles.sectionTitle}>Quick Actions</h2>
+        <div style={styles.actionsGrid}>
+          <div onClick={() => navigate('/products')} className="glass-card action-card">
+            <div className="action-icon">📦</div>
+            <h3 className="action-title">Add Product</h3>
+            <p className="action-desc">Start selling something new</p>
+          </div>
+          <div onClick={() => navigate('/orders')} className="glass-card action-card">
+            <div className="action-icon">📋</div>
+            <h3 className="action-title">View Orders</h3>
+            <p className="action-desc">Manage your orders</p>
+          </div>
+          <div onClick={() => navigate('/ads')} className="glass-card action-card">
+            <div className="action-icon">📢</div>
+            <h3 className="action-title">Boost Ads</h3>
+            <p className="action-desc">Track & share your store</p>
+          </div>
+        </div>
+      </div>
 
       {/* Recent Products */}
       {products.length > 0 && (
