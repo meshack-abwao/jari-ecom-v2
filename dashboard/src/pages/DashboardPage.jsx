@@ -226,27 +226,25 @@ export default function DashboardPage() {
       </div>
 
       {/* Stats Grid - Masonry Layout (1 large landscape + portrait column) */}
-      <div style={styles.statsGrid}>
+      <div className="overview-stats-grid">
         {/* Left: Large Revenue Card (landscape) */}
         <div 
-          className="glass-card stat-card" 
-          style={styles.statCardLarge}
+          className="glass-card stat-card overview-stat-large"
           onClick={() => setShowAnalysis(showAnalysis === 'revenue' ? null : 'revenue')}
         >
-          <div className="stat-icon" style={{ background: statCards[0].gradient, width: '56px', height: '56px' }}>
+          <div className="stat-icon" style={{ background: statCards[0].gradient }}>
             {statCards[0].icon}
           </div>
           <div style={{ flex: 1 }}>
             <p className="stat-label">{statCards[0].title}</p>
-            <p className="stat-value" style={{ fontSize: '36px' }}>{statCards[0].value}</p>
+            <p className="stat-value">{statCards[0].value}</p>
           </div>
         </div>
         
         {/* Right: Portrait column with 3 cards */}
-        <div style={styles.statColumnRight}>
+        <div className="overview-stat-column">
           <div 
-            className="glass-card stat-card" 
-            style={styles.statCardPortrait}
+            className="glass-card stat-card overview-stat-portrait"
             onClick={() => setShowAnalysis(showAnalysis === 'orders' ? null : 'orders')}
           >
             <div className="stat-icon" style={{ background: statCards[1].gradient }}>
@@ -259,8 +257,7 @@ export default function DashboardPage() {
           </div>
           
           <div 
-            className="glass-card stat-card" 
-            style={styles.statCardPortrait}
+            className="glass-card stat-card overview-stat-portrait"
             onClick={() => setShowAnalysis(showAnalysis === 'completed' ? null : 'completed')}
           >
             <div className="stat-icon" style={{ background: statCards[2].gradient }}>
@@ -273,8 +270,7 @@ export default function DashboardPage() {
           </div>
 
           <div 
-            className="glass-card stat-card" 
-            style={styles.statCardPortrait}
+            className="glass-card stat-card overview-stat-portrait"
             onClick={() => setShowAnalysis(showAnalysis === 'pending' ? null : 'pending')}
           >
             <div className="stat-icon" style={{ background: statCards[3].gradient }}>
@@ -289,8 +285,7 @@ export default function DashboardPage() {
         
         {/* Traffic Card - Full width below */}
         <div 
-          className="glass-card stat-card" 
-          style={styles.statCardTraffic}
+          className="glass-card stat-card overview-stat-traffic"
           onClick={() => setTrafficExpanded(!trafficExpanded)}
         >
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)' }}>
@@ -575,33 +570,6 @@ const styles = {
   periodSelector: { display: 'flex', gap: '6px' },
   periodBtn: { padding: '8px 16px', border: 'none', background: 'transparent', borderRadius: '20px', fontSize: '14px', fontWeight: '500', color: 'var(--text-muted)', cursor: 'pointer', transition: 'all 0.2s' },
   periodBtnActive: { background: 'rgba(168, 85, 247, 0.15)', color: 'var(--accent-color)' },
-  
-  statsGrid: { 
-    display: 'grid', 
-    gridTemplateColumns: '1.6fr 1fr', 
-    gridTemplateRows: 'auto auto', 
-    gap: '16px', 
-    marginBottom: '24px' 
-  },
-  statCardLarge: { 
-    cursor: 'pointer',
-    gridRow: 'span 1',
-    padding: '24px',
-    minHeight: '120px'
-  },
-  statColumnRight: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '12px'
-  },
-  statCardPortrait: { 
-    cursor: 'pointer',
-    padding: '14px 16px'
-  },
-  statCardTraffic: { 
-    cursor: 'pointer',
-    gridColumn: 'span 2'
-  },
   
   // Analysis modal with blur
   analysisOverlay: {
