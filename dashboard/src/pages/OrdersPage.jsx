@@ -536,7 +536,7 @@ const styles = {
     padding: '6px',
     minWidth: '140px',
     boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
-    zIndex: 100
+    zIndex: 9999
   },
   dateDropdownItem: {
     display: 'block',
