@@ -386,11 +386,11 @@ const styles = {
   headerActions: { display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' },
   viewStoreBtn: { display: 'flex', alignItems: 'center', gap: '8px' },
   
-  // Filter row - below header like v1
-  filterRow: { display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px', paddingBottom: '16px', borderBottom: '1px solid var(--border-color)' },
-  periodSelector: { display: 'flex', gap: '4px', background: 'var(--bg-secondary)', padding: '4px', borderRadius: '10px' },
-  periodBtn: { padding: '8px 16px', border: 'none', background: 'transparent', borderRadius: '8px', fontSize: '14px', fontWeight: '500', color: 'var(--text-muted)', cursor: 'pointer', transition: 'all 0.2s' },
-  periodBtnActive: { background: 'var(--accent-color)', color: '#fff', boxShadow: '0 2px 8px rgba(168, 85, 247, 0.35)' },
+  // Filter row - below header like v1 with breathing room
+  filterRow: { display: 'flex', alignItems: 'center', gap: '12px', marginTop: '8px', marginBottom: '32px' },
+  periodSelector: { display: 'flex', gap: '6px' },
+  periodBtn: { padding: '8px 16px', border: 'none', background: 'transparent', borderRadius: '20px', fontSize: '14px', fontWeight: '500', color: 'var(--text-muted)', cursor: 'pointer', transition: 'all 0.2s' },
+  periodBtnActive: { background: 'rgba(168, 85, 247, 0.15)', color: 'var(--accent-color)' },
   
   statsGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px', marginBottom: '24px' },
   
