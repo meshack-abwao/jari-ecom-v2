@@ -54,12 +54,7 @@ function getApiUrl() {
 // Core tracking function
 export function track(event, data = {}) {
   const store = state.store;
-  console.log('[Pixel] track() called - event:', event, 'store:', store);
-  
-  if (!store?.id) {
-    console.warn('[Pixel] No store ID found, skipping track. Store object:', store);
-    return;
-  }
+  if (!store?.id) return;
   
   const payload = {
     store_id: store.id,
@@ -72,22 +67,17 @@ export function track(event, data = {}) {
     session_id: SESSION_ID
   };
   
-  console.log('[Pixel] Sending payload:', payload);
-  
-  // Fire and forget - use sendBeacon if available for reliability
   const endpoint = `${getApiUrl()}/pixel`;
-  console.log('[Pixel] Endpoint:', endpoint);
   
   if (navigator.sendBeacon) {
-    const sent = navigator.sendBeacon(endpoint, JSON.stringify(payload));
-    console.log('[Pixel] sendBeacon result:', sent);
+    navigator.sendBeacon(endpoint, JSON.stringify(payload));
   } else {
     fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
-      keepalive: true // Important for page unload
-    }).catch(() => {}); // Fail silently
+      keepalive: true
+    }).catch(() => {});
   }
 }
 

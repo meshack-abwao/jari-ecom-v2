@@ -15,69 +15,29 @@ router.use((req, res, next) => {
 });
 
 // POST /pixel - Track an event (public, no auth)
-// Note: sendBeacon sends as text/plain, so we need to parse manually
 router.post('/', async (req, res) => {
   try {
-    // Handle both JSON body and text/plain from sendBeacon
     let body = req.body;
     if (typeof body === 'string') {
-      try {
-        body = JSON.parse(body);
-      } catch (e) {
-        console.error('Pixel: Failed to parse body string:', body);
-        return res.status(204).end();
-      }
+      try { body = JSON.parse(body); } catch (e) { return res.status(204).end(); }
     }
     
-    // If body is empty or buffer, try to parse from raw
-    if (!body || Object.keys(body).length === 0) {
-      console.error('Pixel: Empty body received');
-      return res.status(204).end();
-    }
+    if (!body || Object.keys(body).length === 0) return res.status(204).end();
     
-    const { 
-      store_id, 
-      event, 
-      data = {}, 
-      utm = {}, 
-      device, 
-      url, 
-      referrer,
-      session_id 
-    } = body;
+    const { store_id, event, data = {}, utm = {}, device, url, referrer, session_id } = body;
     
-    console.log('[Pixel API] Received:', { store_id, event, utm_source: utm.source });
+    if (!store_id || !event) return res.status(204).end();
     
-    // Validate required fields
-    if (!store_id || !event) {
-      console.error('Pixel: Missing store_id or event:', { store_id, event });
-      return res.status(204).end();
-    }
-    
-    // Insert event
     await pool.query(`
       INSERT INTO pixel_events (store_id, event, data, utm_source, utm_medium, utm_campaign, device, url, referrer, session_id)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
     `, [
-      store_id,
-      event,
-      JSON.stringify(data),
-      utm.source || 'direct',
-      utm.medium || null,
-      utm.campaign || null,
-      device || null,
-      url || null,
-      referrer || null,
-      session_id || null
+      store_id, event, JSON.stringify(data), utm.source || 'direct', utm.medium || null,
+      utm.campaign || null, device || null, url || null, referrer || null, session_id || null
     ]);
     
-    console.log('[Pixel API] Event recorded successfully:', event);
-    
-    // Return empty 204 for speed
     res.status(204).end();
   } catch (error) {
-    console.error('Pixel tracking error:', error);
-    // Still return 204 - don't break client on tracking errors
     res.status(204).end();
   }
 });
