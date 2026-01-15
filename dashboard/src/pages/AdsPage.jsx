@@ -27,14 +27,21 @@ export default function AdsPage() {
   const loadData = async () => {
     try {
       const settingsRes = await settingsAPI.getAll();
-      const settings = settingsRes.data?.store || settingsRes.data?.settings || {};
-      const slug = settings.slug || settings.subdomain;
-      const id = settings.id;
+      // The API returns the store object directly
+      const store = settingsRes.data;
+      const slug = store?.slug;
+      const id = store?.id;
+      
+      console.log('AdsPage loadData - store:', store, 'slug:', slug, 'id:', id);
       
       if (id) {
         setStoreId(id);
-        const trafficRes = await pixelAPI.getStats(id, timePeriod);
-        setTraffic(trafficRes.data || { total: 0, sources: [] });
+        try {
+          const trafficRes = await pixelAPI.getStats(id, timePeriod);
+          setTraffic(trafficRes.data || { total: 0, sources: [] });
+        } catch (e) {
+          console.log('Traffic stats not available yet');
+        }
       }
       
       if (slug) {
