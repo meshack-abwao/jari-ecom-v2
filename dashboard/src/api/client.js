@@ -72,8 +72,8 @@ export const productsAPI = {
 // ORDERS API
 // ===========================================
 export const ordersAPI = {
-  getAll: () => api.get('/orders'),
-  getStats: () => api.get('/orders/stats'),
+  getAll: (period = 'all') => api.get(`/orders${period !== 'all' ? `?period=${period}` : ''}`),
+  getStats: (period = 'all') => api.get(`/orders/stats${period !== 'all' ? `?period=${period}` : ''}`),
   create: (orderData) => api.post('/orders', orderData),
   updateStatus: (id, status) => api.put(`/orders/${id}`, { status }),
 };

@@ -62,6 +62,8 @@ router.get('/', auth, async (req, res, next) => {
 // Get order stats
 router.get('/stats', auth, async (req, res, next) => {
   try {
+    const { period } = req.query; // today, week, month, all
+    
     const storeResult = await db.query(
       'SELECT id FROM stores WHERE user_id = $1',
       [req.user.userId]
@@ -79,6 +81,17 @@ router.get('/stats', auth, async (req, res, next) => {
       });
     }
     
+    // Build date filter based on period
+    let dateFilter = '';
+    if (period === 'today') {
+      dateFilter = "AND created_at >= CURRENT_DATE";
+    } else if (period === 'week') {
+      dateFilter = "AND created_at >= CURRENT_DATE - INTERVAL '7 days'";
+    } else if (period === 'month') {
+      dateFilter = "AND created_at >= CURRENT_DATE - INTERVAL '30 days'";
+    }
+    // 'all' or undefined = no date filter
+    
     const result = await db.query(
       `SELECT 
          COUNT(*)::int as total,
@@ -89,7 +102,7 @@ router.get('/stats', auth, async (req, res, next) => {
          COALESCE(SUM((items->0->>'total')::numeric), 0) as revenue,
          COALESCE(SUM((items->0->>'total')::numeric) FILTER (WHERE status = 'pending'), 0) as pending_revenue
        FROM orders 
-       WHERE store_id = $1`,
+       WHERE store_id = $1 ${dateFilter}`,
       [storeResult.rows[0].id]
     );
     

@@ -12,34 +12,32 @@ export default function DashboardPage() {
   const [greeting, setGreeting] = useState('');
   const [traffic, setTraffic] = useState({ total: 0, sources: [] });
   const [trafficExpanded, setTrafficExpanded] = useState(false);
-  const [timePeriod, setTimePeriod] = useState('today');
+  const [timePeriod, setTimePeriod] = useState('all');
   const [shareExpanded, setShareExpanded] = useState(false);
   const [copiedLink, setCopiedLink] = useState(null);
+  const [filteredStats, setFilteredStats] = useState({ total: 0, pending: 0, delivered: 0, revenue: 0, pending_revenue: 0 });
   const navigate = useNavigate();
 
   useEffect(() => {
     loadData();
-    // Set dynamic greeting
-    const hour = new Date().getHours();
-    const greetings = {
-      morning: ["Good morning! Ready to grow?", "Rise and shine! Let's sell.", "Morning! Your store awaits."],
-      afternoon: ["Good afternoon! How's business?", "Afternoon check-in time!", "Hey there! Sales looking good?"],
-      evening: ["Good evening! Nice work today.", "Evening! Let's review the day.", "Winding down? Great progress!"]
-    };
-    const period = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening';
-    const options = greetings[period];
-    setGreeting(options[Math.floor(Math.random() * options.length)]);
   }, []);
+  
+  // Reload stats when time period changes
+  useEffect(() => {
+    loadFilteredStats();
+  }, [timePeriod]);
 
   const loadData = async () => {
     try {
       const [statsRes, productsRes, settingsRes] = await Promise.all([
-        ordersAPI.getStats(),
+        ordersAPI.getStats(timePeriod),
         productsAPI.getAll(),
         settingsAPI.getAll()
       ]);
       
-      setStats(statsRes.data || { total: 0, pending: 0, delivered: 0, revenue: 0, pending_revenue: 0 });
+      const statsData = statsRes.data || { total: 0, pending: 0, delivered: 0, revenue: 0, pending_revenue: 0 };
+      setStats(statsData);
+      setFilteredStats(statsData);
       setProducts(productsRes.data?.products || []);
       
       // Build store URL from settings
@@ -69,14 +67,20 @@ export default function DashboardPage() {
     }
   };
   
-  // Reload traffic when period changes
-  useEffect(() => {
-    if (storeId) {
-      pixelAPI.getStats(storeId, timePeriod)
-        .then(res => setTraffic(res.data || { total: 0, sources: [] }))
-        .catch(() => {});
+  const loadFilteredStats = async () => {
+    try {
+      const statsRes = await ordersAPI.getStats(timePeriod);
+      setFilteredStats(statsRes.data || { total: 0, pending: 0, delivered: 0, revenue: 0, pending_revenue: 0 });
+      
+      // Also reload traffic for the period
+      if (storeId) {
+        const trafficRes = await pixelAPI.getStats(storeId, timePeriod);
+        setTraffic(trafficRes.data || { total: 0, sources: [] });
+      }
+    } catch (error) {
+      console.error('Failed to load filtered stats:', error);
     }
-  }, [timePeriod, storeId]);
+  };
 
   const viewProduct = (productId) => {
     if (storeUrl) {
@@ -102,25 +106,25 @@ export default function DashboardPage() {
   const statCards = [
     {
       title: 'Total Revenue',
-      value: `KES ${Number(stats.revenue || 0).toLocaleString()}`,
+      value: `KES ${Number(filteredStats.revenue || 0).toLocaleString()}`,
       icon: <DollarSign size={22} />,
       gradient: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
     },
     {
       title: 'Total Orders',
-      value: stats.total || 0,
+      value: filteredStats.total || 0,
       icon: <ShoppingCart size={22} />,
       gradient: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)',
     },
     {
       title: 'Completed',
-      value: stats.delivered || 0,
+      value: filteredStats.delivered || 0,
       icon: <Package size={22} />,
       gradient: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
     },
     {
       title: 'Pending Revenue',
-      value: `KES ${Number(stats.pending_revenue || 0).toLocaleString()}`,
+      value: `KES ${Number(filteredStats.pending_revenue || 0).toLocaleString()}`,
       icon: <Clock size={22} />,
       gradient: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
     },
@@ -131,30 +135,39 @@ export default function DashboardPage() {
       <div style={styles.header}>
         <div>
           <h1 style={styles.title}>Overview</h1>
-          <p style={styles.subtitle}>{greeting}</p>
+          <p style={styles.subtitle}>Your store performance at a glance</p>
         </div>
         <div style={styles.headerActions}>
-          {/* Time Period Selector */}
-          <div style={styles.periodSelector}>
-            {['today', 'week', 'month', 'quarter', 'year'].map(period => (
-              <button
-                key={period}
-                onClick={() => setTimePeriod(period)}
-                style={{
-                  ...styles.periodBtn,
-                  ...(timePeriod === period ? styles.periodBtnActive : {})
-                }}
-              >
-                {period.charAt(0).toUpperCase() + period.slice(1)}
-              </button>
-            ))}
-          </div>
           {storeUrl && (
             <button onClick={viewStore} className="btn btn-primary" style={styles.viewStoreBtn}>
               <ExternalLink size={18} />
               <span>View Live Store</span>
             </button>
           )}
+        </div>
+      </div>
+      
+      {/* Time Period Filter - Below header like v1 */}
+      <div style={styles.filterRow}>
+        <Calendar size={16} style={{ color: 'var(--text-muted)' }} />
+        <div style={styles.periodSelector}>
+          {[
+            { key: 'today', label: 'Today' },
+            { key: 'week', label: 'Week' },
+            { key: 'month', label: 'Month' },
+            { key: 'all', label: 'All' }
+          ].map(({ key, label }) => (
+            <button
+              key={key}
+              onClick={() => setTimePeriod(key)}
+              style={{
+                ...styles.periodBtn,
+                ...(timePeriod === key ? styles.periodBtnActive : {})
+              }}
+            >
+              {label}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -367,16 +380,17 @@ const styles = {
   spinner: { width: '40px', height: '40px', border: '3px solid var(--border-color)', borderTopColor: 'var(--accent-color)', borderRadius: '50%', animation: 'spin 1s linear infinite' },
   loadingText: { marginTop: '16px', color: 'var(--text-muted)' },
   
-  header: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' },
+  header: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px', flexWrap: 'wrap', gap: '16px' },
   title: { fontSize: '34px', fontWeight: '700', marginBottom: '6px', color: 'var(--text-primary)', letterSpacing: '-0.025em' },
   subtitle: { fontSize: '15px', color: 'var(--text-muted)', fontWeight: '400' },
   headerActions: { display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' },
   viewStoreBtn: { display: 'flex', alignItems: 'center', gap: '8px' },
   
-  // Time period selector
+  // Filter row - below header like v1
+  filterRow: { display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px', paddingBottom: '16px', borderBottom: '1px solid var(--border-color)' },
   periodSelector: { display: 'flex', gap: '4px', background: 'var(--bg-secondary)', padding: '4px', borderRadius: '10px' },
-  periodBtn: { padding: '6px 12px', border: 'none', background: 'transparent', borderRadius: '8px', fontSize: '13px', fontWeight: '500', color: 'var(--text-muted)', cursor: 'pointer', transition: 'all 0.2s' },
-  periodBtnActive: { background: 'var(--bg-primary)', color: 'var(--text-primary)', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' },
+  periodBtn: { padding: '8px 16px', border: 'none', background: 'transparent', borderRadius: '8px', fontSize: '14px', fontWeight: '500', color: 'var(--text-muted)', cursor: 'pointer', transition: 'all 0.2s' },
+  periodBtnActive: { background: 'var(--accent-color)', color: '#fff', boxShadow: '0 2px 8px rgba(168, 85, 247, 0.35)' },
   
   statsGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px', marginBottom: '24px' },
   
