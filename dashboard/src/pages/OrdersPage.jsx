@@ -397,7 +397,9 @@ const styles = {
   headerActions: {
     display: 'flex',
     gap: '12px',
-    alignItems: 'center'
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    width: '100%'
   },
   iconBtn: {
     padding: '10px',
@@ -486,7 +488,11 @@ const styles = {
   filterTabs: {
     display: 'flex',
     gap: '8px',
-    flexWrap: 'wrap'
+    overflowX: 'auto',
+    WebkitOverflowScrolling: 'touch',
+    scrollbarWidth: 'none',
+    msOverflowStyle: 'none',
+    paddingBottom: '4px'
   },
   filterTab: {
     display: 'flex',
@@ -500,7 +506,9 @@ const styles = {
     fontSize: '13px',
     fontWeight: '500',
     cursor: 'pointer',
-    transition: 'all 0.2s'
+    transition: 'all 0.2s',
+    whiteSpace: 'nowrap',
+    flexShrink: 0
   },
   filterTabActive: {
     background: 'var(--accent-color)',
@@ -621,12 +629,19 @@ const styles = {
     minWidth: '110px' 
   },
   
-  // Date Filter
+  // Date Filter - horizontal scroll on mobile
   dateFilterRow: {
     display: 'flex',
     gap: '6px',
     alignItems: 'center',
-    marginRight: '8px'
+    overflowX: 'auto',
+    WebkitOverflowScrolling: 'touch',
+    scrollbarWidth: 'none',
+    msOverflowStyle: 'none',
+    paddingBottom: '4px',
+    marginRight: '8px',
+    flex: '1 1 auto',
+    minWidth: 0
   },
   dateFilterBtn: {
     display: 'flex',

@@ -525,7 +525,7 @@ const styles = {
   
   // Info icon and analysis popup
   infoIconBtn: { position: 'absolute', top: '12px', right: '12px', background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '4px', borderRadius: '50%', transition: 'all 0.2s', opacity: 0.6 },
-  analysisPopup: { position: 'absolute', top: '100%', left: 0, right: 0, marginTop: '8px', padding: '16px', zIndex: 10, borderRadius: '12px' },
+  analysisPopup: { position: 'absolute', top: '100%', left: 0, right: 0, marginTop: '8px', padding: '16px', zIndex: 100, borderRadius: '12px', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' },
   analysisTitle: { fontSize: '14px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '12px' },
   analysisList: { listStyle: 'none', padding: 0, margin: 0 },
   analysisPoint: { fontSize: '13px', color: 'var(--text-secondary)', padding: '6px 0', borderBottom: '1px solid var(--border-color)', lineHeight: '1.5' },
