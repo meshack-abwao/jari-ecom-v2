@@ -24,6 +24,7 @@ export function setupRoutes(app) {
   // Public store routes (no /api prefix for cleaner URLs)
   app.use('/s', publicRoutes);
   
-  // Pixel tracking (public, no auth needed for tracking)
-  app.use('/pixel', pixelRoutes);
+  // Pixel tracking - both paths for compatibility
+  app.use('/pixel', pixelRoutes);      // For store (no /api prefix)
+  app.use('/api/pixel', pixelRoutes);  // For dashboard (with /api prefix)
 }

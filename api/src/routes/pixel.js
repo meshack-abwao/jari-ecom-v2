@@ -32,6 +32,37 @@ router.get('/health', async (req, res) => {
   }
 });
 
+// GET /pixel/debug/:storeId - Debug endpoint to see raw data
+router.get('/debug/:storeId', async (req, res) => {
+  try {
+    const { storeId } = req.params;
+    
+    // Get all events for this store
+    const events = await pool.query(
+      `SELECT event, utm_source, utm_medium, created_at 
+       FROM pixel_events 
+       WHERE store_id = $1 
+       ORDER BY created_at DESC 
+       LIMIT 20`,
+      [storeId]
+    );
+    
+    // Get store info
+    const store = await pool.query(
+      `SELECT id, slug FROM stores WHERE id = $1`,
+      [storeId]
+    );
+    
+    res.json({
+      store: store.rows[0] || null,
+      total_events: events.rows.length,
+      events: events.rows
+    });
+  } catch (error) {
+    res.json({ error: error.message });
+  }
+});
+
 // POST /pixel - Track an event (public, no auth)
 router.post('/', async (req, res) => {
   try {
