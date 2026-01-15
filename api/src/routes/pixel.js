@@ -6,12 +6,30 @@ const router = Router();
 // CORS middleware for pixel - allow all origins (like Google Analytics)
 router.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
   next();
+});
+
+// GET /pixel/health - Check if pixel tracking is working
+router.get('/health', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT COUNT(*) as count FROM pixel_events');
+    res.json({ 
+      status: 'ok', 
+      table_exists: true, 
+      total_events: parseInt(result.rows[0].count) 
+    });
+  } catch (error) {
+    res.json({ 
+      status: 'error', 
+      table_exists: false, 
+      error: error.message 
+    });
+  }
 });
 
 // POST /pixel - Track an event (public, no auth)
