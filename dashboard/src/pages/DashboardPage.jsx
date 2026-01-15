@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ordersAPI, productsAPI, settingsAPI, pixelAPI } from '../api/client';
-import { DollarSign, ShoppingCart, Package, TrendingUp, ExternalLink, Eye, Calendar, Clock, Users, ChevronDown, ChevronUp, Info, Copy, Check, Share2, BarChart3 } from 'lucide-react';
+import { DollarSign, ShoppingCart, Package, TrendingUp, ExternalLink, Eye, Calendar, Clock, Users, ChevronDown, ChevronUp, Copy, Check, Share2, BarChart3 } from 'lucide-react';
 
 export default function DashboardPage() {
   const [stats, setStats] = useState({ total: 0, pending: 0, delivered: 0, revenue: 0, pending_revenue: 0 });
@@ -230,47 +230,73 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Stats Grid */}
+      {/* Stats Grid - Masonry Layout */}
       <div style={styles.statsGrid}>
-        {statCards.map((card, index) => (
+        {/* Row 1: Revenue (large) + Orders (medium) */}
+        <div 
+          className="glass-card stat-card" 
+          style={styles.statCardLarge}
+          onClick={() => setShowAnalysis(showAnalysis === 'revenue' ? null : 'revenue')}
+        >
+          <div className="stat-icon" style={{ background: statCards[0].gradient }}>
+            {statCards[0].icon}
+          </div>
+          <div style={{ flex: 1 }}>
+            <p className="stat-label">{statCards[0].title}</p>
+            <p className="stat-value" style={{ fontSize: '32px' }}>{statCards[0].value}</p>
+          </div>
+        </div>
+        
+        <div style={styles.statColumnRight}>
           <div 
-            key={index} 
             className="glass-card stat-card" 
-            style={{ 
-              position: 'relative', 
-              overflow: 'visible',
-              zIndex: showAnalysis === card.key ? 999 : 1 
-            }}
+            style={styles.statCardSmall}
+            onClick={() => setShowAnalysis(showAnalysis === 'orders' ? null : 'orders')}
           >
-            <div className="stat-icon" style={{ background: card.gradient }}>
-              {card.icon}
+            <div className="stat-icon" style={{ background: statCards[1].gradient }}>
+              {statCards[1].icon}
             </div>
             <div style={{ flex: 1 }}>
-              <p className="stat-label">{card.title}</p>
-              <p className="stat-value">{card.value}</p>
+              <p className="stat-label">{statCards[1].title}</p>
+              <p className="stat-value">{statCards[1].value}</p>
             </div>
-            <button 
-              onClick={() => setShowAnalysis(showAnalysis === card.key ? null : card.key)}
-              style={styles.infoIconBtn}
-            >
-              <Info size={16} />
-            </button>
-            {/* Analysis Popup */}
-            {showAnalysis === card.key && (
-              <div style={styles.analysisPopup}>
-                <h4 style={styles.analysisTitle}>{getAnalysis(card.key).title}</h4>
-                <ul style={styles.analysisList}>
-                  {getAnalysis(card.key).points.map((point, i) => (
-                    <li key={i} style={styles.analysisPoint}>{point}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
           </div>
-        ))}
+          
+          <div 
+            className="glass-card stat-card" 
+            style={styles.statCardSmall}
+            onClick={() => setShowAnalysis(showAnalysis === 'completed' ? null : 'completed')}
+          >
+            <div className="stat-icon" style={{ background: statCards[2].gradient }}>
+              {statCards[2].icon}
+            </div>
+            <div style={{ flex: 1 }}>
+              <p className="stat-label">{statCards[2].title}</p>
+              <p className="stat-value">{statCards[2].value}</p>
+            </div>
+          </div>
+        </div>
         
-        {/* Traffic Card - Expandable */}
-        <div className="glass-card stat-card" style={{ cursor: 'pointer' }} onClick={() => setTrafficExpanded(!trafficExpanded)}>
+        {/* Row 2: Pending + Traffic + Conversion */}
+        <div 
+          className="glass-card stat-card" 
+          style={styles.statCardMedium}
+          onClick={() => setShowAnalysis(showAnalysis === 'pending' ? null : 'pending')}
+        >
+          <div className="stat-icon" style={{ background: statCards[3].gradient }}>
+            {statCards[3].icon}
+          </div>
+          <div style={{ flex: 1 }}>
+            <p className="stat-label">{statCards[3].title}</p>
+            <p className="stat-value">{statCards[3].value}</p>
+          </div>
+        </div>
+        
+        <div 
+          className="glass-card stat-card" 
+          style={{ ...styles.statCardMedium, cursor: 'pointer' }}
+          onClick={() => setTrafficExpanded(!trafficExpanded)}
+        >
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)' }}>
             <Users size={22} />
           </div>
@@ -279,12 +305,11 @@ export default function DashboardPage() {
             <p className="stat-value">{traffic.total?.toLocaleString() || 0}</p>
           </div>
           <div style={{ color: '#9ca3af' }}>
-            {trafficExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+            {trafficExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
           </div>
         </div>
-
-        {/* Conversion Rate Card */}
-        <div className="glass-card stat-card">
+        
+        <div className="glass-card stat-card" style={styles.statCardMedium}>
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)' }}>
             <TrendingUp size={22} />
           </div>
@@ -294,6 +319,20 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* Analysis Popup with Blur Background */}
+      {showAnalysis && (
+        <div style={styles.analysisOverlay} onClick={() => setShowAnalysis(null)}>
+          <div style={styles.analysisModal} onClick={(e) => e.stopPropagation()}>
+            <h4 style={styles.analysisTitle}>{getAnalysis(showAnalysis).title}</h4>
+            <ul style={styles.analysisList}>
+              {getAnalysis(showAnalysis).points.map((point, i) => (
+                <li key={i} style={styles.analysisPoint}>{point}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
       
       {/* Traffic Breakdown - Expandable */}
       {trafficExpanded && (
@@ -549,14 +588,60 @@ const styles = {
   periodBtn: { padding: '8px 16px', border: 'none', background: 'transparent', borderRadius: '20px', fontSize: '14px', fontWeight: '500', color: 'var(--text-muted)', cursor: 'pointer', transition: 'all 0.2s' },
   periodBtnActive: { background: 'rgba(168, 85, 247, 0.15)', color: 'var(--accent-color)' },
   
-  statsGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px', marginBottom: '24px', position: 'relative', zIndex: 1 },
+  statsGrid: { 
+    display: 'grid', 
+    gridTemplateColumns: '1.6fr 1fr', 
+    gridTemplateRows: 'auto auto', 
+    gap: '16px', 
+    marginBottom: '24px' 
+  },
+  statCardLarge: { 
+    cursor: 'pointer',
+    gridRow: 'span 1',
+    padding: '24px',
+    minHeight: '120px'
+  },
+  statColumnRight: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '16px'
+  },
+  statCardSmall: { 
+    cursor: 'pointer',
+    flex: 1
+  },
+  statCardMedium: { 
+    cursor: 'pointer'
+  },
   
-  // Info icon and analysis popup
-  infoIconBtn: { position: 'absolute', top: '12px', right: '12px', background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '4px', borderRadius: '50%', transition: 'all 0.2s', opacity: 0.6 },
-  analysisPopup: { position: 'absolute', top: 'calc(100% + 8px)', left: '-8px', right: '-8px', padding: '16px', zIndex: 9999, borderRadius: '12px', boxShadow: '0 12px 40px rgba(0,0,0,0.4)', background: 'var(--bg-secondary)', border: '1px solid var(--border-color)' },
-  analysisTitle: { fontSize: '14px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '12px' },
+  // Analysis modal with blur
+  analysisOverlay: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: 'rgba(0,0,0,0.6)',
+    backdropFilter: 'blur(8px)',
+    WebkitBackdropFilter: 'blur(8px)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 9999,
+    padding: '20px'
+  },
+  analysisModal: {
+    background: 'var(--card-bg)',
+    borderRadius: '16px',
+    padding: '24px',
+    maxWidth: '400px',
+    width: '100%',
+    boxShadow: '0 20px 60px rgba(0,0,0,0.4)',
+    border: '1px solid var(--border-color)'
+  },
+  analysisTitle: { fontSize: '18px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '16px' },
   analysisList: { listStyle: 'none', padding: 0, margin: 0 },
-  analysisPoint: { fontSize: '13px', color: 'var(--text-secondary)', padding: '6px 0', borderBottom: '1px solid var(--border-color)', lineHeight: '1.5' },
+  analysisPoint: { fontSize: '14px', color: 'var(--text-secondary)', padding: '10px 0', borderBottom: '1px solid var(--border-color)', lineHeight: '1.6' },
   
   // Traffic breakdown
   trafficBreakdown: { padding: '20px', marginBottom: '24px' },
