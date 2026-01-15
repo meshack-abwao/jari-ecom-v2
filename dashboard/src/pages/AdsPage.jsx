@@ -151,7 +151,7 @@ export default function AdsPage() {
           <div>
             <p className="stat-label">Top Source</p>
             <p className="stat-value" style={{ textTransform: 'capitalize' }}>
-              {traffic.sources?.[0]?.utm_source || 'N/A'}
+              {traffic.sources?.[0]?.source || 'N/A'}
             </p>
           </div>
         </div>
@@ -180,7 +180,11 @@ export default function AdsPage() {
               return (
                 <div key={idx} style={styles.sourceRow}>
                   <div style={styles.sourceInfo}>
-                    <span style={styles.sourceName}>{source.utm_source || 'Direct'}</span>
+                    <span style={styles.sourceName}>
+                      {source.source 
+                        ? source.source.charAt(0).toUpperCase() + source.source.slice(1) 
+                        : 'Direct'}
+                    </span>
                     <span style={styles.sourceCount}>{source.visitors?.toLocaleString()}</span>
                   </div>
                   <div style={styles.sourceBarContainer}>
