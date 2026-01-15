@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ordersAPI, productsAPI, settingsAPI, pixelAPI } from '../api/client';
-import { DollarSign, ShoppingCart, Package, TrendingUp, ExternalLink, Eye, Calendar, Clock, Users, ChevronDown, ChevronUp, Copy, Check, Share2, BarChart3 } from 'lucide-react';
+import { DollarSign, ShoppingCart, Package, ExternalLink, Eye, Calendar, Clock, Users, ChevronDown, ChevronUp, Copy, Check, Share2, BarChart3 } from 'lucide-react';
 
 export default function DashboardPage() {
   const [stats, setStats] = useState({ total: 0, pending: 0, delivered: 0, revenue: 0, pending_revenue: 0 });
@@ -184,11 +184,6 @@ export default function DashboardPage() {
     },
   ];
 
-  // Calculate conversion rate (orders / visitors)
-  const conversionRate = traffic.total > 0 
-    ? ((filteredStats.total / traffic.total) * 100).toFixed(1) 
-    : '0.0';
-
   return (
     <div className="fade-in">
       <div style={styles.header}>
@@ -230,27 +225,28 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Stats Grid - Masonry Layout */}
+      {/* Stats Grid - Masonry Layout (1 large landscape + portrait column) */}
       <div style={styles.statsGrid}>
-        {/* Row 1: Revenue (large) + Orders (medium) */}
+        {/* Left: Large Revenue Card (landscape) */}
         <div 
           className="glass-card stat-card" 
           style={styles.statCardLarge}
           onClick={() => setShowAnalysis(showAnalysis === 'revenue' ? null : 'revenue')}
         >
-          <div className="stat-icon" style={{ background: statCards[0].gradient }}>
+          <div className="stat-icon" style={{ background: statCards[0].gradient, width: '56px', height: '56px' }}>
             {statCards[0].icon}
           </div>
           <div style={{ flex: 1 }}>
             <p className="stat-label">{statCards[0].title}</p>
-            <p className="stat-value" style={{ fontSize: '32px' }}>{statCards[0].value}</p>
+            <p className="stat-value" style={{ fontSize: '36px' }}>{statCards[0].value}</p>
           </div>
         </div>
         
+        {/* Right: Portrait column with 3 cards */}
         <div style={styles.statColumnRight}>
           <div 
             className="glass-card stat-card" 
-            style={styles.statCardSmall}
+            style={styles.statCardPortrait}
             onClick={() => setShowAnalysis(showAnalysis === 'orders' ? null : 'orders')}
           >
             <div className="stat-icon" style={{ background: statCards[1].gradient }}>
@@ -264,7 +260,7 @@ export default function DashboardPage() {
           
           <div 
             className="glass-card stat-card" 
-            style={styles.statCardSmall}
+            style={styles.statCardPortrait}
             onClick={() => setShowAnalysis(showAnalysis === 'completed' ? null : 'completed')}
           >
             <div className="stat-icon" style={{ background: statCards[2].gradient }}>
@@ -275,26 +271,26 @@ export default function DashboardPage() {
               <p className="stat-value">{statCards[2].value}</p>
             </div>
           </div>
+
+          <div 
+            className="glass-card stat-card" 
+            style={styles.statCardPortrait}
+            onClick={() => setShowAnalysis(showAnalysis === 'pending' ? null : 'pending')}
+          >
+            <div className="stat-icon" style={{ background: statCards[3].gradient }}>
+              {statCards[3].icon}
+            </div>
+            <div style={{ flex: 1 }}>
+              <p className="stat-label">{statCards[3].title}</p>
+              <p className="stat-value">{statCards[3].value}</p>
+            </div>
+          </div>
         </div>
         
-        {/* Row 2: Pending + Traffic + Conversion */}
+        {/* Traffic Card - Full width below */}
         <div 
           className="glass-card stat-card" 
-          style={styles.statCardMedium}
-          onClick={() => setShowAnalysis(showAnalysis === 'pending' ? null : 'pending')}
-        >
-          <div className="stat-icon" style={{ background: statCards[3].gradient }}>
-            {statCards[3].icon}
-          </div>
-          <div style={{ flex: 1 }}>
-            <p className="stat-label">{statCards[3].title}</p>
-            <p className="stat-value">{statCards[3].value}</p>
-          </div>
-        </div>
-        
-        <div 
-          className="glass-card stat-card" 
-          style={{ ...styles.statCardMedium, cursor: 'pointer' }}
+          style={styles.statCardTraffic}
           onClick={() => setTrafficExpanded(!trafficExpanded)}
         >
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)' }}>
@@ -306,16 +302,6 @@ export default function DashboardPage() {
           </div>
           <div style={{ color: '#9ca3af' }}>
             {trafficExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-          </div>
-        </div>
-        
-        <div className="glass-card stat-card" style={styles.statCardMedium}>
-          <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)' }}>
-            <TrendingUp size={22} />
-          </div>
-          <div style={{ flex: 1 }}>
-            <p className="stat-label">Conversion</p>
-            <p className="stat-value">{conversionRate}%</p>
           </div>
         </div>
       </div>
@@ -606,14 +592,15 @@ const styles = {
   statColumnRight: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '16px'
+    gap: '12px'
   },
-  statCardSmall: { 
+  statCardPortrait: { 
     cursor: 'pointer',
-    flex: 1
+    padding: '14px 16px'
   },
-  statCardMedium: { 
-    cursor: 'pointer'
+  statCardTraffic: { 
+    cursor: 'pointer',
+    gridColumn: 'span 2'
   },
   
   // Analysis modal with blur
