@@ -228,7 +228,15 @@ export default function DashboardPage() {
       {/* Stats Grid */}
       <div style={styles.statsGrid}>
         {statCards.map((card, index) => (
-          <div key={index} className="glass-card stat-card" style={{ position: 'relative' }}>
+          <div 
+            key={index} 
+            className="glass-card stat-card" 
+            style={{ 
+              position: 'relative', 
+              overflow: 'visible',
+              zIndex: showAnalysis === card.key ? 999 : 1 
+            }}
+          >
             <div className="stat-icon" style={{ background: card.gradient }}>
               {card.icon}
             </div>
@@ -244,7 +252,7 @@ export default function DashboardPage() {
             </button>
             {/* Analysis Popup */}
             {showAnalysis === card.key && (
-              <div style={styles.analysisPopup} className="glass-card">
+              <div style={styles.analysisPopup}>
                 <h4 style={styles.analysisTitle}>{getAnalysis(card.key).title}</h4>
                 <ul style={styles.analysisList}>
                   {getAnalysis(card.key).points.map((point, i) => (
@@ -521,11 +529,11 @@ const styles = {
   periodBtn: { padding: '8px 16px', border: 'none', background: 'transparent', borderRadius: '20px', fontSize: '14px', fontWeight: '500', color: 'var(--text-muted)', cursor: 'pointer', transition: 'all 0.2s' },
   periodBtnActive: { background: 'rgba(168, 85, 247, 0.15)', color: 'var(--accent-color)' },
   
-  statsGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px', marginBottom: '24px' },
+  statsGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px', marginBottom: '24px', position: 'relative', zIndex: 1 },
   
   // Info icon and analysis popup
   infoIconBtn: { position: 'absolute', top: '12px', right: '12px', background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '4px', borderRadius: '50%', transition: 'all 0.2s', opacity: 0.6 },
-  analysisPopup: { position: 'absolute', top: '100%', left: 0, right: 0, marginTop: '8px', padding: '16px', zIndex: 100, borderRadius: '12px', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' },
+  analysisPopup: { position: 'absolute', top: 'calc(100% + 8px)', left: '-8px', right: '-8px', padding: '16px', zIndex: 9999, borderRadius: '12px', boxShadow: '0 12px 40px rgba(0,0,0,0.4)', background: 'var(--bg-secondary)', border: '1px solid var(--border-color)' },
   analysisTitle: { fontSize: '14px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '12px' },
   analysisList: { listStyle: 'none', padding: 0, margin: 0 },
   analysisPoint: { fontSize: '13px', color: 'var(--text-secondary)', padding: '6px 0', borderBottom: '1px solid var(--border-color)', lineHeight: '1.5' },

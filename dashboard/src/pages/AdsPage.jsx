@@ -198,113 +198,123 @@ export default function AdsPage() {
       </div>
 
       {/* UTM Links Generator */}
-      {storeUrl && (
-        <div className="glass-card" style={styles.section}>
-          <div 
-            style={styles.sectionHeaderClickable}
-            onClick={() => setShowUtmSection(!showUtmSection)}
-          >
-            <div>
-              <h2 style={styles.sectionTitle}>📢 Share Your Store</h2>
-              <p style={styles.sectionSubtitle}>Copy trackable links for each platform</p>
-            </div>
-            {showUtmSection ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+      <div className="glass-card" style={styles.section}>
+        <div 
+          style={styles.sectionHeaderClickable}
+          onClick={() => setShowUtmSection(!showUtmSection)}
+        >
+          <div>
+            <h2 style={styles.sectionTitle}>📢 Share Your Store</h2>
+            <p style={styles.sectionSubtitle}>Copy trackable links for each platform</p>
           </div>
-          
-          {showUtmSection && (
-            <>
-              {/* Quick Links Grid */}
-              <div style={styles.utmGrid}>
-                {utmLinks.map((link, idx) => {
-                  const fullUrl = `${storeUrl}&utm_source=${link.source}&utm_medium=${link.medium}`;
-                  const isCopied = copiedLink === idx;
-                  return (
-                    <div key={idx} style={styles.utmCard} className="glass-card">
-                      <div style={styles.utmCardHeader}>
-                        <span style={styles.utmEmoji}>{link.emoji}</span>
-                        <div>
-                          <p style={styles.utmPlatform}>{link.platform}</p>
-                          <p style={styles.utmDesc}>{link.desc}</p>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => copyLink(idx, fullUrl)}
-                        style={{
-                          ...styles.copyBtn,
-                          ...(isCopied ? styles.copyBtnCopied : {})
-                        }}
-                      >
-                        {isCopied ? <Check size={14} /> : <Copy size={14} />}
-                        {isCopied ? 'Copied!' : 'Copy Link'}
-                      </button>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Custom UTM Builder */}
-              <div style={styles.customUtmSection}>
-                <h3 style={styles.customUtmTitle}>
-                  <Link2 size={18} />
-                  Custom Campaign Link
-                </h3>
-                <div style={styles.customUtmForm}>
-                  <div style={styles.inputGroup}>
-                    <label style={styles.inputLabel}>Source *</label>
-                    <input
-                      type="text"
-                      placeholder="e.g., newsletter, influencer"
-                      value={customUtm.source}
-                      onChange={(e) => setCustomUtm({...customUtm, source: e.target.value})}
-                      style={styles.input}
-                      className="dashboard-input"
-                    />
-                  </div>
-                  <div style={styles.inputGroup}>
-                    <label style={styles.inputLabel}>Medium</label>
-                    <input
-                      type="text"
-                      placeholder="e.g., email, referral"
-                      value={customUtm.medium}
-                      onChange={(e) => setCustomUtm({...customUtm, medium: e.target.value})}
-                      style={styles.input}
-                      className="dashboard-input"
-                    />
-                  </div>
-                  <div style={styles.inputGroup}>
-                    <label style={styles.inputLabel}>Campaign</label>
-                    <input
-                      type="text"
-                      placeholder="e.g., january_sale"
-                      value={customUtm.campaign}
-                      onChange={(e) => setCustomUtm({...customUtm, campaign: e.target.value})}
-                      style={styles.input}
-                      className="dashboard-input"
-                    />
-                  </div>
-                </div>
-                {customUtm.source && (
-                  <div style={styles.generatedLink}>
-                    <p style={styles.generatedLinkLabel}>Your Link:</p>
-                    <div style={styles.generatedLinkBox}>
-                      <code style={styles.generatedLinkCode}>{generateCustomLink()}</code>
-                      <button
-                        onClick={() => copyLink('custom', generateCustomLink())}
-                        style={{
-                          ...styles.copyBtnSmall,
-                          ...(copiedLink === 'custom' ? styles.copyBtnCopied : {})
-                        }}
-                      >
-                        {copiedLink === 'custom' ? <Check size={14} /> : <Copy size={14} />}
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </>
-          )}
+          {showUtmSection ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
         </div>
-      )}
+        
+        {showUtmSection && (
+          <>
+            {!storeUrl ? (
+              <div style={styles.setupNotice}>
+                <AlertCircle size={20} />
+                <div>
+                  <p style={styles.setupTitle}>Store URL not configured</p>
+                  <p style={styles.setupDesc}>Go to Settings → Store to set up your store slug first.</p>
+                </div>
+              </div>
+            ) : (
+              <>
+                {/* Quick Links Grid */}
+                <div style={styles.utmGrid}>
+                  {utmLinks.map((link, idx) => {
+                    const fullUrl = `${storeUrl}&utm_source=${link.source}&utm_medium=${link.medium}`;
+                    const isCopied = copiedLink === idx;
+                    return (
+                      <div key={idx} style={styles.utmCard} className="glass-card">
+                        <div style={styles.utmCardHeader}>
+                          <span style={styles.utmEmoji}>{link.emoji}</span>
+                          <div>
+                            <p style={styles.utmPlatform}>{link.platform}</p>
+                            <p style={styles.utmDesc}>{link.desc}</p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => copyLink(idx, fullUrl)}
+                          style={{
+                            ...styles.copyBtn,
+                            ...(isCopied ? styles.copyBtnCopied : {})
+                          }}
+                        >
+                          {isCopied ? <Check size={14} /> : <Copy size={14} />}
+                          {isCopied ? 'Copied!' : 'Copy Link'}
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Custom UTM Builder */}
+                <div style={styles.customUtmSection}>
+                  <h3 style={styles.customUtmTitle}>
+                    <Link2 size={18} />
+                    Custom Campaign Link
+                  </h3>
+                  <div style={styles.customUtmForm}>
+                    <div style={styles.inputGroup}>
+                      <label style={styles.inputLabel}>Source *</label>
+                      <input
+                        type="text"
+                        placeholder="e.g., newsletter, influencer"
+                        value={customUtm.source}
+                        onChange={(e) => setCustomUtm({...customUtm, source: e.target.value})}
+                        style={styles.input}
+                        className="dashboard-input"
+                      />
+                    </div>
+                    <div style={styles.inputGroup}>
+                      <label style={styles.inputLabel}>Medium</label>
+                      <input
+                        type="text"
+                        placeholder="e.g., email, referral"
+                        value={customUtm.medium}
+                        onChange={(e) => setCustomUtm({...customUtm, medium: e.target.value})}
+                        style={styles.input}
+                        className="dashboard-input"
+                      />
+                    </div>
+                    <div style={styles.inputGroup}>
+                      <label style={styles.inputLabel}>Campaign</label>
+                      <input
+                        type="text"
+                        placeholder="e.g., january_sale"
+                        value={customUtm.campaign}
+                        onChange={(e) => setCustomUtm({...customUtm, campaign: e.target.value})}
+                        style={styles.input}
+                        className="dashboard-input"
+                      />
+                    </div>
+                  </div>
+                  {customUtm.source && (
+                    <div style={styles.generatedLink}>
+                      <p style={styles.generatedLinkLabel}>Your Link:</p>
+                      <div style={styles.generatedLinkBox}>
+                        <code style={styles.generatedLinkCode}>{generateCustomLink()}</code>
+                        <button
+                          onClick={() => copyLink('custom', generateCustomLink())}
+                          style={{
+                            ...styles.copyBtnSmall,
+                            ...(copiedLink === 'custom' ? styles.copyBtnCopied : {})
+                          }}
+                        >
+                          {copiedLink === 'custom' ? <Check size={14} /> : <Copy size={14} />}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+          </>
+        )}
+      </div>
 
       {/* Connect Ad Account Modal */}
       {showConnectModal && (
@@ -392,6 +402,11 @@ const styles = {
   emptyState: { textAlign: 'center', padding: '40px 20px' },
   emptyText: { fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '8px' },
   emptyHint: { fontSize: '14px', color: 'var(--text-muted)' },
+  
+  // Setup Notice
+  setupNotice: { display: 'flex', gap: '14px', alignItems: 'flex-start', padding: '20px', background: 'rgba(251, 191, 36, 0.1)', borderRadius: '12px', color: '#f59e0b' },
+  setupTitle: { fontSize: '15px', fontWeight: '600', margin: 0 },
+  setupDesc: { fontSize: '13px', margin: '4px 0 0 0', opacity: 0.9 },
   
   // UTM Links Grid
   utmGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '12px', marginBottom: '24px' },
