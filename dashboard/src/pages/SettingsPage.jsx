@@ -172,11 +172,21 @@ export default function SettingsPage() {
         privacy_policy: storeSettings.privacyPolicy,
         terms_of_service: storeSettings.termsOfService,
         refund_policy: storeSettings.refundPolicy,
-      });
+      }, storeSettings.slug || null);
+      
+      // Update store URL after save if slug was set
+      if (storeSettings.slug) {
+        const baseUrl = window.location.hostname === 'localhost' 
+          ? 'http://localhost:5173' 
+          : 'https://jariecommstore.netlify.app';
+        setStoreUrl(`${baseUrl}?store=${storeSettings.slug}`);
+      }
+      
       alert('✅ Settings saved! Refresh your store to see changes.');
     } catch (error) {
       console.error('Save error:', error);
-      alert('Failed to save settings. Please try again.');
+      const errorMsg = error.response?.data?.error || 'Failed to save settings. Please try again.';
+      alert(errorMsg);
     } finally { 
       setSaving(false); 
     }
@@ -264,15 +274,19 @@ export default function SettingsPage() {
               </div>
 
               <div style={styles.formGroup}>
-                <label style={styles.label}>STORE URL</label>
-                <input 
-                  type="text" 
-                  value={storeSettings.slug} 
-                  disabled 
-                  className="dashboard-input" 
-                  style={styles.inputDisabled} 
-                />
-                <p style={styles.hint}>Your unique store URL</p>
+                <label style={styles.label}>STORE SLUG</label>
+                <div style={styles.slugInputWrapper}>
+                  <span style={styles.slugPrefix}>jariecommstore.netlify.app/?store=</span>
+                  <input 
+                    type="text" 
+                    value={storeSettings.slug} 
+                    onChange={(e) => setStoreSettings({ ...storeSettings, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '') })}
+                    placeholder="mystore"
+                    className="dashboard-input" 
+                    style={styles.slugInput} 
+                  />
+                </div>
+                <p style={styles.hint}>Your unique store URL (lowercase letters, numbers, and dashes only)</p>
               </div>
 
               <div style={styles.formGroup}>
@@ -753,6 +767,28 @@ const styles = {
     background: 'var(--bg-tertiary)', 
     color: 'var(--text-muted)', 
     cursor: 'not-allowed' 
+  },
+  slugInputWrapper: {
+    display: 'flex',
+    alignItems: 'center',
+    background: 'var(--bg-tertiary)',
+    borderRadius: '8px',
+    overflow: 'hidden',
+    border: '1px solid var(--border-color)'
+  },
+  slugPrefix: {
+    padding: '10px 12px',
+    fontSize: '13px',
+    color: 'var(--text-muted)',
+    background: 'var(--bg-secondary)',
+    borderRight: '1px solid var(--border-color)',
+    whiteSpace: 'nowrap'
+  },
+  slugInput: {
+    flex: 1,
+    border: 'none',
+    borderRadius: 0,
+    background: 'transparent'
   },
   hint: { 
     fontSize: '12px', 

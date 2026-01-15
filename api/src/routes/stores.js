@@ -22,19 +22,40 @@ router.get('/', auth, async (req, res, next) => {
   }
 });
 
-// Update store config
+// Update store config and/or slug
 router.put('/', auth, async (req, res, next) => {
   try {
-    const { config: newConfig } = req.body;
+    const { config: newConfig, slug: newSlug } = req.body;
     
-    // Merge with existing config
-    const result = await db.query(
-      `UPDATE stores 
-       SET config = config || $1::jsonb
-       WHERE user_id = $2 
-       RETURNING *`,
-      [JSON.stringify(newConfig), req.user.userId]
-    );
+    // If slug is being updated, check if it's unique
+    if (newSlug) {
+      const slugCheck = await db.query(
+        'SELECT id FROM stores WHERE slug = $1 AND user_id != $2',
+        [newSlug, req.user.userId]
+      );
+      if (slugCheck.rows.length > 0) {
+        return res.status(400).json({ error: 'This slug is already taken. Please choose another.' });
+      }
+    }
+    
+    // Build update query dynamically
+    let updateQuery;
+    let params;
+    
+    if (newSlug && newConfig) {
+      updateQuery = `UPDATE stores SET config = config || $1::jsonb, slug = $2 WHERE user_id = $3 RETURNING *`;
+      params = [JSON.stringify(newConfig), newSlug, req.user.userId];
+    } else if (newSlug) {
+      updateQuery = `UPDATE stores SET slug = $1 WHERE user_id = $2 RETURNING *`;
+      params = [newSlug, req.user.userId];
+    } else if (newConfig) {
+      updateQuery = `UPDATE stores SET config = config || $1::jsonb WHERE user_id = $2 RETURNING *`;
+      params = [JSON.stringify(newConfig), req.user.userId];
+    } else {
+      return res.status(400).json({ error: 'No data to update' });
+    }
+    
+    const result = await db.query(updateQuery, params);
     
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Store not found' });

@@ -84,7 +84,12 @@ export const ordersAPI = {
 // ===========================================
 export const settingsAPI = {
   getAll: () => api.get('/store'),
-  update: (settingsData) => api.put('/store', { config: settingsData }),
+  update: (settingsData, slug = null) => {
+    const payload = { config: settingsData };
+    if (slug) payload.slug = slug;
+    return api.put('/store', payload);
+  },
+  updateSlug: (slug) => api.put('/store', { slug }),
   getThemes: () => api.get('/store/themes'),
   getTemplates: () => api.get('/store/templates'),
   getAddOns: () => api.get('/store/add-ons'),
