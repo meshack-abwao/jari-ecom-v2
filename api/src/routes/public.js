@@ -59,6 +59,7 @@ router.get('/:slug', async (req, res, next) => {
     // Build store response with support for both snake_case and camelCase config keys
     res.json({
       store: {
+        id: store.id,  // Required for pixel tracking
         slug: store.slug,
         // Name - check multiple fields
         name: config.store_name || config.storeName || config.name || profile.business_name || 'Store',
