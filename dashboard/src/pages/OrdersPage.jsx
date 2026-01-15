@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ordersAPI } from '../api/client';
-import { Clock, CheckCircle, XCircle, DollarSign, Package, Truck, Search, RefreshCw, Download, Calendar } from 'lucide-react';
+import { Clock, CheckCircle, XCircle, DollarSign, Package, Truck, Search, RefreshCw, Download } from 'lucide-react';
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState([]);
@@ -10,6 +10,7 @@ export default function OrdersPage() {
   const [activeFilter, setActiveFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [dateFilter, setDateFilter] = useState('all'); // 'all', 'today', 'week', 'month'
+  const [filteredStats, setFilteredStats] = useState({ total: 0, pending: 0, paid: 0, delivered: 0, cancelled: 0, revenue: 0 });
 
   useEffect(() => { 
     loadOrders(); 
@@ -43,7 +44,8 @@ export default function OrdersPage() {
   const filterOrders = () => {
     let filtered = [...orders];
     
-    // Apply date filter
+    // Apply date filter first
+    let dateFiltered = [...orders];
     if (dateFilter !== 'all') {
       const now = new Date();
       const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -59,8 +61,20 @@ export default function OrdersPage() {
         cutoffDate.setMonth(cutoffDate.getMonth() - 1);
       }
       
-      filtered = filtered.filter(o => new Date(o.created_at) >= cutoffDate);
+      dateFiltered = orders.filter(o => new Date(o.created_at) >= cutoffDate);
+      filtered = dateFiltered;
     }
+    
+    // Compute stats from date-filtered orders (before status/search filters)
+    const computedStats = {
+      total: dateFiltered.length,
+      pending: dateFiltered.filter(o => o.status === 'pending').length,
+      paid: dateFiltered.filter(o => o.status === 'paid').length,
+      delivered: dateFiltered.filter(o => o.status === 'delivered' || o.status === 'completed').length,
+      cancelled: dateFiltered.filter(o => o.status === 'cancelled').length,
+      revenue: dateFiltered.reduce((sum, o) => sum + (parseFloat(o.total_amount) || 0), 0)
+    };
+    setFilteredStats(computedStats);
     
     // Apply status filter
     if (activeFilter !== 'all') {
@@ -133,18 +147,18 @@ export default function OrdersPage() {
   };
 
   const statCards = [
-    { label: 'TOTAL ORDERS', value: stats.total, icon: <Package size={22} />, color: '#8b5cf6' },
-    { label: 'PENDING', value: stats.pending, icon: <Clock size={22} />, color: '#f59e0b' },
-    { label: 'COMPLETED', value: stats.delivered, icon: <CheckCircle size={22} />, color: '#22c55e' },
-    { label: 'REVENUE', value: `KES ${Number(stats.revenue || 0).toLocaleString()}`, icon: <DollarSign size={22} />, color: '#3b82f6' },
+    { label: 'TOTAL ORDERS', value: filteredStats.total, icon: <Package size={22} />, color: '#8b5cf6' },
+    { label: 'PENDING', value: filteredStats.pending, icon: <Clock size={22} />, color: '#f59e0b' },
+    { label: 'COMPLETED', value: filteredStats.delivered, icon: <CheckCircle size={22} />, color: '#22c55e' },
+    { label: 'REVENUE', value: `KES ${Number(filteredStats.revenue || 0).toLocaleString()}`, icon: <DollarSign size={22} />, color: '#3b82f6' },
   ];
 
   const filterTabs = [
-    { key: 'all', label: 'All', count: orders.length },
-    { key: 'pending', label: 'Pending', count: stats.pending },
-    { key: 'paid', label: 'Paid', count: stats.paid },
-    { key: 'completed', label: 'Delivered', count: stats.delivered },
-    { key: 'cancelled', label: 'Cancelled', count: stats.cancelled },
+    { key: 'all', label: 'All', count: filteredStats.total },
+    { key: 'pending', label: 'Pending', count: filteredStats.pending },
+    { key: 'paid', label: 'Paid', count: filteredStats.paid },
+    { key: 'completed', label: 'Delivered', count: filteredStats.delivered },
+    { key: 'cancelled', label: 'Cancelled', count: filteredStats.cancelled },
   ];
 
   if (loading) {
@@ -165,27 +179,6 @@ export default function OrdersPage() {
           <p style={styles.subtitle}>Manage and track your orders</p>
         </div>
         <div style={styles.headerActions}>
-          {/* Date Filter Pills */}
-          <div style={styles.dateFilterRow}>
-            {[
-              { key: 'all', label: 'All Time' },
-              { key: 'today', label: 'Today' },
-              { key: 'week', label: 'This Week' },
-              { key: 'month', label: 'This Month' },
-            ].map(df => (
-              <button
-                key={df.key}
-                onClick={() => setDateFilter(df.key)}
-                style={{
-                  ...styles.dateFilterBtn,
-                  ...(dateFilter === df.key ? styles.dateFilterBtnActive : {})
-                }}
-              >
-                {df.key === 'today' && <Calendar size={14} style={{ marginRight: 4 }} />}
-                {df.label}
-              </button>
-            ))}
-          </div>
           <button onClick={() => { loadOrders(); loadStats(); }} style={styles.iconBtn} title="Refresh">
             <RefreshCw size={18} />
           </button>
@@ -208,6 +201,27 @@ export default function OrdersPage() {
               <p style={styles.statValue}>{stat.value}</p>
             </div>
           </div>
+        ))}
+      </div>
+
+      {/* Date/Period Filter */}
+      <div style={styles.periodFilterRow}>
+        {[
+          { key: 'all', label: 'All Time' },
+          { key: 'today', label: 'Today' },
+          { key: 'week', label: 'This Week' },
+          { key: 'month', label: 'This Month' },
+        ].map(df => (
+          <button
+            key={df.key}
+            onClick={() => setDateFilter(df.key)}
+            style={{
+              ...styles.periodFilterBtn,
+              ...(dateFilter === df.key ? styles.periodFilterBtnActive : {})
+            }}
+          >
+            {df.label}
+          </button>
         ))}
       </div>
 
@@ -433,7 +447,7 @@ const styles = {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
     gap: '16px',
-    marginBottom: '24px'
+    marginBottom: '16px'
   },
   statCard: {
     display: 'flex',
@@ -461,6 +475,39 @@ const styles = {
     fontSize: '24px',
     fontWeight: '700',
     color: 'var(--text-primary)'
+  },
+  
+  // Period Filter (below stats, above search)
+  periodFilterRow: {
+    display: 'flex',
+    gap: '8px',
+    marginBottom: '16px',
+    overflowX: 'auto',
+    WebkitOverflowScrolling: 'touch',
+    scrollbarWidth: 'none',
+    msOverflowStyle: 'none',
+    paddingBottom: '4px'
+  },
+  periodFilterBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    padding: '8px 16px',
+    background: 'transparent',
+    border: '1px solid var(--border-color)',
+    borderRadius: '20px',
+    color: 'var(--text-secondary)',
+    fontSize: '13px',
+    fontWeight: '500',
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+    whiteSpace: 'nowrap',
+    flexShrink: 0
+  },
+  periodFilterBtnActive: {
+    background: 'var(--accent-color)',
+    borderColor: 'var(--accent-color)',
+    color: 'white'
   },
   
   // Filters
@@ -627,39 +674,5 @@ const styles = {
     fontSize: '12px', 
     borderRadius: '6px', 
     minWidth: '110px' 
-  },
-  
-  // Date Filter - horizontal scroll on mobile
-  dateFilterRow: {
-    display: 'flex',
-    gap: '6px',
-    alignItems: 'center',
-    overflowX: 'auto',
-    WebkitOverflowScrolling: 'touch',
-    scrollbarWidth: 'none',
-    msOverflowStyle: 'none',
-    paddingBottom: '4px',
-    marginRight: '8px',
-    flex: '1 1 auto',
-    minWidth: 0
-  },
-  dateFilterBtn: {
-    display: 'flex',
-    alignItems: 'center',
-    padding: '8px 14px',
-    background: 'var(--glass-bg)',
-    border: '1px solid var(--border-color)',
-    borderRadius: '8px',
-    color: 'var(--text-secondary)',
-    fontSize: '13px',
-    fontWeight: '500',
-    cursor: 'pointer',
-    transition: 'all 0.2s',
-    whiteSpace: 'nowrap'
-  },
-  dateFilterBtnActive: {
-    background: 'var(--accent-color)',
-    borderColor: 'var(--accent-color)',
-    color: 'white'
   },
 };
