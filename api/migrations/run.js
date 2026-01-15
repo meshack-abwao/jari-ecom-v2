@@ -15,14 +15,19 @@ async function migrate() {
   console.log('🔧 Running migrations...');
   
   try {
-    // Read and execute migration file
-    const sql = fs.readFileSync(
-      path.join(__dirname, '001_initial.sql'),
-      'utf8'
-    );
+    // Get all .sql files and sort them
+    const files = fs.readdirSync(__dirname)
+      .filter(f => f.endsWith('.sql'))
+      .sort();
     
-    await pool.query(sql);
-    console.log('✅ Migrations complete!');
+    for (const file of files) {
+      console.log(`  Running ${file}...`);
+      const sql = fs.readFileSync(path.join(__dirname, file), 'utf8');
+      await pool.query(sql);
+      console.log(`  ✅ ${file} complete`);
+    }
+    
+    console.log('✅ All migrations complete!');
     
   } catch (err) {
     console.error('❌ Migration failed:', err.message);
