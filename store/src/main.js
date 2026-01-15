@@ -2,6 +2,7 @@ import { fetchStore } from './api.js';
 import { state, setState, getSlug, getProductId, setProductId } from './state.js';
 import { renderHeader, renderProductsGrid, renderSingleProduct, renderFooter, renderError } from './render.js';
 import { renderCheckoutModal, initCheckout, openCheckout } from './checkout.js';
+import { initPixel, pixel } from './pixel.js';
 
 const app = document.getElementById('app');
 
@@ -34,6 +35,9 @@ async function init() {
       document.documentElement.style.setProperty('--gradient-primary', data.theme.colors.gradient);
       document.documentElement.style.setProperty('--color-primary', data.theme.colors.primary);
     }
+    
+    // Initialize pixel tracking
+    initPixel();
     
     render();
     
@@ -181,6 +185,9 @@ function initCardGallerySwipe() {
 // ===========================================
 function renderProductView(product) {
   currentImageIndex = 0;
+  
+  // Track product view
+  pixel.productView(product.id, product.data?.name || 'Unknown');
   
   app.innerHTML = `
     ${renderHeader()}

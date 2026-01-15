@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ordersAPI } from '../api/client';
-import { Clock, CheckCircle, XCircle, DollarSign, Package, Truck, Search, RefreshCw, Download } from 'lucide-react';
+import { Clock, CheckCircle, XCircle, DollarSign, Package, Truck, Search, RefreshCw, Download, Calendar } from 'lucide-react';
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState([]);
@@ -9,6 +9,7 @@ export default function OrdersPage() {
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [dateFilter, setDateFilter] = useState('all'); // 'all', 'today', 'week', 'month'
 
   useEffect(() => { 
     loadOrders(); 
@@ -17,7 +18,7 @@ export default function OrdersPage() {
 
   useEffect(() => {
     filterOrders();
-  }, [orders, activeFilter, searchQuery]);
+  }, [orders, activeFilter, searchQuery, dateFilter]);
 
   const loadOrders = async () => {
     try {
@@ -41,6 +42,25 @@ export default function OrdersPage() {
 
   const filterOrders = () => {
     let filtered = [...orders];
+    
+    // Apply date filter
+    if (dateFilter !== 'all') {
+      const now = new Date();
+      const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      
+      let cutoffDate;
+      if (dateFilter === 'today') {
+        cutoffDate = startOfDay;
+      } else if (dateFilter === 'week') {
+        cutoffDate = new Date(startOfDay);
+        cutoffDate.setDate(cutoffDate.getDate() - 7);
+      } else if (dateFilter === 'month') {
+        cutoffDate = new Date(startOfDay);
+        cutoffDate.setMonth(cutoffDate.getMonth() - 1);
+      }
+      
+      filtered = filtered.filter(o => new Date(o.created_at) >= cutoffDate);
+    }
     
     // Apply status filter
     if (activeFilter !== 'all') {
@@ -145,6 +165,27 @@ export default function OrdersPage() {
           <p style={styles.subtitle}>Manage and track your orders</p>
         </div>
         <div style={styles.headerActions}>
+          {/* Date Filter Pills */}
+          <div style={styles.dateFilterRow}>
+            {[
+              { key: 'all', label: 'All Time' },
+              { key: 'today', label: 'Today' },
+              { key: 'week', label: 'This Week' },
+              { key: 'month', label: 'This Month' },
+            ].map(df => (
+              <button
+                key={df.key}
+                onClick={() => setDateFilter(df.key)}
+                style={{
+                  ...styles.dateFilterBtn,
+                  ...(dateFilter === df.key ? styles.dateFilterBtnActive : {})
+                }}
+              >
+                {df.key === 'today' && <Calendar size={14} style={{ marginRight: 4 }} />}
+                {df.label}
+              </button>
+            ))}
+          </div>
           <button onClick={() => { loadOrders(); loadStats(); }} style={styles.iconBtn} title="Refresh">
             <RefreshCw size={18} />
           </button>
@@ -578,5 +619,32 @@ const styles = {
     fontSize: '12px', 
     borderRadius: '6px', 
     minWidth: '110px' 
+  },
+  
+  // Date Filter
+  dateFilterRow: {
+    display: 'flex',
+    gap: '6px',
+    alignItems: 'center',
+    marginRight: '8px'
+  },
+  dateFilterBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    padding: '8px 14px',
+    background: 'var(--glass-bg)',
+    border: '1px solid var(--border-color)',
+    borderRadius: '8px',
+    color: 'var(--text-secondary)',
+    fontSize: '13px',
+    fontWeight: '500',
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+    whiteSpace: 'nowrap'
+  },
+  dateFilterBtnActive: {
+    background: 'var(--accent-color)',
+    borderColor: 'var(--accent-color)',
+    color: 'white'
   },
 };

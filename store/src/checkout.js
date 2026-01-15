@@ -1,5 +1,6 @@
 import { state } from './state.js';
 import { createOrder } from './api.js';
+import { pixel } from './pixel.js';
 
 let selectedPaymentMethod = null;
 
@@ -149,6 +150,9 @@ export function openCheckout() {
   const price = selectedPrice || Number(data.price || 0);
   const total = price * quantity;
   
+  // Track checkout start
+  pixel.checkoutStart(total);
+  
   // Update summary
   document.getElementById('summaryProduct').textContent = data.name || 'Product';
   document.getElementById('summaryQty').textContent = quantity;
@@ -295,6 +299,9 @@ async function completeOrder() {
     const result = await createOrder(store.slug, orderData);
     
     if (result.success) {
+      // Track successful purchase
+      pixel.purchase(result.order_number, total, currentProduct.id);
+      
       // Show success
       document.getElementById('orderNumber').textContent = result.order_number;
       

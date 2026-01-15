@@ -91,6 +91,13 @@ export const settingsAPI = {
 };
 
 // ===========================================
+// PIXEL/ANALYTICS API
+// ===========================================
+export const pixelAPI = {
+  getStats: (storeId, period = 'today') => api.get(`/pixel/stats/${storeId}?period=${period}`),
+};
+
+// ===========================================
 // LEGACY API (for backwards compatibility)
 // ===========================================
 export const legacyApi = {

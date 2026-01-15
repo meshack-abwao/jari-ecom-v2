@@ -3,6 +3,7 @@ import storesRoutes from './stores.js';
 import productsRoutes from './products.js';
 import ordersRoutes from './orders.js';
 import publicRoutes from './public.js';
+import pixelRoutes from './pixel.js';
 
 export function setupRoutes(app) {
   // Health check
@@ -22,4 +23,7 @@ export function setupRoutes(app) {
   
   // Public store routes (no /api prefix for cleaner URLs)
   app.use('/s', publicRoutes);
+  
+  // Pixel tracking (public, no auth needed for tracking)
+  app.use('/pixel', pixelRoutes);
 }
