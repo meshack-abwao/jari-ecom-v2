@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ordersAPI, productsAPI, settingsAPI, pixelAPI } from '../api/client';
-import { DollarSign, ShoppingCart, Package, TrendingUp, ExternalLink, Eye, Calendar, Clock, Users, ChevronDown, ChevronUp, Info, Copy, Check, Share2 } from 'lucide-react';
+import { DollarSign, ShoppingCart, Package, TrendingUp, ExternalLink, Eye, Calendar, Clock, Users, ChevronDown, ChevronUp, Info, Copy, Check, Share2, BarChart3 } from 'lucide-react';
 
 export default function DashboardPage() {
   const [stats, setStats] = useState({ total: 0, pending: 0, delivered: 0, revenue: 0, pending_revenue: 0 });
@@ -9,13 +9,14 @@ export default function DashboardPage() {
   const [storeUrl, setStoreUrl] = useState('');
   const [storeId, setStoreId] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [greeting, setGreeting] = useState('');
   const [traffic, setTraffic] = useState({ total: 0, sources: [] });
   const [trafficExpanded, setTrafficExpanded] = useState(false);
   const [timePeriod, setTimePeriod] = useState('all');
   const [shareExpanded, setShareExpanded] = useState(false);
   const [copiedLink, setCopiedLink] = useState(null);
   const [filteredStats, setFilteredStats] = useState({ total: 0, pending: 0, delivered: 0, revenue: 0, pending_revenue: 0 });
+  const [topProducts, setTopProducts] = useState([]);
+  const [topProductsView, setTopProductsView] = useState('orders'); // 'orders' or 'revenue'
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -69,8 +70,12 @@ export default function DashboardPage() {
   
   const loadFilteredStats = async () => {
     try {
-      const statsRes = await ordersAPI.getStats(timePeriod);
+      const [statsRes, topProductsRes] = await Promise.all([
+        ordersAPI.getStats(timePeriod),
+        ordersAPI.getTopProducts(timePeriod)
+      ]);
       setFilteredStats(statsRes.data || { total: 0, pending: 0, delivered: 0, revenue: 0, pending_revenue: 0 });
+      setTopProducts(topProductsRes.data || []);
       
       // Also reload traffic for the period
       if (storeId) {
@@ -301,13 +306,71 @@ export default function DashboardPage() {
             <h3 className="action-title">View Orders</h3>
             <p className="action-desc">Manage your orders</p>
           </div>
-          <div onClick={() => navigate('/templates')} className="glass-card action-card">
-            <div className="action-icon">🎨</div>
-            <h3 className="action-title">Templates</h3>
-            <p className="action-desc">Choose page layouts</p>
+          <div onClick={() => navigate('/ads')} className="glass-card action-card">
+            <div className="action-icon">📢</div>
+            <h3 className="action-title">Boost Ads</h3>
+            <p className="action-desc">Track & share your store</p>
           </div>
         </div>
       </div>
+
+      {/* Top Products */}
+      {topProducts.length > 0 && (
+        <div style={styles.section}>
+          <div style={styles.sectionHeader}>
+            <h2 style={styles.sectionTitle}>Top Products</h2>
+            <div style={styles.toggleGroup}>
+              <button 
+                onClick={() => setTopProductsView('orders')}
+                style={{ ...styles.toggleBtn, ...(topProductsView === 'orders' ? styles.toggleBtnActive : {}) }}
+              >
+                Orders
+              </button>
+              <button 
+                onClick={() => setTopProductsView('revenue')}
+                style={{ ...styles.toggleBtn, ...(topProductsView === 'revenue' ? styles.toggleBtnActive : {}) }}
+              >
+                Revenue
+              </button>
+            </div>
+          </div>
+          <div className="glass-card" style={styles.topProductsList}>
+            {[...topProducts]
+              .sort((a, b) => topProductsView === 'orders' 
+                ? (b.order_count || 0) - (a.order_count || 0)
+                : (b.total_revenue || 0) - (a.total_revenue || 0)
+              )
+              .map((product, idx) => (
+                <div key={product.id} style={styles.topProductRow}>
+                  <span style={styles.topProductRank}>{idx + 1}</span>
+                  <div style={styles.topProductImg}>
+                    {product.image ? (
+                      <img src={product.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }} />
+                    ) : (
+                      <span>📦</span>
+                    )}
+                  </div>
+                  <div style={styles.topProductInfo}>
+                    <p style={styles.topProductName}>{product.name || 'Product'}</p>
+                    <p style={styles.topProductMeta}>
+                      {topProductsView === 'orders' 
+                        ? `${product.order_count || 0} orders`
+                        : `KES ${Number(product.total_revenue || 0).toLocaleString()}`
+                      }
+                    </p>
+                  </div>
+                  <div style={styles.topProductValue}>
+                    {topProductsView === 'orders' 
+                      ? <span style={styles.orderBadge}>{product.order_count || 0}</span>
+                      : <span style={styles.revenueBadge}>KES {Number(product.total_revenue || 0).toLocaleString()}</span>
+                    }
+                  </div>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+      )}
 
       {/* Recent Products */}
       {products.length > 0 && (
@@ -439,4 +502,19 @@ const styles = {
   shareLinkPlatform: { flex: 1, fontSize: '14px', fontWeight: '500', color: 'var(--text-primary)' },
   copyBtn: { display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 14px', background: 'var(--bg-tertiary)', border: '1px solid var(--border-color)', borderRadius: '8px', fontSize: '12px', fontWeight: '600', color: 'var(--text-secondary)', cursor: 'pointer', transition: 'all 0.2s' },
   copyBtnCopied: { background: 'rgba(34, 197, 94, 0.15)', borderColor: 'rgba(34, 197, 94, 0.3)', color: '#22c55e' },
+  
+  // Top Products
+  toggleGroup: { display: 'flex', gap: '4px', background: 'var(--bg-secondary)', padding: '3px', borderRadius: '8px' },
+  toggleBtn: { padding: '6px 12px', border: 'none', background: 'transparent', borderRadius: '6px', fontSize: '12px', fontWeight: '500', color: 'var(--text-muted)', cursor: 'pointer', transition: 'all 0.2s' },
+  toggleBtnActive: { background: 'var(--bg-primary)', color: 'var(--text-primary)' },
+  topProductsList: { padding: '12px' },
+  topProductRow: { display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', borderRadius: '10px', transition: 'background 0.2s' },
+  topProductRank: { width: '24px', height: '24px', borderRadius: '50%', background: 'var(--bg-tertiary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: '700', color: 'var(--text-muted)' },
+  topProductImg: { width: '44px', height: '44px', borderRadius: '8px', background: 'var(--bg-tertiary)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  topProductInfo: { flex: 1, minWidth: 0 },
+  topProductName: { fontSize: '14px', fontWeight: '600', color: 'var(--text-primary)', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
+  topProductMeta: { fontSize: '12px', color: 'var(--text-muted)', margin: '2px 0 0 0' },
+  topProductValue: { textAlign: 'right' },
+  orderBadge: { display: 'inline-block', padding: '4px 10px', background: 'rgba(139, 92, 246, 0.15)', borderRadius: '12px', fontSize: '13px', fontWeight: '600', color: '#8b5cf6' },
+  revenueBadge: { display: 'inline-block', padding: '4px 10px', background: 'rgba(34, 197, 94, 0.15)', borderRadius: '12px', fontSize: '13px', fontWeight: '600', color: '#22c55e' },
 };

@@ -112,6 +112,52 @@ router.get('/stats', auth, async (req, res, next) => {
   }
 });
 
+// Get top products by order count and revenue
+router.get('/top-products', auth, async (req, res, next) => {
+  try {
+    const { period } = req.query;
+    
+    const storeResult = await db.query(
+      'SELECT id FROM stores WHERE user_id = $1',
+      [req.user.userId]
+    );
+    
+    if (storeResult.rows.length === 0) {
+      return res.json([]);
+    }
+    
+    // Build date filter based on period
+    let dateFilter = '';
+    if (period === 'today') {
+      dateFilter = "AND o.created_at >= CURRENT_DATE";
+    } else if (period === 'week') {
+      dateFilter = "AND o.created_at >= CURRENT_DATE - INTERVAL '7 days'";
+    } else if (period === 'month') {
+      dateFilter = "AND o.created_at >= CURRENT_DATE - INTERVAL '30 days'";
+    }
+    
+    const result = await db.query(
+      `SELECT 
+         p.id,
+         p.data->>'name' as name,
+         (p.media->'images'->>0) as image,
+         COUNT(o.id)::int as order_count,
+         COALESCE(SUM((o.items->0->>'total')::numeric), 0) as total_revenue
+       FROM products p
+       LEFT JOIN orders o ON o.product_id = p.id ${dateFilter}
+       WHERE p.store_id = $1
+       GROUP BY p.id
+       ORDER BY order_count DESC, total_revenue DESC
+       LIMIT 5`,
+      [storeResult.rows[0].id]
+    );
+    
+    res.json(result.rows);
+  } catch (err) {
+    next(err);
+  }
+});
+
 // Create order (public endpoint for store checkout)
 router.post('/', async (req, res, next) => {
   try {
