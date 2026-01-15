@@ -368,60 +368,62 @@ export default function DashboardPage() {
 
       {/* Share Your Store - UTM Links */}
       {storeUrl && (
-        <div className="glass-card" style={styles.shareSection}>
-          <div 
-            style={styles.shareHeader} 
-            onClick={() => setShareExpanded(!shareExpanded)}
-          >
-            <div style={styles.shareHeaderLeft}>
-              <Share2 size={20} style={{ color: 'var(--accent-color)' }} />
-              <div>
-                <h3 style={styles.shareTitle}>Share Your Store</h3>
-                <p style={styles.shareSubtitle}>Copy trackable links for each platform</p>
+        <div style={styles.shareWrapper}>
+          <div className="glass-card" style={styles.shareSection}>
+            <div 
+              style={styles.shareHeader} 
+              onClick={() => setShareExpanded(!shareExpanded)}
+            >
+              <div style={styles.shareHeaderLeft}>
+                <Share2 size={20} style={{ color: 'var(--accent-color)' }} />
+                <div>
+                  <h3 style={styles.shareTitle}>Share Your Store</h3>
+                  <p style={styles.shareSubtitle}>Copy trackable links for each platform</p>
+                </div>
+              </div>
+              <div style={{ color: '#9ca3af' }}>
+                {shareExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
               </div>
             </div>
-            <div style={{ color: '#9ca3af' }}>
-              {shareExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-            </div>
-          </div>
-          
-          {shareExpanded && (
-            <div style={styles.shareLinksList}>
-              {[
-                { platform: 'Instagram Bio', source: 'instagram', medium: 'bio', emoji: '📸' },
-                { platform: 'Instagram Story', source: 'instagram', medium: 'story', emoji: '📱' },
-                { platform: 'WhatsApp Status', source: 'whatsapp', medium: 'status', emoji: '💬' },
-                { platform: 'WhatsApp Chat', source: 'whatsapp', medium: 'chat', emoji: '📲' },
-                { platform: 'Facebook Post', source: 'facebook', medium: 'post', emoji: '👍' },
-                { platform: 'TikTok Bio', source: 'tiktok', medium: 'bio', emoji: '🎵' },
-                { platform: 'Twitter/X', source: 'twitter', medium: 'post', emoji: '🐦' },
-              ].map((link, idx) => {
-                const fullUrl = `${storeUrl}&utm_source=${link.source}&utm_medium=${link.medium}`;
-                const isCopied = copiedLink === idx;
-                
-                return (
-                  <div key={idx} style={styles.shareLinkRow}>
-                    <span style={styles.shareLinkEmoji}>{link.emoji}</span>
-                    <span style={styles.shareLinkPlatform}>{link.platform}</span>
-                    <button
-                      onClick={() => {
-                        navigator.clipboard.writeText(fullUrl);
-                        setCopiedLink(idx);
-                        setTimeout(() => setCopiedLink(null), 2000);
-                      }}
-                      style={{
-                        ...styles.copyBtn,
-                        ...(isCopied ? styles.copyBtnCopied : {})
-                      }}
-                    >
-                      {isCopied ? <Check size={14} /> : <Copy size={14} />}
-                      {isCopied ? 'Copied!' : 'Copy'}
-                    </button>
-                  </div>
+            
+            {shareExpanded && (
+              <div style={styles.shareLinksList}>
+                {[
+                  { platform: 'Instagram Bio', source: 'instagram', medium: 'bio', icon: '📷' },
+                  { platform: 'Instagram Story', source: 'instagram', medium: 'story', icon: '📱' },
+                  { platform: 'WhatsApp Status', source: 'whatsapp', medium: 'status', icon: '💬' },
+                  { platform: 'WhatsApp Chat', source: 'whatsapp', medium: 'chat', icon: '📲' },
+                  { platform: 'Facebook Post', source: 'facebook', medium: 'post', icon: '📘' },
+                  { platform: 'TikTok Bio', source: 'tiktok', medium: 'bio', icon: '🎵' },
+                  { platform: 'Twitter/X', source: 'twitter', medium: 'post', icon: '✖️' },
+                ].map((link, idx) => {
+                  const fullUrl = `${storeUrl}&utm_source=${link.source}&utm_medium=${link.medium}`;
+                  const isCopied = copiedLink === idx;
+                  
+                  return (
+                    <div key={idx} style={styles.shareLinkRow}>
+                      <span style={styles.shareLinkIcon}>{link.icon}</span>
+                      <span style={styles.shareLinkPlatform}>{link.platform}</span>
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(fullUrl);
+                          setCopiedLink(idx);
+                          setTimeout(() => setCopiedLink(null), 2000);
+                        }}
+                        style={{
+                          ...styles.copyBtn,
+                          ...(isCopied ? styles.copyBtnCopied : {})
+                        }}
+                      >
+                        {isCopied ? <Check size={14} /> : <Copy size={14} />}
+                        {isCopied ? 'Copied!' : 'Copy'}
+                      </button>
+                    </div>
                 );
               })}
             </div>
           )}
+          </div>
         </div>
       )}
 
@@ -677,14 +679,15 @@ const styles = {
   emptyDesc: { fontSize: '14px', color: 'var(--text-muted)' },
   
   // Share section
-  shareSection: { padding: '0', marginBottom: '24px', overflow: 'hidden' },
+  shareWrapper: { maxWidth: '480px', marginBottom: '24px' },
+  shareSection: { padding: '0', overflow: 'hidden' },
   shareHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', cursor: 'pointer', transition: 'background 0.2s' },
   shareHeaderLeft: { display: 'flex', alignItems: 'center', gap: '12px' },
   shareTitle: { fontSize: '15px', fontWeight: '600', color: 'var(--text-primary)', margin: 0 },
   shareSubtitle: { fontSize: '12px', color: 'var(--text-muted)', margin: 0 },
   shareLinksList: { padding: '0 20px 16px', display: 'flex', flexDirection: 'column', gap: '8px' },
   shareLinkRow: { display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 14px', background: 'var(--bg-secondary)', borderRadius: '10px' },
-  shareLinkEmoji: { fontSize: '18px' },
+  shareLinkIcon: { fontSize: '18px', width: '24px', textAlign: 'center' },
   shareLinkPlatform: { flex: 1, fontSize: '14px', fontWeight: '500', color: 'var(--text-primary)' },
   copyBtn: { display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 14px', background: 'var(--bg-tertiary)', border: '1px solid var(--border-color)', borderRadius: '8px', fontSize: '12px', fontWeight: '600', color: 'var(--text-secondary)', cursor: 'pointer', transition: 'all 0.2s' },
   copyBtnCopied: { background: 'rgba(34, 197, 94, 0.15)', borderColor: 'rgba(34, 197, 94, 0.3)', color: '#22c55e' },
