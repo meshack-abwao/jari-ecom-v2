@@ -3,7 +3,7 @@ import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useTheme } from '../hooks/useTheme';
 import { settingsAPI } from '../api/client';
-import { Home, Package, ShoppingCart, Settings, Zap, LogOut, Sun, Moon, Menu, X, CreditCard, User, Store, Crown, ArrowUpRight, LayoutGrid, Megaphone } from 'lucide-react';
+import { Home, Package, ShoppingCart, Settings, Zap, LogOut, Sun, Moon, Menu, X, User, Store, Crown, ArrowUpRight, LayoutGrid, Megaphone } from 'lucide-react';
 
 export default function Layout() {
   const { user, logout } = useAuth();
@@ -195,24 +195,21 @@ export default function Layout() {
           <NavLink to="/" end className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
             <Home size={20} /><span>Overview</span>
           </NavLink>
-          <NavLink to="/products" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
-            <Package size={20} /><span>My Products</span>
-          </NavLink>
-          <NavLink to="/templates" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
-            <LayoutGrid size={20} /><span>Templates</span>
-          </NavLink>
           <NavLink to="/orders" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
             <ShoppingCart size={20} /><span>Orders</span>
+          </NavLink>
+          <NavLink to="/products" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
+            <Package size={20} /><span>My Products</span>
           </NavLink>
           <NavLink to="/ads" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
             <Megaphone size={20} /><span>Ads</span>
           </NavLink>
+          <NavLink to="/templates" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
+            <LayoutGrid size={20} /><span>Templates</span>
+          </NavLink>
           <NavLink to="/add-ons" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
             <Zap size={20} /><span>Add-Ons</span>
           </NavLink>
-          <button onClick={handleShowAccount} className="nav-link">
-            <CreditCard size={20} /><span>Account & Billing</span>
-          </button>
           <NavLink to="/settings" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
             <Settings size={20} /><span>Settings</span>
           </NavLink>
