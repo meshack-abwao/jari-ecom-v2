@@ -606,9 +606,10 @@ body {
 /* ===== OVERVIEW STATS GRID - RESPONSIVE MASONRY ===== */
 .overview-stats-grid {
   display: grid;
-  grid-template-columns: 1.6fr 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 16px;
   margin-bottom: 24px;
+  max-width: 540px;
 }
 
 .overview-stat-large {
