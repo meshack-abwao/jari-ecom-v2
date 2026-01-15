@@ -11,6 +11,7 @@ const app = express();
 // Middleware
 app.use(cors({ origin: config.corsOrigins, credentials: true }));
 app.use(express.json());
+app.use(express.text()); // For sendBeacon which sends as text/plain
 
 // Routes
 setupRoutes(app);

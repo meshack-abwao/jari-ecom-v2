@@ -4,8 +4,26 @@ import pool from '../config/database.js';
 const router = Router();
 
 // POST /pixel - Track an event (public, no auth)
+// Note: sendBeacon sends as text/plain, so we need to parse manually
 router.post('/', async (req, res) => {
   try {
+    // Handle both JSON body and text/plain from sendBeacon
+    let body = req.body;
+    if (typeof body === 'string') {
+      try {
+        body = JSON.parse(body);
+      } catch (e) {
+        console.error('Pixel: Failed to parse body string:', body);
+        return res.status(204).end();
+      }
+    }
+    
+    // If body is empty or buffer, try to parse from raw
+    if (!body || Object.keys(body).length === 0) {
+      console.error('Pixel: Empty body received');
+      return res.status(204).end();
+    }
+    
     const { 
       store_id, 
       event, 
@@ -15,14 +33,17 @@ router.post('/', async (req, res) => {
       url, 
       referrer,
       session_id 
-    } = req.body;
+    } = body;
+    
+    console.log('[Pixel API] Received:', { store_id, event, utm_source: utm.source });
     
     // Validate required fields
     if (!store_id || !event) {
-      return res.status(400).json({ error: 'store_id and event required' });
+      console.error('Pixel: Missing store_id or event:', { store_id, event });
+      return res.status(204).end();
     }
     
-    // Insert event (fire and forget style, but we await for reliability)
+    // Insert event
     await pool.query(`
       INSERT INTO pixel_events (store_id, event, data, utm_source, utm_medium, utm_campaign, device, url, referrer, session_id)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
@@ -38,6 +59,8 @@ router.post('/', async (req, res) => {
       referrer || null,
       session_id || null
     ]);
+    
+    console.log('[Pixel API] Event recorded successfully:', event);
     
     // Return empty 204 for speed
     res.status(204).end();
