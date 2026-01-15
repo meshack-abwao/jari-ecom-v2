@@ -17,6 +17,7 @@ export default function DashboardPage() {
   const [filteredStats, setFilteredStats] = useState({ total: 0, pending: 0, delivered: 0, revenue: 0, pending_revenue: 0 });
   const [topProducts, setTopProducts] = useState([]);
   const [topProductsView, setTopProductsView] = useState('orders'); // 'orders' or 'revenue'
+  const [showAnalysis, setShowAnalysis] = useState(null); // which stat card analysis to show
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -108,26 +109,74 @@ export default function DashboardPage() {
     );
   }
 
+  // Generate analysis based on stats
+  const getAnalysis = (key) => {
+    const ordersDown = filteredStats.total < (stats.total * 0.8);
+    const hasPending = filteredStats.pending > 0;
+    const lowTraffic = traffic.total < 100;
+    
+    const analyses = {
+      revenue: {
+        title: '💰 Revenue Analysis',
+        points: [
+          filteredStats.revenue > 0 ? `Strong revenue of KES ${Number(filteredStats.revenue).toLocaleString()}` : 'No revenue yet this period',
+          hasPending ? `${filteredStats.pending} pending orders worth KES ${Number(filteredStats.pending_revenue).toLocaleString()}` : null,
+          lowTraffic ? '💡 Tip: Share your store links to drive more traffic' : null,
+        ].filter(Boolean)
+      },
+      orders: {
+        title: '📦 Orders Analysis',
+        points: [
+          filteredStats.total > 0 ? `${filteredStats.total} orders received this period` : 'No orders yet this period',
+          ordersDown ? '⚠️ Orders seem lower than usual' : null,
+          filteredStats.delivered > 0 ? `${filteredStats.delivered} orders completed (${Math.round((filteredStats.delivered/filteredStats.total)*100)}% completion rate)` : null,
+          ordersDown ? '💡 Tip: Try running a promotion or boosting your ads' : null,
+        ].filter(Boolean)
+      },
+      completed: {
+        title: '✅ Completion Analysis',
+        points: [
+          filteredStats.delivered > 0 ? `${filteredStats.delivered} orders delivered successfully` : 'No completed orders yet',
+          filteredStats.total > 0 ? `Completion rate: ${Math.round((filteredStats.delivered/filteredStats.total)*100)}%` : null,
+          (filteredStats.total - filteredStats.delivered - filteredStats.pending) > 0 ? `${filteredStats.total - filteredStats.delivered - filteredStats.pending} orders cancelled` : null,
+        ].filter(Boolean)
+      },
+      pending: {
+        title: '⏳ Pending Analysis',
+        points: [
+          hasPending ? `${filteredStats.pending} orders awaiting action` : 'No pending orders - great!',
+          hasPending ? `Potential revenue: KES ${Number(filteredStats.pending_revenue).toLocaleString()}` : null,
+          hasPending ? '💡 Tip: Process pending orders quickly to improve customer satisfaction' : null,
+        ].filter(Boolean)
+      }
+    };
+    return analyses[key];
+  };
+
   const statCards = [
     {
+      key: 'revenue',
       title: 'Total Revenue',
       value: `KES ${Number(filteredStats.revenue || 0).toLocaleString()}`,
       icon: <DollarSign size={22} />,
       gradient: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
     },
     {
+      key: 'orders',
       title: 'Total Orders',
       value: filteredStats.total || 0,
       icon: <ShoppingCart size={22} />,
       gradient: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)',
     },
     {
+      key: 'completed',
       title: 'Completed',
       value: filteredStats.delivered || 0,
       icon: <Package size={22} />,
       gradient: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
     },
     {
+      key: 'pending',
       title: 'Pending Revenue',
       value: `KES ${Number(filteredStats.pending_revenue || 0).toLocaleString()}`,
       icon: <Clock size={22} />,
@@ -179,14 +228,31 @@ export default function DashboardPage() {
       {/* Stats Grid */}
       <div style={styles.statsGrid}>
         {statCards.map((card, index) => (
-          <div key={index} className="glass-card stat-card">
+          <div key={index} className="glass-card stat-card" style={{ position: 'relative' }}>
             <div className="stat-icon" style={{ background: card.gradient }}>
               {card.icon}
             </div>
-            <div>
+            <div style={{ flex: 1 }}>
               <p className="stat-label">{card.title}</p>
               <p className="stat-value">{card.value}</p>
             </div>
+            <button 
+              onClick={() => setShowAnalysis(showAnalysis === card.key ? null : card.key)}
+              style={styles.infoIconBtn}
+            >
+              <Info size={16} />
+            </button>
+            {/* Analysis Popup */}
+            {showAnalysis === card.key && (
+              <div style={styles.analysisPopup} className="glass-card">
+                <h4 style={styles.analysisTitle}>{getAnalysis(card.key).title}</h4>
+                <ul style={styles.analysisList}>
+                  {getAnalysis(card.key).points.map((point, i) => (
+                    <li key={i} style={styles.analysisPoint}>{point}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         ))}
         
@@ -456,6 +522,13 @@ const styles = {
   periodBtnActive: { background: 'rgba(168, 85, 247, 0.15)', color: 'var(--accent-color)' },
   
   statsGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px', marginBottom: '24px' },
+  
+  // Info icon and analysis popup
+  infoIconBtn: { position: 'absolute', top: '12px', right: '12px', background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '4px', borderRadius: '50%', transition: 'all 0.2s', opacity: 0.6 },
+  analysisPopup: { position: 'absolute', top: '100%', left: 0, right: 0, marginTop: '8px', padding: '16px', zIndex: 10, borderRadius: '12px' },
+  analysisTitle: { fontSize: '14px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '12px' },
+  analysisList: { listStyle: 'none', padding: 0, margin: 0 },
+  analysisPoint: { fontSize: '13px', color: 'var(--text-secondary)', padding: '6px 0', borderBottom: '1px solid var(--border-color)', lineHeight: '1.5' },
   
   // Traffic breakdown
   trafficBreakdown: { padding: '20px', marginBottom: '24px' },
