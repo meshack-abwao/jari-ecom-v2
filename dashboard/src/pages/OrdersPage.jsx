@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ordersAPI } from '../api/client';
-import { Clock, CheckCircle, XCircle, DollarSign, Package, Truck, Search, RefreshCw, Download } from 'lucide-react';
+import { Clock, CheckCircle, XCircle, DollarSign, Package, Truck, Search, RefreshCw, Download, SlidersHorizontal, ChevronDown } from 'lucide-react';
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState([]);
@@ -11,6 +11,8 @@ export default function OrdersPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [dateFilter, setDateFilter] = useState('all'); // 'all', 'today', 'week', 'month'
   const [filteredStats, setFilteredStats] = useState({ total: 0, pending: 0, paid: 0, delivered: 0, cancelled: 0, revenue: 0 });
+  const [showDateDropdown, setShowDateDropdown] = useState(false);
+  const dateDropdownRef = useRef(null);
 
   useEffect(() => { 
     loadOrders(); 
@@ -20,6 +22,17 @@ export default function OrdersPage() {
   useEffect(() => {
     filterOrders();
   }, [orders, activeFilter, searchQuery, dateFilter]);
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dateDropdownRef.current && !dateDropdownRef.current.contains(e.target)) {
+        setShowDateDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const loadOrders = async () => {
     try {
@@ -146,6 +159,13 @@ export default function OrdersPage() {
     return styles[status] || styles.pending;
   };
 
+  const dateFilterLabels = {
+    all: 'All Time',
+    today: 'Today',
+    week: 'This Week',
+    month: 'This Month'
+  };
+
   const statCards = [
     { label: 'TOTAL ORDERS', value: filteredStats.total, icon: <Package size={22} />, color: '#8b5cf6' },
     { label: 'PENDING', value: filteredStats.pending, icon: <Clock size={22} />, color: '#f59e0b' },
@@ -204,39 +224,47 @@ export default function OrdersPage() {
         ))}
       </div>
 
-      {/* Date/Period Filter */}
-      <div style={styles.periodFilterRow}>
-        {[
-          { key: 'all', label: 'All Time' },
-          { key: 'today', label: 'Today' },
-          { key: 'week', label: 'This Week' },
-          { key: 'month', label: 'This Month' },
-        ].map(df => (
-          <button
-            key={df.key}
-            onClick={() => setDateFilter(df.key)}
-            style={{
-              ...styles.periodFilterBtn,
-              ...(dateFilter === df.key ? styles.periodFilterBtnActive : {})
-            }}
-          >
-            {df.label}
-          </button>
-        ))}
-      </div>
-
       {/* Search & Filters */}
       <div style={styles.filtersContainer} className="glass-card">
-        <div style={styles.searchBox}>
-          <Search size={18} style={styles.searchIcon} />
-          <input
-            type="text"
-            placeholder="Search by name, phone, order #..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            style={styles.searchInput}
-            className="dashboard-input"
-          />
+        <div style={styles.filterRow}>
+          <div style={styles.searchBox}>
+            <Search size={18} style={styles.searchIcon} />
+            <input
+              type="text"
+              placeholder="Search by name, phone, order #..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={styles.searchInput}
+              className="dashboard-input"
+            />
+          </div>
+          {/* Date Filter Dropdown */}
+          <div style={styles.dateDropdownWrapper} ref={dateDropdownRef}>
+            <button 
+              style={styles.dateDropdownBtn}
+              onClick={() => setShowDateDropdown(!showDateDropdown)}
+            >
+              <SlidersHorizontal size={16} />
+              <span>{dateFilterLabels[dateFilter]}</span>
+              <ChevronDown size={14} style={{ opacity: 0.6 }} />
+            </button>
+            {showDateDropdown && (
+              <div style={styles.dateDropdownMenu}>
+                {Object.entries(dateFilterLabels).map(([key, label]) => (
+                  <button
+                    key={key}
+                    style={{
+                      ...styles.dateDropdownItem,
+                      ...(dateFilter === key ? styles.dateDropdownItemActive : {})
+                    }}
+                    onClick={() => { setDateFilter(key); setShowDateDropdown(false); }}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
         <div style={styles.filterTabs}>
           {filterTabs.map(tab => (
@@ -447,7 +475,7 @@ const styles = {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
     gap: '16px',
-    marginBottom: '16px'
+    marginBottom: '24px'
   },
   statCard: {
     display: 'flex',
@@ -477,36 +505,55 @@ const styles = {
     color: 'var(--text-primary)'
   },
   
-  // Period Filter (below stats, above search)
-  periodFilterRow: {
-    display: 'flex',
-    gap: '8px',
-    marginBottom: '16px',
-    overflowX: 'auto',
-    WebkitOverflowScrolling: 'touch',
-    scrollbarWidth: 'none',
-    msOverflowStyle: 'none',
-    paddingBottom: '4px'
+  // Date Filter Dropdown
+  dateDropdownWrapper: {
+    position: 'relative',
+    flexShrink: 0
   },
-  periodFilterBtn: {
+  dateDropdownBtn: {
     display: 'flex',
     alignItems: 'center',
     gap: '8px',
-    padding: '8px 16px',
-    background: 'transparent',
+    padding: '10px 14px',
+    background: 'var(--glass-bg)',
     border: '1px solid var(--border-color)',
-    borderRadius: '20px',
+    borderRadius: '10px',
     color: 'var(--text-secondary)',
     fontSize: '13px',
     fontWeight: '500',
     cursor: 'pointer',
     transition: 'all 0.2s',
-    whiteSpace: 'nowrap',
-    flexShrink: 0
+    whiteSpace: 'nowrap'
   },
-  periodFilterBtnActive: {
+  dateDropdownMenu: {
+    position: 'absolute',
+    top: '100%',
+    right: 0,
+    marginTop: '4px',
+    background: 'var(--card-bg)',
+    border: '1px solid var(--border-color)',
+    borderRadius: '10px',
+    padding: '6px',
+    minWidth: '140px',
+    boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+    zIndex: 100
+  },
+  dateDropdownItem: {
+    display: 'block',
+    width: '100%',
+    padding: '8px 12px',
+    background: 'transparent',
+    border: 'none',
+    borderRadius: '6px',
+    color: 'var(--text-secondary)',
+    fontSize: '13px',
+    fontWeight: '500',
+    cursor: 'pointer',
+    textAlign: 'left',
+    transition: 'all 0.15s'
+  },
+  dateDropdownItemActive: {
     background: 'var(--accent-color)',
-    borderColor: 'var(--accent-color)',
     color: 'white'
   },
   
@@ -515,9 +562,15 @@ const styles = {
     padding: '16px 20px',
     marginBottom: '24px'
   },
+  filterRow: {
+    display: 'flex',
+    gap: '12px',
+    alignItems: 'center',
+    marginBottom: '16px'
+  },
   searchBox: {
     position: 'relative',
-    marginBottom: '16px'
+    flex: 1
   },
   searchIcon: {
     position: 'absolute',

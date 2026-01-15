@@ -184,6 +184,11 @@ export default function DashboardPage() {
     },
   ];
 
+  // Calculate conversion rate (orders / visitors)
+  const conversionRate = traffic.total > 0 
+    ? ((filteredStats.total / traffic.total) * 100).toFixed(1) 
+    : '0.0';
+
   return (
     <div className="fade-in">
       <div style={styles.header}>
@@ -277,6 +282,17 @@ export default function DashboardPage() {
             {trafficExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
           </div>
         </div>
+
+        {/* Conversion Rate Card */}
+        <div className="glass-card stat-card">
+          <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)' }}>
+            <TrendingUp size={22} />
+          </div>
+          <div style={{ flex: 1 }}>
+            <p className="stat-label">Conversion</p>
+            <p className="stat-value">{conversionRate}%</p>
+          </div>
+        </div>
       </div>
       
       {/* Traffic Breakdown - Expandable */}
@@ -290,7 +306,11 @@ export default function DashboardPage() {
                 return (
                   <div key={idx} style={styles.sourceRow}>
                     <div style={styles.sourceInfo}>
-                      <span style={styles.sourceName}>{source.utm_source || 'Direct'}</span>
+                      <span style={styles.sourceName}>
+                        {source.source 
+                          ? source.source.charAt(0).toUpperCase() + source.source.slice(1) 
+                          : 'Direct'}
+                      </span>
                       <span style={styles.sourceCount}>{source.visitors?.toLocaleString()}</span>
                     </div>
                     <div style={styles.sourceBarContainer}>
