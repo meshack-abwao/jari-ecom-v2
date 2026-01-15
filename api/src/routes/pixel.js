@@ -3,6 +3,17 @@ import pool from '../config/database.js';
 
 const router = Router();
 
+// CORS middleware for pixel - allow all origins (like Google Analytics)
+router.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+  next();
+});
+
 // POST /pixel - Track an event (public, no auth)
 // Note: sendBeacon sends as text/plain, so we need to parse manually
 router.post('/', async (req, res) => {
