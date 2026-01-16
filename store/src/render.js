@@ -855,13 +855,15 @@ function renderStoryViewer(stories) {
   
   return `
     <div class="story-viewer" id="storyViewer">
-      <div class="story-progress">
-        ${stories.map(() => `<div class="story-progress-bar"><div class="story-progress-fill"></div></div>`).join('')}
+      <div class="story-content">
+        <div class="story-progress-container">
+          ${stories.map(() => `<div class="story-progress-bar"><div class="story-progress-fill"></div></div>`).join('')}
+        </div>
+        <button class="story-close-btn" id="storyClose">✕</button>
+        <img src="" alt="Story" class="story-image" id="storyImage">
+        <div class="story-nav-left" id="storyPrev"></div>
+        <div class="story-nav-right" id="storyNext"></div>
       </div>
-      <button class="story-close" id="storyClose">✕</button>
-      <img src="" alt="Story" class="story-image" id="storyImage">
-      <button class="story-nav prev" id="storyPrev">‹</button>
-      <button class="story-nav next" id="storyNext">›</button>
     </div>
   `;
 }

@@ -657,8 +657,21 @@ function showShowcaseItem(index) {
     }
   }
   
-  // Magazine-style caption overlay
-  if (magazineCaption) magazineCaption.textContent = item.caption || '';
+  // Magazine-style caption with intelligent text splitting
+  if (magazineCaption) {
+    const caption = item.caption || '';
+    const words = caption.split(' ');
+    
+    if (words.length > 1) {
+      // Split text: first word(s) lighter, last word bold
+      const lastWord = words.pop();
+      const firstPart = words.join(' ');
+      magazineCaption.innerHTML = `<span class="caption-light">${firstPart}</span> <span class="caption-bold">${lastWord}</span>`;
+    } else {
+      magazineCaption.textContent = caption;
+    }
+  }
+  
   // Scrollable description
   if (description) description.textContent = item.description || '';
   if (counter) counter.textContent = index + 1;
