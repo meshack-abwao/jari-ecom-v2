@@ -692,32 +692,41 @@ body {
 /* Mobile breakpoint */
 @media (max-width: 600px) {
   .overview-stats-grid {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
     gap: 10px;
   }
   
   .overview-stat-large {
-    padding: 16px;
+    padding: 20px;
     min-height: auto;
-    grid-column: 1;
   }
   
   .overview-stat-large .stat-icon {
-    width: 44px;
-    height: 44px;
+    width: 48px;
+    height: 48px;
   }
   
   .overview-stat-large .stat-value {
-    font-size: 24px;
+    font-size: 28px;
   }
   
   .overview-stat-row {
-    grid-column: 1;
+    display: grid;
     grid-template-columns: 1fr 1fr;
+    gap: 10px;
   }
   
   .overview-stat-small {
-    padding: 12px;
+    padding: 14px;
+  }
+  
+  .overview-stat-small .stat-value {
+    font-size: 16px;
+  }
+  
+  .overview-stat-small .stat-label {
+    font-size: 10px;
   }
   
   .overview-stat-half {
