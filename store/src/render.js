@@ -526,14 +526,9 @@ function renderDeepDive(product) {
     ${showBackButton ? '<button class="back-btn" id="backBtn">← Back to All Products</button>' : ''}
     <div class="product-container template-deep-dive">
       
-      <!-- HERO GALLERY -->
-      <div class="deep-dive-hero">
-        ${renderGallery(media.images || [])}
-      </div>
-      
-      <!-- PRODUCT INFO -->
-      <div class="deep-dive-info">
-        <div class="info-row">
+      <!-- PRODUCT HEADER - Above Image -->
+      <div class="deep-dive-header">
+        <div class="header-top-row">
           <h1 class="product-name">${data.name || 'Product'}</h1>
           <div class="social-actions">
             <button class="social-btn share-btn" title="Share" onclick="shareProduct()">
@@ -549,8 +544,7 @@ function renderDeepDive(product) {
             </button>
           </div>
         </div>
-        
-        <div class="product-meta">
+        <div class="header-meta-row">
           <div class="rating-stars">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="#FFD700"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="#FFD700"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
@@ -562,10 +556,18 @@ function renderDeepDive(product) {
           <span class="meta-dot">•</span>
           <span class="stock-badge in-stock">In Stock</span>
         </div>
-        
+      </div>
+      
+      <!-- HERO GALLERY -->
+      <div class="deep-dive-hero">
+        ${renderGallery(media.images || [])}
+      </div>
+      
+      <!-- PRICE + DESCRIPTION -->
+      <div class="deep-dive-info">
         <div class="price-row">
-          <span class="price-main">${parseInt(data.price || 0).toLocaleString()}</span>
           <span class="price-currency">KES</span>
+          <span class="price-main">${parseInt(data.price || 0).toLocaleString()}</span>
         </div>
         
         ${data.description ? `<p class="product-description">${data.description}</p>` : ''}
