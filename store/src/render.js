@@ -682,14 +682,16 @@ function renderShowcaseViewer(showcaseImages, showcaseVideo) {
           </svg>
         </button>
         
-        <!-- Image with Magazine Overlay -->
+        <!-- Image with Magazine Overlay INSIDE -->
         <div class="showcase-viewer-media">
-          <img class="showcase-viewer-img" id="showcaseViewerImg" src="" alt="" style="display:none;">
-          <video class="showcase-viewer-video" id="showcaseViewerVideo" playsinline controls style="display:none;"></video>
-          
-          <!-- Magazine-style caption overlay on image -->
-          <div class="showcase-magazine-overlay">
-            <span class="showcase-magazine-caption" id="showcaseMagazineCaption"></span>
+          <div class="showcase-image-wrapper">
+            <img class="showcase-viewer-img" id="showcaseViewerImg" src="" alt="" style="display:none;">
+            <video class="showcase-viewer-video" id="showcaseViewerVideo" playsinline controls style="display:none;"></video>
+            
+            <!-- Magazine-style caption overlay ON the image -->
+            <div class="showcase-magazine-overlay">
+              <span class="showcase-magazine-caption" id="showcaseMagazineCaption"></span>
+            </div>
           </div>
         </div>
         

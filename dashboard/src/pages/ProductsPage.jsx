@@ -1044,7 +1044,7 @@ export default function ProductsPage() {
                         <p style={styles.hint}>Add detail shots, lifestyle images, in-use photos - the more the better!</p>
                       </div>
                       {(formData.showcaseImages || [{ url: '', caption: '', description: '' }]).map((item, idx) => (
-                        <div key={idx} style={{ marginBottom: '16px', padding: '12px', background: '#f9fafb', borderRadius: '8px' }}>
+                        <div key={idx} style={{ marginBottom: '16px', paddingBottom: '16px', borderBottom: '1px solid var(--border-color, #333)' }}>
                           <div style={{ display: 'flex', gap: '12px', marginBottom: '8px' }}>
                             <input
                               type="url"
