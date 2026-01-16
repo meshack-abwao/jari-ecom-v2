@@ -1970,7 +1970,7 @@ body {
 .deep-dive-info .price-row {
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
+    align-items: flex-start;
     gap: 0;
     margin-bottom: 20px;
 }
@@ -2090,10 +2090,10 @@ body {
 
 .showcase-caption {
     color: white;
-    font-size: 18px;
+    font-size: 15px;
     font-weight: 600;
-    letter-spacing: -0.02em;
-    text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    letter-spacing: -0.01em;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.3);
 }
 
 .showcase-tap-hint {
@@ -2409,46 +2409,47 @@ body {
 .showcase-viewer-media {
     position: relative;
     width: 100%;
-    height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 60px 20px 20px;
     flex-shrink: 0;
 }
 
 /* Image wrapper for overlay positioning */
 .showcase-image-wrapper {
     position: relative;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: inline-block;
+    max-width: 100%;
 }
 
 .showcase-viewer-img,
 .showcase-viewer-video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+    max-width: 100%;
+    max-height: 65vh;
+    object-fit: contain;
+    border-radius: 12px;
+    display: block;
 }
 
 /* Magazine-style caption overlay - Rule of thirds (bottom-left) */
 .showcase-magazine-overlay {
     position: absolute;
-    bottom: 15%;
+    bottom: 0;
     left: 0;
     right: 0;
-    padding: 0 24px;
+    padding: 60px 20px 20px;
+    background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%);
+    border-radius: 0 0 12px 12px;
     pointer-events: none;
 }
 
 .showcase-magazine-caption {
     display: block;
-    font-size: clamp(32px, 10vw, 56px);
+    font-size: clamp(28px, 8vw, 48px);
     font-weight: 500;
     color: white;
-    text-shadow: 0 2px 20px rgba(0,0,0,0.4);
+    text-shadow: 0 2px 16px rgba(0,0,0,0.4);
     letter-spacing: -0.02em;
     line-height: 1.1;
     word-break: break-word;
@@ -2470,22 +2471,16 @@ body {
     display: none;
 }
 
-/* Scrollable description area */
+/* Scrollable description area - BELOW image */
 .showcase-viewer-scroll {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 24px 24px 100px;
-    background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
-    max-height: 40vh;
-    overflow-y: auto;
+    width: 100%;
+    padding: 24px 24px 120px;
 }
 
 .showcase-viewer-description {
-    max-width: 500px;
+    max-width: 480px;
     margin: 0 auto;
-    font-size: 14px;
+    font-size: 15px;
     color: rgba(255,255,255,0.7);
     line-height: 1.6;
     letter-spacing: -0.01em;
@@ -2541,26 +2536,31 @@ body {
 /* Desktop: Larger magazine text */
 @media (min-width: 768px) {
     .showcase-magazine-caption {
-        font-size: clamp(40px, 7vw, 64px);
+        font-size: clamp(32px, 6vw, 52px);
+    }
+    
+    .showcase-viewer-media {
+        padding: 80px 40px 24px;
+    }
+    
+    .showcase-viewer-img,
+    .showcase-viewer-video {
+        max-height: 70vh;
     }
     
     .showcase-magazine-overlay {
-        padding: 0 48px;
-        bottom: 18%;
-    }
-    
-    .showcase-viewer-description {
-        font-size: 15px;
+        padding: 80px 24px 24px;
     }
 }
 
 @media (min-width: 1000px) {
     .showcase-magazine-caption {
-        font-size: clamp(48px, 6vw, 72px);
+        font-size: clamp(36px, 5vw, 56px);
     }
     
-    .showcase-magazine-overlay {
-        padding: 0 64px;
+    .showcase-viewer-img,
+    .showcase-viewer-video {
+        max-height: 75vh;
     }
 }
 
