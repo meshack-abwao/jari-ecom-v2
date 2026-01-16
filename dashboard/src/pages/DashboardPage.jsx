@@ -225,9 +225,9 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Stats Grid - Masonry Layout (1 large landscape + portrait column) */}
+      {/* Stats Grid - New Layout per wireframe */}
       <div className="overview-stats-grid">
-        {/* Left: Large Revenue Card (landscape) */}
+        {/* Row 1: Revenue (large) + 3 stat cards horizontal */}
         <div 
           className="glass-card stat-card overview-stat-large"
           onClick={() => setShowAnalysis(showAnalysis === 'revenue' ? null : 'revenue')}
@@ -241,10 +241,10 @@ export default function DashboardPage() {
           </div>
         </div>
         
-        {/* Right: Portrait column with 3 cards */}
-        <div className="overview-stat-column">
+        {/* Right: 3 cards in a horizontal row */}
+        <div className="overview-stat-row">
           <div 
-            className="glass-card stat-card overview-stat-portrait"
+            className="glass-card stat-card overview-stat-small"
             onClick={() => setShowAnalysis(showAnalysis === 'orders' ? null : 'orders')}
           >
             <div className="stat-icon" style={{ background: statCards[1].gradient }}>
@@ -257,7 +257,7 @@ export default function DashboardPage() {
           </div>
           
           <div 
-            className="glass-card stat-card overview-stat-portrait"
+            className="glass-card stat-card overview-stat-small"
             onClick={() => setShowAnalysis(showAnalysis === 'completed' ? null : 'completed')}
           >
             <div className="stat-icon" style={{ background: statCards[2].gradient }}>
@@ -270,7 +270,7 @@ export default function DashboardPage() {
           </div>
 
           <div 
-            className="glass-card stat-card overview-stat-portrait"
+            className="glass-card stat-card overview-stat-small"
             onClick={() => setShowAnalysis(showAnalysis === 'pending' ? null : 'pending')}
           >
             <div className="stat-icon" style={{ background: statCards[3].gradient }}>
@@ -283,9 +283,9 @@ export default function DashboardPage() {
           </div>
         </div>
         
-        {/* Traffic Card - Full width below */}
+        {/* Row 2: Traffic + Share (50/50) */}
         <div 
-          className="glass-card stat-card overview-stat-traffic"
+          className="glass-card stat-card overview-stat-half"
           onClick={() => setTrafficExpanded(!trafficExpanded)}
         >
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)' }}>
@@ -299,6 +299,24 @@ export default function DashboardPage() {
             {trafficExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
           </div>
         </div>
+        
+        {storeUrl && (
+          <div 
+            className="glass-card stat-card overview-stat-half"
+            onClick={() => setShareExpanded(!shareExpanded)}
+          >
+            <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)' }}>
+              <Share2 size={22} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <p className="stat-label">Share Your Store</p>
+              <p style={{ fontSize: '12px', color: 'var(--text-muted)', margin: 0 }}>Copy trackable links</p>
+            </div>
+            <div style={{ color: '#9ca3af' }}>
+              {shareExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Analysis Popup with Blur Background */}
@@ -347,64 +365,42 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Share Your Store - UTM Links */}
-      {storeUrl && (
-        <div style={styles.shareWrapper}>
-          <div className="glass-card" style={styles.shareSection}>
-            <div 
-              style={styles.shareHeader} 
-              onClick={() => setShareExpanded(!shareExpanded)}
-            >
-              <div style={styles.shareHeaderLeft}>
-                <Share2 size={20} style={{ color: 'var(--accent-color)' }} />
-                <div>
-                  <h3 style={styles.shareTitle}>Share Your Store</h3>
-                  <p style={styles.shareSubtitle}>Copy trackable links for each platform</p>
-                </div>
-              </div>
-              <div style={{ color: '#9ca3af' }}>
-                {shareExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-              </div>
-            </div>
+      {/* Share Links - Expandable Content */}
+      {shareExpanded && storeUrl && (
+        <div className="glass-card" style={styles.shareLinksList}>
+          {[
+            { platform: 'Instagram Bio', source: 'instagram', medium: 'bio', icon: '📷' },
+            { platform: 'Instagram Story', source: 'instagram', medium: 'story', icon: '📱' },
+            { platform: 'WhatsApp Status', source: 'whatsapp', medium: 'status', icon: '💬' },
+            { platform: 'WhatsApp Chat', source: 'whatsapp', medium: 'chat', icon: '📲' },
+            { platform: 'Facebook Post', source: 'facebook', medium: 'post', icon: '📘' },
+            { platform: 'TikTok Bio', source: 'tiktok', medium: 'bio', icon: '🎵' },
+            { platform: 'Twitter/X', source: 'twitter', medium: 'post', icon: '✖️' },
+          ].map((link, idx) => {
+            const fullUrl = `${storeUrl}&utm_source=${link.source}&utm_medium=${link.medium}`;
+            const isCopied = copiedLink === idx;
             
-            {shareExpanded && (
-              <div style={styles.shareLinksList}>
-                {[
-                  { platform: 'Instagram Bio', source: 'instagram', medium: 'bio', icon: '📷' },
-                  { platform: 'Instagram Story', source: 'instagram', medium: 'story', icon: '📱' },
-                  { platform: 'WhatsApp Status', source: 'whatsapp', medium: 'status', icon: '💬' },
-                  { platform: 'WhatsApp Chat', source: 'whatsapp', medium: 'chat', icon: '📲' },
-                  { platform: 'Facebook Post', source: 'facebook', medium: 'post', icon: '📘' },
-                  { platform: 'TikTok Bio', source: 'tiktok', medium: 'bio', icon: '🎵' },
-                  { platform: 'Twitter/X', source: 'twitter', medium: 'post', icon: '✖️' },
-                ].map((link, idx) => {
-                  const fullUrl = `${storeUrl}&utm_source=${link.source}&utm_medium=${link.medium}`;
-                  const isCopied = copiedLink === idx;
-                  
-                  return (
-                    <div key={idx} style={styles.shareLinkRow}>
-                      <span style={styles.shareLinkIcon}>{link.icon}</span>
-                      <span style={styles.shareLinkPlatform}>{link.platform}</span>
-                      <button
-                        onClick={() => {
-                          navigator.clipboard.writeText(fullUrl);
-                          setCopiedLink(idx);
-                          setTimeout(() => setCopiedLink(null), 2000);
-                        }}
-                        style={{
-                          ...styles.copyBtn,
-                          ...(isCopied ? styles.copyBtnCopied : {})
-                        }}
-                      >
-                        {isCopied ? <Check size={14} /> : <Copy size={14} />}
-                        {isCopied ? 'Copied!' : 'Copy'}
-                      </button>
-                    </div>
-                );
-              })}
-            </div>
-          )}
-          </div>
+            return (
+              <div key={idx} style={styles.shareLinkRow}>
+                <span style={styles.shareLinkIcon}>{link.icon}</span>
+                <span style={styles.shareLinkPlatform}>{link.platform}</span>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(fullUrl);
+                    setCopiedLink(idx);
+                    setTimeout(() => setCopiedLink(null), 2000);
+                  }}
+                  style={{
+                    ...styles.copyBtn,
+                    ...(isCopied ? styles.copyBtnCopied : {})
+                  }}
+                >
+                  {isCopied ? <Check size={14} /> : <Copy size={14} />}
+                  {isCopied ? 'Copied!' : 'Copy'}
+                </button>
+              </div>
+            );
+          })}
         </div>
       )}
 
@@ -634,13 +630,7 @@ const styles = {
   emptyDesc: { fontSize: '14px', color: 'var(--text-muted)' },
   
   // Share section
-  shareWrapper: { maxWidth: '480px', marginBottom: '24px' },
-  shareSection: { padding: '0', overflow: 'hidden' },
-  shareHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', cursor: 'pointer', transition: 'background 0.2s' },
-  shareHeaderLeft: { display: 'flex', alignItems: 'center', gap: '12px' },
-  shareTitle: { fontSize: '15px', fontWeight: '600', color: 'var(--text-primary)', margin: 0 },
-  shareSubtitle: { fontSize: '12px', color: 'var(--text-muted)', margin: 0 },
-  shareLinksList: { padding: '0 20px 16px', display: 'flex', flexDirection: 'column', gap: '8px' },
+  shareLinksList: { padding: '16px', display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '24px' },
   shareLinkRow: { display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 14px', background: 'var(--bg-secondary)', borderRadius: '10px' },
   shareLinkIcon: { fontSize: '18px', width: '24px', textAlign: 'center' },
   shareLinkPlatform: { flex: 1, fontSize: '14px', fontWeight: '500', color: 'var(--text-primary)' },

@@ -603,18 +603,22 @@ body {
   background: var(--accent-light);
 }
 
-/* ===== OVERVIEW STATS GRID - RESPONSIVE MASONRY ===== */
+/* ===== OVERVIEW STATS GRID - WIREFRAME LAYOUT ===== */
 .overview-stats-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 2fr;
+  grid-template-rows: auto auto;
   gap: 16px;
   margin-bottom: 24px;
 }
 
+/* Row 1: Large revenue card */
 .overview-stat-large {
   padding: 28px 24px;
-  min-height: 140px;
+  min-height: 160px;
   cursor: pointer;
+  grid-row: 1;
+  grid-column: 1;
 }
 
 .overview-stat-large .stat-icon {
@@ -626,19 +630,27 @@ body {
   font-size: 36px;
 }
 
-.overview-stat-column {
-  display: flex;
-  flex-direction: column;
+/* Row 1 right: 3 cards horizontal */
+.overview-stat-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 12px;
+  grid-row: 1;
+  grid-column: 2;
 }
 
-.overview-stat-portrait {
-  padding: 14px 16px;
+.overview-stat-small {
+  padding: 16px;
   cursor: pointer;
 }
 
-.overview-stat-traffic {
-  grid-column: span 2;
+.overview-stat-small .stat-value {
+  font-size: 20px;
+}
+
+/* Row 2: Traffic + Share (50/50) */
+.overview-stat-half {
+  padding: 16px 20px;
   cursor: pointer;
 }
 
@@ -646,12 +658,12 @@ body {
 @media (max-width: 900px) {
   .overview-stats-grid {
     grid-template-columns: 1fr 1fr;
-    gap: 12px;
   }
   
   .overview-stat-large {
     padding: 20px 18px;
-    min-height: 110px;
+    min-height: 120px;
+    grid-column: span 2;
   }
   
   .overview-stat-large .stat-icon {
@@ -663,12 +675,17 @@ body {
     font-size: 28px;
   }
   
-  .overview-stat-column {
-    gap: 10px;
+  .overview-stat-row {
+    grid-column: span 2;
+    grid-template-columns: repeat(3, 1fr);
   }
   
-  .overview-stat-portrait {
-    padding: 12px 14px;
+  .overview-stat-small {
+    padding: 14px;
+  }
+  
+  .overview-stat-small .stat-value {
+    font-size: 18px;
   }
 }
 
@@ -682,6 +699,7 @@ body {
   .overview-stat-large {
     padding: 16px;
     min-height: auto;
+    grid-column: 1;
   }
   
   .overview-stat-large .stat-icon {
@@ -693,15 +711,19 @@ body {
     font-size: 24px;
   }
   
-  .overview-stat-column {
-    display: grid;
+  .overview-stat-row {
+    grid-column: 1;
     grid-template-columns: 1fr 1fr;
-    gap: 10px;
   }
   
-  .overview-stat-portrait {
+  .overview-stat-small {
     padding: 12px;
   }
+  
+  .overview-stat-half {
+    padding: 14px 16px;
+  }
+}
   
   .overview-stat-portrait .stat-icon {
     width: 36px;
