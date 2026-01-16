@@ -225,7 +225,7 @@ export default function Layout() {
           <span>{theme === 'dark' ? 'Dark Mode' : 'Light Mode'}</span>
         </button>
 
-        <div style={styles.userCard} className="glass-card">
+        <div style={{ ...styles.userCard, cursor: 'pointer' }} className="glass-card" onClick={handleShowAccount}>
           <div style={styles.avatar}>{user?.business_name?.charAt(0) || 'U'}</div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <p style={styles.userName}>{user?.business_name || 'User'}</p>
