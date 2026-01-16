@@ -688,16 +688,12 @@ function renderShowcaseViewer(showcaseImages, showcaseVideo) {
             <img class="showcase-viewer-img" id="showcaseViewerImg" src="" alt="" style="display:none;">
             <video class="showcase-viewer-video" id="showcaseViewerVideo" playsinline controls style="display:none;"></video>
             
-            <!-- Magazine-style caption overlay ON the image -->
+            <!-- Magazine-style overlay with caption + description -->
             <div class="showcase-magazine-overlay">
               <span class="showcase-magazine-caption" id="showcaseMagazineCaption"></span>
+              <p class="showcase-overlay-description" id="showcaseViewerDescription"></p>
             </div>
           </div>
-        </div>
-        
-        <!-- Scrollable description area -->
-        <div class="showcase-viewer-scroll">
-          <div class="showcase-viewer-description" id="showcaseViewerDescription"></div>
         </div>
         
         <!-- Navigation -->

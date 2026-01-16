@@ -2434,27 +2434,28 @@ body {
     display: block;
 }
 
-/* Magazine-style caption overlay - Rule of thirds (bottom-left) */
+/* Magazine-style caption overlay - Bottom left with breathing room */
 .showcase-magazine-overlay {
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
-    padding: 60px 20px 20px;
-    background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%);
+    padding: 80px 28px 28px;
+    background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 60%, transparent 100%);
     border-radius: 0 0 12px 12px;
     pointer-events: none;
 }
 
 .showcase-magazine-caption {
     display: block;
-    font-size: clamp(28px, 8vw, 48px);
+    font-size: clamp(24px, 7vw, 42px);
     font-weight: 500;
     color: white;
-    text-shadow: 0 2px 16px rgba(0,0,0,0.4);
+    text-shadow: 0 2px 12px rgba(0,0,0,0.3);
     letter-spacing: -0.02em;
     line-height: 1.1;
     word-break: break-word;
+    margin-bottom: 8px;
 }
 
 /* Intelligent text splitting - lighter first, bolder last */
@@ -2473,23 +2474,22 @@ body {
     display: none;
 }
 
-/* Scrollable description area - BELOW image */
-.showcase-viewer-scroll {
-    width: 100%;
-    padding: 24px 24px 120px;
-}
-
-.showcase-viewer-description {
-    max-width: 480px;
-    margin: 0 auto;
-    font-size: 15px;
-    color: rgba(255,255,255,0.7);
-    line-height: 1.6;
+/* Description - smallest in hierarchy, left-aligned */
+.showcase-overlay-description {
+    font-size: 12px;
+    color: rgba(255,255,255,0.65);
+    line-height: 1.5;
     letter-spacing: -0.01em;
-    text-align: center;
+    text-align: left;
+    max-width: 70%;
 }
 
-.showcase-viewer-description:empty {
+.showcase-overlay-description:empty {
+    display: none;
+}
+
+/* Remove the separate scroll area - description now in overlay */
+.showcase-viewer-scroll {
     display: none;
 }
 
@@ -2538,7 +2538,7 @@ body {
 /* Desktop: Larger magazine text */
 @media (min-width: 768px) {
     .showcase-magazine-caption {
-        font-size: clamp(32px, 6vw, 52px);
+        font-size: clamp(28px, 5vw, 48px);
     }
     
     .showcase-viewer-media {
@@ -2551,18 +2551,32 @@ body {
     }
     
     .showcase-magazine-overlay {
-        padding: 80px 24px 24px;
+        padding: 100px 36px 36px;
+    }
+    
+    .showcase-overlay-description {
+        font-size: 13px;
+        max-width: 60%;
     }
 }
 
 @media (min-width: 1000px) {
     .showcase-magazine-caption {
-        font-size: clamp(36px, 5vw, 56px);
+        font-size: clamp(32px, 4vw, 52px);
     }
     
     .showcase-viewer-img,
     .showcase-viewer-video {
         max-height: 75vh;
+    }
+    
+    .showcase-magazine-overlay {
+        padding: 120px 48px 48px;
+    }
+    
+    .showcase-overlay-description {
+        font-size: 14px;
+        max-width: 50%;
     }
 }
 
