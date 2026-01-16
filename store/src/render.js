@@ -528,8 +528,20 @@ function renderDeepDive(product) {
       
       <!-- PRODUCT HEADER - Above Image -->
       <div class="deep-dive-header">
-        <div class="header-top-row">
-          <h1 class="product-name">${data.name || 'Product'}</h1>
+        <h1 class="product-name">${data.name || 'Product'}</h1>
+        <div class="header-meta-row">
+          <div class="meta-left">
+            <div class="rating-stars">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="#FFD700"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="#FFD700"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="#FFD700"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="#FFD700"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="#E0E0E0"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <span class="rating-count">4.8</span>
+            </div>
+            <span class="meta-dot">•</span>
+            <span class="stock-badge in-stock">In Stock</span>
+          </div>
           <div class="social-actions">
             <button class="social-btn share-btn" title="Share" onclick="shareProduct()">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -543,18 +555,6 @@ function renderDeepDive(product) {
               </svg>
             </button>
           </div>
-        </div>
-        <div class="header-meta-row">
-          <div class="rating-stars">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="#FFD700"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="#FFD700"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="#FFD700"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="#FFD700"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="#E0E0E0"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <span class="rating-count">4.8</span>
-          </div>
-          <span class="meta-dot">•</span>
-          <span class="stock-badge in-stock">In Stock</span>
         </div>
       </div>
       
@@ -596,7 +596,7 @@ function renderDeepDive(product) {
               </div>
             ` : ''}
             ${validShowcase.map((img, i) => `
-              <div class="showcase-item ${!showcaseVideo && i === 0 ? 'showcase-large' : ''}" data-index="${i}" data-caption="${img.caption || ''}">
+              <div class="showcase-item ${!showcaseVideo && i === 0 ? 'showcase-large' : ''}" data-index="${i}" data-caption="${img.caption || ''}" data-description="${img.description || ''}">
                 <img src="${img.url}" alt="${img.caption || ''}" loading="lazy">
                 ${img.caption ? `<div class="showcase-overlay"><span class="showcase-caption">${img.caption}</span></div>` : '<div class="showcase-tap-hint"></div>'}
               </div>
@@ -664,7 +664,7 @@ function renderDeepDive(product) {
   `;
 }
 
-// Showcase Fullscreen Viewer (Premium Modal)
+// Showcase Fullscreen Viewer (Premium Modal - Magazine Style)
 function renderShowcaseViewer(showcaseImages, showcaseVideo) {
   const hasContent = (showcaseImages && showcaseImages.length > 0) || showcaseVideo;
   if (!hasContent) return '';
@@ -673,7 +673,7 @@ function renderShowcaseViewer(showcaseImages, showcaseVideo) {
   
   return `
     <div class="showcase-viewer" id="showcaseViewer">
-      <div class="showcase-viewer-backdrop"></div>
+      <div class="showcase-viewer-backdrop" onclick="closeShowcaseViewer()"></div>
       <div class="showcase-viewer-container">
         <button class="showcase-close" onclick="closeShowcaseViewer()">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -681,21 +681,32 @@ function renderShowcaseViewer(showcaseImages, showcaseVideo) {
             <line x1="6" y1="6" x2="18" y2="18"></line>
           </svg>
         </button>
+        
+        <!-- Image with Magazine Overlay -->
         <div class="showcase-viewer-media">
           <img class="showcase-viewer-img" id="showcaseViewerImg" src="" alt="" style="display:none;">
           <video class="showcase-viewer-video" id="showcaseViewerVideo" playsinline controls style="display:none;"></video>
-        </div>
-        <div class="showcase-viewer-info">
-          <p class="showcase-viewer-caption" id="showcaseViewerCaption"></p>
-          <div class="showcase-viewer-nav">
-            <button class="showcase-nav-arrow prev" onclick="navigateShowcase(-1)">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
-            </button>
-            <span class="showcase-nav-count"><span id="showcaseCurrentIndex">1</span> / ${totalItems}</span>
-            <button class="showcase-nav-arrow next" onclick="navigateShowcase(1)">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
-            </button>
+          
+          <!-- Magazine-style caption overlay on image -->
+          <div class="showcase-magazine-overlay">
+            <span class="showcase-magazine-caption" id="showcaseMagazineCaption"></span>
           </div>
+        </div>
+        
+        <!-- Scrollable description area -->
+        <div class="showcase-viewer-scroll">
+          <div class="showcase-viewer-description" id="showcaseViewerDescription"></div>
+        </div>
+        
+        <!-- Navigation -->
+        <div class="showcase-viewer-nav">
+          <button class="showcase-nav-arrow prev" onclick="navigateShowcase(-1)">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          </button>
+          <span class="showcase-nav-count"><span id="showcaseCurrentIndex">1</span> / ${totalItems}</span>
+          <button class="showcase-nav-arrow next" onclick="navigateShowcase(1)">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
         </div>
       </div>
     </div>

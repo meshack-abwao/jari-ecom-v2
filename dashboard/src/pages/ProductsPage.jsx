@@ -84,7 +84,7 @@ const getInitialFormData = () => ({
   // Specifications (deep-dive)
   specifications: [{ label: '', value: '' }],
   warranty: '',
-  showcaseImages: [{ url: '', caption: '' }],
+  showcaseImages: [{ url: '', caption: '', description: '' }],
   showcaseVideo: '',
   showcaseTitle: 'Gallery',
   
@@ -342,7 +342,7 @@ export default function ProductsPage() {
       warranty: data.warranty || '',
       showcaseImages: media.showcaseImages?.length > 0
         ? media.showcaseImages
-        : [{ url: '', caption: '' }],
+        : [{ url: '', caption: '', description: '' }],
       showcaseVideo: media.showcaseVideo || '',
       showcaseTitle: data.showcaseTitle || 'Gallery',
       
@@ -1043,37 +1043,51 @@ export default function ProductsPage() {
                         <label style={styles.label}>SHOWCASE IMAGES</label>
                         <p style={styles.hint}>Add detail shots, lifestyle images, in-use photos - the more the better!</p>
                       </div>
-                      {(formData.showcaseImages || [{ url: '', caption: '' }]).map((item, idx) => (
-                        <div key={idx} style={{ display: 'flex', gap: '12px', marginBottom: '12px' }}>
-                          <input
-                            type="url"
-                            value={item.url || ''}
+                      {(formData.showcaseImages || [{ url: '', caption: '', description: '' }]).map((item, idx) => (
+                        <div key={idx} style={{ marginBottom: '16px', padding: '12px', background: '#f9fafb', borderRadius: '8px' }}>
+                          <div style={{ display: 'flex', gap: '12px', marginBottom: '8px' }}>
+                            <input
+                              type="url"
+                              value={item.url || ''}
+                              onChange={e => {
+                                const newImgs = [...(formData.showcaseImages || [])];
+                                newImgs[idx] = { ...newImgs[idx], url: e.target.value };
+                                updateField('showcaseImages', newImgs);
+                              }}
+                              placeholder="https://image-url.com/detail.jpg"
+                              style={{ flex: 2 }}
+                              className="dashboard-input"
+                            />
+                            <input
+                              type="text"
+                              value={item.caption || ''}
+                              onChange={e => {
+                                const newImgs = [...(formData.showcaseImages || [])];
+                                newImgs[idx] = { ...newImgs[idx], caption: e.target.value };
+                                updateField('showcaseImages', newImgs);
+                              }}
+                              placeholder="Title (shows on image)"
+                              style={{ flex: 1 }}
+                              className="dashboard-input"
+                            />
+                          </div>
+                          <textarea
+                            value={item.description || ''}
                             onChange={e => {
                               const newImgs = [...(formData.showcaseImages || [])];
-                              newImgs[idx] = { ...newImgs[idx], url: e.target.value };
+                              newImgs[idx] = { ...newImgs[idx], description: e.target.value };
                               updateField('showcaseImages', newImgs);
                             }}
-                            placeholder="https://image-url.com/detail.jpg"
-                            style={{ flex: 2 }}
+                            placeholder="Optional description (shows when viewing full image)"
+                            rows={2}
                             className="dashboard-input"
-                          />
-                          <input
-                            type="text"
-                            value={item.caption || ''}
-                            onChange={e => {
-                              const newImgs = [...(formData.showcaseImages || [])];
-                              newImgs[idx] = { ...newImgs[idx], caption: e.target.value };
-                              updateField('showcaseImages', newImgs);
-                            }}
-                            placeholder="Optional caption"
-                            style={{ flex: 1 }}
-                            className="dashboard-input"
+                            style={{ width: '100%', resize: 'vertical' }}
                           />
                         </div>
                       ))}
                       <button
                         type="button"
-                        onClick={() => updateField('showcaseImages', [...(formData.showcaseImages || []), { url: '', caption: '' }])}
+                        onClick={() => updateField('showcaseImages', [...(formData.showcaseImages || []), { url: '', caption: '', description: '' }])}
                         style={styles.addBtn}
                       >
                         + Add Image

@@ -598,7 +598,8 @@ function initShowcaseHandlers() {
     showcaseData.push({
       type: 'image',
       src: img?.src || '',
-      caption: item.dataset.caption || ''
+      caption: item.dataset.caption || '',
+      description: item.dataset.description || ''
     });
   });
   
@@ -633,7 +634,8 @@ function showShowcaseItem(index) {
   
   const img = document.getElementById('showcaseViewerImg');
   const video = document.getElementById('showcaseViewerVideo');
-  const caption = document.getElementById('showcaseViewerCaption');
+  const magazineCaption = document.getElementById('showcaseMagazineCaption');
+  const description = document.getElementById('showcaseViewerDescription');
   const counter = document.getElementById('showcaseCurrentIndex');
   
   // Reset
@@ -655,7 +657,10 @@ function showShowcaseItem(index) {
     }
   }
   
-  if (caption) caption.textContent = item.caption || '';
+  // Magazine-style caption overlay
+  if (magazineCaption) magazineCaption.textContent = item.caption || '';
+  // Scrollable description
+  if (description) description.textContent = item.description || '';
   if (counter) counter.textContent = index + 1;
 }
 
