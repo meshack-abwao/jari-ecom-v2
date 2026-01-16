@@ -609,7 +609,6 @@ body {
   grid-template-columns: 1fr 1fr;
   gap: 16px;
   margin-bottom: 24px;
-  max-width: 540px;
 }
 
 .overview-stat-large {
