@@ -4,6 +4,7 @@ import { renderHeader, renderProductsGrid, renderSingleProduct, renderFooter, re
 import { renderCheckoutModal, initCheckout, openCheckout } from './checkout.js';
 import { initPixel, pixel } from './pixel.js';
 import { initPortfolioBookingHandlers } from './templates/portfolioBookingHandlers.js';
+import './booking/bookingHandlers.js'; // Auto-registers event listener
 
 const app = document.getElementById('app');
 
@@ -19,6 +20,9 @@ let storyTimer = null;
 // ===========================================
 async function init() {
   const slug = getSlug();
+  
+  // Set global slug for booking system
+  window.JARI_STORE_SLUG = slug;
   
   try {
     const data = await fetchStore(slug);
