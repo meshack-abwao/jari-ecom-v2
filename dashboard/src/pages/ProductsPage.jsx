@@ -892,6 +892,90 @@ export default function ProductsPage() {
                           className="dashboard-input"
                         />
                       </div>
+                      
+                      {/* Gallery Title */}
+                      <div style={{ marginTop: '16px' }}>
+                        <label style={styles.label}>GALLERY TITLE</label>
+                        <input
+                          type="text"
+                          value={formData.galleryTitle}
+                          onChange={e => updateField('galleryTitle', e.target.value)}
+                          placeholder="Gallery"
+                          className="dashboard-input"
+                        />
+                      </div>
+                      
+                      {/* Why Choose Us */}
+                      <div style={{ marginTop: '16px' }}>
+                        <label style={styles.label}>WHY CHOOSE US</label>
+                        {formData.whyChooseUs.map((item, idx) => (
+                          <div key={idx} style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+                            <input
+                              type="text"
+                              value={item}
+                              onChange={e => {
+                                const newItems = [...formData.whyChooseUs];
+                                newItems[idx] = e.target.value;
+                                updateField('whyChooseUs', newItems);
+                              }}
+                              placeholder="e.g. 10+ years experience"
+                              className="dashboard-input"
+                              style={{ flex: 1 }}
+                            />
+                            {formData.whyChooseUs.length > 1 && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const newItems = formData.whyChooseUs.filter((_, i) => i !== idx);
+                                  updateField('whyChooseUs', newItems);
+                                }}
+                                style={{ ...styles.addBtn, background: '#fee', color: '#c00', padding: '8px' }}
+                              >×</button>
+                            )}
+                          </div>
+                        ))}
+                        <button
+                          type="button"
+                          onClick={() => updateField('whyChooseUs', [...formData.whyChooseUs, ''])}
+                          style={{ ...styles.addBtn, marginTop: '4px' }}
+                        >+ Add Reason</button>
+                      </div>
+                      
+                      {/* What's Included */}
+                      <div style={{ marginTop: '16px' }}>
+                        <label style={styles.label}>WHAT'S INCLUDED</label>
+                        {formData.whatsIncluded.map((item, idx) => (
+                          <div key={idx} style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+                            <input
+                              type="text"
+                              value={item}
+                              onChange={e => {
+                                const newItems = [...formData.whatsIncluded];
+                                newItems[idx] = e.target.value;
+                                updateField('whatsIncluded', newItems);
+                              }}
+                              placeholder="e.g. Free consultation"
+                              className="dashboard-input"
+                              style={{ flex: 1 }}
+                            />
+                            {formData.whatsIncluded.length > 1 && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const newItems = formData.whatsIncluded.filter((_, i) => i !== idx);
+                                  updateField('whatsIncluded', newItems);
+                                }}
+                                style={{ ...styles.addBtn, background: '#fee', color: '#c00', padding: '8px' }}
+                              >×</button>
+                            )}
+                          </div>
+                        ))}
+                        <button
+                          type="button"
+                          onClick={() => updateField('whatsIncluded', [...formData.whatsIncluded, ''])}
+                          style={{ ...styles.addBtn, marginTop: '4px' }}
+                        >+ Add Item</button>
+                      </div>
                     </div>
                   )}
                 </div>
