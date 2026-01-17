@@ -19,7 +19,7 @@ const TEMPLATES = {
     price: 500,
     description: 'For service providers with packages',
     icon: '📋',
-    fields: ['basic', 'gallery', 'stories', 'packages', 'testimonials']
+    fields: ['basic', 'gallery', 'stories', 'showcase', 'packages', 'testimonials']
   },
   'visual-menu': {
     name: 'Visual Menu',
@@ -271,7 +271,7 @@ export default function ProductsPage() {
         media: {
           images: formData.images.filter(url => url?.trim()),
           stories: formData.stories.filter(s => s.url?.trim()),
-          ...(selectedTemplate === 'deep-dive' && {
+          ...((selectedTemplate === 'deep-dive' || selectedTemplate === 'portfolio-booking') && {
             showcaseImages: (formData.showcaseImages || []).filter(img => img.url?.trim()),
             showcaseVideo: formData.showcaseVideo || '',
           }),
@@ -1104,8 +1104,8 @@ export default function ProductsPage() {
                 </div>
               )}
 
-              {/* SHOWCASE IMAGES (deep-dive) */}
-              {showField('specifications') && (
+              {/* SHOWCASE IMAGES (deep-dive, portfolio-booking) */}
+              {(showField('specifications') || showField('showcase')) && (
                 <div style={styles.section}>
                   <SectionHeader section="showcase" title="Showcase Gallery" icon="🖼️" />
                   {expandedSections.showcase && (
