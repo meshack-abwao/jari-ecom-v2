@@ -102,6 +102,18 @@ function renderPbkStars(rating) {
   return '★'.repeat(full) + '☆'.repeat(empty);
 }
 
+// Helper: Intelligent text split for captions (like Deep Dive lightbox)
+function splitCaptionText(caption) {
+  if (!caption) return '';
+  const words = caption.split(' ');
+  if (words.length > 1) {
+    const lastWord = words.pop();
+    const firstPart = words.join(' ');
+    return `<span class="caption-light">${firstPart}</span> <span class="caption-bold">${lastWord}</span>`;
+  }
+  return caption;
+}
+
 function renderPbkHero(media) {
   // Use showcaseImages if available (has captions), fallback to images
   const showcaseImages = media.showcaseImages || [];
@@ -121,9 +133,9 @@ function renderPbkHero(media) {
   return `
     <div class="pbk-hero-image">
       <img src="${firstImg}" alt="Service" id="pbkMainImage">
-      <!-- Caption Overlay -->
+      <!-- Caption Overlay with intelligent text split -->
       <div class="pbk-hero-overlay" id="pbkHeroOverlay" ${firstCaption ? '' : 'style="display:none"'}>
-        <span class="pbk-hero-caption" id="pbkHeroCaption">${firstCaption || ''}</span>
+        <span class="pbk-hero-caption" id="pbkHeroCaption">${splitCaptionText(firstCaption)}</span>
       </div>
       ${images.length > 1 ? `
         <div class="pbk-hero-nav">

@@ -88,13 +88,26 @@ function goToImage(index) {
   const mainImg = document.getElementById('pbkMainImage');
   if (mainImg) mainImg.src = img.url || img;
   
-  // Update caption
+  // Update caption with intelligent text splitting (like Deep Dive lightbox)
   const captionEl = document.getElementById('pbkHeroCaption');
   const overlayEl = document.getElementById('pbkHeroOverlay');
   if (captionEl && overlayEl) {
     const caption = img.caption || '';
-    captionEl.textContent = caption;
-    overlayEl.style.display = caption ? '' : 'none';
+    if (caption) {
+      const words = caption.split(' ');
+      if (words.length > 1) {
+        // Split text: first word(s) lighter, last word bold
+        const lastWord = words.pop();
+        const firstPart = words.join(' ');
+        captionEl.innerHTML = `<span class="caption-light">${firstPart}</span> <span class="caption-bold">${lastWord}</span>`;
+      } else {
+        captionEl.textContent = caption;
+      }
+      overlayEl.style.display = '';
+    } else {
+      captionEl.textContent = '';
+      overlayEl.style.display = 'none';
+    }
   }
   
   // Update dots
