@@ -79,9 +79,10 @@
   flex-shrink: 0;
 }
 
+/* Action buttons - Deep Dive IG style */
 .pbk-action-btn {
-  width: var(--size-icon-sm);
-  height: var(--size-icon-sm);
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   background: var(--bg-gray);
   border: none;
@@ -91,12 +92,21 @@
   cursor: pointer;
   color: var(--text-secondary);
   transition: all 0.2s ease;
-  font-size: var(--fs-body);
+  font-size: 18px;
 }
 
 .pbk-action-btn:hover {
+  transform: scale(1.1);
   background: var(--border);
   color: var(--text-primary);
+}
+
+.pbk-action-btn:active {
+  transform: scale(0.95);
+}
+
+.pbk-action-btn.liked {
+  color: #ff375f;
 }
 
 
@@ -637,7 +647,7 @@
 }
 
 /* ===========================================
-   STICKY CTA - Glass Style (matches Deep Dive)
+   STICKY CTA - Glass Style (Deep Dive compact inline)
    =========================================== */
 .pbk-sticky-cta {
   position: fixed;
@@ -653,48 +663,52 @@
 .pbk-cta-glass {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 10px 12px;
-  background: rgba(255, 255, 255, 0.88);
+  justify-content: center;
+  gap: var(--space-md);
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-radius: 16px;
+  border-radius: var(--radius);
   box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08);
   border: 1px solid rgba(255,255,255,0.6);
   pointer-events: all;
 }
 
+/* Price section - inline with border separator */
 .pbk-cta-price {
   display: flex;
-  flex-direction: column;
-  line-height: 1.2;
+  align-items: baseline;
+  gap: 4px;
+  padding-right: var(--space-md);
+  border-right: 1px solid var(--border);
 }
 
 .pbk-cta-label {
-  font-size: 11px;
-  color: #888;
+  font-size: var(--fs-tiny);
+  color: var(--text-secondary);
   font-weight: 500;
 }
 
 .pbk-cta-amount {
-  font-size: 18px;
+  font-size: var(--fs-heading);
   font-weight: 700;
-  color: #000;
+  color: var(--color-primary);
+  letter-spacing: -0.02em;
 }
 
 .pbk-cta-buttons {
   display: flex;
-  gap: 8px;
+  gap: var(--space-sm);
 }
 
 .pbk-cta-book {
   padding: 12px 20px;
-  background: linear-gradient(135deg, var(--color-primary, #ff6b6b) 0%, #ff8e53 100%);
+  background: var(--gradient-primary);
   color: #fff;
   border: none;
-  border-radius: 12px;
-  font-size: 14px;
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-small);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
@@ -703,7 +717,7 @@
 
 .pbk-cta-book:hover {
   transform: scale(1.02);
-  box-shadow: 0 4px 12px rgba(255,107,107,0.4);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
 }
 
 .pbk-cta-inquire {
@@ -711,8 +725,8 @@
   background: #25D366;
   color: #fff;
   border: none;
-  border-radius: 12px;
-  font-size: 16px;
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-body);
   text-decoration: none;
   display: flex;
   align-items: center;
