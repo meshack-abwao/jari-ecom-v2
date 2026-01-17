@@ -39,13 +39,13 @@ C:\Users\ADMIN\Desktop\jari-ecom-v2\
 │   │   │   ├── orders.js
 │   │   │   ├── settings.js
 │   │   │   ├── tracking.js
-│   │   │   └── bookings.js   # NEW - Booking system
+│   │   │   └── bookings.js   # Booking system API
 │   │   ├── middleware/
 │   │   └── config/
 │   └── migrations/
 │       ├── 001_initial.sql
 │       ├── 002_pixel_tracking.sql
-│       ├── 003_booking_system.sql  # NEW
+│       ├── 003_booking_system.sql  # ✅ RUN ON RAILWAY 2026-01-17
 │       └── run.js
 │
 ├── dashboard/                # React Admin Dashboard
@@ -58,7 +58,7 @@ C:\Users\ADMIN\Desktop\jari-ecom-v2\
 │   │   │   ├── TemplatesPage.jsx   # Template selection
 │   │   │   ├── SettingsPage.jsx    # Store settings
 │   │   │   ├── AddOnsPage.jsx      # Premium features
-│   │   │   └── BookingsPage.jsx    # NEW - Calendar + Booking settings
+│   │   │   └── BookingsPage.jsx    # Calendar + Booking settings
 │   │   ├── components/
 │   │   │   ├── Layout.jsx          # Sidebar + main content
 │   │   │   └── Sidebar.jsx
@@ -108,6 +108,14 @@ cd C:\Users\ADMIN\Desktop\jari-ecom-v2; git add -A; git commit -m "message"; git
 cd C:\Users\ADMIN\Desktop\jari-ecom-v2; git status; git log --oneline -5
 ```
 
+### Railway Migration Commands
+```powershell
+# Run migration locally with Railway's public DB URL
+cd C:\Users\ADMIN\Desktop\jari-ecom-v2\api
+$env:DATABASE_PUBLIC_URL = "postgresql://postgres:PASSWORD@turntable.proxy.rlwy.net:16265/railway"
+node test-migrate.js
+```
+
 ### Debug Workflow (Surgical Edits)
 1. `read_file` with offset/length to examine specific sections
 2. `edit_block` with exact old_string match for surgical changes
@@ -146,19 +154,19 @@ cd C:\Users\ADMIN\Desktop\jari-ecom-v2; git status; git log --oneline -5
 
 ---
 
-## 5. BOOKING SYSTEM (Currently Building)
+## 5. BOOKING SYSTEM
 
-### Database Schema (Migration 003)
+### Database Tables (Migration 003 - ✅ COMPLETE)
 ```sql
--- Tables created:
+-- All 5 tables created on Railway DB (2026-01-17):
 booking_settings     -- Per-store settings (slots, fees, deposits)
-working_hours        -- Day-by-day schedule
+working_hours        -- Day-by-day schedule (Mon-Sun)
 blocked_dates        -- Holidays, personal days
 bookings            -- Customer bookings
 service_packages    -- Package options per service
 ```
 
-### Key Features Planned
+### Key Features
 - **Calendar picker** (storefront) - Available dates/times
 - **Working hours** - Provider sets schedule per day
 - **Slot management** - Duration, max per slot, max per day
@@ -167,7 +175,6 @@ service_packages    -- Package options per service
 - **Deposits** - Configurable percentage
 - **Inquiry fee** - Reduce tire-kickers
 - **Reminders** - SMS/WhatsApp (5hr, 2hr, 30min before)
-- **Multi-select categories** - Services appear in multiple filters
 
 ### API Endpoints (bookings.js)
 ```
@@ -205,29 +212,28 @@ export const bookingsAPI = {
 
 ## 6. CURRENT BUILD STATUS
 
-### ✅ Completed
-- [x] Migration 003_booking_system.sql
-- [x] API routes (bookings.js) - All endpoints
-- [x] Dashboard API client (bookingsAPI)
-- [x] BookingsPage.jsx - Calendar tab, Settings tab
-- [x] Wire BookingsPage into App.jsx routes
-- [x] Add Bookings to sidebar navigation (with Calendar icon)
+### ✅ Completed (Booking System Backend)
+- [x] Migration 003_booking_system.sql - Created
+- [x] Migration 003 RUN on Railway DB - 5/5 tables confirmed
+- [x] API routes (bookings.js) - All endpoints working
+- [x] API routes registered in index.js (/api/bookings)
+- [x] Dashboard API client (bookingsAPI) in client.js
+- [x] BookingsPage.jsx - Calendar tab + Settings tab with all sections
+- [x] BookingsPage wired into App.jsx routes
+- [x] Bookings added to sidebar navigation (Calendar icon)
 
-### ❌ Not Done Yet
-- [ ] Run migration on Railway DB
-- [ ] Test dashboard booking settings UI
+### ❌ Not Done Yet (Storefront + Polish)
+- [ ] Test dashboard BookingsPage UI live
 - [ ] Storefront calendar picker component
 - [ ] Storefront booking checkout flow (2-4 steps)
 - [ ] Portfolio template page structure
 - [ ] Multi-select categories for products
 
 ### 🎯 Immediate Next Steps
-1. Run migration 003 on Railway DB
-2. Add route: `<Route path="bookings" element={<BookingsPage />} />`
-3. Add "Bookings" to sidebar navigation in Layout.jsx
-4. Run migration 003 on Railway
-5. Test BookingsPage UI in browser
-6. Build storefront booking flow
+1. **TEST** - Visit dashboard /bookings page, verify Settings tab works
+2. **BUILD** - Storefront calendar picker component
+3. **BUILD** - Booking checkout flow (Select → Date → Details → Pay)
+4. **BUILD** - Portfolio template page layout
 
 ---
 
@@ -299,6 +305,11 @@ Categories remain as-is (working system, don't break it).
 **Problem:** Commands fail with `&&`
 **Fix:** Use semicolons instead: `cd path; git add -A; git commit -m "msg"`
 
+### Formula 6: Railway Migration
+**Problem:** `getaddrinfo ENOTFOUND postgres.railway.internal`
+**Cause:** Using internal URL from outside Railway network
+**Fix:** Use DATABASE_PUBLIC_URL for local migrations
+
 ---
 
 ## 10. ENVIRONMENT URLS
@@ -308,13 +319,14 @@ Categories remain as-is (working system, don't break it).
 | Dashboard (Netlify) | https://jari-dashboard.netlify.app |
 | Store (Netlify) | https://jari-store.netlify.app |
 | API (Railway) | https://jari-api-production.up.railway.app |
-| GitHub Repo | https://github.com/[username]/jari-ecom-v2 |
+| GitHub Repo | https://github.com/meshack-abwao/jari-ecom-v2 |
 
 ---
 
 ## 11. COMMIT HISTORY (Recent)
 
 ```
+a3f23d5 📚 Update PROJECT-INSTRUCTIONS: Mark wiring complete, update commits
 051e9a1 🐛 Fix BookingsPage: Add missing main render with tabs (Calendar/Settings)
 d9563f5 🔌 Wire BookingsPage: Add route to App.jsx + Bookings nav in sidebar
 b85b111 📚 Add comprehensive PROJECT-INSTRUCTIONS.md for Claude Project context
@@ -322,9 +334,6 @@ e4d0e78 ✨ Add bookingsAPI client for dashboard
 76ffb75 ✨ Add booking API routes: settings, working hours, blocked dates, availability, create booking
 105ba88 ✨ Add booking system migration: booking_settings, working_hours, blocked_dates, bookings, service_packages
 8372be4 🎨 Lightbox description: Smaller text (10-12px), 85% width for design balance
-b847622 ✨ Lightbox overlay: Caption pulled from corner, description in overlay
-23cd8b4 🎯 Lightbox: Center image vertically for balanced look
-3778f6a 🎨 Lightbox: Breathing room around image, description below
 ```
 
 ---
@@ -363,11 +372,12 @@ start_search(path, { pattern: "searchTerm", searchType: "content" })
 | File | Purpose |
 |------|---------|
 | `api/src/routes/bookings.js` | Booking API endpoints |
-| `api/migrations/003_booking_system.sql` | Booking tables |
+| `api/src/routes/index.js` | Route registration (bookings at /api/bookings) |
+| `api/migrations/003_booking_system.sql` | Booking tables (RUN ✅) |
 | `dashboard/src/pages/BookingsPage.jsx` | Booking dashboard UI |
 | `dashboard/src/api/client.js` | API client (all endpoints) |
-| `dashboard/src/App.jsx` | React routing |
-| `dashboard/src/components/Layout.jsx` | Sidebar navigation |
+| `dashboard/src/App.jsx` | React routing (bookings route added) |
+| `dashboard/src/components/Layout.jsx` | Sidebar navigation (Bookings link added) |
 | `store/src/render.js` | Storefront template rendering |
 | `store/src/styles/base.css` | All storefront CSS |
 
@@ -379,8 +389,10 @@ cd C:\Users\ADMIN\Desktop\jari-ecom-v2; git status; git log --oneline -5
 # Commit changes
 cd C:\Users\ADMIN\Desktop\jari-ecom-v2; git add -A; git commit -m "message"; git push origin main
 
-# Run migration (via Railway CLI or dashboard)
-# Check Railway dashboard for DB access
+# Run migration locally (use PUBLIC URL)
+cd C:\Users\ADMIN\Desktop\jari-ecom-v2\api
+$env:DATABASE_PUBLIC_URL = "postgresql://postgres:PASSWORD@turntable.proxy.rlwy.net:16265/railway"
+node test-migrate.js
 ```
 
 ---
@@ -388,11 +400,13 @@ cd C:\Users\ADMIN\Desktop\jari-ecom-v2; git add -A; git commit -m "message"; git
 ## 14. NEXT SESSION CHECKLIST
 
 When starting a new chat:
-1. ✅ Confirm access to Desktop Commander
+1. ✅ Confirm access to Desktop Commander / Filesystem tools
 2. ✅ Run `git log --oneline -10` to see latest commits
-3. ✅ Check what's wired vs not wired
-4. ✅ Reference this document for architecture
-5. ✅ Continue from "Immediate Next Steps" section
+3. ✅ Reference this document for architecture
+4. ✅ Continue from "Immediate Next Steps" section
+
+### Current Priority:
+**Test BookingsPage in dashboard, then build storefront booking flow**
 
 ---
 

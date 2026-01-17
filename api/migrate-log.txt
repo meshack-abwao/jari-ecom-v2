@@ -1,0 +1,11 @@
+🔧 Starting migration...
+DATABASE_URL exists: true
+Reading SQL from: C:\Users\ADMIN\Desktop\jari-ecom-v2\api\migrations\003_booking_system.sql
+SQL length: 5833 chars
+Executing migration...
+❌ Migration failed: getaddrinfo ENOTFOUND postgres.railway.internal
+Stack: Error: getaddrinfo ENOTFOUND postgres.railway.internal
+    at C:\Users\ADMIN\Desktop\jari-ecom-v2\api\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async migrate (file:///C:/Users/ADMIN/Desktop/jari-ecom-v2/api/test-migrate.js:32:5)
+Done.
