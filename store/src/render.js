@@ -306,10 +306,10 @@ function renderQuickDecision(product) {
 }
 
 // ===========================================
-// TEMPLATE: PORTFOLIO + BOOKING (Isolated CSS: pb- prefix)
+// TEMPLATE: PORTFOLIO + BOOKING
 // ===========================================
 function renderPortfolioBooking(product) {
-  const { products, store } = state;
+  const { products } = state;
   const data = product.data || {};
   const media = product.media || {};
   const packages = data.packages || [];
@@ -317,87 +317,47 @@ function renderPortfolioBooking(product) {
   const policies = data.policies || {};
   const showBackButton = products.length > 1;
   
-  // Calculate starting price
-  const startingPrice = packages.length > 0 
-    ? Math.min(...packages.map(p => parseInt(p.price || 0)))
-    : parseInt(data.price || 0);
-  
   return `
     ${showBackButton ? '<button class="back-btn" id="backBtn">← Back to All Services</button>' : ''}
-    <div class="product-container template-portfolio-booking">
+    <div class="product-container">
       <div class="product-card">
-        
-        <!-- Header -->
-        <div class="pb-header">
-          <h1 class="product-name">${data.name || 'Service'}</h1>
-        </div>
-        
-        <!-- Gallery -->
         ${renderGallery(media.images || [])}
-        
-        <!-- Stories -->
         ${(media.stories || []).length > 0 ? renderStories(media.stories, data.storyTitle || 'Our Work') : ''}
         
         <div class="product-info">
-          <!-- Description -->
-          ${data.description ? `<p class="product-description">${data.description}</p>` : ''}
+          <h2 class="product-name">${data.name || 'Service'}</h2>
+          <p class="product-description">${data.description || ''}</p>
           
-          <!-- Packages Section -->
           ${packages.length > 0 ? `
-            <div class="pb-packages">
-              <h3 class="pb-packages-title">📦 Service Packages</h3>
-              <div class="pb-packages-grid">
-                ${packages.map((pkg, i) => `
-                  <div class="pb-package-card ${pkg.featured || i === 0 ? 'featured' : ''}">
-                    ${pkg.featured || i === 0 ? '<span class="pb-package-badge">Most Popular</span>' : ''}
-                    <div class="pb-package-header">
-                      <span class="pb-package-name">${pkg.name}</span>
-                      <span class="pb-package-price">KES ${parseInt(pkg.price || 0).toLocaleString()}</span>
-                    </div>
-                    ${pkg.duration ? `<p class="pb-package-duration">⏱️ ${pkg.duration}</p>` : ''}
-                    ${pkg.description ? `<p class="pb-package-description">${pkg.description}</p>` : ''}
-                    <button class="pb-package-select-btn" data-price="${pkg.price}" data-name="${pkg.name}" data-duration="${pkg.duration || ''}">Select Package</button>
+            <div class="packages-section">
+              <h3 class="section-title">📦 Service Packages</h3>
+              ${packages.map((pkg, i) => `
+                <div class="package-card ${i === 0 ? 'featured' : ''}">
+                  <div class="package-header">
+                    <span class="package-name">${pkg.name}</span>
+                    <span class="package-price">KES ${parseInt(pkg.price || 0).toLocaleString()}</span>
                   </div>
-                `).join('')}
-              </div>
+                  ${pkg.duration ? `<p class="package-duration">⏱️ ${pkg.duration}</p>` : ''}
+                  ${pkg.description ? `<p class="package-description">${pkg.description}</p>` : ''}
+                  <button class="package-select-btn" data-price="${pkg.price}" data-name="${pkg.name}">Select Package</button>
+                </div>
+              `).join('')}
             </div>
           ` : `
             <div class="price-display">
               <span class="price-label">Starting From</span>
-              <div class="price">KES <span id="displayPrice">${startingPrice.toLocaleString()}</span></div>
+              <div class="price">KES <span id="displayPrice">${parseInt(data.price || 0).toLocaleString()}</span></div>
             </div>
           `}
           
-          <!-- Booking Note -->
           ${data.bookingNote ? `<p class="booking-note">ℹ️ ${data.bookingNote}</p>` : ''}
-          
-          <!-- Testimonials -->
           ${testimonials.length > 0 ? renderTestimonials(testimonials) : ''}
           
+          <button class="buy-btn" id="buyBtn"><span class="btn-text">📅 Book Now</span><span class="btn-arrow">→</span></button>
           ${renderProductPolicyLinks(policies)}
         </div>
       </div>
     </div>
-    
-    <!-- Sticky CTA -->
-    <div class="pb-cta">
-      <div class="pb-cta-glass">
-        <div class="pb-cta-price">
-          <span style="font-size:12px;color:#666;">From</span><br>
-          KES ${startingPrice.toLocaleString()}
-        </div>
-        <div class="pb-cta-buttons">
-          <button class="pb-cta-book-btn" id="buyBtn">📅 Check Availability</button>
-          ${store?.contact_phone ? `
-            <a href="https://wa.me/${store.contact_phone.replace(/\\D/g, '')}?text=Hi! I'm interested in ${encodeURIComponent(data.name || 'your service')}" 
-               class="pb-cta-inquire-btn" target="_blank">
-              💬
-            </a>
-          ` : ''}
-        </div>
-      </div>
-    </div>
-    
     ${renderStoryViewer(media.stories || [])}
     ${renderProductPolicyModals(policies)}
   `;
