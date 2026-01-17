@@ -20,60 +20,83 @@
   background: none;
   border: none;
   font-size: 14px;
-  color: #666;
+  color: #86868b;
   cursor: pointer;
+  transition: color 0.2s;
 }
 
-/* Header */
+.pbk-back-btn:hover {
+  color: #1d1d1f;
+}
+
+/* ===========================================
+   HEADER - Premium Typography (Deep Dive style)
+   =========================================== */
 .pbk-header {
-  padding: 16px 0;
+  padding: 20px 4px 24px;
 }
 
 .pbk-title {
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 700;
-  margin: 0 0 12px;
-  line-height: 1.2;
-  color: #000;
+  line-height: 1.1;
+  color: var(--text-primary, #1d1d1f);
+  letter-spacing: -0.03em;
+  margin-bottom: 12px;
 }
 
 .pbk-meta {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 16px;
+}
+
+.pbk-meta-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .pbk-rating {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 14px;
+  gap: 2px;
   color: #f5a623;
+  font-size: 14px;
 }
 
-.pbk-rating span {
-  color: #666;
-  font-weight: 500;
+.pbk-rating-count {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1d1d1f;
+  margin-left: 6px;
 }
 
 .pbk-actions {
   display: flex;
   gap: 8px;
+  flex-shrink: 0;
 }
 
 .pbk-action-btn {
   width: 36px;
   height: 36px;
-  border: 1px solid #e0e0e0;
   border-radius: 50%;
-  background: #fff;
-  font-size: 16px;
+  background: #f5f5f7;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  transition: all 0.2s;
+  color: #86868b;
+  transition: all 0.2s ease;
+  font-size: 16px;
 }
 
 .pbk-action-btn:hover {
-  background: #f5f5f5;
+  background: #e8e8ed;
+  color: #1d1d1f;
 }
 
 

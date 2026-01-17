@@ -25,11 +25,13 @@ export function renderPortfolioBookingTemplate(product) {
     ${showBackButton ? '<button class="pbk-back-btn" id="backBtn">← Back to Services</button>' : ''}
     
     <div class="pbk-container">
-      <!-- Header -->
+      <!-- Header - Premium Typography -->
       <div class="pbk-header">
         <h1 class="pbk-title">${data.name || 'Service'}</h1>
         <div class="pbk-meta">
-          <div class="pbk-rating">${renderPbkStars(4.8)} <span>4.8</span></div>
+          <div class="pbk-meta-left">
+            <div class="pbk-rating">${renderPbkStars(4.8)}<span class="pbk-rating-count">4.8</span></div>
+          </div>
           <div class="pbk-actions">
             <button class="pbk-action-btn" onclick="sharePbk()">↗</button>
             <button class="pbk-action-btn" onclick="likePbk(this)">♡</button>
