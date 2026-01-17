@@ -63,6 +63,14 @@ export function initPortfolioBookingHandlers() {
       openStoryViewer(index);
     });
   });
+  
+  // Gallery items -> Lightbox
+  document.querySelectorAll('.pbk-gallery-item').forEach(item => {
+    item.addEventListener('click', (e) => {
+      const index = parseInt(e.currentTarget.dataset.index);
+      window.openPbkLightbox(index);
+    });
+  });
 }
 
 // Gallery navigation
@@ -145,4 +153,48 @@ window.sharePbk = function() {
 window.likePbk = function(btn) {
   btn.textContent = btn.textContent === '♡' ? '♥' : '♡';
   btn.style.color = btn.textContent === '♥' ? '#e74c3c' : '';
+};
+
+// Lightbox functions
+let lightboxImages = [];
+let lightboxIndex = 0;
+
+window.openPbkLightbox = function(index) {
+  const product = state.currentProduct;
+  lightboxImages = product?.media?.showcaseImages || [];
+  lightboxIndex = index;
+  
+  const lightbox = document.getElementById('pbkLightbox');
+  const img = document.getElementById('pbkLightboxImg');
+  const caption = document.getElementById('pbkLightboxCaption');
+  
+  if (lightbox && img && lightboxImages[index]) {
+    img.src = lightboxImages[index].url;
+    caption.textContent = lightboxImages[index].caption || '';
+    caption.style.display = lightboxImages[index].caption ? '' : 'none';
+    lightbox.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+};
+
+window.closePbkLightbox = function() {
+  const lightbox = document.getElementById('pbkLightbox');
+  if (lightbox) {
+    lightbox.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+};
+
+window.pbkLightboxNav = function(direction) {
+  if (lightboxImages.length <= 1) return;
+  lightboxIndex = (lightboxIndex + direction + lightboxImages.length) % lightboxImages.length;
+  
+  const img = document.getElementById('pbkLightboxImg');
+  const caption = document.getElementById('pbkLightboxCaption');
+  
+  if (img && lightboxImages[lightboxIndex]) {
+    img.src = lightboxImages[lightboxIndex].url;
+    caption.textContent = lightboxImages[lightboxIndex].caption || '';
+    caption.style.display = lightboxImages[lightboxIndex].caption ? '' : 'none';
+  }
 };

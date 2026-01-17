@@ -53,8 +53,17 @@ export function renderPortfolioBookingTemplate(product) {
       <!-- Stories (if any) -->
       ${media.stories?.length > 0 ? renderPbkStories(media.stories) : ''}
 
+      <!-- Gallery (Showcase) - uses showcaseImages or fallback to images -->
+      ${renderPbkGallerySection(media, data.galleryTitle)}
+
+      <!-- Why Choose Us -->
+      ${data.whyChooseUs ? renderPbkWhyChooseUs(data.whyChooseUs) : ''}
+
       <!-- Packages -->
       ${packages.length > 0 ? renderPbkPackages(packages) : ''}
+
+      <!-- What's Included -->
+      ${data.whatsIncluded ? renderPbkWhatsIncluded(data.whatsIncluded) : ''}
 
       <!-- Testimonials -->
       ${testimonials.length > 0 ? renderPbkTestimonials(testimonials) : ''}
@@ -152,6 +161,51 @@ function renderPbkStories(stories) {
   `;
 }
 
+// Gallery with masonry grid + lightbox (like Deep Dive showcase)
+function renderPbkGallery(images, title) {
+  const valid = images.filter(img => img.url);
+  if (valid.length === 0) return '';
+  
+  return `
+    <div class="pbk-gallery">
+      <h3 class="pbk-section-title">${title || 'Gallery'}</h3>
+      <div class="pbk-gallery-grid">
+        ${valid.map((img, i) => `
+          <div class="pbk-gallery-item ${i === 0 ? 'pbk-gallery-large' : ''}" data-index="${i}">
+            <img src="${img.url}" alt="${img.caption || ''}" loading="lazy">
+            ${img.caption ? `
+              <div class="pbk-gallery-overlay">
+                <span class="pbk-gallery-caption">${img.caption}</span>
+              </div>
+            ` : ''}
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    ${renderPbkLightbox(valid)}
+  `;
+}
+
+// Lightbox for gallery
+function renderPbkLightbox(images) {
+  return `
+    <div class="pbk-lightbox" id="pbkLightbox">
+      <div class="pbk-lightbox-backdrop" onclick="closePbkLightbox()"></div>
+      <div class="pbk-lightbox-content">
+        <button class="pbk-lightbox-close" onclick="closePbkLightbox()">✕</button>
+        <div class="pbk-lightbox-media">
+          <img id="pbkLightboxImg" src="" alt="">
+          <div class="pbk-lightbox-caption" id="pbkLightboxCaption"></div>
+        </div>
+        <div class="pbk-lightbox-nav">
+          <button class="pbk-lightbox-prev" onclick="pbkLightboxNav(-1)">‹</button>
+          <button class="pbk-lightbox-next" onclick="pbkLightboxNav(1)">›</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 function renderPbkPackages(packages) {
   return `
     <div class="pbk-packages">
@@ -192,6 +246,73 @@ function renderPbkTestimonials(testimonials) {
           </div>
         `).join('')}
       </div>
+    </div>
+  `;
+}
+
+
+// Gallery section wrapper - handles fallback from showcaseImages to images
+function renderPbkGallerySection(media, title) {
+  // Prefer showcaseImages (has captions), fallback to regular images
+  const showcaseImages = media.showcaseImages || [];
+  const regularImages = media.images || [];
+  
+  // Convert regular images to object format if needed
+  const images = showcaseImages.length > 0 
+    ? showcaseImages 
+    : regularImages.slice(1).map(url => ({ url, caption: '' })); // Skip first (hero uses it)
+  
+  if (images.length === 0) return '';
+  
+  return renderPbkGallery(images, title);
+}
+
+// Why Choose Us section
+function renderPbkWhyChooseUs(content) {
+  if (!content) return '';
+  
+  // Support both string and array format
+  const items = Array.isArray(content) ? content : [content];
+  
+  return `
+    <div class="pbk-why-choose">
+      <h3 class="pbk-section-title">Why Choose Us</h3>
+      <div class="pbk-why-content">
+        ${items.map(item => {
+          if (typeof item === 'string') {
+            return `<p class="pbk-why-text">${item}</p>`;
+          }
+          // Object with icon and text
+          return `
+            <div class="pbk-why-item">
+              ${item.icon ? `<span class="pbk-why-icon">${item.icon}</span>` : ''}
+              <span class="pbk-why-text">${item.text || item}</span>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    </div>
+  `;
+}
+
+// What's Included section
+function renderPbkWhatsIncluded(content) {
+  if (!content) return '';
+  
+  // Support both string and array format
+  const items = Array.isArray(content) ? content : [content];
+  
+  return `
+    <div class="pbk-whats-included">
+      <h3 class="pbk-section-title">What's Included</h3>
+      <ul class="pbk-included-list">
+        ${items.map(item => `
+          <li class="pbk-included-item">
+            <span class="pbk-included-check">✓</span>
+            <span class="pbk-included-text">${typeof item === 'string' ? item : item.text || item}</span>
+          </li>
+        `).join('')}
+      </ul>
     </div>
   `;
 }
