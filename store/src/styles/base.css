@@ -740,3 +740,480 @@
     order: 2;
   }
 }
+
+
+/* ===========================================
+   TEMPLATE: PORTFOLIO + BOOKING
+   =========================================== */
+
+.template-portfolio {
+  max-width: 600px;
+  margin: 0 auto;
+  padding-bottom: 100px; /* Space for sticky CTA */
+}
+
+/* Premium Header */
+.portfolio-header {
+  padding: 16px 20px;
+  text-align: center;
+}
+
+.portfolio-header .product-name {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 12px;
+  line-height: 1.2;
+  letter-spacing: -0.5px;
+}
+
+.portfolio-header .header-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.portfolio-header .meta-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.portfolio-header .rating-stars {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.portfolio-header .rating-count {
+  font-weight: 600;
+  font-size: 14px;
+  margin-left: 6px;
+}
+
+.portfolio-header .review-count {
+  font-size: 13px;
+  color: #666;
+  margin-left: 4px;
+}
+
+/* Hero Media */
+.portfolio-hero {
+  margin: 0 16px 20px;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.hero-video-container {
+  position: relative;
+  aspect-ratio: 16/9;
+  background: #000;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.hero-video-container video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero-play-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.3);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.hero-play-overlay:hover {
+  background: rgba(0,0,0,0.4);
+}
+
+.hero-play-overlay .play-icon {
+  width: 72px;
+  height: 72px;
+  background: rgba(0,0,0,0.6);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+}
+
+/* Intro Section */
+.portfolio-intro {
+  padding: 0 20px 20px;
+}
+
+.portfolio-intro .price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.portfolio-intro .price-label {
+  font-size: 13px;
+  color: #666;
+}
+
+.portfolio-intro .price-main-row {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.portfolio-intro .price-currency {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+}
+
+.portfolio-intro .price-main {
+  font-size: 32px;
+  font-weight: 700;
+  color: #000;
+}
+
+.portfolio-intro .intro-description {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #444;
+}
+
+/* Stories Section */
+.portfolio-stories {
+  padding: 0 20px 20px;
+}
+
+/* Showcase Gallery */
+.portfolio-showcase {
+  padding: 20px;
+  background: #f8f8f8;
+  margin: 0 0 20px;
+}
+
+.portfolio-showcase .showcase-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 0 16px;
+  text-align: center;
+}
+
+/* Copy Sections */
+.portfolio-section {
+  padding: 20px;
+  margin: 0 0 8px;
+}
+
+.portfolio-section .section-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 12px;
+  color: #000;
+}
+
+.portfolio-section .section-content {
+  font-size: 15px;
+  line-height: 1.7;
+  color: #444;
+}
+
+/* Packages Section */
+.portfolio-packages {
+  padding: 20px;
+  background: linear-gradient(180deg, #f8f8f8 0%, #fff 100%);
+}
+
+.portfolio-packages .packages-title {
+  font-size: 20px;
+  font-weight: 600;
+  text-align: center;
+  margin: 0 0 20px;
+}
+
+.packages-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.package-card {
+  background: #fff;
+  border: 2px solid #e8e8e8;
+  border-radius: 16px;
+  padding: 20px;
+  position: relative;
+  transition: all 0.2s;
+}
+
+.package-card:hover {
+  border-color: #ccc;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+.package-card.featured {
+  border-color: #000;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+}
+
+.package-badge {
+  position: absolute;
+  top: -10px;
+  left: 20px;
+  background: #000;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.package-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.package-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: #000;
+}
+
+.package-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.package-currency {
+  font-size: 14px;
+  color: #666;
+}
+
+.package-price {
+  font-size: 24px;
+  font-weight: 700;
+  color: #000;
+}
+
+.package-duration {
+  font-size: 14px;
+  color: #666;
+  margin: 0 0 8px;
+}
+
+.package-description {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #555;
+  margin: 0 0 12px;
+}
+
+.package-includes {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 16px;
+}
+
+.package-includes li {
+  font-size: 14px;
+  color: #444;
+  padding: 6px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.package-includes li:last-child {
+  border-bottom: none;
+}
+
+.package-select-btn {
+  width: 100%;
+  padding: 14px 24px;
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.package-select-btn:hover {
+  background: #333;
+  transform: translateY(-1px);
+}
+
+.package-card.featured .package-select-btn {
+  background: linear-gradient(135deg, #000 0%, #333 100%);
+}
+
+/* Testimonials */
+.portfolio-testimonials {
+  padding: 20px;
+}
+
+/* Booking Note */
+.portfolio-booking-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 16px 20px;
+  background: #fff8e6;
+  margin: 0 16px 20px;
+  border-radius: 12px;
+  border: 1px solid #ffe082;
+}
+
+.portfolio-booking-note .note-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.portfolio-booking-note p {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #666;
+  margin: 0;
+}
+
+/* Sticky Dual CTA */
+.portfolio-cta {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding: 12px 16px;
+  background: linear-gradient(180deg, transparent 0%, rgba(255,255,255,0.9) 20%, #fff 40%);
+  padding-top: 24px;
+}
+
+.portfolio-cta .cta-glass {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+  border: 1px solid rgba(0,0,0,0.05);
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.portfolio-cta .cta-price-section {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.portfolio-cta .cta-price-label {
+  font-size: 11px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.portfolio-cta .cta-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.portfolio-cta .cta-price-currency {
+  font-size: 12px;
+  color: #666;
+}
+
+.portfolio-cta .cta-price-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #000;
+}
+
+.portfolio-cta .cta-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.portfolio-cta .cta-book-btn {
+  padding: 12px 20px;
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.portfolio-cta .cta-book-btn:hover {
+  background: #333;
+  transform: translateY(-1px);
+}
+
+.portfolio-cta .cta-inquire-btn {
+  padding: 12px 16px;
+  background: #25D366;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.portfolio-cta .cta-inquire-btn:hover {
+  background: #128c7e;
+  transform: translateY(-1px);
+}
+
+/* Desktop Styles */
+@media (min-width: 768px) {
+  .template-portfolio {
+    max-width: 900px;
+  }
+  
+  .portfolio-header .product-name {
+    font-size: 36px;
+  }
+  
+  .portfolio-intro .price-main {
+    font-size: 40px;
+  }
+  
+  .packages-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+  }
+  
+  .portfolio-cta .cta-glass {
+    max-width: 600px;
+  }
+  
+  .portfolio-cta .cta-book-btn {
+    padding: 14px 28px;
+    font-size: 15px;
+  }
+}
+
+/* Hero Video Play Function */

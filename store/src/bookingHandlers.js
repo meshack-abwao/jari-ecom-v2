@@ -147,6 +147,19 @@ window.selectPackage = function(el) {
   if (continueBtn) continueBtn.disabled = false;
 };
 
+// Select package from product page AND open booking modal
+window.selectPackageAndBook = async function(el) {
+  const name = el.dataset.name;
+  const price = el.dataset.price;
+  const duration = el.dataset.duration;
+  
+  // Pre-select this package
+  state.booking.selectedPackage = { name, price, duration };
+  
+  // Open booking modal (which will start at Step 1 but with package pre-selected)
+  window.openBookingModal();
+};
+
 // Select date (Step 2)
 window.selectDate = async function(dateStr) {
   state.booking.selectedDate = dateStr;
@@ -319,3 +332,15 @@ export function setupBookingListeners() {
     }
   });
 }
+
+// Play hero video (Portfolio template)
+window.playHeroVideo = function(overlay) {
+  const container = overlay.closest('.hero-video-container');
+  const video = container?.querySelector('video');
+  if (video) {
+    overlay.style.display = 'none';
+    video.muted = false;
+    video.controls = true;
+    video.play();
+  }
+};

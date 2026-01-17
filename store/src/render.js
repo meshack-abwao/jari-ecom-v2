@@ -158,6 +158,12 @@ function renderProductCard(product) {
   const price = data.price || 0;
   const description = data.description || '';
   const name = data.name || 'Product';
+  const template = product.template || 'quick-decision';
+  
+  // Portfolio template uses "View" instead of "Get This Now" (no double CTAs)
+  const isPortfolio = template === 'portfolio-booking';
+  const btnText = isPortfolio ? 'View →' : 'Get This Now';
+  const pricePrefix = isPortfolio ? 'From ' : '';
   
   // Build gallery HTML
   const hasMultiple = cardImages.length > 1;
@@ -169,17 +175,17 @@ function renderProductCard(product) {
     : '<div class="image-placeholder">📸</div>';
   
   return `
-    <div class="collection-card" data-product-id="${product.id}">
+    <div class="collection-card" data-product-id="${product.id}" data-template="${template}">
       <div class="collection-image">
         ${galleryHTML}
         <div class="collection-overlay">
           <h3 class="collection-name">${name}</h3>
-          <p class="collection-price"><span class="currency">KES</span> <span class="amount">${parseInt(price).toLocaleString()}</span></p>
+          <p class="collection-price">${pricePrefix}<span class="currency">KES</span> <span class="amount">${parseInt(price).toLocaleString()}</span></p>
         </div>
       </div>
       <div class="collection-content">
         <p class="collection-description">${description.substring(0, 100)}${description.length > 100 ? '...' : ''}</p>
-        <button class="collection-btn">Get This Now</button>
+        <button class="collection-btn ${isPortfolio ? 'view-btn' : ''}">${btnText}</button>
       </div>
     </div>
   `;
@@ -306,61 +312,227 @@ function renderQuickDecision(product) {
 }
 
 // ===========================================
-// TEMPLATE: PORTFOLIO + BOOKING
+// TEMPLATE: PORTFOLIO + BOOKING (Service Providers)
+// Reference: Deep Dive structure + Booking-specific features
 // ===========================================
 function renderPortfolioBooking(product) {
-  const { products } = state;
+  const { products, store } = state;
   const data = product.data || {};
   const media = product.media || {};
   const packages = data.packages || [];
   const testimonials = data.testimonials || [];
+  const showcaseImages = media.showcaseImages || [];
+  const heroVideo = media.heroVideo || null;
   const policies = data.policies || {};
   const showBackButton = products.length > 1;
   
+  // Filter valid showcase images (reuse Deep Dive gallery)
+  const validShowcase = showcaseImages.filter(img => img.url);
+  
+  // Calculate starting price from packages or base price
+  const startingPrice = packages.length > 0 
+    ? Math.min(...packages.map(p => parseInt(p.price || 0)))
+    : parseInt(data.price || 0);
+  
+  // Rating (use from data or default)
+  const rating = data.rating || 4.8;
+  const reviewCount = data.reviewCount || data.reviews_count || 0;
+  
   return `
     ${showBackButton ? '<button class="back-btn" id="backBtn">← Back to All Services</button>' : ''}
-    <div class="product-container">
-      <div class="product-card">
-        ${renderGallery(media.images || [])}
-        ${(media.stories || []).length > 0 ? renderStories(media.stories, data.storyTitle || 'Our Work') : ''}
-        
-        <div class="product-info">
-          <h2 class="product-name">${data.name || 'Service'}</h2>
-          <p class="product-description">${data.description || ''}</p>
-          
-          ${packages.length > 0 ? `
-            <div class="packages-section">
-              <h3 class="section-title">📦 Service Packages</h3>
-              ${packages.map((pkg, i) => `
-                <div class="package-card ${i === 0 ? 'featured' : ''}">
-                  <div class="package-header">
-                    <span class="package-name">${pkg.name}</span>
-                    <span class="package-price">KES ${parseInt(pkg.price || 0).toLocaleString()}</span>
+    <div class="product-container template-portfolio">
+      
+      <!-- PREMIUM HEADER (Deep Dive style) -->
+      <div class="portfolio-header">
+        <h1 class="product-name">${data.name || 'Service'}</h1>
+        <div class="header-meta-row">
+          <div class="meta-left">
+            <div class="rating-stars">
+              ${renderStarRating(rating)}
+              <span class="rating-count">${rating}</span>
+              ${reviewCount > 0 ? `<span class="review-count">(${reviewCount} reviews)</span>` : ''}
+            </div>
+          </div>
+          <div class="social-actions">
+            <button class="social-btn share-btn" title="Share" onclick="shareProduct()">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <line x1="22" y1="2" x2="11" y2="13"/>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+              </svg>
+            </button>
+            <button class="social-btn heart-btn" title="Save" onclick="toggleLike(this)">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- HERO MEDIA (Video/Reel OR Image) -->
+      <div class="portfolio-hero">
+        ${heroVideo ? `
+          <div class="hero-video-container">
+            <video src="${heroVideo}" poster="${(media.images || [])[0] || ''}" playsinline muted loop>
+            </video>
+            <div class="hero-play-overlay" onclick="playHeroVideo(this)">
+              <div class="play-icon">
+                <svg width="56" height="56" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
+              </div>
+            </div>
+          </div>
+        ` : renderGallery(media.images || [])}
+      </div>
+      
+      <!-- INTRO COPY -->
+      <div class="portfolio-intro">
+        <div class="price-row">
+          <span class="price-label">Starting from</span>
+          <div class="price-main-row">
+            <span class="price-currency">KES</span>
+            <span class="price-main">${startingPrice.toLocaleString()}</span>
+          </div>
+        </div>
+        ${data.description ? `<p class="intro-description">${data.description}</p>` : ''}
+      </div>
+      
+      <!-- STORIES (Service Highlights) -->
+      ${(media.stories || []).length > 0 ? `
+        <div class="portfolio-stories">
+          ${renderStories(media.stories, data.storyTitle || 'Our Work')}
+        </div>
+      ` : ''}
+      
+      <!-- "OUR WORK" GALLERY (Deep Dive magazine style) -->
+      ${validShowcase.length > 0 ? `
+        <div class="portfolio-showcase">
+          <h2 class="showcase-title">${data.showcaseTitle || 'Our Work'}</h2>
+          <div class="showcase-grid">
+            ${validShowcase.map((img, i) => `
+              <div class="showcase-item ${i === 0 ? 'showcase-large' : ''}" data-index="${i}" data-caption="${img.caption || ''}" data-description="${img.description || ''}">
+                <img src="${img.url}" alt="${img.caption || ''}" loading="lazy">
+                ${img.caption ? `<div class="showcase-overlay"><span class="showcase-caption">${img.caption}</span></div>` : '<div class="showcase-tap-hint"></div>'}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      ` : ''}
+      
+      <!-- WHY CHOOSE US (Copy Section) -->
+      ${data.whyChooseUs ? `
+        <div class="portfolio-section why-choose-us">
+          <h3 class="section-title">Why Choose Us</h3>
+          <p class="section-content">${data.whyChooseUs}</p>
+        </div>
+      ` : ''}
+      
+      <!-- PACKAGES SECTION -->
+      ${packages.length > 0 ? `
+        <div class="portfolio-packages">
+          <h2 class="packages-title">📦 Service Packages</h2>
+          <div class="packages-grid">
+            ${packages.map((pkg, i) => `
+              <div class="package-card ${pkg.featured ? 'featured' : ''}" data-package-index="${i}">
+                ${pkg.featured ? '<span class="package-badge">Most Popular</span>' : ''}
+                <div class="package-header">
+                  <span class="package-name">${pkg.name}</span>
+                  <div class="package-price-row">
+                    <span class="package-currency">KES</span>
+                    <span class="package-price">${parseInt(pkg.price || 0).toLocaleString()}</span>
                   </div>
-                  ${pkg.duration ? `<p class="package-duration">⏱️ ${pkg.duration}</p>` : ''}
-                  ${pkg.description ? `<p class="package-description">${pkg.description}</p>` : ''}
-                  <button class="package-select-btn" data-price="${pkg.price}" data-name="${pkg.name}">Select Package</button>
                 </div>
-              `).join('')}
-            </div>
-          ` : `
-            <div class="price-display">
-              <span class="price-label">Starting From</span>
-              <div class="price">KES <span id="displayPrice">${parseInt(data.price || 0).toLocaleString()}</span></div>
-            </div>
-          `}
-          
-          ${data.bookingNote ? `<p class="booking-note">ℹ️ ${data.bookingNote}</p>` : ''}
-          ${testimonials.length > 0 ? renderTestimonials(testimonials) : ''}
-          
-          <button class="buy-btn" id="buyBtn"><span class="btn-text">📅 Book Now</span><span class="btn-arrow">→</span></button>
-          ${renderProductPolicyLinks(policies)}
+                ${pkg.duration ? `<p class="package-duration">⏱️ ${pkg.duration}</p>` : ''}
+                ${pkg.description ? `<p class="package-description">${pkg.description}</p>` : ''}
+                ${pkg.includes ? `
+                  <ul class="package-includes">
+                    ${pkg.includes.map(item => `<li>✓ ${item}</li>`).join('')}
+                  </ul>
+                ` : ''}
+                <button class="package-select-btn" data-price="${pkg.price}" data-name="${pkg.name}" data-duration="${pkg.duration || ''}" onclick="selectPackageAndBook(this)">
+                  Select Package
+                </button>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      ` : ''}
+      
+      <!-- WHAT'S INCLUDED (Copy Section) -->
+      ${data.whatsIncluded ? `
+        <div class="portfolio-section whats-included">
+          <h3 class="section-title">What's Included</h3>
+          <p class="section-content">${data.whatsIncluded}</p>
+        </div>
+      ` : ''}
+      
+      <!-- TESTIMONIALS -->
+      ${testimonials.length > 0 ? `
+        <div class="portfolio-testimonials">
+          ${renderTestimonials(testimonials)}
+        </div>
+      ` : ''}
+      
+      <!-- BOOKING NOTE -->
+      ${data.bookingNote ? `
+        <div class="portfolio-booking-note">
+          <span class="note-icon">ℹ️</span>
+          <p>${data.bookingNote}</p>
+        </div>
+      ` : ''}
+      
+      ${renderProductPolicyLinks(policies)}
+    </div>
+    
+    <!-- STICKY DUAL CTA (Portfolio-specific) -->
+    <div class="portfolio-cta">
+      <div class="cta-glass">
+        <div class="cta-price-section">
+          <span class="cta-price-label">From</span>
+          <div class="cta-price-row">
+            <span class="cta-price-currency">KES</span>
+            <span class="cta-price-value">${startingPrice.toLocaleString()}</span>
+          </div>
+        </div>
+        <div class="cta-buttons">
+          <button class="cta-book-btn" id="buyBtn">
+            📅 Check Availability
+          </button>
+          ${store?.contact_phone ? `
+            <a href="https://wa.me/${store.contact_phone.replace(/\\D/g, '')}?text=Hi! I'm interested in ${encodeURIComponent(data.name || 'your service')}" 
+               class="cta-inquire-btn" target="_blank">
+              💬 Inquire
+            </a>
+          ` : ''}
         </div>
       </div>
     </div>
+    
     ${renderStoryViewer(media.stories || [])}
+    ${renderShowcaseViewer(validShowcase, null)}
     ${renderProductPolicyModals(policies)}
   `;
+}
+
+// Helper: Render star rating SVGs
+function renderStarRating(rating) {
+  const fullStars = Math.floor(rating);
+  const hasHalf = rating % 1 >= 0.5;
+  const emptyStars = 5 - fullStars - (hasHalf ? 1 : 0);
+  
+  let html = '';
+  // Full stars
+  for (let i = 0; i < fullStars; i++) {
+    html += '<svg width="14" height="14" viewBox="0 0 24 24" fill="#FFD700"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
+  }
+  // Half star (optional)
+  if (hasHalf) {
+    html += '<svg width="14" height="14" viewBox="0 0 24 24"><defs><linearGradient id="halfGrad"><stop offset="50%" stop-color="#FFD700"/><stop offset="50%" stop-color="#E0E0E0"/></linearGradient></defs><path fill="url(#halfGrad)" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
+  }
+  // Empty stars
+  for (let i = 0; i < emptyStars; i++) {
+    html += '<svg width="14" height="14" viewBox="0 0 24 24" fill="#E0E0E0"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
+  }
+  return html;
 }
 
 // ===========================================
