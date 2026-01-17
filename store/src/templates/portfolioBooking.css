@@ -362,56 +362,93 @@
   margin: 0 0 20px;
 }
 
-/* Sticky CTA */
+/* ===========================================
+   STICKY CTA - Glass Style (matches Deep Dive)
+   =========================================== */
 .pbk-sticky-cta {
   position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 100;
-  background: linear-gradient(transparent, rgba(255,255,255,0.95) 20%);
-  padding: 20px 16px 16px;
+  width: calc(100% - 32px);
+  max-width: 468px;
+  pointer-events: none;
 }
 
-.pbk-sticky-cta > div:first-child {
-  display: none;
+.pbk-cta-glass {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08);
+  border: 1px solid rgba(255,255,255,0.6);
+  pointer-events: all;
+}
+
+.pbk-cta-price {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.pbk-cta-label {
+  font-size: 11px;
+  color: #888;
+  font-weight: 500;
+}
+
+.pbk-cta-amount {
+  font-size: 18px;
+  font-weight: 700;
+  color: #000;
 }
 
 .pbk-cta-buttons {
   display: flex;
-  gap: 10px;
-  max-width: 500px;
-  margin: 0 auto;
+  gap: 8px;
 }
 
 .pbk-cta-book {
-  flex: 1;
-  padding: 16px 24px;
-  background: #000;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, var(--color-primary, #ff6b6b) 0%, #ff8e53 100%);
   color: #fff;
   border: none;
-  border-radius: 14px;
-  font-size: 16px;
+  border-radius: 12px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
+  white-space: nowrap;
 }
 
 .pbk-cta-book:hover {
-  background: #333;
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(255,107,107,0.4);
 }
 
 .pbk-cta-inquire {
-  padding: 16px 20px;
+  padding: 12px 14px;
   background: #25D366;
   color: #fff;
   border: none;
-  border-radius: 14px;
-  font-size: 18px;
+  border-radius: 12px;
+  font-size: 16px;
   text-decoration: none;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.2s;
+}
+
+.pbk-cta-inquire:hover {
+  background: #1da851;
+  transform: scale(1.02);
 }
 
 /* Desktop */

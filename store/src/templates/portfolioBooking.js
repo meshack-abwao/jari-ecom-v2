@@ -61,15 +61,17 @@ export function renderPortfolioBookingTemplate(product) {
       ${data.bookingNote ? `<p class="pbk-note">ℹ️ ${data.bookingNote}</p>` : ''}
     </div>
 
-    <!-- Sticky CTA -->
+    <!-- Sticky CTA - Glass Style -->
     <div class="pbk-sticky-cta">
-      <div class="pbk-cta-price">
-        <span class="pbk-cta-label">From</span>
-        <span class="pbk-cta-amount">KES ${startingPrice.toLocaleString()}</span>
-      </div>
-      <div class="pbk-cta-buttons">
-        <button class="pbk-cta-book" id="pbkBookBtn">📅 Check Availability</button>
-        ${whatsappLink ? `<a href="${whatsappLink}" class="pbk-cta-inquire" target="_blank">💬</a>` : ''}
+      <div class="pbk-cta-glass">
+        <div class="pbk-cta-price">
+          <span class="pbk-cta-label">From</span>
+          <span class="pbk-cta-amount">KES ${startingPrice.toLocaleString()}</span>
+        </div>
+        <div class="pbk-cta-buttons">
+          <button class="pbk-cta-book" id="pbkBookBtn">📅 Check Availability</button>
+          ${whatsappLink ? `<a href="${whatsappLink}" class="pbk-cta-inquire" target="_blank">💬</a>` : ''}
+        </div>
       </div>
     </div>
 
