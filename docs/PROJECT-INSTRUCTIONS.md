@@ -209,11 +209,11 @@ export const bookingsAPI = {
 - [x] Migration 003_booking_system.sql
 - [x] API routes (bookings.js) - All endpoints
 - [x] Dashboard API client (bookingsAPI)
-- [x] BookingsPage.jsx (683 lines) - Calendar tab, Settings tab
+- [x] BookingsPage.jsx - Calendar tab, Settings tab
+- [x] Wire BookingsPage into App.jsx routes
+- [x] Add Bookings to sidebar navigation (with Calendar icon)
 
 ### ❌ Not Done Yet
-- [ ] Wire BookingsPage into App.jsx routes
-- [ ] Add Bookings to sidebar navigation
 - [ ] Run migration on Railway DB
 - [ ] Test dashboard booking settings UI
 - [ ] Storefront calendar picker component
@@ -222,7 +222,7 @@ export const bookingsAPI = {
 - [ ] Multi-select categories for products
 
 ### 🎯 Immediate Next Steps
-1. Add `import BookingsPage` to App.jsx
+1. Run migration 003 on Railway DB
 2. Add route: `<Route path="bookings" element={<BookingsPage />} />`
 3. Add "Bookings" to sidebar navigation in Layout.jsx
 4. Run migration 003 on Railway
@@ -315,6 +315,9 @@ Categories remain as-is (working system, don't break it).
 ## 11. COMMIT HISTORY (Recent)
 
 ```
+051e9a1 🐛 Fix BookingsPage: Add missing main render with tabs (Calendar/Settings)
+d9563f5 🔌 Wire BookingsPage: Add route to App.jsx + Bookings nav in sidebar
+b85b111 📚 Add comprehensive PROJECT-INSTRUCTIONS.md for Claude Project context
 e4d0e78 ✨ Add bookingsAPI client for dashboard
 76ffb75 ✨ Add booking API routes: settings, working hours, blocked dates, availability, create booking
 105ba88 ✨ Add booking system migration: booking_settings, working_hours, blocked_dates, bookings, service_packages
@@ -322,10 +325,6 @@ e4d0e78 ✨ Add bookingsAPI client for dashboard
 b847622 ✨ Lightbox overlay: Caption pulled from corner, description in overlay
 23cd8b4 🎯 Lightbox: Center image vertically for balanced look
 3778f6a 🎨 Lightbox: Breathing room around image, description below
-961324a ✨ Deep Dive: Full-screen lightbox, rule-of-thirds caption, intelligent text split
-f6710fe 🎨 Deep Dive: KES stacked, magazine overlay INSIDE image
-36d3f51 ✨ Deep Dive: Social icons bottom-right, centered mobile CTA
-68cecff ✨ Deep Dive theme: Title+stars above image, premium typography
 ```
 
 ---
