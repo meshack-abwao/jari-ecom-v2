@@ -3,7 +3,7 @@ import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useTheme } from '../hooks/useTheme';
 import { settingsAPI } from '../api/client';
-import { Home, Package, ShoppingCart, Settings, Zap, LogOut, Sun, Moon, Menu, X, User, Store, Crown, ArrowUpRight, LayoutGrid, Megaphone } from 'lucide-react';
+import { Home, Package, ShoppingCart, Settings, Zap, LogOut, Sun, Moon, Menu, X, User, Store, Crown, ArrowUpRight, LayoutGrid, Megaphone, Calendar } from 'lucide-react';
 
 export default function Layout() {
   const { user, logout } = useAuth();
@@ -197,6 +197,9 @@ export default function Layout() {
           </NavLink>
           <NavLink to="/orders" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
             <ShoppingCart size={20} /><span>Orders</span>
+          </NavLink>
+          <NavLink to="/bookings" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
+            <Calendar size={20} /><span>Bookings</span>
           </NavLink>
           <NavLink to="/products" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
             <Package size={20} /><span>My Products</span>

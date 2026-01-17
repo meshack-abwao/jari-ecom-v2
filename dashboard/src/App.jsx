@@ -11,6 +11,7 @@ import SettingsPage from './pages/SettingsPage';
 import TemplatesPage from './pages/TemplatesPage';
 import AddOnsPage from './pages/AddOnsPage';
 import AdsPage from './pages/AdsPage';
+import BookingsPage from './pages/BookingsPage';
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -51,6 +52,7 @@ export default function App() {
               <Route path="products" element={<ProductsPage />} />
               <Route path="templates" element={<TemplatesPage />} />
               <Route path="orders" element={<OrdersPage />} />
+              <Route path="bookings" element={<BookingsPage />} />
               <Route path="ads" element={<AdsPage />} />
               <Route path="add-ons" element={<AddOnsPage />} />
               <Route path="settings" element={<SettingsPage />} />
