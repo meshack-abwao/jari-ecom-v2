@@ -104,6 +104,31 @@ export const pixelAPI = {
 };
 
 // ===========================================
+// BOOKINGS API
+// ===========================================
+export const bookingsAPI = {
+  // Settings
+  getSettings: () => api.get('/bookings/settings'),
+  updateSettings: (data) => api.put('/bookings/settings', data),
+  
+  // Working hours
+  getWorkingHours: () => api.get('/bookings/working-hours'),
+  updateWorkingHours: (day, data) => api.put(`/bookings/working-hours/${day}`, data),
+  
+  // Blocked dates
+  getBlockedDates: () => api.get('/bookings/blocked-dates'),
+  addBlockedDate: (data) => api.post('/bookings/blocked-dates', data),
+  removeBlockedDate: (id) => api.delete(`/bookings/blocked-dates/${id}`),
+  
+  // Bookings
+  getAll: (filters = {}) => {
+    const params = new URLSearchParams(filters).toString();
+    return api.get(`/bookings${params ? `?${params}` : ''}`);
+  },
+  update: (id, data) => api.put(`/bookings/${id}`, data),
+};
+
+// ===========================================
 // LEGACY API (for backwards compatibility)
 // ===========================================
 export const legacyApi = {
