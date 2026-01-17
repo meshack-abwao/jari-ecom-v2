@@ -141,7 +141,9 @@ function renderPbkStories(stories) {
       <div class="pbk-stories-row">
         ${valid.map((story, i) => `
           <div class="pbk-story" data-index="${i}">
-            <img src="${story.thumbnail || story.url}" alt="${story.label || ''}">
+            <div class="pbk-story-ring">
+              <img src="${story.thumbnail || story.url}" alt="${story.label || ''}">
+            </div>
             ${story.label ? `<span class="pbk-story-label">${story.label}</span>` : ''}
           </div>
         `).join('')}

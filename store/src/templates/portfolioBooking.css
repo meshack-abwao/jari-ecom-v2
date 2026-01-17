@@ -237,47 +237,71 @@
   color: #000;
 }
 
-/* Stories */
+/* ===========================================
+   STORIES - Theme colored rings (uses store primary color)
+   =========================================== */
 .pbk-stories {
   margin-bottom: 28px;
+  padding: 20px;
+  background: #f8f8f8;
+  border-radius: 16px;
+}
+
+.pbk-stories .pbk-section-title {
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: #666;
+  margin-bottom: 16px;
 }
 
 .pbk-stories-row {
   display: flex;
-  gap: 12px;
+  gap: 16px;
   overflow-x: auto;
   padding-bottom: 8px;
   -webkit-overflow-scrolling: touch;
+  justify-content: center;
 }
 
 .pbk-story {
   flex-shrink: 0;
-  width: 80px;
+  width: 72px;
   text-align: center;
   cursor: pointer;
 }
 
-.pbk-story img {
+.pbk-story-ring {
   width: 72px;
   height: 72px;
   border-radius: 50%;
-  object-fit: cover;
-  border: 3px solid #f0f0f0;
-  transition: border-color 0.2s;
+  padding: 3px;
+  background: linear-gradient(135deg, var(--color-primary, #ff6b6b) 0%, #ff8e53 100%);
+  transition: transform 0.2s;
 }
 
-.pbk-story:hover img {
-  border-color: #000;
+.pbk-story:hover .pbk-story-ring {
+  transform: scale(1.05);
+}
+
+.pbk-story img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #fff;
 }
 
 .pbk-story-label {
   display: block;
   font-size: 11px;
-  color: #666;
-  margin-top: 6px;
+  color: #444;
+  margin-top: 8px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-weight: 500;
 }
 
 /* Packages */
