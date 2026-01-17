@@ -680,3 +680,52 @@ export default function BookingsPage() {
       </button>
     </div>
   );
+
+  // ==================== MAIN RENDER ====================
+  if (loading) {
+    return (
+      <div style={styles.container}>
+        <div style={styles.header}>
+          <h1 style={styles.title}>Bookings</h1>
+          <p style={styles.subtitle}>Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={styles.container}>
+      <div style={styles.header}>
+        <h1 style={styles.title}>Bookings</h1>
+        <p style={styles.subtitle}>Manage your calendar and booking settings</p>
+      </div>
+
+      {/* Tabs */}
+      <div style={styles.tabs}>
+        <button 
+          style={{ ...styles.tab, ...(activeTab === 'calendar' ? styles.tabActive : {}) }}
+          onClick={() => setActiveTab('calendar')}
+        >
+          <Calendar size={18} /> Calendar
+        </button>
+        <button 
+          style={{ ...styles.tab, ...(activeTab === 'settings' ? styles.tabActive : {}) }}
+          onClick={() => setActiveTab('settings')}
+        >
+          <Settings size={18} /> Settings
+        </button>
+      </div>
+
+      {/* Tab Content */}
+      {activeTab === 'calendar' ? (
+        <div style={styles.emptyState}>
+          <Calendar size={48} style={{ marginBottom: '16px', opacity: 0.5 }} />
+          <h3 style={{ marginBottom: '8px', color: 'var(--text-primary)' }}>No bookings yet</h3>
+          <p>When customers book your services, they'll appear here.</p>
+        </div>
+      ) : (
+        renderSettings()
+      )}
+    </div>
+  );
+}
