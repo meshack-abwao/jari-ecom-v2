@@ -53,14 +53,14 @@ export function renderPortfolioBookingTemplate(product) {
       <!-- Stories (if any) -->
       ${media.stories?.length > 0 ? renderPbkStories(media.stories) : ''}
 
-      <!-- Gallery (Showcase) - uses showcaseImages or fallback to images -->
-      ${renderPbkGallerySection(media, data.galleryTitle)}
-
       <!-- Why Choose Us -->
       ${data.whyChooseUs ? renderPbkWhyChooseUs(data.whyChooseUs) : ''}
 
       <!-- Packages -->
       ${packages.length > 0 ? renderPbkPackages(packages) : ''}
+
+      <!-- Gallery (Showcase) - uses showcaseImages or fallback to images -->
+      ${renderPbkGallerySection(media, data.galleryTitle)}
 
       <!-- What's Included -->
       ${data.whatsIncluded ? renderPbkWhatsIncluded(data.whatsIncluded) : ''}
