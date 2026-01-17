@@ -2,37 +2,50 @@
 const API_BASE = import.meta.env.VITE_API_URL || 'https://jari-api-production.up.railway.app';
 
 export const bookingApi = {
-  // Get store's booking settings
-  async getSettings(storeId) {
-    const res = await fetch(`${API_BASE}/api/bookings/settings?store_id=${storeId}`);
-    if (!res.ok) throw new Error('Failed to fetch booking settings');
+  // Get store's booking settings (public)
+  async getSettings(storeSlug) {
+    const res = await fetch(`${API_BASE}/api/bookings/public/${storeSlug}/settings`);
+    if (!res.ok) {
+      // If 404, return empty settings (store might not have booking configured)
+      if (res.status === 404) return { data: {} };
+      throw new Error('Failed to fetch booking settings');
+    }
     return res.json();
   },
 
-  // Get working hours
-  async getWorkingHours(storeId) {
-    const res = await fetch(`${API_BASE}/api/bookings/working-hours?store_id=${storeId}`);
-    if (!res.ok) throw new Error('Failed to fetch working hours');
+  // Get working hours (public)
+  async getWorkingHours(storeSlug) {
+    const res = await fetch(`${API_BASE}/api/bookings/public/${storeSlug}/working-hours`);
+    if (!res.ok) {
+      if (res.status === 404) return { data: [] };
+      throw new Error('Failed to fetch working hours');
+    }
     return res.json();
   },
 
-  // Get blocked dates
-  async getBlockedDates(storeId) {
-    const res = await fetch(`${API_BASE}/api/bookings/blocked-dates?store_id=${storeId}`);
-    if (!res.ok) throw new Error('Failed to fetch blocked dates');
+  // Get blocked dates (public)
+  async getBlockedDates(storeSlug) {
+    const res = await fetch(`${API_BASE}/api/bookings/public/${storeSlug}/blocked-dates`);
+    if (!res.ok) {
+      if (res.status === 404) return { data: [] };
+      throw new Error('Failed to fetch blocked dates');
+    }
     return res.json();
   },
 
-  // Get available slots for a specific date
-  async getAvailability(storeId, date) {
-    const res = await fetch(`${API_BASE}/api/bookings/availability?store_id=${storeId}&date=${date}`);
+  // Get available slots for a specific date (public)
+  async getAvailability(storeSlug, date, serviceId = null) {
+    let url = `${API_BASE}/api/bookings/public/${storeSlug}/available?date=${date}`;
+    if (serviceId) url += `&service_id=${serviceId}`;
+    
+    const res = await fetch(url);
     if (!res.ok) throw new Error('Failed to fetch availability');
     return res.json();
   },
 
-  // Create a new booking
-  async createBooking(bookingData) {
-    const res = await fetch(`${API_BASE}/api/bookings`, {
+  // Create a new booking (public)
+  async createBooking(storeSlug, bookingData) {
+    const res = await fetch(`${API_BASE}/api/bookings/public/${storeSlug}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(bookingData)

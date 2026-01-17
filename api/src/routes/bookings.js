@@ -310,6 +310,84 @@ router.put('/:id', auth, async (req, res, next) => {
 // PUBLIC BOOKING ENDPOINTS (Customer-facing)
 // ===========================================
 
+// Get booking settings (public)
+router.get('/public/:storeSlug/settings', async (req, res, next) => {
+  try {
+    const { storeSlug } = req.params;
+    
+    const storeResult = await db.query(
+      'SELECT id FROM stores WHERE slug = $1',
+      [storeSlug]
+    );
+    
+    if (storeResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Store not found' });
+    }
+    
+    const result = await db.query(
+      'SELECT * FROM booking_settings WHERE store_id = $1',
+      [storeResult.rows[0].id]
+    );
+    
+    res.json({ data: result.rows[0] || {} });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Get working hours (public)
+router.get('/public/:storeSlug/working-hours', async (req, res, next) => {
+  try {
+    const { storeSlug } = req.params;
+    
+    const storeResult = await db.query(
+      'SELECT id FROM stores WHERE slug = $1',
+      [storeSlug]
+    );
+    
+    if (storeResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Store not found' });
+    }
+    
+    const result = await db.query(
+      'SELECT * FROM working_hours WHERE store_id = $1 ORDER BY day_of_week',
+      [storeResult.rows[0].id]
+    );
+    
+    res.json({ data: result.rows });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Get blocked dates (public)
+router.get('/public/:storeSlug/blocked-dates', async (req, res, next) => {
+  try {
+    const { storeSlug } = req.params;
+    
+    const storeResult = await db.query(
+      'SELECT id FROM stores WHERE slug = $1',
+      [storeSlug]
+    );
+    
+    if (storeResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Store not found' });
+    }
+    
+    // Only return future blocked dates
+    const result = await db.query(
+      `SELECT * FROM blocked_dates 
+       WHERE store_id = $1 AND blocked_date >= CURRENT_DATE
+       ORDER BY blocked_date`,
+      [storeResult.rows[0].id]
+    );
+    
+    res.json({ data: result.rows });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // Get available slots for a date (public - no auth)
 router.get('/public/:storeSlug/available', async (req, res, next) => {
   try {

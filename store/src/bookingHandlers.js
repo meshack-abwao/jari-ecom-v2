@@ -4,13 +4,13 @@ import { bookingApi } from './bookingApi.js';
 import { renderBookingStep, renderCalendarMonth, renderTimeSlots, renderBookingSuccess } from './render.js';
 
 // Initialize booking data when opening modal
-export async function initBooking(storeId, productId) {
+export async function initBooking(storeSlug, productId) {
   try {
     // Load booking settings and data
     const [settingsRes, hoursRes, blockedRes] = await Promise.all([
-      bookingApi.getSettings(storeId),
-      bookingApi.getWorkingHours(storeId),
-      bookingApi.getBlockedDates(storeId)
+      bookingApi.getSettings(storeSlug),
+      bookingApi.getWorkingHours(storeSlug),
+      bookingApi.getBlockedDates(storeSlug)
     ]);
     
     // Update state
@@ -48,8 +48,8 @@ window.openBookingModal = async function() {
     document.body.style.overflow = 'hidden';
   }
   
-  // Initialize booking data
-  await initBooking(store.id, currentProduct.id);
+  // Initialize booking data (use store slug for public API)
+  await initBooking(store.slug, currentProduct.id);
   
   // Re-render step content
   const content = document.getElementById('bookingContent');
@@ -165,9 +165,10 @@ window.selectDate = async function(dateStr) {
   
   // Fetch available slots
   try {
-    const { store } = state;
-    const res = await bookingApi.getAvailability(store.id, dateStr);
-    const slots = res.data || [];
+    const { store, currentProduct } = state;
+    const res = await bookingApi.getAvailability(store.slug, dateStr, currentProduct?.id);
+    // API returns { available: bool, slots: [], settings: {} }
+    const slots = res.slots || [];
     
     if (slotsEl) {
       slotsEl.innerHTML = renderTimeSlots(slots);
@@ -251,19 +252,18 @@ window.confirmBooking = async function() {
   
   const selectedPackage = booking.selectedPackage || { name: data.name, price: data.price };
   
-  // Prepare booking data
+  // Prepare booking data (for public API)
   const bookingData = {
-    store_id: store.id,
-    product_id: currentProduct.id,
-    service_name: selectedPackage.name,
-    service_price: parseInt(selectedPackage.price || 0),
-    booking_date: booking.selectedDate,
-    booking_time: booking.selectedTime,
+    service_id: currentProduct.id,
+    package_name: selectedPackage.name,
     customer_name: booking.customerName,
     customer_phone: booking.customerPhone,
     customer_email: booking.customerEmail || null,
-    notes: booking.notes || null,
-    jump_line: booking.jumpLine || false
+    booking_date: booking.selectedDate,
+    booking_time: booking.selectedTime,
+    customer_notes: booking.notes || null,
+    jumped_line: booking.jumpLine || false,
+    payment_type: settings.deposit_enabled ? 'deposit' : 'full'
   };
   
   // Disable confirm button
@@ -274,8 +274,8 @@ window.confirmBooking = async function() {
   }
   
   try {
-    const res = await bookingApi.createBooking(bookingData);
-    const bookingRef = res.data?.reference || 'PENDING';
+    const res = await bookingApi.createBooking(store.slug, bookingData);
+    const bookingRef = res.booking?.id || 'PENDING';
     
     // Show success
     const content = document.getElementById('bookingContent');
