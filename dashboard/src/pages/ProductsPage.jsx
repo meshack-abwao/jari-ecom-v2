@@ -335,6 +335,9 @@ export default function ProductsPage() {
         ? data.packages 
         : [{ name: '', description: '', price: '', duration: '' }],
       bookingNote: data.bookingNote || '',
+      whyChooseUs: data.whyChooseUs?.length > 0 ? data.whyChooseUs : [''],
+      whatsIncluded: data.whatsIncluded?.length > 0 ? data.whatsIncluded : [''],
+      galleryTitle: data.galleryTitle || 'Gallery',
       
       dietaryTags: data.dietaryTags || [],
       prepTime: data.prepTime || '',
