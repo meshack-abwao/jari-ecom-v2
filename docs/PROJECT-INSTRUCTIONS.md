@@ -1,8 +1,8 @@
 # Jari.Ecom V2 - Project Instructions
 
 > **Purpose:** Feed this document into a Claude Project to maintain full context across all conversations.
-> **Last Updated:** January 17, 2026
-> **Current Phase:** Building Portfolio/Booking Template + Calendar System
+> **Last Updated:** January 17, 2026 (Session 5)
+> **Current Phase:** Portfolio-Booking Template Styling + Dashboard Fields
 
 ---
 
@@ -39,263 +39,66 @@ C:\Users\ADMIN\Desktop\jari-ecom-v2\
 │   │   │   ├── orders.js
 │   │   │   ├── settings.js
 │   │   │   ├── tracking.js
-│   │   │   └── bookings.js   # Booking system API
+│   │   │   ├── public.js     # Public booking endpoints (no auth)
+│   │   │   └── bookings.js   # Booking system API (auth required)
 │   │   ├── middleware/
 │   │   └── config/
 │   └── migrations/
 │       ├── 001_initial.sql
 │       ├── 002_pixel_tracking.sql
-│       ├── 003_booking_system.sql  # ✅ RUN ON RAILWAY 2026-01-17
+│       ├── 003_booking_system.sql  # ✅ RUN ON RAILWAY
 │       └── run.js
 │
 ├── dashboard/                # React Admin Dashboard
 │   ├── src/
 │   │   ├── pages/
-│   │   │   ├── DashboardPage.jsx   # Overview/Stats
-│   │   │   ├── ProductsPage.jsx    # Product management + Templates
-│   │   │   ├── OrdersPage.jsx      # Order management
-│   │   │   ├── AdsPage.jsx         # UTM tracking + Ads
-│   │   │   ├── TemplatesPage.jsx   # Template selection
-│   │   │   ├── SettingsPage.jsx    # Store settings
-│   │   │   ├── AddOnsPage.jsx      # Premium features
-│   │   │   └── BookingsPage.jsx    # Calendar + Booking settings
+│   │   │   ├── DashboardPage.jsx
+│   │   │   ├── ProductsPage.jsx    # ✅ Portfolio-booking fields added
+│   │   │   ├── OrdersPage.jsx
+│   │   │   ├── AdsPage.jsx
+│   │   │   ├── TemplatesPage.jsx
+│   │   │   ├── SettingsPage.jsx
+│   │   │   ├── AddOnsPage.jsx
+│   │   │   └── BookingsPage.jsx    # ✅ Calendar + Settings tabs
 │   │   ├── components/
-│   │   │   ├── Layout.jsx          # Sidebar + main content
+│   │   │   ├── Layout.jsx          # ✅ Bookings in sidebar
 │   │   │   └── Sidebar.jsx
 │   │   ├── api/
-│   │   │   └── client.js           # API client (settingsAPI, productsAPI, bookingsAPI, etc.)
+│   │   │   └── client.js           # ✅ bookingsAPI added
 │   │   └── hooks/
 │   └── index.html
 │
 ├── store/                    # Public Storefront (Vanilla JS)
 │   ├── src/
-│   │   ├── main.js           # Entry point, event wiring
-│   │   ├── render.js         # Template dispatcher (imports templates)
+│   │   ├── main.js           # Entry point
+│   │   ├── render.js         # Template dispatcher
 │   │   ├── state.js          # Global state
 │   │   ├── api.js            # Store API calls
 │   │   ├── checkout.js       # Checkout modal
 │   │   ├── pixel.js          # Analytics tracking
-│   │   ├── templates/        # ⚠️ ISOLATED TEMPLATES (each has own prefix)
-│   │   │   ├── portfolioBooking.js       # pbk- prefix
-│   │   │   ├── portfolioBooking.css      # pbk- prefix
-│   │   │   └── portfolioBookingHandlers.js
-│   │   ├── booking/          # ⚠️ ISOLATED BOOKING SYSTEM (bkm- prefix)
-│   │   │   ├── bookingState.js
-│   │   │   ├── bookingModal.js
-│   │   │   ├── bookingModal.css
-│   │   │   ├── bookingApi.js
-│   │   │   └── bookingHandlers.js
+│   │   ├── templates/        # ⚠️ ISOLATED TEMPLATES
+│   │   │   ├── portfolioBooking.js       # pbk- prefix ✅
+│   │   │   ├── portfolioBooking.css      # pbk- prefix ✅
+│   │   │   └── portfolioBookingHandlers.js ✅
+│   │   ├── booking/          # ⚠️ ISOLATED BOOKING SYSTEM
+│   │   │   ├── bookingState.js    # bkm- prefix ✅
+│   │   │   ├── bookingModal.js    # bkm- prefix ✅
+│   │   │   ├── bookingModal.css   # bkm- prefix ✅
+│   │   │   ├── bookingApi.js      # ✅
+│   │   │   └── bookingHandlers.js # ✅
 │   │   └── styles/
-│   │       ├── base.css      # Core styles + imports
+│   │       ├── base.css      # Core + imports
 │   │       └── footer.css
 │   └── index.html
 │
-├── shared/                   # Shared utilities
-│
 └── docs/
-    ├── HANDOVER-CONTEXT.md
     ├── PROJECT-INSTRUCTIONS.md  # THIS FILE
     └── sales-materials/
 ```
 
 ---
 
-## 3. CRITICAL TECHNICAL PATTERNS
-
-### ⚠️ API Response Pattern (CRITICAL - Memorize This)
-```javascript
-// settingsAPI.getAll() returns store object DIRECTLY
-const response = await settingsAPI.getAll();
-const store = response.data;  // ✅ CORRECT
-const slug = store.slug;      // ✅ CORRECT
-
-// WRONG patterns that cause bugs:
-const store = response.data.store;     // ❌ WRONG
-const store = response.data.settings;  // ❌ WRONG
-```
-
-### Git Commands (Windows PowerShell)
-```powershell
-# Use semicolons, NOT &&
-cd C:\Users\ADMIN\Desktop\jari-ecom-v2; git add -A; git commit -m "message"; git push origin main
-
-# Check status + recent commits
-cd C:\Users\ADMIN\Desktop\jari-ecom-v2; git status; git log --oneline -5
-```
-
-### Railway Migration Commands
-```powershell
-# Run migration locally with Railway's public DB URL
-cd C:\Users\ADMIN\Desktop\jari-ecom-v2\api
-$env:DATABASE_PUBLIC_URL = "postgresql://postgres:PASSWORD@turntable.proxy.rlwy.net:16265/railway"
-node test-migrate.js
-```
-
-### Debug Workflow (Surgical Edits)
-1. `read_file` with offset/length to examine specific sections
-2. `edit_block` with exact old_string match for surgical changes
-3. `git commit` immediately after each fix to preserve progress
-4. Small, focused commits prevent context loss
-
-### CSS File Location
-- All storefront CSS: `store/src/styles/base.css`
-- Dashboard uses inline styles in JSX components
-
----
-
-## 4. TEMPLATE SYSTEM (THEMES)
-
-### Available Templates
-| Template | Purpose | Status |
-|----------|---------|--------|
-| **Quick Decision** | Fast impulse buys, simple products | ✅ Complete |
-| **Deep Dive** | High-value items, detailed specs | ✅ Complete |
-| **Portfolio/Booking** | Services, photographers, consultants | 🚧 Building |
-| **Showcase** | Fashion, visual products | 📋 Planned |
-| **Subscription** | Recurring services | 📋 Planned |
-| **Bundle** | Product bundles | 📋 Planned |
-
-### Deep Dive Theme - Completed Features
-- Title + Stars above image (premium typography)
-- Social icons (share/heart) bottom-right, parallel to stars
-- KES stacked on top of price (both mobile + desktop)
-- Magazine-style lightbox gallery (Apple Music/Spotify inspired)
-- Intelligent text split (light/bold word splitting)
-- Caption inside image overlay with breathing room
-- Description below caption (smallest text, 10-12px, 85% width)
-- Specifications section with breathing room
-- Sticky CTA on desktop with centered elements
-- Dashboard fields for showcase image descriptions
-
----
-
-## 5. BOOKING SYSTEM
-
-### Database Tables (Migration 003 - ✅ COMPLETE)
-```sql
--- All 5 tables created on Railway DB (2026-01-17):
-booking_settings     -- Per-store settings (slots, fees, deposits)
-working_hours        -- Day-by-day schedule (Mon-Sun)
-blocked_dates        -- Holidays, personal days
-bookings            -- Customer bookings
-service_packages    -- Package options per service
-```
-
-### Key Features
-- **Calendar picker** (storefront) - Available dates/times
-- **Working hours** - Provider sets schedule per day
-- **Slot management** - Duration, max per slot, max per day
-- **Advance booking rules** - Min notice (24hr), max advance (30 days)
-- **Jump the Line** - Premium fee to skip wait time
-- **Deposits** - Configurable percentage
-- **Inquiry fee** - Reduce tire-kickers
-- **Reminders** - SMS/WhatsApp (5hr, 2hr, 30min before)
-
-### API Endpoints (bookings.js)
-```
-GET    /bookings/settings         - Get store's booking settings
-PUT    /bookings/settings         - Update booking settings
-GET    /bookings/working-hours    - Get working hours
-PUT    /bookings/working-hours/:day - Update day's hours
-GET    /bookings/blocked-dates    - Get blocked dates
-POST   /bookings/blocked-dates    - Add blocked date
-DELETE /bookings/blocked-dates/:id - Remove blocked date
-GET    /bookings/availability     - Get available slots for date
-GET    /bookings                  - Get all bookings
-POST   /bookings                  - Create new booking
-PUT    /bookings/:id/status       - Update booking status
-```
-
-### Dashboard API Client (client.js)
-```javascript
-export const bookingsAPI = {
-  getSettings: () => api.get('/bookings/settings'),
-  updateSettings: (data) => api.put('/bookings/settings', data),
-  getWorkingHours: () => api.get('/bookings/working-hours'),
-  updateWorkingHours: (day, data) => api.put(`/bookings/working-hours/${day}`, data),
-  getBlockedDates: () => api.get('/bookings/blocked-dates'),
-  addBlockedDate: (data) => api.post('/bookings/blocked-dates', data),
-  removeBlockedDate: (id) => api.delete(`/bookings/blocked-dates/${id}`),
-  getAvailability: (date) => api.get(`/bookings/availability?date=${date}`),
-  getAll: () => api.get('/bookings'),
-  create: (data) => api.post('/bookings', data),
-  updateStatus: (id, status) => api.put(`/bookings/${id}/status`, { status })
-};
-```
-
----
-
-## 6. CURRENT BUILD STATUS
-
-### ✅ Completed (Booking System Backend)
-- [x] Migration 003_booking_system.sql - Created
-- [x] Migration 003 RUN on Railway DB - 5/5 tables confirmed
-- [x] API routes (bookings.js) - All endpoints working
-- [x] API routes registered in index.js (/api/bookings)
-- [x] Dashboard API client (bookingsAPI) in client.js
-- [x] BookingsPage.jsx - Calendar tab + Settings tab with all sections
-- [x] BookingsPage wired into App.jsx routes
-- [x] Bookings added to sidebar navigation (Calendar icon)
-
-### ❌ Not Done Yet (Storefront + Polish)
-- [ ] Test dashboard BookingsPage UI live
-- [ ] Storefront calendar picker component
-- [ ] Storefront booking checkout flow (2-4 steps)
-- [ ] Portfolio template page structure
-- [ ] Multi-select categories for products
-
-### 🎯 Immediate Next Steps
-1. **TEST** - Visit dashboard /bookings page, verify Settings tab works
-2. **BUILD** - Storefront calendar picker component
-3. **BUILD** - Booking checkout flow (Select → Date → Details → Pay)
-4. **BUILD** - Portfolio template page layout
-
----
-
-## 7. METHODOLOGY: JTBD/ODI APPROACH
-
-We use Jobs-to-be-Done (JTBD) and Outcome-Driven Innovation (ODI) frameworks.
-
-### Core Job for Portfolio/Booking Template
-**"Help service providers (photographers, consultants, trainers) get booked by clients with minimal friction"**
-
-### 8 Job Steps (ODI Framework)
-1. **Define** - Client understands what service is offered
-2. **Locate** - Client finds the right package/option
-3. **Prepare** - Client gathers info needed to book
-4. **Confirm** - Client selects date/time
-5. **Execute** - Client completes booking/payment
-6. **Monitor** - Client receives confirmation + reminders
-7. **Modify** - Client can reschedule if needed
-8. **Conclude** - Service delivered, review requested
-
-### Checkout Flow (2-4 Steps Max)
-```
-Step 1: Select Service/Package
-Step 2: Pick Date & Time (Calendar)
-Step 3: Your Details (Name, Phone, Notes)
-Step 4: Pay (Deposit/Full) OR Inquire (WhatsApp)
-```
-
----
-
-## 8. CATEGORIES STRATEGY
-
-Categories remain as-is (working system, don't break it).
-
-### Current Behavior
-- Provider creates categories in dashboard
-- Categories filter products/services on collection page
-- Each product has single category
-
-### Enhancement: Multi-Select Categories
-- Allow multiple categories per service
-- "Wedding Photography" appears in BOTH "Weddings" AND "Outdoor" filters
-- Implementation: Add `categories` array to products.data JSONB
-
----
-
-## 9. ⛔ CRITICAL RULES - DO NOT VIOLATE
+## 3. ⛔ CRITICAL RULES - DO NOT VIOLATE
 
 ### Rule 1: Template Isolation (MOST IMPORTANT)
 **Each template MUST be completely isolated:**
@@ -309,15 +112,15 @@ Categories remain as-is (working system, don't break it).
 
 ### Rule 2: CSS Class Naming Convention
 ```
-Template prefixes:
-- portfolio-booking: pbk-
-- deep-dive: ddv-
-- quick-decision: qkd-
-- visual-menu: vmn-
-- event-landing: evt-
+Template prefixes (MANDATORY):
+- portfolio-booking: pbk-   ✅ DONE
+- deep-dive: ddv-           ❌ NEEDS ISOLATION
+- quick-decision: qkd-      ❌ NEEDS ISOLATION
+- visual-menu: vmn-         ❌ NEEDS ISOLATION
+- event-landing: evt-       ❌ NEEDS ISOLATION
 
-Booking system: bkm-
-Checkout system: chk-
+Booking system: bkm-        ✅ DONE
+Checkout system: chk-       ❌ NEEDS ISOLATION
 ```
 
 ### Rule 3: Surgical Commits
@@ -335,37 +138,175 @@ Checkout system: chk-
 - Test each phase before moving to next
 - Don't build 5 features then test 1
 
+### Rule 6: Read Before Writing
+- Always `read_file` to see current state first
+- Never assume file contents from memory
+- Context can be lost mid-session
+
 ---
 
-## 10. DEBUG FORMULAS (Lessons Learned)
+## 4. TEMPLATE ISOLATION STATUS
+
+| Template | Isolated? | Prefix | Location | Priority |
+|----------|-----------|--------|----------|----------|
+| portfolio-booking | ✅ Yes | `pbk-` | `templates/portfolioBooking.*` | - |
+| booking-modal | ✅ Yes | `bkm-` | `booking/bookingModal.*` | - |
+| deep-dive | ❌ No | needs `ddv-` | `render.js` line ~466 | HIGH |
+| quick-decision | ❌ No | needs `qkd-` | `render.js` line ~265 | MEDIUM |
+| visual-menu | ❌ No | needs `vmn-` | `render.js` line ~326 | LOW |
+| event-landing | ❌ No | needs `evt-` | `render.js` line ~674 | LOW |
+
+**⚠️ BEFORE editing any non-isolated template:**
+1. Create folder: `store/src/templates/{templateName}/`
+2. Extract JS to: `{templateName}.js`
+3. Extract CSS to: `{templateName}.css` with prefix
+4. Create handlers: `{templateName}Handlers.js`
+5. Import in `render.js` and `base.css`
+6. Test thoroughly before continuing
+
+---
+
+## 5. CURRENT SESSION STATUS (Jan 17, 2026 - Session 5)
+
+### ✅ Completed This Session
+
+**Portfolio-Booking Template Styling:**
+1. `eef84b1` - CTA glass style (Deep Dive match)
+2. `0911b0b` - Header typography (32px title, Apple-style buttons)
+3. `db481da` - Hero caption overlay (magazine style)
+4. `b871f06` - Stories gradient rings + theme colors
+
+**Dashboard Form Fields:**
+5. `4bcaa77` - Gallery fallback + Why Choose Us + What's Included sections
+6. `ea6961a` - Form data fields (whyChooseUs, whatsIncluded, galleryTitle)
+7. `2bc239b` - UI input fields for new sections
+8. `f4b421b` - Load fields when editing product
+9. `16eaad9` - Enable showcase gallery (with captions) for portfolio-booking
+
+### 🐛 Known Bugs to Debug (Next Session)
+- Gallery section may not render if no showcaseImages
+- Lightbox functionality needs testing
+- Hero image captions need storefront rendering
+- Booking modal flow not fully tested
+
+### 📋 TODO (Next Session Priority)
+1. **Debug** - Test gallery rendering with showcaseImages
+2. **Debug** - Verify lightbox works on gallery tap
+3. **Debug** - Test booking modal opens and loads settings
+4. **Build** - Storefront calendar picker component
+5. **Build** - Complete booking checkout flow
+
+---
+
+## 6. PORTFOLIO-BOOKING TEMPLATE STRUCTURE
+
+### Data Fields (ProductsPage.jsx)
+```javascript
+// In getInitialFormData():
+packages: [{ name: '', description: '', price: '', duration: '' }],
+bookingNote: '',
+whyChooseUs: [''],      // ✅ Array of reasons
+whatsIncluded: [''],    // ✅ Array of items
+galleryTitle: 'Gallery', // ✅ Section title
+
+// In media:
+showcaseImages: [{ url: '', caption: '', description: '' }], // ✅ From deep-dive
+```
+
+### Storefront Sections (portfolioBooking.js)
+```
+1. Header (title, stars, share/heart)
+2. Hero Media (carousel with caption overlay)
+3. Intro (starting price, description)
+4. Stories (horizontal scroll circles)
+5. Gallery (masonry grid → lightbox)
+6. Why Choose Us (reasons list)
+7. Packages (cards with select buttons)
+8. What's Included (checklist)
+9. Testimonials (cards grid)
+10. Booking Note (info text)
+11. Sticky CTA (glass style, book + WhatsApp)
+```
+
+### CSS Classes (pbk- prefix)
+```css
+.pbk-container, .pbk-header, .pbk-title, .pbk-meta
+.pbk-hero, .pbk-hero-image, .pbk-hero-caption
+.pbk-stories, .pbk-story, .pbk-story-ring
+.pbk-gallery, .pbk-gallery-grid, .pbk-gallery-item
+.pbk-lightbox, .pbk-lightbox-content
+.pbk-why-choose, .pbk-why-item
+.pbk-packages, .pbk-package, .pbk-package-btn
+.pbk-whats-included, .pbk-included-item
+.pbk-testimonials, .pbk-testimonial
+.pbk-sticky-cta, .pbk-cta-glass
+```
+
+---
+
+## 7. BOOKING SYSTEM STATUS
+
+### Backend (✅ Complete)
+- Migration 003 run on Railway
+- 5 tables: booking_settings, working_hours, blocked_dates, bookings, service_packages
+- API routes: /api/bookings/* (authenticated)
+- Public routes: /api/public/:slug/booking/* (no auth)
+
+### Dashboard (✅ Complete)
+- BookingsPage.jsx with Calendar + Settings tabs
+- Working hours toggles per day
+- Blocked dates management
+- Slot settings (duration, max per slot/day)
+- Advance booking rules
+- Deposit and inquiry fee settings
+
+### Storefront (🚧 Partial)
+- bookingState.js ✅
+- bookingModal.js ✅ (4-step flow structure)
+- bookingModal.css ✅ (bkm- prefix)
+- bookingApi.js ✅
+- bookingHandlers.js ✅
+- **NOT TESTED** - Needs live testing
+
+---
+
+## 8. API RESPONSE PATTERNS
+
+### ⚠️ Critical - Memorize This
+```javascript
+// settingsAPI.getAll() returns store object DIRECTLY
+const response = await settingsAPI.getAll();
+const store = response.data;  // ✅ CORRECT
+const slug = store.slug;      // ✅ CORRECT
+
+// WRONG patterns that cause bugs:
+const store = response.data.store;     // ❌ WRONG
+const store = response.data.settings;  // ❌ WRONG
+```
+
+---
+
+## 9. DEBUG FORMULAS
 
 ### Formula 1: API Response Structure
 **Problem:** `Cannot read property 'slug' of undefined`
-**Cause:** Accessing `response.data.store.slug` instead of `response.data.slug`
 **Fix:** API returns store object directly at `response.data`
 
 ### Formula 2: CSS Parse Errors
 **Problem:** Build fails with CSS syntax error
-**Cause:** Orphaned CSS rules from incomplete edits
 **Fix:** Search for orphaned selectors, remove duplicates
 
-### Formula 3: Mobile Layout Breaking
-**Problem:** Cards overlap, horizontal scroll appears
-**Cause:** CSS Grid doesn't stack properly on mobile
-**Fix:** Use flexbox with `flex-direction: column` for mobile
+### Formula 3: Template Contamination
+**Problem:** Editing one template breaks another
+**Fix:** Isolate templates with unique CSS prefixes
 
-### Formula 4: Z-Index Issues
-**Problem:** Dropdowns hidden behind other elements
-**Fix:** Use `z-index: 9999` for dropdowns/modals
+### Formula 4: Context Loss Recovery
+**Problem:** Claude loses context mid-session
+**Fix:** Check `git log --oneline -20`, read recent commits, reference this doc
 
 ### Formula 5: Git on Windows
 **Problem:** Commands fail with `&&`
-**Fix:** Use semicolons instead: `cd path; git add -A; git commit -m "msg"`
-
-### Formula 6: Railway Migration
-**Problem:** `getaddrinfo ENOTFOUND postgres.railway.internal`
-**Cause:** Using internal URL from outside Railway network
-**Fix:** Use DATABASE_PUBLIC_URL for local migrations
+**Fix:** Use semicolons: `cd path; git add -A; git commit -m "msg"`
 
 ---
 
@@ -373,114 +314,77 @@ Checkout system: chk-
 
 | Environment | URL |
 |-------------|-----|
-| Dashboard (Netlify) | https://jari-dashboard.netlify.app |
-| Store (Netlify) | https://jari-store.netlify.app |
-| API (Railway) | https://jari-api-production.up.railway.app |
-| GitHub Repo | https://github.com/meshack-abwao/jari-ecom-v2 |
+| Dashboard | https://jari-dashboard.netlify.app |
+| Store | https://jari-store.netlify.app |
+| API | https://jari-api-production.up.railway.app |
+| GitHub | https://github.com/meshack-abwao/jari-ecom-v2 |
 
 ---
 
-## 11. TEMPLATE ISOLATION STATUS
-
-| Template | Isolated? | Prefix | Location |
-|----------|-----------|--------|----------|
-| portfolio-booking | ✅ Yes | `pbk-` | `templates/portfolioBooking.js` |
-| deep-dive | ❌ No | needs `ddv-` | Still in `render.js` line 466 |
-| quick-decision | ❌ No | needs `qkd-` | Still in `render.js` line 265 |
-| visual-menu | ❌ No | needs `vmn-` | Still in `render.js` line 326 |
-| event-landing | ❌ No | needs `evt-` | Still in `render.js` line 674 |
-
-**TODO:** When editing any non-isolated template, first extract to own folder with unique prefix.
-
----
-
-## 12. COMMIT HISTORY (Recent)
+## 11. RECENT COMMITS
 
 ```
-e8ed828 🔧 Ensure booking modal CSS import in base.css
+16eaad9 ✨ Dashboard: Enable showcase gallery (with captions) for portfolio-booking
+f4b421b 🔧 Dashboard: Load whyChooseUs, whatsIncluded, galleryTitle when editing
+2bc239b ✨ Dashboard: Add UI fields for galleryTitle, whyChooseUs, whatsIncluded
+ea6961a ✨ Dashboard: Add whyChooseUs, whatsIncluded, galleryTitle to form data
+4bcaa77 ✨ PBK: Gallery fallback to images, add Why Choose Us + Whats Included
+b871f06 🎨 PBK Stories: Theme gradient rings, centered layout
+db481da ✨ PBK Hero: Caption overlay on images (magazine style)
+0911b0b 🎨 PBK Header: Deep Dive typography (32px title, Apple-style buttons)
+eef84b1 🎨 PBK CTA: Glass style matching Deep Dive
+93c7345 📚 Update PROJECT-INSTRUCTIONS
+e8ed828 🔧 Ensure booking modal CSS import
 9ba957c ✨ Add booking modal: handlers + CSS (bkm- prefix)
 eac0d17 ✨ Add booking modal: state + render (4-step flow)
 f881da8 ✨ Add public booking API endpoints
-7bae830 🐛 Fix BookingsPage: Expand sections by default
-d07daa1 ✨ Add portfolioBookingHandlers.js
-5165fe5 ✨ Collection cards: portfolio-booking shows 'From KES X' + 'View →'
-ddb0e83 🔌 Wire portfolioBooking template
-7db5c3a ✨ Add isolated portfolioBooking.css (pbk- prefix)
-a357457 ✨ Add isolated portfolioBooking.js template
-753720c 🔄 Revert storefront to b847622: Clean slate after CSS disaster
 ```
 
 ---
 
-## 13. WORKING WITH CLAUDE
-
-### Preferred Workflow
-1. **Read before editing** - Always `read_file` to see current state
-2. **Surgical edits** - Small, focused changes with `edit_block`
-3. **Commit often** - After each successful change
-4. **Test incrementally** - Don't build 5 features before testing 1
-
-### When Context is Lost
-1. Check git log: `git log --oneline -20`
-2. Read recent files to recover state
-3. Reference this document for architecture
-4. Continue from last commit
-
-### File Editing Commands
-```javascript
-// Read specific section
-read_file(path, { offset: 100, length: 50 })
-
-// Surgical edit (exact string match required)
-edit_block(path, { old_string: "exact match", new_string: "replacement" })
-
-// Search for patterns
-start_search(path, { pattern: "searchTerm", searchType: "content" })
-```
-
----
-
-## 13. QUICK REFERENCE
-
-### Key Files to Know
-| File | Purpose |
-|------|---------|
-| `api/src/routes/bookings.js` | Booking API endpoints |
-| `api/src/routes/index.js` | Route registration (bookings at /api/bookings) |
-| `api/migrations/003_booking_system.sql` | Booking tables (RUN ✅) |
-| `dashboard/src/pages/BookingsPage.jsx` | Booking dashboard UI |
-| `dashboard/src/api/client.js` | API client (all endpoints) |
-| `dashboard/src/App.jsx` | React routing (bookings route added) |
-| `dashboard/src/components/Layout.jsx` | Sidebar navigation (Bookings link added) |
-| `store/src/render.js` | Storefront template rendering |
-| `store/src/styles/base.css` | All storefront CSS |
-
-### Common Tasks
-```powershell
-# Check project status
-cd C:\Users\ADMIN\Desktop\jari-ecom-v2; git status; git log --oneline -5
-
-# Commit changes
-cd C:\Users\ADMIN\Desktop\jari-ecom-v2; git add -A; git commit -m "message"; git push origin main
-
-# Run migration locally (use PUBLIC URL)
-cd C:\Users\ADMIN\Desktop\jari-ecom-v2\api
-$env:DATABASE_PUBLIC_URL = "postgresql://postgres:PASSWORD@turntable.proxy.rlwy.net:16265/railway"
-node test-migrate.js
-```
-
----
-
-## 14. NEXT SESSION CHECKLIST
+## 12. NEXT SESSION CHECKLIST
 
 When starting a new chat:
-1. ✅ Confirm access to Desktop Commander / Filesystem tools
-2. ✅ Run `git log --oneline -10` to see latest commits
-3. ✅ Reference this document for architecture
-4. ✅ Continue from "Immediate Next Steps" section
 
-### Current Priority:
-**Test BookingsPage in dashboard, then build storefront booking flow**
+1. **Confirm tools available**
+   - Desktop Commander OR Filesystem tools
+   - Git access
+
+2. **Check current state**
+   ```powershell
+   cd C:\Users\ADMIN\Desktop\jari-ecom-v2
+   git log --oneline -10
+   git status
+   ```
+
+3. **Review this document** for:
+   - Current phase and status
+   - Known bugs to debug
+   - TODO priorities
+
+4. **Priority order:**
+   - Debug existing features first
+   - Test before building more
+   - Isolate templates before editing
+
+---
+
+## 13. KEY FILES REFERENCE
+
+| File | Purpose |
+|------|---------|
+| `store/src/templates/portfolioBooking.js` | PBK template render |
+| `store/src/templates/portfolioBooking.css` | PBK styles (pbk-) |
+| `store/src/templates/portfolioBookingHandlers.js` | PBK event handlers |
+| `store/src/booking/bookingModal.js` | Booking modal (bkm-) |
+| `store/src/booking/bookingHandlers.js` | Booking event handlers |
+| `store/src/render.js` | Template dispatcher |
+| `store/src/styles/base.css` | Core CSS + imports |
+| `dashboard/src/pages/ProductsPage.jsx` | Product form fields |
+| `dashboard/src/pages/BookingsPage.jsx` | Booking settings UI |
+| `dashboard/src/api/client.js` | All API clients |
+| `api/src/routes/public.js` | Public booking endpoints |
+| `api/src/routes/bookings.js` | Auth'd booking endpoints |
 
 ---
 
