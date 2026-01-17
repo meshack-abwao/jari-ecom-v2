@@ -38,14 +38,15 @@ export default function BookingsPage() {
   
   // UI state
   const [savingSettings, setSavingSettings] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
   const [expandedSections, setExpandedSections] = useState({
     schedule: true,
-    slots: false,
-    advance: false,
+    slots: true,
+    advance: true,
     premium: false,
     payment: false,
     reminders: false,
-    blocked: false
+    blocked: true
   });
 
   const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -80,11 +81,14 @@ export default function BookingsPage() {
 
   const saveSettings = async () => {
     setSavingSettings(true);
+    setSaveSuccess(false);
     try {
       await bookingsAPI.updateSettings(settings);
-      // Show success toast or notification
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
     } catch (error) {
       console.error('Failed to save settings:', error);
+      alert('Failed to save settings. Please try again.');
     } finally {
       setSavingSettings(false);
     }
@@ -92,13 +96,20 @@ export default function BookingsPage() {
 
   const updateWorkingHour = async (day, field, value) => {
     const existingHour = workingHours.find(h => h.day_of_week === day);
-    const newData = { ...existingHour, [field]: value };
+    const defaultHour = { day_of_week: day, is_open: false, start_time: '09:00', end_time: '17:00' };
+    const currentHour = existingHour || defaultHour;
+    const newData = { ...currentHour, [field]: value };
     
     try {
-      await bookingsAPI.updateWorkingHours(day, newData);
-      setWorkingHours(prev => 
-        prev.map(h => h.day_of_week === day ? { ...h, [field]: value } : h)
-      );
+      const result = await bookingsAPI.updateWorkingHours(day, newData);
+      if (existingHour) {
+        setWorkingHours(prev => 
+          prev.map(h => h.day_of_week === day ? { ...h, ...result.data } : h)
+        );
+      } else {
+        // New entry created
+        setWorkingHours(prev => [...prev, result.data]);
+      }
     } catch (error) {
       console.error('Failed to update working hours:', error);
     }
@@ -674,9 +685,16 @@ export default function BookingsPage() {
       </Section>
 
       {/* Save Button */}
-      <button style={styles.saveButton} onClick={saveSettings} disabled={savingSettings}>
+      <button 
+        style={{
+          ...styles.saveButton,
+          ...(saveSuccess ? { background: '#10b981' } : {})
+        }} 
+        onClick={saveSettings} 
+        disabled={savingSettings}
+      >
         {savingSettings ? <RefreshCw size={16} className="spin" /> : <Check size={16} />}
-        {savingSettings ? 'Saving...' : 'Save Settings'}
+        {savingSettings ? 'Saving...' : saveSuccess ? 'Saved!' : 'Save Settings'}
       </button>
     </div>
   );
