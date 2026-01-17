@@ -5,14 +5,24 @@
 import { state } from '../state.js';
 
 let currentImageIndex = 0;
-let images = [];
+let heroImages = []; // Store image objects with captions
 
 // Initialize handlers when template loads
 export function initPortfolioBookingHandlers() {
   const product = state.currentProduct;
   if (!product) return;
   
-  images = product.media?.images || [];
+  // Load hero images with captions
+  const heroDataEl = document.getElementById('pbkHeroData');
+  if (heroDataEl) {
+    try {
+      heroImages = JSON.parse(heroDataEl.textContent);
+    } catch (e) {
+      heroImages = (product.media?.images || []).map(url => ({ url, caption: '' }));
+    }
+  } else {
+    heroImages = (product.media?.images || []).map(url => ({ url, caption: '' }));
+  }
   currentImageIndex = 0;
   
   // Gallery navigation
@@ -57,15 +67,27 @@ export function initPortfolioBookingHandlers() {
 
 // Gallery navigation
 function navigateGallery(direction) {
-  if (images.length <= 1) return;
-  currentImageIndex = (currentImageIndex + direction + images.length) % images.length;
+  if (heroImages.length <= 1) return;
+  currentImageIndex = (currentImageIndex + direction + heroImages.length) % heroImages.length;
   goToImage(currentImageIndex);
 }
 
 function goToImage(index) {
   currentImageIndex = index;
+  const img = heroImages[index];
+  
+  // Update image
   const mainImg = document.getElementById('pbkMainImage');
-  if (mainImg) mainImg.src = images[index];
+  if (mainImg) mainImg.src = img.url || img;
+  
+  // Update caption
+  const captionEl = document.getElementById('pbkHeroCaption');
+  const overlayEl = document.getElementById('pbkHeroOverlay');
+  if (captionEl && overlayEl) {
+    const caption = img.caption || '';
+    captionEl.textContent = caption;
+    overlayEl.style.display = caption ? '' : 'none';
+  }
   
   // Update dots
   document.querySelectorAll('.pbk-dot').forEach((dot, i) => {

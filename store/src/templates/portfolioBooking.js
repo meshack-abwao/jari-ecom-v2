@@ -94,15 +94,28 @@ function renderPbkStars(rating) {
 }
 
 function renderPbkHero(media) {
-  const images = media.images || [];
+  // Use showcaseImages if available (has captions), fallback to images
+  const showcaseImages = media.showcaseImages || [];
+  const regularImages = media.images || [];
+  
+  // Prefer showcaseImages for caption support
+  const hasShowcase = showcaseImages.length > 0;
+  const images = hasShowcase ? showcaseImages : regularImages.map(url => ({ url, caption: '' }));
+  
   if (images.length === 0) {
     return `<div class="pbk-hero-placeholder">📷</div>`;
   }
   
-  const mainImage = images[0];
+  const firstImg = hasShowcase ? images[0].url : images[0];
+  const firstCaption = hasShowcase ? images[0].caption : '';
+  
   return `
     <div class="pbk-hero-image">
-      <img src="${mainImage}" alt="Service" id="pbkMainImage">
+      <img src="${firstImg}" alt="Service" id="pbkMainImage">
+      <!-- Caption Overlay -->
+      <div class="pbk-hero-overlay" id="pbkHeroOverlay" ${firstCaption ? '' : 'style="display:none"'}>
+        <span class="pbk-hero-caption" id="pbkHeroCaption">${firstCaption || ''}</span>
+      </div>
       ${images.length > 1 ? `
         <div class="pbk-hero-nav">
           <button class="pbk-nav-btn" id="pbkPrevImg">‹</button>
@@ -113,6 +126,8 @@ function renderPbkHero(media) {
         </div>
       ` : ''}
     </div>
+    <!-- Store image data for JS -->
+    <script id="pbkHeroData" type="application/json">${JSON.stringify(images.map(img => hasShowcase ? img : { url: img, caption: '' }))}</script>
   `;
 }
 

@@ -118,6 +118,32 @@
   display: block;
 }
 
+/* Hero Caption Overlay - Magazine style (like Deep Dive lightbox) */
+.pbk-hero-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 40px 20px 20px;
+  background: linear-gradient(transparent, rgba(0,0,0,0.7));
+  pointer-events: none;
+}
+
+.pbk-hero-caption {
+  display: block;
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  line-height: 1.3;
+}
+
+@media (min-width: 768px) {
+  .pbk-hero-caption {
+    font-size: 22px;
+  }
+}
+
 .pbk-hero-placeholder {
   width: 100%;
   aspect-ratio: 4/3;
