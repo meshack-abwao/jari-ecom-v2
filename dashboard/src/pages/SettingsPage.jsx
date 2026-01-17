@@ -115,7 +115,7 @@ export default function SettingsPage() {
       if (store?.slug) {
         const baseUrl = window.location.hostname === 'localhost' 
           ? 'http://localhost:5173' 
-          : 'https://jariecomstore.netlify.app';
+          : 'https://jariecommstore.netlify.app';
         setStoreUrl(`${baseUrl}?store=${store.slug}`);
       }
     } catch (error) { 
