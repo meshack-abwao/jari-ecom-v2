@@ -69,10 +69,25 @@ C:\Users\ADMIN\Desktop\jari-ecom-v2\
 │
 ├── store/                    # Public Storefront (Vanilla JS)
 │   ├── src/
-│   │   ├── render.js         # Main rendering engine (all templates)
-│   │   ├── styles/
-│   │   │   └── base.css      # All CSS including templates
-│   │   └── utils/
+│   │   ├── main.js           # Entry point, event wiring
+│   │   ├── render.js         # Template dispatcher (imports templates)
+│   │   ├── state.js          # Global state
+│   │   ├── api.js            # Store API calls
+│   │   ├── checkout.js       # Checkout modal
+│   │   ├── pixel.js          # Analytics tracking
+│   │   ├── templates/        # ⚠️ ISOLATED TEMPLATES (each has own prefix)
+│   │   │   ├── portfolioBooking.js       # pbk- prefix
+│   │   │   ├── portfolioBooking.css      # pbk- prefix
+│   │   │   └── portfolioBookingHandlers.js
+│   │   ├── booking/          # ⚠️ ISOLATED BOOKING SYSTEM (bkm- prefix)
+│   │   │   ├── bookingState.js
+│   │   │   ├── bookingModal.js
+│   │   │   ├── bookingModal.css
+│   │   │   ├── bookingApi.js
+│   │   │   └── bookingHandlers.js
+│   │   └── styles/
+│   │       ├── base.css      # Core styles + imports
+│   │       └── footer.css
 │   └── index.html
 │
 ├── shared/                   # Shared utilities
@@ -280,7 +295,49 @@ Categories remain as-is (working system, don't break it).
 
 ---
 
-## 9. DEBUG FORMULAS (Lessons Learned)
+## 9. ⛔ CRITICAL RULES - DO NOT VIOLATE
+
+### Rule 1: Template Isolation (MOST IMPORTANT)
+**Each template MUST be completely isolated:**
+- Own folder: `store/src/templates/{templateName}/`
+- Own CSS file with UNIQUE prefix (e.g., `pbk-`, `ddv-`, `qkd-`)
+- Own handlers file
+- NEVER share CSS class names between templates
+- NEVER edit one template and affect another
+
+**Why:** We nearly destroyed the entire storefront by using shared class names. Deep Dive template broke completely when editing Portfolio-Booking because they shared `.product-name`, `.package-card`, etc.
+
+### Rule 2: CSS Class Naming Convention
+```
+Template prefixes:
+- portfolio-booking: pbk-
+- deep-dive: ddv-
+- quick-decision: qkd-
+- visual-menu: vmn-
+- event-landing: evt-
+
+Booking system: bkm-
+Checkout system: chk-
+```
+
+### Rule 3: Surgical Commits
+- Commit after EVERY successful change
+- Small, focused commits (1-3 files max)
+- Push after every 2-3 commits
+- This prevents losing work on context loss/crashes
+
+### Rule 4: Never Overwrite Entire Files
+- Always use `edit_block` for surgical edits
+- Never `write_file` to replace an entire working file
+- This caused CSS to be wiped (3000+ lines lost)
+
+### Rule 5: Test Before Adding More Features
+- Test each phase before moving to next
+- Don't build 5 features then test 1
+
+---
+
+## 10. DEBUG FORMULAS (Lessons Learned)
 
 ### Formula 1: API Response Structure
 **Problem:** `Cannot read property 'slug' of undefined`
@@ -323,22 +380,39 @@ Categories remain as-is (working system, don't break it).
 
 ---
 
-## 11. COMMIT HISTORY (Recent)
+## 11. TEMPLATE ISOLATION STATUS
+
+| Template | Isolated? | Prefix | Location |
+|----------|-----------|--------|----------|
+| portfolio-booking | ✅ Yes | `pbk-` | `templates/portfolioBooking.js` |
+| deep-dive | ❌ No | needs `ddv-` | Still in `render.js` line 466 |
+| quick-decision | ❌ No | needs `qkd-` | Still in `render.js` line 265 |
+| visual-menu | ❌ No | needs `vmn-` | Still in `render.js` line 326 |
+| event-landing | ❌ No | needs `evt-` | Still in `render.js` line 674 |
+
+**TODO:** When editing any non-isolated template, first extract to own folder with unique prefix.
+
+---
+
+## 12. COMMIT HISTORY (Recent)
 
 ```
-a3f23d5 📚 Update PROJECT-INSTRUCTIONS: Mark wiring complete, update commits
-051e9a1 🐛 Fix BookingsPage: Add missing main render with tabs (Calendar/Settings)
-d9563f5 🔌 Wire BookingsPage: Add route to App.jsx + Bookings nav in sidebar
-b85b111 📚 Add comprehensive PROJECT-INSTRUCTIONS.md for Claude Project context
-e4d0e78 ✨ Add bookingsAPI client for dashboard
-76ffb75 ✨ Add booking API routes: settings, working hours, blocked dates, availability, create booking
-105ba88 ✨ Add booking system migration: booking_settings, working_hours, blocked_dates, bookings, service_packages
-8372be4 🎨 Lightbox description: Smaller text (10-12px), 85% width for design balance
+e8ed828 🔧 Ensure booking modal CSS import in base.css
+9ba957c ✨ Add booking modal: handlers + CSS (bkm- prefix)
+eac0d17 ✨ Add booking modal: state + render (4-step flow)
+f881da8 ✨ Add public booking API endpoints
+7bae830 🐛 Fix BookingsPage: Expand sections by default
+d07daa1 ✨ Add portfolioBookingHandlers.js
+5165fe5 ✨ Collection cards: portfolio-booking shows 'From KES X' + 'View →'
+ddb0e83 🔌 Wire portfolioBooking template
+7db5c3a ✨ Add isolated portfolioBooking.css (pbk- prefix)
+a357457 ✨ Add isolated portfolioBooking.js template
+753720c 🔄 Revert storefront to b847622: Clean slate after CSS disaster
 ```
 
 ---
 
-## 12. WORKING WITH CLAUDE
+## 13. WORKING WITH CLAUDE
 
 ### Preferred Workflow
 1. **Read before editing** - Always `read_file` to see current state
