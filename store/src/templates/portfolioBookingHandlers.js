@@ -90,22 +90,34 @@ function goToImage(index) {
   
   // Update caption with intelligent text splitting (like Deep Dive lightbox)
   const captionEl = document.getElementById('pbkHeroCaption');
+  const descEl = document.getElementById('pbkHeroDesc');
   const overlayEl = document.getElementById('pbkHeroOverlay');
   if (captionEl && overlayEl) {
     const caption = img.caption || '';
-    if (caption) {
-      const words = caption.split(' ');
-      if (words.length > 1) {
-        // Split text: first word(s) lighter, last word bold
-        const lastWord = words.pop();
-        const firstPart = words.join(' ');
-        captionEl.innerHTML = `<span class="caption-light">${firstPart}</span> <span class="caption-bold">${lastWord}</span>`;
+    const description = img.description || '';
+    
+    if (caption || description) {
+      // Caption with text split
+      if (caption) {
+        const words = caption.split(' ');
+        if (words.length > 1) {
+          const lastWord = words.pop();
+          const firstPart = words.join(' ');
+          captionEl.innerHTML = `<span class="caption-light">${firstPart}</span> <span class="caption-bold">${lastWord}</span>`;
+        } else {
+          captionEl.textContent = caption;
+        }
       } else {
-        captionEl.textContent = caption;
+        captionEl.textContent = '';
       }
+      
+      // Description
+      if (descEl) descEl.textContent = description;
+      
       overlayEl.style.display = '';
     } else {
       captionEl.textContent = '';
+      if (descEl) descEl.textContent = '';
       overlayEl.style.display = 'none';
     }
   }

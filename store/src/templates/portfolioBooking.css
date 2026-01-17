@@ -105,48 +105,63 @@
   margin-bottom: var(--space-xl);
 }
 
+/* Hero image card - FIXED size, image fills inside */
 .pbk-hero-image {
   position: relative;
   border-radius: var(--radius);
   overflow: hidden;
   background: var(--bg-gray);
+  height: 340px;  /* Fixed height - image adapts to this */
 }
 
 .pbk-hero-image img {
   width: 100%;
-  height: auto;
-  min-height: 280px;
-  max-height: 450px;
-  object-fit: cover;
+  height: 100%;
+  object-fit: cover;  /* Fill container, crop if needed */
+  object-position: center;
   display: block;
 }
 
 @media (min-width: 768px) {
-  .pbk-hero-image img {
-    min-height: 350px;
-    max-height: 500px;
+  .pbk-hero-image {
+    height: 420px;  /* Taller on desktop */
   }
 }
 
-/* Hero Caption Overlay - Magazine style with intelligent text split */
+@media (min-width: 1024px) {
+  .pbk-hero-image {
+    height: 480px;  /* Even taller on large screens */
+  }
+}
+
+/* Hero Caption Overlay - Magazine style, rule of thirds positioning */
 .pbk-hero-overlay {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 60px var(--space-xl) var(--space-xl);
-  background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 60%, transparent 100%);
+  padding: 80px var(--space-2xl) var(--space-2xl);
+  background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.4) 50%, transparent 100%);
   pointer-events: none;
 }
 
 .pbk-hero-caption {
   display: block;
-  font-size: clamp(20px, 5vw, 28px);
+  font-size: clamp(18px, 5vw, 26px);
   font-weight: 500;
   color: #fff;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.4);
-  line-height: 1.2;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.5);
+  line-height: 1.25;
   letter-spacing: -0.02em;
+  margin-bottom: var(--space-sm);
+}
+
+/* Hero description - smaller, below caption */
+.pbk-hero-description {
+  font-size: var(--fs-small);
+  color: rgba(255,255,255,0.75);
+  line-height: 1.5;
+  max-width: 80%;
 }
 
 /* Intelligent text splitting - matches Deep Dive lightbox */
@@ -162,8 +177,17 @@
 }
 
 @media (min-width: 768px) {
+  .pbk-hero-overlay {
+    padding: 100px var(--space-3xl) var(--space-3xl);
+  }
+  
   .pbk-hero-caption {
-    font-size: clamp(24px, 4vw, 36px);
+    font-size: clamp(22px, 4vw, 32px);
+  }
+  
+  .pbk-hero-description {
+    font-size: var(--fs-body-sm);
+    max-width: 70%;
   }
 }
 

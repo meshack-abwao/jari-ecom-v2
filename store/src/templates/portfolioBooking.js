@@ -121,21 +121,23 @@ function renderPbkHero(media) {
   
   // Prefer showcaseImages for caption support
   const hasShowcase = showcaseImages.length > 0;
-  const images = hasShowcase ? showcaseImages : regularImages.map(url => ({ url, caption: '' }));
+  const images = hasShowcase ? showcaseImages : regularImages.map(url => ({ url, caption: '', description: '' }));
   
   if (images.length === 0) {
     return `<div class="pbk-hero-placeholder">📷</div>`;
   }
   
   const firstImg = hasShowcase ? images[0].url : images[0];
-  const firstCaption = hasShowcase ? images[0].caption : '';
+  const firstCaption = hasShowcase ? (images[0].caption || '') : '';
+  const firstDesc = hasShowcase ? (images[0].description || '') : '';
   
   return `
     <div class="pbk-hero-image">
       <img src="${firstImg}" alt="Service" id="pbkMainImage">
-      <!-- Caption Overlay with intelligent text split -->
-      <div class="pbk-hero-overlay" id="pbkHeroOverlay" ${firstCaption ? '' : 'style="display:none"'}>
+      <!-- Caption Overlay with intelligent text split + description -->
+      <div class="pbk-hero-overlay" id="pbkHeroOverlay" ${(firstCaption || firstDesc) ? '' : 'style="display:none"'}>
         <span class="pbk-hero-caption" id="pbkHeroCaption">${splitCaptionText(firstCaption)}</span>
+        <p class="pbk-hero-description" id="pbkHeroDesc">${firstDesc}</p>
       </div>
       ${images.length > 1 ? `
         <div class="pbk-hero-nav">
@@ -148,7 +150,7 @@ function renderPbkHero(media) {
       ` : ''}
     </div>
     <!-- Store image data for JS -->
-    <script id="pbkHeroData" type="application/json">${JSON.stringify(images.map(img => hasShowcase ? img : { url: img, caption: '' }))}</script>
+    <script id="pbkHeroData" type="application/json">${JSON.stringify(images.map(img => hasShowcase ? img : { url: img, caption: '', description: '' }))}</script>
   `;
 }
 
