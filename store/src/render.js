@@ -159,6 +159,14 @@ function renderProductCard(product) {
   const price = data.price || 0;
   const description = data.description || '';
   const name = data.name || 'Product';
+  const template = product.template || 'quick-decision';
+  
+  // Portfolio-booking: show "From" price and "View" button
+  const isPortfolio = template === 'portfolio-booking';
+  const packages = data.packages || [];
+  const startingPrice = isPortfolio && packages.length > 0
+    ? Math.min(...packages.map(p => parseInt(p.price || 0)))
+    : parseInt(price);
   
   // Build gallery HTML
   const hasMultiple = cardImages.length > 1;
@@ -169,18 +177,24 @@ function renderProductCard(product) {
        </div>`
     : '<div class="image-placeholder">📸</div>';
   
+  // Button text and price display based on template
+  const btnText = isPortfolio ? 'View →' : 'Get This Now';
+  const priceDisplay = isPortfolio 
+    ? `<span class="price-from">From</span> <span class="currency">KES</span> <span class="amount">${startingPrice.toLocaleString()}</span>`
+    : `<span class="currency">KES</span> <span class="amount">${parseInt(price).toLocaleString()}</span>`;
+  
   return `
     <div class="collection-card" data-product-id="${product.id}">
       <div class="collection-image">
         ${galleryHTML}
         <div class="collection-overlay">
           <h3 class="collection-name">${name}</h3>
-          <p class="collection-price"><span class="currency">KES</span> <span class="amount">${parseInt(price).toLocaleString()}</span></p>
+          <p class="collection-price">${priceDisplay}</p>
         </div>
       </div>
       <div class="collection-content">
         <p class="collection-description">${description.substring(0, 100)}${description.length > 100 ? '...' : ''}</p>
-        <button class="collection-btn">Get This Now</button>
+        <button class="collection-btn">${btnText}</button>
       </div>
     </div>
   `;

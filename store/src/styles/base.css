@@ -417,6 +417,13 @@ body {
     letter-spacing: -0.01em;
 }
 
+.collection-overlay .collection-price .price-from {
+    font-size: 11px;
+    font-weight: 400;
+    opacity: 0.85;
+    margin-right: 2px;
+}
+
 .image-placeholder {
     font-size: var(--fs-display);
 }
