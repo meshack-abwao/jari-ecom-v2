@@ -1,7 +1,7 @@
 // Booking event handlers for storefront
 import { state, setState } from './state.js';
 import { bookingApi } from './bookingApi.js';
-import { renderBookingStep, renderCalendarMonth, renderTimeSlots, renderBookingSuccess } from './render.js';
+import { renderBookingStep, renderCalendarMonth, renderTimeSlots, renderBookingSuccess } from './bookingRender.js';
 
 // Initialize booking data when opening modal
 export async function initBooking(storeSlug, productId) {

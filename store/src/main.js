@@ -1,6 +1,7 @@
 import { fetchStore } from './api.js';
 import { state, setState, getSlug, getProductId, setProductId } from './state.js';
-import { renderHeader, renderProductsGrid, renderSingleProduct, renderFooter, renderError, renderBookingModal } from './render.js';
+import { renderHeader, renderProductsGrid, renderSingleProduct, renderFooter, renderError } from './render.js';
+import { renderBookingModal, renderBookingStep, renderCalendarMonth, renderTimeSlots, renderBookingSuccess } from './bookingRender.js';
 import { renderCheckoutModal, initCheckout, openCheckout } from './checkout.js';
 import { initPixel, pixel } from './pixel.js';
 import { setupBookingListeners } from './bookingHandlers.js';
