@@ -6,7 +6,21 @@ export const state = {
   currentProduct: null,
   quantity: 1,
   selectedPrice: null,  // For package/ticket selection
-  paymentMethod: null
+  paymentMethod: null,
+  // Booking state
+  booking: {
+    settings: null,
+    workingHours: [],
+    blockedDates: [],
+    selectedDate: null,
+    selectedTime: null,
+    selectedPackage: null,
+    customerName: '',
+    customerPhone: '',
+    customerEmail: '',
+    notes: '',
+    step: 1  // 1=package, 2=date/time, 3=details, 4=confirm
+  }
 };
 
 export function setState(updates) {

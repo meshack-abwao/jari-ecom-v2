@@ -1,8 +1,9 @@
 import { fetchStore } from './api.js';
 import { state, setState, getSlug, getProductId, setProductId } from './state.js';
-import { renderHeader, renderProductsGrid, renderSingleProduct, renderFooter, renderError } from './render.js';
+import { renderHeader, renderProductsGrid, renderSingleProduct, renderFooter, renderError, renderBookingModal } from './render.js';
 import { renderCheckoutModal, initCheckout, openCheckout } from './checkout.js';
 import { initPixel, pixel } from './pixel.js';
+import { setupBookingListeners } from './bookingHandlers.js';
 
 const app = document.getElementById('app');
 
@@ -189,6 +190,9 @@ function renderProductView(product) {
   // Track product view
   pixel.productView(product.id, product.data?.name || 'Unknown');
   
+  // Check if this is a booking template
+  const isBookingTemplate = product.template === 'portfolio-booking';
+  
   app.innerHTML = `
     ${renderHeader()}
     <main class="main">
@@ -196,6 +200,7 @@ function renderProductView(product) {
     </main>
     ${renderFooter()}
     ${renderCheckoutModal()}
+    ${isBookingTemplate ? renderBookingModal(product) : ''}
   `;
   
   initProductHandlers(product);
@@ -206,6 +211,11 @@ function renderProductView(product) {
   initStorePolicyHandlers();
   initPackageTicketHandlers(product);
   initCheckout();
+  
+  // Setup booking listeners for portfolio-booking template
+  if (isBookingTemplate) {
+    setupBookingListeners();
+  }
 }
 
 // ===========================================
