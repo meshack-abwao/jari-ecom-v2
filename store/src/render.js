@@ -1,4 +1,5 @@
 import { state } from './state.js';
+import { renderPortfolioBookingTemplate } from './templates/portfolioBooking.js';
 
 // ===========================================
 // HEADER
@@ -234,7 +235,7 @@ export function renderSingleProduct(product) {
   console.log(`[Render] Loading template: ${template} for product:`, product.data?.name);
   
   switch (template) {
-    case 'portfolio-booking': return renderPortfolioBooking(product);
+    case 'portfolio-booking': return renderPortfolioBookingTemplate(product);
     case 'visual-menu': return renderVisualMenu(product);
     case 'deep-dive': return renderDeepDive(product);
     case 'event-landing': return renderEventLanding(product);
@@ -301,64 +302,6 @@ function renderQuickDecision(product) {
     </div>
     
     ${renderStoryViewer(stories)}
-    ${renderProductPolicyModals(policies)}
-  `;
-}
-
-// ===========================================
-// TEMPLATE: PORTFOLIO + BOOKING
-// ===========================================
-function renderPortfolioBooking(product) {
-  const { products } = state;
-  const data = product.data || {};
-  const media = product.media || {};
-  const packages = data.packages || [];
-  const testimonials = data.testimonials || [];
-  const policies = data.policies || {};
-  const showBackButton = products.length > 1;
-  
-  return `
-    ${showBackButton ? '<button class="back-btn" id="backBtn">← Back to All Services</button>' : ''}
-    <div class="product-container">
-      <div class="product-card">
-        ${renderGallery(media.images || [])}
-        ${(media.stories || []).length > 0 ? renderStories(media.stories, data.storyTitle || 'Our Work') : ''}
-        
-        <div class="product-info">
-          <h2 class="product-name">${data.name || 'Service'}</h2>
-          <p class="product-description">${data.description || ''}</p>
-          
-          ${packages.length > 0 ? `
-            <div class="packages-section">
-              <h3 class="section-title">📦 Service Packages</h3>
-              ${packages.map((pkg, i) => `
-                <div class="package-card ${i === 0 ? 'featured' : ''}">
-                  <div class="package-header">
-                    <span class="package-name">${pkg.name}</span>
-                    <span class="package-price">KES ${parseInt(pkg.price || 0).toLocaleString()}</span>
-                  </div>
-                  ${pkg.duration ? `<p class="package-duration">⏱️ ${pkg.duration}</p>` : ''}
-                  ${pkg.description ? `<p class="package-description">${pkg.description}</p>` : ''}
-                  <button class="package-select-btn" data-price="${pkg.price}" data-name="${pkg.name}">Select Package</button>
-                </div>
-              `).join('')}
-            </div>
-          ` : `
-            <div class="price-display">
-              <span class="price-label">Starting From</span>
-              <div class="price">KES <span id="displayPrice">${parseInt(data.price || 0).toLocaleString()}</span></div>
-            </div>
-          `}
-          
-          ${data.bookingNote ? `<p class="booking-note">ℹ️ ${data.bookingNote}</p>` : ''}
-          ${testimonials.length > 0 ? renderTestimonials(testimonials) : ''}
-          
-          <button class="buy-btn" id="buyBtn"><span class="btn-text">📅 Book Now</span><span class="btn-arrow">→</span></button>
-          ${renderProductPolicyLinks(policies)}
-        </div>
-      </div>
-    </div>
-    ${renderStoryViewer(media.stories || [])}
     ${renderProductPolicyModals(policies)}
   `;
 }
