@@ -3,6 +3,7 @@ import { state, setState, getSlug, getProductId, setProductId } from './state.js
 import { renderHeader, renderProductsGrid, renderSingleProduct, renderFooter, renderError } from './render.js';
 import { renderCheckoutModal, initCheckout, openCheckout } from './checkout.js';
 import { initPixel, pixel } from './pixel.js';
+import { initPortfolioBookingHandlers } from './templates/portfolioBookingHandlers.js';
 
 const app = document.getElementById('app');
 
@@ -205,6 +206,12 @@ function renderProductView(product) {
   initProductPolicyHandlers();
   initStorePolicyHandlers();
   initPackageTicketHandlers(product);
+  
+  // Portfolio-Booking template specific handlers
+  if (product.template === 'portfolio-booking') {
+    state.currentProduct = product;
+    initPortfolioBookingHandlers();
+  }
   initCheckout();
 }
 
