@@ -73,6 +73,9 @@ const getInitialFormData = () => ({
   // Packages (portfolio-booking)
   packages: [{ name: '', description: '', price: '', duration: '' }],
   bookingNote: '',
+  whyChooseUs: [''],
+  whatsIncluded: [''],
+  galleryTitle: 'Gallery',
   
   // Dietary (visual-menu)
   dietaryTags: [],
@@ -238,6 +241,9 @@ export default function ProductsPage() {
           ...(selectedTemplate === 'portfolio-booking' && {
             packages: formData.packages.filter(p => p.name?.trim()),
             bookingNote: formData.bookingNote,
+            whyChooseUs: formData.whyChooseUs.filter(item => item?.trim()),
+            whatsIncluded: formData.whatsIncluded.filter(item => item?.trim()),
+            galleryTitle: formData.galleryTitle || 'Gallery',
           }),
           
           ...(selectedTemplate === 'visual-menu' && {
