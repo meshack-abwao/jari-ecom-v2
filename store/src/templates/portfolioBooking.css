@@ -325,7 +325,7 @@
 }
 
 
-/* Section Title (Level 3 in hierarchy) - Clear wayfinding */
+/* Section Title (Level 3 in hierarchy) - Clear wayfinding, centered */
 .pbk-section-title {
   font-size: var(--fs-heading);
   font-weight: 600;
@@ -333,6 +333,7 @@
   color: var(--text-primary);
   letter-spacing: -0.01em;
   line-height: 1.3;
+  text-align: center;
 }
 
 @media (min-width: 768px) {
