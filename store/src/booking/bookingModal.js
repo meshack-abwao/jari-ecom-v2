@@ -415,14 +415,21 @@ function renderStep4() {
 }
 
 // Success screen - JTBD: "Give me confidence my booking is secured"
-export function renderBookingSuccess(booking) {
+export function renderBookingSuccess(booking = {}) {
   const { product, selectedPackage, selectedDate, selectedTime, 
           customerName, customerPhone, paymentType, jumpLine,
           settings } = bookingState;
   const data = product?.data || {};
   
+  // Use API response as backup if state was cleared
+  const serviceName = selectedPackage?.name || data.name || booking?.service_name || 'Your Service';
+  const bookingDate = selectedDate || booking?.booking_date || '';
+  const bookingTime = selectedTime || booking?.booking_time || '';
+  const clientName = customerName || booking?.customer_name || '';
+  const clientPhone = customerPhone || booking?.customer_phone || '';
+  
   // Calculate what was paid/owed
-  const basePrice = Number(selectedPackage?.price) || Number(data.price) || 0;
+  const basePrice = Number(selectedPackage?.price) || Number(data.price) || Number(booking?.total_amount) || 0;
   const jumpLineFee = jumpLine ? (Number(settings?.jump_line_fee) || 0) : 0;
   const total = basePrice + jumpLineFee;
   const depositPercent = Number(settings?.deposit_percentage) || 20;
@@ -441,87 +448,76 @@ export function renderBookingSuccess(booking) {
     paymentLabel = amountPaid > 0 ? 'Inquiry Fee Paid' : 'Inquiry Sent';
   }
   
-  const storeName = data.store_name || 'the provider';
   const storePhone = data.store_phone || '';
   
-  return \`
-    <div class="bkm-success">
-      <div class="bkm-success-header">
-        <div class="bkm-success-icon">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-            <polyline points="20 6 9 17 4 12"></polyline>
-          </svg>
-        </div>
-        <h3 class="bkm-success-title">Booking Confirmed!</h3>
-        <p class="bkm-success-subtitle">Your appointment has been scheduled</p>
-      </div>
-      
-      <!-- Booking Receipt -->
-      <div class="bkm-receipt">
-        <div class="bkm-receipt-section">
-          <span class="bkm-receipt-label">Service</span>
-          <span class="bkm-receipt-value">\${selectedPackage?.name || data.name || 'Service'}</span>
-        </div>
-        
-        <div class="bkm-receipt-section">
-          <span class="bkm-receipt-label">Date & Time</span>
-          <span class="bkm-receipt-value">\${formatDate(selectedDate)}</span>
-          <span class="bkm-receipt-value bkm-receipt-time">\${selectedTime || ''}</span>
-        </div>
-        
-        <div class="bkm-receipt-section">
-          <span class="bkm-receipt-label">Your Details</span>
-          <span class="bkm-receipt-value">\${customerName}</span>
-          <span class="bkm-receipt-value bkm-receipt-phone">\${customerPhone}</span>
-        </div>
-        
-        <div class="bkm-receipt-divider"></div>
-        
-        <div class="bkm-receipt-section bkm-receipt-payment">
-          <div class="bkm-receipt-row">
-            <span>Service Total</span>
-            <span>KES \${Number(basePrice).toLocaleString()}</span>
-          </div>
-          \${jumpLineFee > 0 ? \`
-            <div class="bkm-receipt-row">
-              <span>⚡ Priority Fee</span>
-              <span>KES \${Number(jumpLineFee).toLocaleString()}</span>
-            </div>
-          \` : ''}
-          <div class="bkm-receipt-row bkm-receipt-total">
-            <span>\${paymentLabel}</span>
-            <span>KES \${Number(amountPaid).toLocaleString()}</span>
-          </div>
-          \${amountDue > 0 ? \`
-            <div class="bkm-receipt-row bkm-receipt-due">
-              <span>Due on Arrival</span>
-              <span>KES \${Number(amountDue).toLocaleString()}</span>
-            </div>
-          \` : ''}
-        </div>
-      </div>
-      
-      <!-- What's Next -->
-      <div class="bkm-next-steps">
-        <h4>What's Next?</h4>
-        <ul>
-          <li>📧 You'll receive a confirmation message</li>
-          \${amountDue > 0 ? '<li>💰 Bring the remaining balance to your appointment</li>' : ''}
-          <li>📍 Arrive 5-10 minutes before your scheduled time</li>
-          \${storePhone ? \`<li>📞 Questions? Contact: \${storePhone}</li>\` : ''}
-        </ul>
-      </div>
-      
-      <div class="bkm-success-actions">
-        <button class="bkm-btn bkm-btn-secondary" id="bkmAddToCalendar">
-          📅 Add to Calendar
-        </button>
-        <button class="bkm-btn bkm-btn-primary" id="bkmDone">
-          Done
-        </button>
-      </div>
-    </div>
-  \`;
+  // Build receipt HTML
+  let priorityFeeHtml = '';
+  if (jumpLineFee > 0) {
+    priorityFeeHtml = '<div class="bkm-receipt-row"><span>⚡ Priority Fee</span><span>KES ' + Number(jumpLineFee).toLocaleString() + '</span></div>';
+  }
+  
+  let amountDueHtml = '';
+  if (amountDue > 0) {
+    amountDueHtml = '<div class="bkm-receipt-row bkm-receipt-due"><span>Due on Arrival</span><span>KES ' + Number(amountDue).toLocaleString() + '</span></div>';
+  }
+  
+  let balanceNote = '';
+  if (amountDue > 0) {
+    balanceNote = '<li>💰 Bring the remaining balance to your appointment</li>';
+  }
+  
+  let phoneNote = '';
+  if (storePhone) {
+    phoneNote = '<li>📞 Questions? Contact: ' + storePhone + '</li>';
+  }
+  
+  return '<div class="bkm-success">' +
+    '<div class="bkm-success-header">' +
+      '<div class="bkm-success-icon">' +
+        '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">' +
+          '<polyline points="20 6 9 17 4 12"></polyline>' +
+        '</svg>' +
+      '</div>' +
+      '<h3 class="bkm-success-title">Booking Confirmed!</h3>' +
+      '<p class="bkm-success-subtitle">Your appointment has been scheduled</p>' +
+    '</div>' +
+    '<div class="bkm-receipt">' +
+      '<div class="bkm-receipt-section">' +
+        '<span class="bkm-receipt-label">Service</span>' +
+        '<span class="bkm-receipt-value">' + serviceName + '</span>' +
+      '</div>' +
+      '<div class="bkm-receipt-section">' +
+        '<span class="bkm-receipt-label">Date & Time</span>' +
+        '<span class="bkm-receipt-value">' + formatDate(bookingDate) + '</span>' +
+        '<span class="bkm-receipt-value bkm-receipt-time">' + (bookingTime || '') + '</span>' +
+      '</div>' +
+      '<div class="bkm-receipt-section">' +
+        '<span class="bkm-receipt-label">Your Details</span>' +
+        '<span class="bkm-receipt-value">' + clientName + '</span>' +
+        '<span class="bkm-receipt-value bkm-receipt-phone">' + clientPhone + '</span>' +
+      '</div>' +
+      '<div class="bkm-receipt-divider"></div>' +
+      '<div class="bkm-receipt-section bkm-receipt-payment">' +
+        '<div class="bkm-receipt-row"><span>Service Total</span><span>KES ' + Number(basePrice).toLocaleString() + '</span></div>' +
+        priorityFeeHtml +
+        '<div class="bkm-receipt-row bkm-receipt-total"><span>' + paymentLabel + '</span><span>KES ' + Number(amountPaid).toLocaleString() + '</span></div>' +
+        amountDueHtml +
+      '</div>' +
+    '</div>' +
+    '<div class="bkm-next-steps">' +
+      '<h4>What\'s Next?</h4>' +
+      '<ul>' +
+        '<li>📧 You\'ll receive a confirmation message</li>' +
+        balanceNote +
+        '<li>📍 Arrive 5-10 minutes before your scheduled time</li>' +
+        phoneNote +
+      '</ul>' +
+    '</div>' +
+    '<div class="bkm-success-actions">' +
+      '<button class="bkm-btn bkm-btn-secondary" id="bkmAddToCalendar">📅 Add to Calendar</button>' +
+      '<button class="bkm-btn bkm-btn-primary" id="bkmDone">Done</button>' +
+    '</div>' +
+  '</div>';
 }
 
 function formatDate(dateStr) {
