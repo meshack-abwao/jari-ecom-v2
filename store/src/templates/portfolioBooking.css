@@ -708,22 +708,22 @@
 
 
 /* ===========================================
-   TESTIMONIALS - Clean Apple Style
-   Uses CSS vars from base.css for consistency
+   TESTIMONIALS - Clean Apple Style (Social Proof)
+   Psychology: Rounded cards = safe, trusted voices
    =========================================== */
 .pbk-testimonials {
-  margin-bottom: var(--space-4xl);
-  padding-top: var(--space-3xl);
+  margin-bottom: var(--space-5xl);
+  padding-top: var(--space-4xl);
   border-top: 1px solid var(--border);
 }
 
 .pbk-testimonials .pbk-section-title {
-  font-size: var(--fs-heading-lg);
-  font-weight: 700;
+  font-size: var(--fs-heading);
+  font-weight: 600;
   color: var(--text-primary);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
   text-align: center;
-  margin-bottom: var(--space-2xl);
+  margin-bottom: var(--space-3xl);
 }
 
 .pbk-testimonials-grid {
@@ -774,10 +774,14 @@
 .pbk-testimonial-text {
   font-size: var(--fs-body);
   color: var(--text-primary);
-  line-height: 1.6;
-  margin: 0 0 var(--space-lg);
+  line-height: 1.7;
+  margin: 0 0 var(--space-xl);
   font-weight: 400;
+  font-style: italic;  /* Italic = personality, voice differentiation */
   text-align: center;
+  max-width: 30ch;  /* Optimal for quote readability */
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .pbk-testimonial-author {
