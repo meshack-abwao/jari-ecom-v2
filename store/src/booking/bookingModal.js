@@ -184,18 +184,36 @@ export function renderCalendarDays() {
 }
 
 export function renderTimeSlots() {
-  const { availableSlots, selectedTime } = bookingState;
+  const { availableSlots, selectedTime, dayFullyBooked, settings } = bookingState;
   
-  if (!availableSlots || availableSlots.length === 0) {
-    return '<p class="bkm-no-slots">No available times</p>';
+  if (dayFullyBooked && settings.jump_line_enabled) {
+    return `
+      <div class="bkm-fully-booked">
+        <p class="bkm-fully-booked-msg">⚡ This day is fully booked</p>
+        <p class="bkm-jump-hint">Enable "Jump the Line" at checkout for priority booking</p>
+      </div>
+    `;
   }
   
-  return availableSlots.map(slot => `
-    <button class="bkm-slot ${selectedTime === slot.time ? 'selected' : ''} ${!slot.available ? 'disabled' : ''}"
-            data-time="${slot.time}" ${!slot.available ? 'disabled' : ''}>
-      ${slot.time}
-    </button>
-  `).join('');
+  if (!availableSlots || availableSlots.length === 0) {
+    return '<p class="bkm-no-slots">No available times for this day</p>';
+  }
+  
+  // Check if slot availability is a number or boolean
+  return availableSlots.map(slot => {
+    const isAvailable = typeof slot.available === 'number' ? slot.available > 0 : slot.available;
+    const spotsText = typeof slot.available === 'number' && slot.available > 0 ? 
+      `${slot.available} spot${slot.available > 1 ? 's' : ''}` : '';
+    
+    return `
+      <button class="bkm-slot ${selectedTime === slot.time ? 'selected' : ''} ${!isAvailable ? 'disabled full' : ''}"
+              data-time="${slot.time}" ${!isAvailable ? 'disabled' : ''}>
+        <span class="bkm-slot-time">${slot.time}</span>
+        ${!isAvailable ? '<span class="bkm-slot-full">Full</span>' : ''}
+        ${spotsText && isAvailable ? `<span class="bkm-slot-spots">${spotsText}</span>` : ''}
+      </button>
+    `;
+  }).join('');
 }
 
 function getMonthYear() {

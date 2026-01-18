@@ -299,7 +299,13 @@ function changeMonth(delta) {
 
 // Select a date
 async function selectDate(dateStr) {
-  updateBookingState({ selectedDate: dateStr, selectedTime: null, availableSlots: [] });
+  updateBookingState({ 
+    selectedDate: dateStr, 
+    selectedTime: null, 
+    availableSlots: [],
+    dayFullyBooked: false,
+    slotFullyBooked: false
+  });
   
   // Update UI
   document.querySelectorAll('.bkm-day').forEach(d => d.classList.remove('selected'));
@@ -311,15 +317,34 @@ async function selectDate(dateStr) {
     const result = await bookingApi.getAvailability(storeSlug, dateStr);
     
     if (result.available && result.slots?.length > 0) {
-      updateBookingState({ availableSlots: result.slots });
+      // Check if day is fully booked (all slots have 0 availability)
+      const availableCount = result.slots.filter(s => s.available > 0).length;
+      const dayFullyBooked = availableCount === 0;
+      
+      updateBookingState({ 
+        availableSlots: result.slots,
+        dayFullyBooked
+      });
+    } else if (!result.available) {
+      // Day is fully booked or blocked
+      updateBookingState({ 
+        availableSlots: [],
+        dayFullyBooked: true
+      });
     } else {
       // API returned no slots - generate defaults
-      updateBookingState({ availableSlots: generateDefaultSlots() });
+      updateBookingState({ 
+        availableSlots: generateDefaultSlots(),
+        dayFullyBooked: false
+      });
     }
   } catch (error) {
     console.error('[Booking] Failed to load slots, using defaults:', error);
     // Generate client-side slots when API fails
-    updateBookingState({ availableSlots: generateDefaultSlots() });
+    updateBookingState({ 
+      availableSlots: generateDefaultSlots(),
+      dayFullyBooked: false
+    });
   }
   
   // Always re-render to show slots

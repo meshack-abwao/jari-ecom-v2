@@ -733,3 +733,72 @@
   opacity: 0.7;
   cursor: not-allowed;
 }
+
+/* Fully Booked Day Message */
+.bkm-fully-booked {
+  text-align: center;
+  padding: 24px 16px;
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  border-radius: 12px;
+  border: 1px solid #f59e0b;
+}
+
+.bkm-fully-booked-msg {
+  font-size: 15px;
+  font-weight: 600;
+  color: #92400e;
+  margin: 0 0 8px;
+}
+
+.bkm-jump-hint {
+  font-size: 13px;
+  color: #b45309;
+  margin: 0;
+}
+
+/* Time Slot Improvements */
+.bkm-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 8px;
+  min-height: 50px;
+}
+
+.bkm-slot-time {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.bkm-slot-spots {
+  font-size: 10px;
+  color: #10b981;
+  font-weight: 500;
+}
+
+.bkm-slot-full {
+  font-size: 10px;
+  color: #ef4444;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.bkm-slot.full {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #991b1b;
+}
+
+.bkm-slot.full:disabled {
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+/* No Slots Message */
+.bkm-no-slots {
+  text-align: center;
+  padding: 20px;
+  color: var(--text-muted, #888);
+  font-size: 14px;
+}
