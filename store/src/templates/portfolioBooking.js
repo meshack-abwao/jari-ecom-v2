@@ -309,19 +309,20 @@ function renderPbkWhyChooseUs(content) {
   // Support both string and array format
   const items = Array.isArray(content) ? content : [content];
   
+  // Default icons if none provided - rotating set of relevant icons
+  const defaultIcons = ['✓', '⭐', '🎯', '💎', '🏆', '✨'];
+  
   return `
     <div class="pbk-why-choose">
       <h3 class="pbk-section-title">Why Choose Us</h3>
       <div class="pbk-why-content">
-        ${items.map(item => {
-          if (typeof item === 'string') {
-            return `<p class="pbk-why-text">${item}</p>`;
-          }
-          // Object with icon and text
+        ${items.map((item, index) => {
+          const text = typeof item === 'string' ? item : (item.text || item);
+          const icon = (typeof item === 'object' && item.icon) ? item.icon : defaultIcons[index % defaultIcons.length];
           return `
             <div class="pbk-why-item">
-              ${item.icon ? `<span class="pbk-why-icon">${item.icon}</span>` : ''}
-              <span class="pbk-why-text">${item.text || item}</span>
+              <span class="pbk-why-icon">${icon}</span>
+              <span class="pbk-why-text">${text}</span>
             </div>
           `;
         }).join('')}
