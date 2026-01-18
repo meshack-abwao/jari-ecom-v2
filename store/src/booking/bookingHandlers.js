@@ -300,6 +300,7 @@ function generateDefaultSlots() {
   }
   
   return slots;
+}
 
 // Select a time slot
 function selectTime(time) {
