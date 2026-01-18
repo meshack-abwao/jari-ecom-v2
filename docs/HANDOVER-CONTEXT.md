@@ -105,11 +105,15 @@ service_packages  - Package options
 | 9 | **Price string concatenation** | ✅ FIXED | Use `Number()` instead of `parseInt()` |
 | 10 | **Jump Line always showing** | ✅ FIXED | Only show when `dayFullyBooked=true` |
 | 11 | **Time slots no availability info** | ✅ FIXED | Show spots count and "Full" badges |
+| 12 | **Duplicate payNow declaration** | ✅ FIXED | Removed duplicate code block |
+| 13 | **Poor booking confirmation** | ✅ FIXED | Full receipt with payment breakdown |
+| 14 | **Dashboard bookings hard to manage** | ✅ FIXED | Expandable cards with action buttons |
 
-### Still Needs Testing:
-- API connection after Netlify rebuild
-- Full booking flow end-to-end
-- Dashboard settings persistence
+### New Features Added:
+- **Booking Confirmation Receipt** - Service, date/time, customer, payment breakdown, "What's Next" steps
+- **Dashboard Booking Cards** - Expandable with full details, grouped by status (Pending/Upcoming/Completed)
+- **Booking Actions** - Confirm, Decline, Mark Complete, Call, WhatsApp buttons
+- **Modern Settings UI** - Toggle switches, color-coded sections, stepper inputs
 
 ---
 
