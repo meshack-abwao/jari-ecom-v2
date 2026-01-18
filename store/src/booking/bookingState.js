@@ -52,6 +52,10 @@ export const bookingState = {
   discountCode: '',
   discountAmount: 0,
   
+  // Availability tracking
+  dayFullyBooked: false,  // True when all slots for day are taken
+  slotFullyBooked: false, // True when selected time slot is full
+  
   // UI state
   loading: false,
   submitting: false,
@@ -73,6 +77,8 @@ export function resetBookingState() {
   bookingState.jumpLine = false;
   bookingState.discountCode = '';
   bookingState.discountAmount = 0;
+  bookingState.dayFullyBooked = false;
+  bookingState.slotFullyBooked = false;
   bookingState.error = null;
   bookingState.submitting = false;
   bookingState.viewMonth = new Date().getMonth();
