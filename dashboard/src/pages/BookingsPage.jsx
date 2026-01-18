@@ -551,6 +551,17 @@ export default function BookingsPage() {
   );
 
   // ==================== RENDER CALENDAR / BOOKINGS ====================
+  const [expandedBooking, setExpandedBooking] = useState(null);
+  
+  const updateBookingStatus = async (id, status) => {
+    try {
+      await bookingsAPI.updateStatus(id, status);
+      setBookings(prev => prev.map(b => b.id === id ? { ...b, status } : b));
+    } catch (err) {
+      alert('Failed to update booking');
+    }
+  };
+
   const renderCalendar = () => {
     if (bookings.length === 0) {
       return (
@@ -562,33 +573,185 @@ export default function BookingsPage() {
       );
     }
 
-    return (
-      <div style={styles.bookingsList}>
-        {bookings.map(booking => (
-          <div key={booking.id} style={styles.bookingCard}>
+    // Group bookings by status
+    const pending = bookings.filter(b => b.status === 'pending');
+    const confirmed = bookings.filter(b => b.status === 'confirmed');
+    const completed = bookings.filter(b => b.status === 'completed');
+
+    const renderBookingCard = (booking) => {
+      const isExpanded = expandedBooking === booking.id;
+      const bookingDate = new Date(booking.booking_date);
+      const isPast = bookingDate < new Date();
+      
+      return (
+        <div key={booking.id} style={styles.bookingCardWrap}>
+          {/* Main Card - Clickable */}
+          <div 
+            style={styles.bookingCard}
+            onClick={() => setExpandedBooking(isExpanded ? null : booking.id)}
+          >
             <div style={styles.bookingDate}>
-              <span style={styles.bookingDay}>
-                {new Date(booking.booking_date).getDate()}
-              </span>
+              <span style={styles.bookingDay}>{bookingDate.getDate()}</span>
               <span style={styles.bookingMonth}>
-                {new Date(booking.booking_date).toLocaleDateString('en-US', { month: 'short' })}
+                {bookingDate.toLocaleDateString('en-US', { month: 'short' })}
               </span>
             </div>
-            <div style={styles.bookingInfo}>
-              <strong>{booking.customer_name}</strong>
-              <span>{booking.booking_time?.substring(0, 5)} · {booking.customer_phone}</span>
+            
+            <div style={styles.bookingMain}>
+              <div style={styles.bookingCustomer}>{booking.customer_name}</div>
+              <div style={styles.bookingMeta}>
+                <span>🕐 {booking.booking_time?.substring(0, 5)}</span>
+                <span>📞 {booking.customer_phone}</span>
+              </div>
             </div>
-            <div style={{
-              ...styles.statusBadge,
-              background: booking.status === 'confirmed' ? '#dcfce7' : 
-                         booking.status === 'pending' ? '#fef3c7' : '#fee2e2',
-              color: booking.status === 'confirmed' ? '#166534' : 
-                     booking.status === 'pending' ? '#92400e' : '#991b1b'
-            }}>
-              {booking.status}
+            
+            <div style={styles.bookingRight}>
+              <div style={{
+                ...styles.statusBadge,
+                background: booking.status === 'confirmed' ? '#dcfce7' : 
+                           booking.status === 'pending' ? '#fef3c7' : 
+                           booking.status === 'completed' ? '#e0e7ff' : '#fee2e2',
+                color: booking.status === 'confirmed' ? '#166534' : 
+                       booking.status === 'pending' ? '#92400e' : 
+                       booking.status === 'completed' ? '#3730a3' : '#991b1b'
+              }}>
+                {booking.status}
+              </div>
+              <ChevronDown 
+                size={18} 
+                style={{ 
+                  color: 'var(--text-muted)',
+                  transform: isExpanded ? 'rotate(180deg)' : 'rotate(0)',
+                  transition: 'transform 0.2s'
+                }} 
+              />
             </div>
           </div>
-        ))}
+          
+          {/* Expanded Details */}
+          {isExpanded && (
+            <div style={styles.bookingExpanded}>
+              <div style={styles.expandedGrid}>
+                <div style={styles.expandedSection}>
+                  <span style={styles.expandedLabel}>Service</span>
+                  <span style={styles.expandedValue}>
+                    {booking.package_name || booking.service_name || 'Booking'}
+                  </span>
+                </div>
+                
+                <div style={styles.expandedSection}>
+                  <span style={styles.expandedLabel}>Price</span>
+                  <span style={styles.expandedValue}>
+                    KES {parseInt(booking.total_amount || booking.package_price || 0).toLocaleString()}
+                  </span>
+                </div>
+                
+                <div style={styles.expandedSection}>
+                  <span style={styles.expandedLabel}>Payment</span>
+                  <span style={styles.expandedValue}>
+                    {booking.payment_type === 'deposit' ? `Deposit (${booking.deposit_percentage || 20}%)` :
+                     booking.payment_type === 'inquiry' ? 'Inquiry' : 'Full Payment'}
+                  </span>
+                </div>
+                
+                <div style={styles.expandedSection}>
+                  <span style={styles.expandedLabel}>Email</span>
+                  <span style={styles.expandedValue}>
+                    {booking.customer_email || '—'}
+                  </span>
+                </div>
+              </div>
+              
+              {booking.notes && (
+                <div style={styles.expandedNotes}>
+                  <span style={styles.expandedLabel}>Notes</span>
+                  <p style={styles.notesText}>{booking.notes}</p>
+                </div>
+              )}
+              
+              {/* Action Buttons */}
+              <div style={styles.bookingActions}>
+                {booking.status === 'pending' && (
+                  <>
+                    <button 
+                      style={styles.actionBtnConfirm}
+                      onClick={(e) => { e.stopPropagation(); updateBookingStatus(booking.id, 'confirmed'); }}
+                    >
+                      <Check size={16} /> Confirm
+                    </button>
+                    <button 
+                      style={styles.actionBtnCancel}
+                      onClick={(e) => { e.stopPropagation(); updateBookingStatus(booking.id, 'cancelled'); }}
+                    >
+                      <X size={16} /> Decline
+                    </button>
+                  </>
+                )}
+                {booking.status === 'confirmed' && !isPast && (
+                  <button 
+                    style={styles.actionBtnComplete}
+                    onClick={(e) => { e.stopPropagation(); updateBookingStatus(booking.id, 'completed'); }}
+                  >
+                    <Check size={16} /> Mark Complete
+                  </button>
+                )}
+                <a 
+                  href={`tel:${booking.customer_phone}`} 
+                  style={styles.actionBtnCall}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  📞 Call
+                </a>
+                <a 
+                  href={`https://wa.me/${booking.customer_phone?.replace(/\D/g, '')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={styles.actionBtnWhatsApp}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  💬 WhatsApp
+                </a>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    };
+
+    return (
+      <div>
+        {/* Pending - Needs Attention */}
+        {pending.length > 0 && (
+          <div style={styles.bookingGroup}>
+            <div style={styles.groupHeader}>
+              <span style={styles.groupTitle}>🔔 Needs Attention</span>
+              <span style={styles.groupCount}>{pending.length}</span>
+            </div>
+            {pending.map(renderBookingCard)}
+          </div>
+        )}
+        
+        {/* Upcoming Confirmed */}
+        {confirmed.length > 0 && (
+          <div style={styles.bookingGroup}>
+            <div style={styles.groupHeader}>
+              <span style={styles.groupTitle}>✅ Upcoming</span>
+              <span style={styles.groupCount}>{confirmed.length}</span>
+            </div>
+            {confirmed.map(renderBookingCard)}
+          </div>
+        )}
+        
+        {/* Completed */}
+        {completed.length > 0 && (
+          <div style={styles.bookingGroup}>
+            <div style={styles.groupHeader}>
+              <span style={styles.groupTitle}>📋 Completed</span>
+              <span style={styles.groupCount}>{completed.length}</span>
+            </div>
+            {completed.map(renderBookingCard)}
+          </div>
+        )}
       </div>
     );
   };
@@ -967,5 +1130,182 @@ const styles = {
     fontSize: '12px',
     fontWeight: '500',
     textTransform: 'capitalize',
+  },
+
+  // Booking Groups
+  bookingGroup: {
+    marginBottom: '24px',
+  },
+  groupHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    marginBottom: '12px',
+  },
+  groupTitle: {
+    fontSize: '14px',
+    fontWeight: '600',
+    color: 'var(--text-primary)',
+  },
+  groupCount: {
+    fontSize: '12px',
+    fontWeight: '600',
+    color: 'var(--accent-color)',
+    background: 'var(--accent-light)',
+    padding: '2px 8px',
+    borderRadius: '10px',
+  },
+
+  // Booking Card (Expandable)
+  bookingCardWrap: {
+    marginBottom: '10px',
+  },
+  bookingCard: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '16px',
+    padding: '16px',
+    background: 'var(--bg-secondary, white)',
+    borderRadius: '12px',
+    border: '1px solid var(--border-color)',
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+  },
+  bookingMain: {
+    flex: 1,
+    minWidth: 0,
+  },
+  bookingCustomer: {
+    fontSize: '15px',
+    fontWeight: '600',
+    color: 'var(--text-primary)',
+    marginBottom: '4px',
+  },
+  bookingMeta: {
+    display: 'flex',
+    gap: '12px',
+    fontSize: '13px',
+    color: 'var(--text-muted)',
+  },
+  bookingRight: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+  },
+
+  // Expanded Section
+  bookingExpanded: {
+    background: 'var(--bg-tertiary, #f9fafb)',
+    borderRadius: '0 0 12px 12px',
+    padding: '16px 20px',
+    marginTop: '-8px',
+    borderTop: '1px dashed var(--border-color)',
+  },
+  expandedGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(2, 1fr)',
+    gap: '16px',
+    marginBottom: '16px',
+  },
+  expandedSection: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '4px',
+  },
+  expandedLabel: {
+    fontSize: '11px',
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: '0.5px',
+    color: 'var(--text-muted)',
+  },
+  expandedValue: {
+    fontSize: '14px',
+    fontWeight: '500',
+    color: 'var(--text-primary)',
+  },
+  expandedNotes: {
+    marginBottom: '16px',
+  },
+  notesText: {
+    fontSize: '13px',
+    color: 'var(--text-secondary)',
+    background: 'var(--bg-secondary)',
+    padding: '10px 12px',
+    borderRadius: '8px',
+    margin: '6px 0 0',
+    fontStyle: 'italic',
+  },
+
+  // Action Buttons
+  bookingActions: {
+    display: 'flex',
+    gap: '8px',
+    flexWrap: 'wrap',
+  },
+  actionBtnConfirm: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '8px 16px',
+    background: '#10b981',
+    border: 'none',
+    borderRadius: '8px',
+    color: 'white',
+    fontSize: '13px',
+    fontWeight: '500',
+    cursor: 'pointer',
+  },
+  actionBtnCancel: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '8px 16px',
+    background: '#ef4444',
+    border: 'none',
+    borderRadius: '8px',
+    color: 'white',
+    fontSize: '13px',
+    fontWeight: '500',
+    cursor: 'pointer',
+  },
+  actionBtnComplete: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '8px 16px',
+    background: '#6366f1',
+    border: 'none',
+    borderRadius: '8px',
+    color: 'white',
+    fontSize: '13px',
+    fontWeight: '500',
+    cursor: 'pointer',
+  },
+  actionBtnCall: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '8px 16px',
+    background: 'var(--bg-secondary)',
+    border: '1px solid var(--border-color)',
+    borderRadius: '8px',
+    color: 'var(--text-primary)',
+    fontSize: '13px',
+    fontWeight: '500',
+    textDecoration: 'none',
+  },
+  actionBtnWhatsApp: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '8px 16px',
+    background: '#25d366',
+    border: 'none',
+    borderRadius: '8px',
+    color: 'white',
+    fontSize: '13px',
+    fontWeight: '500',
+    textDecoration: 'none',
   },
 };

@@ -414,20 +414,114 @@ function renderStep4() {
   `;
 }
 
-// Success screen
+// Success screen - JTBD: "Give me confidence my booking is secured"
 export function renderBookingSuccess(booking) {
-  return `
+  const { product, selectedPackage, selectedDate, selectedTime, 
+          customerName, customerPhone, paymentType, jumpLine,
+          settings } = bookingState;
+  const data = product?.data || {};
+  
+  // Calculate what was paid/owed
+  const basePrice = Number(selectedPackage?.price) || Number(data.price) || 0;
+  const jumpLineFee = jumpLine ? (Number(settings?.jump_line_fee) || 0) : 0;
+  const total = basePrice + jumpLineFee;
+  const depositPercent = Number(settings?.deposit_percentage) || 20;
+  
+  let amountPaid = total;
+  let amountDue = 0;
+  let paymentLabel = 'Paid in Full';
+  
+  if (paymentType === 'deposit') {
+    amountPaid = Math.round(total * depositPercent / 100);
+    amountDue = total - amountPaid;
+    paymentLabel = 'Deposit Paid';
+  } else if (paymentType === 'inquiry') {
+    amountPaid = Number(settings?.inquiry_fee) || 0;
+    amountDue = total - amountPaid;
+    paymentLabel = amountPaid > 0 ? 'Inquiry Fee Paid' : 'Inquiry Sent';
+  }
+  
+  const storeName = data.store_name || 'the provider';
+  const storePhone = data.store_phone || '';
+  
+  return \`
     <div class="bkm-success">
-      <div class="bkm-success-icon">✓</div>
-      <h3>Booking Confirmed!</h3>
-      <p>Your appointment has been scheduled.</p>
-      <div class="bkm-success-details">
-        <p><strong>${booking.package_name || 'Service'}</strong></p>
-        <p>${formatDate(booking.booking_date)} at ${booking.booking_time}</p>
+      <div class="bkm-success-header">
+        <div class="bkm-success-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+        <h3 class="bkm-success-title">Booking Confirmed!</h3>
+        <p class="bkm-success-subtitle">Your appointment has been scheduled</p>
       </div>
-      <button class="bkm-btn bkm-btn-primary" id="bkmDone">Done</button>
+      
+      <!-- Booking Receipt -->
+      <div class="bkm-receipt">
+        <div class="bkm-receipt-section">
+          <span class="bkm-receipt-label">Service</span>
+          <span class="bkm-receipt-value">\${selectedPackage?.name || data.name || 'Service'}</span>
+        </div>
+        
+        <div class="bkm-receipt-section">
+          <span class="bkm-receipt-label">Date & Time</span>
+          <span class="bkm-receipt-value">\${formatDate(selectedDate)}</span>
+          <span class="bkm-receipt-value bkm-receipt-time">\${selectedTime || ''}</span>
+        </div>
+        
+        <div class="bkm-receipt-section">
+          <span class="bkm-receipt-label">Your Details</span>
+          <span class="bkm-receipt-value">\${customerName}</span>
+          <span class="bkm-receipt-value bkm-receipt-phone">\${customerPhone}</span>
+        </div>
+        
+        <div class="bkm-receipt-divider"></div>
+        
+        <div class="bkm-receipt-section bkm-receipt-payment">
+          <div class="bkm-receipt-row">
+            <span>Service Total</span>
+            <span>KES \${Number(basePrice).toLocaleString()}</span>
+          </div>
+          \${jumpLineFee > 0 ? \`
+            <div class="bkm-receipt-row">
+              <span>⚡ Priority Fee</span>
+              <span>KES \${Number(jumpLineFee).toLocaleString()}</span>
+            </div>
+          \` : ''}
+          <div class="bkm-receipt-row bkm-receipt-total">
+            <span>\${paymentLabel}</span>
+            <span>KES \${Number(amountPaid).toLocaleString()}</span>
+          </div>
+          \${amountDue > 0 ? \`
+            <div class="bkm-receipt-row bkm-receipt-due">
+              <span>Due on Arrival</span>
+              <span>KES \${Number(amountDue).toLocaleString()}</span>
+            </div>
+          \` : ''}
+        </div>
+      </div>
+      
+      <!-- What's Next -->
+      <div class="bkm-next-steps">
+        <h4>What's Next?</h4>
+        <ul>
+          <li>📧 You'll receive a confirmation message</li>
+          \${amountDue > 0 ? '<li>💰 Bring the remaining balance to your appointment</li>' : ''}
+          <li>📍 Arrive 5-10 minutes before your scheduled time</li>
+          \${storePhone ? \`<li>📞 Questions? Contact: \${storePhone}</li>\` : ''}
+        </ul>
+      </div>
+      
+      <div class="bkm-success-actions">
+        <button class="bkm-btn bkm-btn-secondary" id="bkmAddToCalendar">
+          📅 Add to Calendar
+        </button>
+        <button class="bkm-btn bkm-btn-primary" id="bkmDone">
+          Done
+        </button>
+      </div>
     </div>
-  `;
+  \`;
 }
 
 function formatDate(dateStr) {
