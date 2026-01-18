@@ -1185,15 +1185,6 @@ const styles = {
     color: 'var(--text-muted)',
     textTransform: 'uppercase',
   },
-    fontWeight: '700',
-    color: 'var(--text-primary)',
-  },
-  statLabel: {
-    fontSize: '12px',
-    color: 'var(--text-muted)',
-    textTransform: 'uppercase',
-    letterSpacing: '0.5px',
-  },
   
   tabs: {
     display: 'flex',
