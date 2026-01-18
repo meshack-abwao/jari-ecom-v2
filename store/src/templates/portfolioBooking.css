@@ -309,31 +309,38 @@
 }
 
 
-/* Section Title (reusable) */
+/* Section Title (reusable) - More impactful */
 .pbk-section-title {
-  font-size: var(--fs-heading-sm);
-  font-weight: 600;
-  margin: 0 0 var(--space-lg);
+  font-size: var(--fs-heading-lg);
+  font-weight: 700;
+  margin: 0 0 var(--space-xl);
   color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+@media (min-width: 768px) {
+  .pbk-section-title {
+    font-size: var(--fs-heading-xl);
+  }
 }
 
 /* ===========================================
    STORIES - Theme colored rings (uses store primary color)
    =========================================== */
 .pbk-stories {
-  margin-bottom: 28px;
-  padding: 20px;
-  background: #f8f8f8;
-  border-radius: 16px;
+  margin-bottom: var(--space-3xl);
+  padding: var(--space-xl);
+  background: var(--bg-gray);
+  border-radius: var(--radius);
 }
 
 .pbk-stories .pbk-section-title {
   text-align: center;
   text-transform: uppercase;
-  font-size: 12px;
+  font-size: var(--fs-small);
   letter-spacing: 0.08em;
-  color: #666;
-  margin-bottom: 16px;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-lg);
 }
 
 .pbk-stories-row {
@@ -388,7 +395,7 @@
    GALLERY - Magazine grid like Deep Dive showcase
    =========================================== */
 .pbk-gallery {
-  margin-bottom: var(--space-3xl);
+  margin-bottom: var(--space-4xl);
 }
 
 .pbk-gallery .pbk-section-title {
@@ -396,7 +403,7 @@
   font-size: var(--fs-display);
   font-weight: 700;
   letter-spacing: -0.03em;
-  margin-bottom: var(--space-xl);
+  margin-bottom: var(--space-2xl);
 }
 
 .pbk-gallery-grid {
@@ -454,15 +461,22 @@
 @media (min-width: 768px) {
   .pbk-gallery-grid {
     grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-lg);
+    gap: var(--space-xl);
   }
   
   .pbk-gallery .pbk-section-title {
-    font-size: var(--fs-display-xl);
+    font-size: 40px;
+    margin-bottom: var(--space-3xl);
   }
   
   .pbk-gallery-caption {
     font-size: var(--fs-body-lg);
+  }
+}
+
+@media (min-width: 1024px) {
+  .pbk-gallery-grid {
+    gap: var(--space-2xl);
   }
 }
 
@@ -564,61 +578,62 @@
 
 /* Packages */
 .pbk-packages {
-  margin-bottom: 28px;
+  margin-bottom: var(--space-4xl);
 }
 
 .pbk-packages-grid {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--space-lg);
 }
 
 .pbk-package {
   position: relative;
-  padding: 20px;
-  border: 2px solid #e8e8e8;
-  border-radius: 16px;
-  background: #fff;
+  padding: var(--space-xl);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
   transition: all 0.2s;
 }
 
 .pbk-package:hover {
-  border-color: #ccc;
+  border-color: var(--text-secondary);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
 }
 
 .pbk-package-featured {
-  border-color: #000;
+  border-color: var(--text-primary);
 }
 
 .pbk-package-badge {
   position: absolute;
   top: -10px;
-  left: 16px;
-  background: #000;
-  color: #fff;
-  font-size: 11px;
+  left: var(--space-lg);
+  background: var(--text-primary);
+  color: var(--surface);
+  font-size: var(--fs-tiny);
   font-weight: 600;
-  padding: 4px 10px;
-  border-radius: 12px;
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-full);
 }
 
 .pbk-package-name {
-  font-size: 18px;
+  font-size: var(--fs-heading-sm);
   font-weight: 600;
-  margin-bottom: 4px;
+  margin-bottom: var(--space-xs);
 }
 
 .pbk-package-price {
-  font-size: 24px;
+  font-size: var(--fs-heading-xl);
   font-weight: 700;
-  color: #000;
-  margin-bottom: 8px;
+  color: var(--text-primary);
+  margin-bottom: var(--space-sm);
 }
 
 .pbk-package-duration {
-  font-size: 13px;
-  color: #666;
-  margin-bottom: 8px;
+  font-size: var(--fs-body-sm);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-sm);
 }
 
 .pbk-package-desc {
@@ -942,33 +957,33 @@
    WHY CHOOSE US
    =========================================== */
 .pbk-why-choose {
-  margin-bottom: 28px;
-  padding: 24px 20px;
-  background: var(--bg-secondary, #f8f8f8);
-  border-radius: 16px;
+  margin-bottom: var(--space-3xl);
+  padding: var(--space-2xl) var(--space-xl);
+  background: var(--bg-gray);
+  border-radius: var(--radius);
 }
 
 .pbk-why-content {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--space-md);
 }
 
 .pbk-why-item {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
+  gap: var(--space-md);
 }
 
 .pbk-why-icon {
-  font-size: 20px;
+  font-size: var(--fs-heading);
   flex-shrink: 0;
 }
 
 .pbk-why-text {
-  font-size: 15px;
+  font-size: var(--fs-body);
   line-height: 1.5;
-  color: var(--text-primary, #1a1a1a);
+  color: var(--text-primary);
   margin: 0;
 }
 
@@ -976,10 +991,10 @@
    WHAT'S INCLUDED
    =========================================== */
 .pbk-whats-included {
-  margin-bottom: 28px;
-  padding: 24px 20px;
-  background: var(--bg-secondary, #f8f8f8);
-  border-radius: 16px;
+  margin-bottom: var(--space-3xl);
+  padding: var(--space-2xl) var(--space-xl);
+  background: var(--bg-gray);
+  border-radius: var(--radius);
 }
 
 .pbk-included-list {
@@ -988,13 +1003,13 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--space-md);
 }
 
 .pbk-included-item {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
+  gap: var(--space-md);
 }
 
 .pbk-included-check {
