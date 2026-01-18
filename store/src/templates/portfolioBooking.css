@@ -148,16 +148,17 @@
 
 /* Hero */
 .pbk-hero {
-  margin-bottom: var(--space-xl);
+  margin-bottom: var(--space-2xl);
 }
 
-/* Hero image card - FIXED size, image fills inside */
+/* Hero image card - Golden Ratio proportions (1:1.618) */
 .pbk-hero-image {
   position: relative;
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
   overflow: hidden;
   background: var(--bg-gray);
-  height: 340px;  /* Fixed height - image adapts to this */
+  aspect-ratio: 1.618 / 1;  /* Golden ratio - harmonious proportions */
+  max-height: 400px;  /* Cap height on mobile */
 }
 
 .pbk-hero-image img {
@@ -170,13 +171,14 @@
 
 @media (min-width: 768px) {
   .pbk-hero-image {
-    height: 420px;  /* Taller on desktop */
+    max-height: 480px;  /* Allow taller on tablet */
+    border-radius: var(--radius-lg);
   }
 }
 
 @media (min-width: 1024px) {
   .pbk-hero-image {
-    height: 480px;  /* Even taller on large screens */
+    max-height: 560px;  /* Full height on desktop */
   }
 }
 
