@@ -989,44 +989,47 @@
 
 /* ===========================================
    WHY CHOOSE US - Clean Apple style
+   Builds trust through differentiators
    =========================================== */
 .pbk-why-choose {
-  margin-bottom: var(--space-3xl);
-  padding-top: var(--space-2xl);
+  margin-bottom: var(--space-4xl);
+  padding-top: var(--space-4xl);
   border-top: 1px solid var(--border);
 }
 
 .pbk-why-content {
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
+  gap: var(--space-lg);
 }
 
 .pbk-why-item {
   display: flex;
   align-items: flex-start;
-  gap: var(--space-md);
+  gap: var(--space-lg);
 }
 
 .pbk-why-icon {
-  font-size: var(--fs-heading);
+  font-size: var(--fs-heading-lg);
   flex-shrink: 0;
-  opacity: 0.7;
+  opacity: 0.8;
 }
 
 .pbk-why-text {
   font-size: var(--fs-body);
-  line-height: 1.6;
+  line-height: 1.7;
   color: var(--text-secondary);
   margin: 0;
+  max-width: 55ch;  /* Optimal reading width */
 }
 
 /* ===========================================
    WHAT'S INCLUDED - Clean Apple style
+   Reassurance before booking decision
    =========================================== */
 .pbk-whats-included {
-  margin-bottom: var(--space-3xl);
-  padding-top: var(--space-2xl);
+  margin-bottom: var(--space-4xl);
+  padding-top: var(--space-4xl);
   border-top: 1px solid var(--border);
 }
 
@@ -1036,25 +1039,26 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
+  gap: var(--space-lg);
 }
 
 .pbk-included-item {
   display: flex;
   align-items: flex-start;
-  gap: var(--space-md);
+  gap: var(--space-lg);
 }
 
 .pbk-included-icon {
   color: var(--color-primary);
-  font-size: var(--fs-heading-sm);
+  font-size: var(--fs-heading);
   flex-shrink: 0;
 }
 
 .pbk-included-text {
   font-size: var(--fs-body);
   color: var(--text-secondary);
-  line-height: 1.5;
+  line-height: 1.6;
+  max-width: 55ch;
 }
 
 .pbk-included-check {
