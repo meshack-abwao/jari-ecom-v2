@@ -185,6 +185,15 @@ export default function BookingsPage() {
   const [blockedDates, setBlockedDates] = useState([]);
   const [newBlockedDate, setNewBlockedDate] = useState('');
   const [newBlockedReason, setNewBlockedReason] = useState('');
+  
+  // Responsive: track window width
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
@@ -666,7 +675,10 @@ export default function BookingsPage() {
     
     // ==================== STATS CARDS (Clickable) ====================
     const statsSection = (
-      <div style={styles.statsGrid}>
+      <div style={{
+        ...styles.statsGrid,
+        gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)'
+      }}>
         <div 
           style={{...styles.statCard, ...(viewFilter === 'today' ? styles.statCardActive : {})}}
           onClick={() => { setViewFilter(viewFilter === 'today' ? 'all' : 'today'); setSelectedDay(null); }}
@@ -725,7 +737,11 @@ export default function BookingsPage() {
     
     // ==================== WEEK VIEW (When "This Week" selected) ====================
     const weekViewSection = viewFilter === 'week' && (
-      <div style={styles.weekView}>
+      <div style={{
+        ...styles.weekView,
+        overflowX: isMobile ? 'auto' : 'visible',
+        gridTemplateColumns: isMobile ? 'repeat(7, minmax(60px, 1fr))' : 'repeat(7, 1fr)'
+      }}>
         {weekDays.map((day, idx) => (
           <div 
             key={idx}
@@ -1035,7 +1051,11 @@ export default function BookingsPage() {
 
 // ==================== STYLES ====================
 const styles = {
-  page: { maxWidth: '900px' },
+  page: { 
+    maxWidth: '1000px',
+    margin: '0 auto',
+    padding: '0 16px',
+  },
   header: { marginBottom: '28px' },
   pageTitle: { 
     fontSize: '28px', 
@@ -1067,6 +1087,7 @@ const styles = {
     border: '1px solid var(--border-light, rgba(255,255,255,0.1))',
     cursor: 'pointer',
     transition: 'all 0.2s',
+    minWidth: '0', // Prevent overflow on mobile
   },
   statCardActive: {
     border: '2px solid var(--accent-color, #8b5cf6)',
