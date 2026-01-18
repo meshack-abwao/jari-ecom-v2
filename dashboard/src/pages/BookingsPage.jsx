@@ -1,4 +1,4 @@
-import { useState, useEffect, memo } from 'react';
+import { useState, useEffect, memo, useCallback } from 'react';
 import { bookingsAPI } from '../api/client';
 import { 
   Calendar, Clock, Settings, Users, DollarSign, 
@@ -203,14 +203,14 @@ export default function BookingsPage() {
     }
   };
 
-  const toggleSection = (section) => {
+  const toggleSection = useCallback((section) => {
     setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
-  };
+  }, []);
 
-  const getWorkingHour = (day) => {
+  const getWorkingHour = useCallback((day) => {
     return workingHours.find(h => h.day_of_week === day) || 
            { is_open: false, start_time: '09:00', end_time: '17:00' };
-  };
+  }, [workingHours]);
 
   // Helper to render Section with expanded state
   const renderSection = (id, icon, title, description, children) => (
@@ -348,6 +348,8 @@ export default function BookingsPage() {
         icon={Calendar} 
         title="Advance Booking"
         description="Control when clients can book"
+        isExpanded={expandedSections.advance}
+        onToggle={toggleSection}
       >
         <SettingRow label="Minimum notice" hint="How far in advance clients must book">
           <select 
@@ -389,6 +391,8 @@ export default function BookingsPage() {
         icon={Zap} 
         title="Jump the Line"
         description="Let clients pay extra for urgent bookings"
+        isExpanded={expandedSections.premium}
+        onToggle={toggleSection}
       >
         <SettingRow label="Enable skip-the-wait fee" hint="Clients can pay to book within minimum notice">
           <label style={styles.toggleLabel}>
@@ -422,6 +426,8 @@ export default function BookingsPage() {
         icon={DollarSign} 
         title="Payment"
         description="Configure deposits and fees"
+        isExpanded={expandedSections.payment}
+        onToggle={toggleSection}
       >
         <SettingRow label="Accept deposits" hint="Let clients pay a portion upfront">
           <label style={styles.toggleLabel}>
@@ -470,6 +476,8 @@ export default function BookingsPage() {
         icon={Bell} 
         title="Reminders"
         description="Notify clients before appointments"
+        isExpanded={expandedSections.reminders}
+        onToggle={toggleSection}
       >
         <SettingRow label="Enable reminders" hint="Send notifications before appointments">
           <label style={styles.toggleLabel}>
@@ -504,6 +512,8 @@ export default function BookingsPage() {
         icon={CalendarX} 
         title="Blocked Dates"
         description="Mark days you're unavailable"
+        isExpanded={expandedSections.blocked}
+        onToggle={toggleSection}
       >
         {blockedDates.length > 0 ? (
           <div style={styles.blockedList}>
