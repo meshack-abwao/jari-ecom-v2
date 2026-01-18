@@ -468,6 +468,7 @@ async function handleConfirm() {
     if (content) {
       content.innerHTML = renderBookingSuccess(booking);
       document.getElementById('bkmDone')?.addEventListener('click', closeBookingModal);
+      document.getElementById('bkmAddToCalendar')?.addEventListener('click', () => addToCalendar(booking));
     }
   } catch (error) {
     console.error('[Booking] Failed to create booking:', error);
@@ -535,6 +536,61 @@ Please confirm availability.`;
     `;
     document.getElementById('bkmDone')?.addEventListener('click', closeBookingModal);
   }
+}
+
+// Add booking to calendar (generates .ics file download)
+function addToCalendar(booking = {}) {
+  const { product, selectedPackage, selectedDate, selectedTime, customerName } = bookingState;
+  
+  const serviceName = selectedPackage?.name || product?.data?.name || booking?.package_name || 'Appointment';
+  const bookingDate = selectedDate || booking?.booking_date;
+  const bookingTime = selectedTime || booking?.booking_time || '09:00';
+  const storeName = product?.data?.store_name || 'Service Provider';
+  
+  if (!bookingDate) {
+    alert('No date available for calendar');
+    return;
+  }
+  
+  // Parse date and time
+  const [hours, minutes] = bookingTime.split(':').map(Number);
+  const startDate = new Date(bookingDate);
+  startDate.setHours(hours || 9, minutes || 0, 0, 0);
+  
+  // End time (1 hour later by default)
+  const endDate = new Date(startDate);
+  endDate.setHours(endDate.getHours() + 1);
+  
+  // Format for ICS (YYYYMMDDTHHMMSS)
+  const formatICS = (date) => {
+    return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+  };
+  
+  // Create ICS content
+  const icsContent = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Jari.Eco//Booking//EN
+BEGIN:VEVENT
+UID:${Date.now()}@jari.eco
+DTSTAMP:${formatICS(new Date())}
+DTSTART:${formatICS(startDate)}
+DTEND:${formatICS(endDate)}
+SUMMARY:${serviceName} - ${storeName}
+DESCRIPTION:Your appointment for ${serviceName}. Remember to arrive 5-10 minutes early.
+STATUS:CONFIRMED
+END:VEVENT
+END:VCALENDAR`;
+
+  // Download the file
+  const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `appointment-${bookingDate}.ics`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
 }
 
 // Listen for portfolio-booking template events

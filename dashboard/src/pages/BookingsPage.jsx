@@ -569,29 +569,30 @@ export default function BookingsPage() {
 
   const renderCalendar = () => {
     // ==================== CALCULATE STATS ====================
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
     
-    // Get start of week (Monday)
+    // Get start of current week (Monday) - handles Sunday correctly
     const weekStart = new Date(today);
-    const dayOfWeek = today.getDay();
-    const diff = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
-    weekStart.setDate(today.getDate() - diff);
+    const dayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
+    const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+    weekStart.setDate(today.getDate() - daysFromMonday);
     const weekEnd = new Date(weekStart);
     weekEnd.setDate(weekEnd.getDate() + 7);
     
     // Filter helpers
     const isToday = (d) => {
       const date = new Date(d);
-      date.setHours(0, 0, 0, 0);
-      return date.getTime() === today.getTime();
+      const dateOnly = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      return dateOnly.getTime() === today.getTime();
     };
     
     const isThisWeek = (d) => {
       const date = new Date(d);
-      return date >= weekStart && date < weekEnd;
+      const dateOnly = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      return dateOnly >= weekStart && dateOnly < weekEnd;
     };
     
     // Stats counts
