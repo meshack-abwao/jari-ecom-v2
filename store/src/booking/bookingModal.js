@@ -297,17 +297,6 @@ function renderStep4() {
   // Debug log (remove after testing)
   console.log('[Booking] Price calc:', { basePrice, jumpLineFee, jumpFeeApplied, discount, subtotal, payNow });
   
-  // What customer pays now
-  let payNow = subtotal;
-  let payLater = 0;
-  if (paymentType === 'deposit' && depositEnabled) {
-    payNow = depositAmount;
-    payLater = subtotal - depositAmount;
-  } else if (paymentType === 'inquiry') {
-    payNow = inquiryFee;
-    payLater = subtotal - inquiryFee;
-  }
-  
   return `
     <div class="bkm-step-content">
       <h3 class="bkm-title">Review & Confirm</h3>
