@@ -699,8 +699,8 @@
 .pbk-package-btn {
   width: 100%;
   padding: var(--space-lg) var(--space-xl);
-  background: var(--text-primary);
-  color: var(--surface);
+  background: var(--color-primary);
+  color: #fff;
   border: none;
   border-radius: var(--radius-full);  /* Fully rounded = friendly, safe to click */
   font-size: var(--fs-body);
@@ -710,7 +710,7 @@
 }
 
 .pbk-package-btn:hover {
-  opacity: 0.9;
+  filter: brightness(1.1);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
