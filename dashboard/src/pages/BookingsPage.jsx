@@ -603,9 +603,13 @@ export default function BookingsPage() {
     const completedBookings = bookings.filter(b => b.status === 'completed');
     const cancelledBookings = bookings.filter(b => b.status === 'cancelled');
     
-    // Revenue calculation - from confirmed + completed (amount_paid field)
+    // Revenue calculation - from confirmed + completed bookings
     const paidBookings = bookings.filter(b => b.status === 'confirmed' || b.status === 'completed');
-    const totalRevenue = paidBookings.reduce((sum, b) => sum + (Number(b.amount_paid) || Number(b.total_amount) || 0), 0);
+    const totalRevenue = paidBookings.reduce((sum, b) => sum + (Number(b.total_amount) || 0), 0);
+    
+    // Pending revenue - from pending bookings
+    const pendingRevenue = pendingBookings.reduce((sum, b) => sum + (Number(b.total_amount) || 0), 0);
+    
     const fullPayments = paidBookings.filter(b => b.payment_type === 'full');
     const depositPayments = paidBookings.filter(b => b.payment_type === 'deposit');
     const inquiryPayments = paidBookings.filter(b => b.payment_type === 'inquiry');
@@ -709,6 +713,11 @@ export default function BookingsPage() {
           <div style={styles.statInfo}>
             <div style={styles.statLabel}>REVENUE</div>
             <div style={styles.statValue}>KES {totalRevenue.toLocaleString()}</div>
+            {pendingRevenue > 0 && (
+              <div style={{fontSize: '11px', color: '#f59e0b', marginTop: '2px'}}>
+                +KES {pendingRevenue.toLocaleString()} pending
+              </div>
+            )}
           </div>
         </div>
       </div>
