@@ -25,7 +25,12 @@ export function renderPortfolioBookingTemplate(product) {
     ${showBackButton ? '<button class="pbk-back-btn" id="backBtn">← Back to Services</button>' : ''}
     
     <div class="pbk-container">
-      <!-- Header - Premium Typography -->
+      <!-- ==========================================
+           SECTION FLOW (Psychology-Based Reading Path)
+           Based on "Grids and Page Layouts" - cinematic sequence
+           ========================================== -->
+      
+      <!-- 1. HEADER - "What is this?" (First impression) -->
       <div class="pbk-header">
         <h1 class="pbk-title">${data.name || 'Service'}</h1>
         <div class="pbk-meta">
@@ -49,40 +54,40 @@ export function renderPortfolioBookingTemplate(product) {
         </div>
       </div>
 
-      <!-- Hero Media -->
+      <!-- 2. HERO - Emotional hook (visual impact) -->
       <div class="pbk-hero">
         ${renderPbkHero(media)}
       </div>
 
-      <!-- Intro -->
+      <!-- 3. INTRO - "Why should I care?" (Value proposition) -->
       <div class="pbk-intro">
         <div class="pbk-price-from">Starting from <strong>KES ${startingPrice.toLocaleString()}</strong></div>
         ${data.description ? `<p class="pbk-description">${data.description}</p>` : ''}
       </div>
 
-      <!-- Stories (if any) -->
-      ${media.stories?.length > 0 ? renderPbkStories(media.stories) : ''}
-
-      <!-- Why Choose Us -->
-      ${data.whyChooseUs ? renderPbkWhyChooseUs(data.whyChooseUs) : ''}
-
-      <!-- Packages -->
+      <!-- 4. PACKAGES - "What do I get?" (Decision framework - EARLY!) -->
       ${packages.length > 0 ? renderPbkPackages(packages) : ''}
 
-      <!-- Gallery (Showcase) - uses showcaseImages or fallback to images -->
+      <!-- 5. GALLERY - "Is the work good?" (Proof of quality) -->
       ${renderPbkGallerySection(media, data.galleryTitle)}
 
-      <!-- What's Included -->
+      <!-- 6. WHY CHOOSE US - "Why you over competitors?" (Differentiators) -->
+      ${data.whyChooseUs ? renderPbkWhyChooseUs(data.whyChooseUs) : ''}
+
+      <!-- 7. WHAT'S INCLUDED - "What exactly is in my package?" (Details) -->
       ${data.whatsIncluded ? renderPbkWhatsIncluded(data.whatsIncluded) : ''}
 
-      <!-- Testimonials -->
+      <!-- 8. TESTIMONIALS - "Do others trust this provider?" (Social proof) -->
       ${testimonials.length > 0 ? renderPbkTestimonials(testimonials) : ''}
 
-      <!-- Booking Note -->
+      <!-- 9. STORIES - "See more examples" (Bonus content - last) -->
+      ${media.stories?.length > 0 ? renderPbkStories(media.stories) : ''}
+
+      <!-- 10. BOOKING NOTE - Final reassurance -->
       ${data.bookingNote ? `<p class="pbk-note">ℹ️ ${data.bookingNote}</p>` : ''}
     </div>
 
-    <!-- Sticky CTA - Glass Style -->
+    <!-- Sticky CTA - Always visible -->
     <div class="pbk-sticky-cta">
       <div class="pbk-cta-glass">
         <div class="pbk-cta-price">
