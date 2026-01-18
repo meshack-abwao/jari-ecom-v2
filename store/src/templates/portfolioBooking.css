@@ -4,11 +4,24 @@
    Uses design tokens from base.css for consistency
    =========================================== */
 
-/* Container */
+/* Container - Breathable width, not cramped */
 .pbk-container {
-  max-width: 600px;
+  max-width: 680px;
   margin: 0 auto;
-  padding: 0 var(--space-lg) 120px;
+  padding: 0 var(--space-xl) 120px;
+}
+
+@media (min-width: 768px) {
+  .pbk-container {
+    max-width: 720px;
+    padding: 0 var(--space-2xl) 120px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .pbk-container {
+    max-width: 800px;
+  }
 }
 
 /* Back Button */
@@ -79,10 +92,10 @@
   flex-shrink: 0;
 }
 
-/* Action buttons - Deep Dive IG style */
+/* Action buttons - Deep Dive style with SVG icons */
 .pbk-action-btn {
-  width: 40px;
-  height: 40px;
+  width: var(--size-icon-md);
+  height: var(--size-icon-md);
   border-radius: 50%;
   background: var(--bg-gray);
   border: none;
@@ -92,7 +105,11 @@
   cursor: pointer;
   color: var(--text-secondary);
   transition: all 0.2s ease;
-  font-size: 18px;
+}
+
+.pbk-action-btn svg {
+  width: 20px;
+  height: 20px;
 }
 
 .pbk-action-btn:hover {
@@ -106,7 +123,12 @@
 }
 
 .pbk-action-btn.liked {
-  color: #ff375f;
+  background: rgba(255, 59, 48, 0.1);
+  color: #ff3b30;
+}
+
+.pbk-action-btn.liked svg {
+  fill: #ff3b30;
 }
 
 
@@ -363,29 +385,37 @@
 }
 
 /* ===========================================
-   GALLERY - Masonry grid with lightbox
+   GALLERY - Magazine grid like Deep Dive showcase
    =========================================== */
 .pbk-gallery {
-  margin-bottom: 28px;
+  margin-bottom: var(--space-3xl);
 }
 
 .pbk-gallery .pbk-section-title {
   text-align: center;
-  margin-bottom: 20px;
+  font-size: var(--fs-display);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  margin-bottom: var(--space-xl);
 }
 
 .pbk-gallery-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
+  gap: var(--space-md);
 }
 
 .pbk-gallery-item {
   position: relative;
-  border-radius: 12px;
+  border-radius: var(--radius);
   overflow: hidden;
   cursor: pointer;
   aspect-ratio: 1;
+  background: var(--bg-gray);
+}
+
+.pbk-gallery-item:hover {
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
 }
 
 .pbk-gallery-item.pbk-gallery-large {
@@ -397,11 +427,11 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s;
+  transition: transform 0.4s ease;
 }
 
 .pbk-gallery-item:hover img {
-  transform: scale(1.03);
+  transform: scale(1.05);
 }
 
 .pbk-gallery-overlay {
@@ -409,14 +439,31 @@
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 30px 16px 12px;
-  background: linear-gradient(transparent, rgba(0,0,0,0.6));
+  padding: 40px var(--space-lg) var(--space-lg);
+  background: linear-gradient(transparent, rgba(0,0,0,0.7));
 }
 
 .pbk-gallery-caption {
-  font-size: 14px;
-  font-weight: 500;
+  font-size: var(--fs-body);
+  font-weight: 600;
   color: #fff;
+  letter-spacing: -0.01em;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+@media (min-width: 768px) {
+  .pbk-gallery-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-lg);
+  }
+  
+  .pbk-gallery .pbk-section-title {
+    font-size: var(--fs-display-xl);
+  }
+  
+  .pbk-gallery-caption {
+    font-size: var(--fs-body-lg);
+  }
 }
 
 /* Lightbox */
@@ -757,40 +804,35 @@
     gap: 16px;
   }
   
-  .pbk-sticky-cta > div:first-child {
-    display: block;
+  /* Desktop CTA - Same inline compact as mobile, just slightly bigger */
+  .pbk-sticky-cta {
+    max-width: 520px;
+  }
+  
+  .pbk-cta-glass {
+    padding: 12px 18px;
+    gap: var(--space-lg);
   }
   
   .pbk-cta-price {
-    text-align: left;
+    padding-right: var(--space-lg);
   }
   
   .pbk-cta-label {
-    font-size: 12px;
-    color: #666;
-    display: block;
+    font-size: var(--fs-small);
   }
   
   .pbk-cta-amount {
-    font-size: 20px;
-    font-weight: 700;
+    font-size: var(--fs-heading-lg);
   }
   
-  .pbk-sticky-cta {
-    padding: 16px;
+  .pbk-cta-book {
+    padding: 14px 24px;
+    font-size: var(--fs-body-sm);
   }
   
-  .pbk-sticky-cta > div {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    max-width: 500px;
-    margin: 0 auto;
-    background: rgba(255,255,255,0.95);
-    backdrop-filter: blur(10px);
-    padding: 12px 16px;
-    border-radius: 20px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+  .pbk-cta-inquire {
+    padding: 14px 16px;
   }
 }
 
