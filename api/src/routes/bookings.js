@@ -419,7 +419,7 @@ router.get('/public/:storeSlug/blocked-dates', async (req, res, next) => {
 });
 
 // Get available slots for a date (public - no auth)
-router.get('/public/:storeSlug/available', async (req, res, next) => {
+router.get('/public/:storeSlug/availability', async (req, res, next) => {
   try {
     const { storeSlug } = req.params;
     const { date, service_id } = req.query;
@@ -533,7 +533,7 @@ router.get('/public/:storeSlug/available', async (req, res, next) => {
 
 
 // Create booking (public - customer)
-router.post('/public/:storeSlug', async (req, res, next) => {
+router.post('/public/:storeSlug/bookings', async (req, res, next) => {
   try {
     const { storeSlug } = req.params;
     const {
