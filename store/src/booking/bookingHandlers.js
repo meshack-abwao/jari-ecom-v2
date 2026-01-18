@@ -417,8 +417,68 @@ async function handleConfirm() {
   } catch (error) {
     console.error('[Booking] Failed to create booking:', error);
     updateBookingState({ submitting: false });
-    updateContent();
-    alert(error.message || 'Failed to create booking. Please try again.');
+    
+    // Fallback to WhatsApp booking when API fails
+    const fallbackToWhatsApp = confirm(
+      'Unable to complete online booking. Would you like to book via WhatsApp instead?'
+    );
+    
+    if (fallbackToWhatsApp) {
+      sendBookingViaWhatsApp();
+    } else {
+      updateContent();
+    }
+  }
+}
+
+// Send booking via WhatsApp (fallback when API unavailable)
+function sendBookingViaWhatsApp() {
+  const { 
+    product, selectedPackage, selectedDate, selectedTime, 
+    customerName, customerPhone, notes, paymentType, jumpLine
+  } = bookingState;
+  
+  const serviceName = selectedPackage?.name || product?.data?.name || 'Service';
+  const price = selectedPackage?.price || product?.data?.price || 0;
+  
+  // Format the booking message
+  const message = `🗓️ *BOOKING REQUEST*
+
+*Service:* ${serviceName}
+*Date:* ${selectedDate}
+*Time:* ${selectedTime}
+*Price:* KES ${parseInt(price).toLocaleString()}
+
+*Customer Details:*
+• Name: ${customerName}
+• Phone: ${customerPhone}
+${notes ? `• Notes: ${notes}` : ''}
+
+*Payment:* ${paymentType === 'deposit' ? 'Deposit' : paymentType === 'inquiry' ? 'Inquiry' : 'Full Payment'}
+${jumpLine ? '⚡ Priority Booking Requested' : ''}
+
+Please confirm availability.`;
+
+  // Get store phone from product or use default
+  const storePhone = product?.data?.whatsapp || product?.data?.phone || '254700000000';
+  const cleanPhone = storePhone.replace(/[^0-9]/g, '');
+  
+  // Open WhatsApp
+  const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
+  window.open(whatsappUrl, '_blank');
+  
+  // Show success anyway
+  const content = document.getElementById('bkmContent');
+  if (content) {
+    content.innerHTML = `
+      <div class="bkm-success">
+        <div class="bkm-success-icon" style="background: #25D366;">💬</div>
+        <h3>WhatsApp Opened!</h3>
+        <p>Complete your booking in WhatsApp.<br>The provider will confirm your appointment.</p>
+        <button class="bkm-btn bkm-btn-primary" id="bkmDone">Done</button>
+      </div>
+    `;
+    document.getElementById('bkmDone')?.addEventListener('click', closeBookingModal);
   }
 }
 
