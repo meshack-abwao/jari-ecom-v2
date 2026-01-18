@@ -2,6 +2,20 @@
    PORTFOLIO-BOOKING TEMPLATE CSS
    Prefix: pbk-
    Uses design tokens from base.css for consistency
+   
+   TYPOGRAPHY HIERARCHY (Based on Psychology):
+   ─────────────────────────────────────────────
+   Level 1: Service Title    → --fs-display-xl (32px) / 700
+   Level 2: Package Names    → --fs-heading-xl (24px) / 600  
+   Level 3: Section Headers  → --fs-heading (20px) / 600
+   Level 4: Body Copy        → --fs-body (15px) / 400
+   Level 5: Captions/Meta    → --fs-small (12px) / 400
+   
+   SPACING RHYTHM (8px base):
+   ─────────────────────────────────────────────
+   Section gaps: --space-4xl (40px) or --space-5xl (48px)
+   Element gaps: --space-xl (20px) or --space-2xl (24px)
+   Tight groups: --space-md (12px) or --space-lg (16px)
    =========================================== */
 
 /* Container - Breathable width, not cramped */
@@ -309,16 +323,23 @@
 }
 
 
-/* Section Title (reusable) - More impactful */
+/* Section Title (Level 3 in hierarchy) - Clear wayfinding */
 .pbk-section-title {
-  font-size: var(--fs-heading-lg);
-  font-weight: 700;
-  margin: 0 0 var(--space-xl);
+  font-size: var(--fs-heading);
+  font-weight: 600;
+  margin: 0 0 var(--space-2xl);
   color: var(--text-primary);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
 }
 
 @media (min-width: 768px) {
+  .pbk-section-title {
+    font-size: var(--fs-heading-lg);
+  }
+}
+
+@media (min-width: 1024px) {
   .pbk-section-title {
     font-size: var(--fs-heading-xl);
   }
