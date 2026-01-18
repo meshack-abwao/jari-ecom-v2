@@ -769,7 +769,7 @@
   color: #ffb800;
   margin-bottom: var(--space-md);
   font-size: var(--fs-body-sm);
-  letter-spacing: 2px;
+  letter-spacing: var(--space-xs);
   text-align: center;
 }
 
@@ -794,10 +794,10 @@
 }
 
 .pbk-testimonial-avatar {
-  width: 40px;
-  height: 40px;
-  min-width: 40px;
-  min-height: 40px;
+  width: var(--space-4xl);
+  height: var(--space-4xl);
+  min-width: var(--space-4xl);
+  min-height: var(--space-4xl);
   border-radius: 50%;
   background: linear-gradient(135deg, var(--color-primary) 0%, #ffb347 100%);
   display: inline-flex;
@@ -850,11 +850,11 @@
    =========================================== */
 .pbk-sticky-cta {
   position: fixed;
-  bottom: 20px;
+  bottom: var(--space-xl);
   left: 50%;
   transform: translateX(-50%);
   z-index: 100;
-  width: calc(100% - 32px);
+  width: calc(100% - var(--space-3xl));
   max-width: 468px;
   pointer-events: none;
 }
@@ -864,7 +864,7 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-lg);
-  padding: 12px 18px;
+  padding: var(--space-md) var(--space-lg);
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -878,7 +878,7 @@
 .pbk-cta-price {
   display: flex;
   align-items: baseline;
-  gap: 4px;
+  gap: var(--space-xs);
   padding-right: var(--space-md);
   border-right: 1px solid var(--border);
 }
@@ -902,7 +902,7 @@
 }
 
 .pbk-cta-book {
-  padding: 12px 24px;
+  padding: var(--space-md) var(--space-2xl);
   background: var(--gradient-primary);
   color: #fff;
   border: none;
@@ -920,7 +920,7 @@
 }
 
 .pbk-cta-inquire {
-  padding: 12px 16px;
+  padding: var(--space-md) var(--space-lg);
   background: #25D366;
   color: #fff;
   border: none;
