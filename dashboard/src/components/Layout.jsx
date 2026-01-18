@@ -195,14 +195,14 @@ export default function Layout() {
           <NavLink to="/" end className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
             <Home size={20} /><span>Overview</span>
           </NavLink>
+          <NavLink to="/products" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
+            <Package size={20} /><span>My Products</span>
+          </NavLink>
           <NavLink to="/orders" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
             <ShoppingCart size={20} /><span>Orders</span>
           </NavLink>
           <NavLink to="/bookings" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
             <Calendar size={20} /><span>Bookings</span>
-          </NavLink>
-          <NavLink to="/products" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
-            <Package size={20} /><span>My Products</span>
           </NavLink>
           <NavLink to="/ads" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
             <Megaphone size={20} /><span>Ads</span>

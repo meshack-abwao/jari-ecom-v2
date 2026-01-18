@@ -1052,9 +1052,8 @@ export default function BookingsPage() {
 // ==================== STYLES ====================
 const styles = {
   page: { 
-    maxWidth: '1000px',
-    margin: '0 auto',
-    padding: '0 16px',
+    maxWidth: '100%',
+    padding: '0',
   },
   header: { marginBottom: '28px' },
   pageTitle: { 
