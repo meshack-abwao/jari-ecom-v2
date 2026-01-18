@@ -257,18 +257,49 @@ async function selectDate(dateStr) {
     const { storeSlug } = bookingState;
     const result = await bookingApi.getAvailability(storeSlug, dateStr);
     
-    if (result.available) {
+    if (result.available && result.slots?.length > 0) {
       updateBookingState({ availableSlots: result.slots });
     } else {
-      updateBookingState({ availableSlots: [] });
+      // API returned no slots - generate defaults
+      updateBookingState({ availableSlots: generateDefaultSlots() });
     }
-    
-    // Re-render step 2 to show slots
-    updateContent();
   } catch (error) {
-    console.error('[Booking] Failed to load slots:', error);
+    console.error('[Booking] Failed to load slots, using defaults:', error);
+    // Generate client-side slots when API fails
+    updateBookingState({ availableSlots: generateDefaultSlots() });
   }
+  
+  // Always re-render to show slots
+  updateContent();
 }
+
+// Generate default time slots (9am-5pm, hourly)
+function generateDefaultSlots() {
+  const { settings, workingHours, selectedDate } = bookingState;
+  const slots = [];
+  
+  // Get working hours for selected day
+  const dateObj = new Date(selectedDate);
+  const dayOfWeek = dateObj.getDay();
+  const dayHours = workingHours.find(w => w.day_of_week === dayOfWeek);
+  
+  // Default to 9-5 if no working hours configured
+  const startHour = dayHours?.start_time ? parseInt(dayHours.start_time.split(':')[0]) : 9;
+  const endHour = dayHours?.end_time ? parseInt(dayHours.end_time.split(':')[0]) : 17;
+  const duration = settings?.slot_duration_minutes || 60;
+  
+  // Generate slots
+  for (let hour = startHour; hour < endHour; hour++) {
+    const time = `${hour.toString().padStart(2, '0')}:00`;
+    slots.push({ time, available: true });
+    
+    // Add half-hour slots if duration is 30 min
+    if (duration === 30 && hour < endHour - 1) {
+      slots.push({ time: `${hour.toString().padStart(2, '0')}:30`, available: true });
+    }
+  }
+  
+  return slots;
 
 // Select a time slot
 function selectTime(time) {
