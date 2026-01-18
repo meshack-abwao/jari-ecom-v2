@@ -630,8 +630,8 @@
 }
 
 .pbk-gallery-caption {
-  font-size: var(--fs-body-lg);  /* Larger for better legibility */
-  font-weight: 500;
+  font-size: var(--fs-body-lg);
+  font-weight: 300;  /* Lighter for softer overlay - reduced from 400 */
   color: #fff;
   letter-spacing: -0.01em;
   text-shadow: 0 2px 8px rgba(0,0,0,0.5);
@@ -650,7 +650,8 @@
   }
   
   .pbk-gallery-caption {
-    font-size: var(--fs-heading-sm);  /* Even larger on desktop */
+    font-size: var(--fs-heading-sm);
+    font-weight: 400;  /* Lighter for softer overlay */
   }
   
   .pbk-gallery-overlay {
@@ -768,6 +769,7 @@
    PACKAGES - Clean card design (Level 2 hierarchy)
    Cards with shadow = trust signal (rounded = safe)
    Typography psychology: bolder = more important
+   Fixed CTA position prevents layout breaking
    =========================================== */
 .pbk-packages {
   margin-bottom: var(--space-5xl);
@@ -783,7 +785,6 @@
 
 .pbk-package {
   position: relative;
-  padding: var(--space-xl) var(--space-2xl);
   background: var(--surface);
   border-radius: var(--radius-lg);
   border: 1px solid var(--border);
@@ -791,7 +792,7 @@
   box-shadow: 0 2px 8px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
+  overflow: hidden;
   transition: all 0.25s ease;
 }
 
@@ -806,6 +807,37 @@
   background: linear-gradient(135deg, rgba(var(--color-primary-rgb, 0,0,0), 0.02) 0%, transparent 100%);
 }
 
+/* Package image - Golden ratio aspect, optional */
+.pbk-package-image {
+  width: 100%;
+  aspect-ratio: 1.618 / 1;  /* Golden ratio */
+  overflow: hidden;
+  background: var(--bg-gray);
+}
+
+.pbk-package-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.pbk-package:hover .pbk-package-image img {
+  transform: scale(1.05);
+}
+
+/* Package content - Fixed height structure with absolute CTA */
+.pbk-package-content {
+  padding: var(--space-xl) var(--space-2xl);
+  padding-bottom: calc(var(--space-2xl) + 44px + var(--space-lg));  /* Space for fixed CTA */
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 180px;  /* Minimum height for consistency */
+  position: relative;
+}
+
+/* Badge - Center on desktop, right on mobile */
 .pbk-package-badge {
   position: absolute;
   top: 0;
@@ -817,6 +849,7 @@
   font-weight: 600;
   padding: var(--space-xs) var(--space-md);
   border-radius: var(--radius-full);
+  z-index: 2;
 }
 
 /* Package name - larger, bolder for impact */
@@ -825,6 +858,7 @@
   font-weight: 700;  /* Bolder */
   color: var(--text-primary);
   letter-spacing: -0.02em;
+  margin-bottom: var(--space-xs);
 }
 
 .pbk-package-price {
@@ -832,12 +866,14 @@
   font-weight: 700;
   color: var(--color-primary);
   letter-spacing: -0.02em;
+  margin-bottom: var(--space-xs);
 }
 
 .pbk-package-duration {
   font-size: var(--fs-small);
   color: var(--text-secondary);
-  font-weight: 500;  /* Slightly bolder */
+  font-weight: 500;
+  margin-bottom: var(--space-sm);
 }
 
 .pbk-package-desc {
@@ -845,14 +881,17 @@
   color: var(--text-secondary);
   line-height: 1.5;
   margin: 0;
-  font-weight: 450;  /* Slightly bolder for readability */
+  font-weight: 450;
 }
 
-/* CTA - Golden ratio sizing (61.8% of card width), compact */
+/* CTA - Fixed at bottom, Golden ratio sizing */
 .pbk-package-btn {
+  position: absolute;
+  bottom: var(--space-xl);
+  left: 50%;
+  transform: translateX(-50%);
   width: 61.8%;  /* Golden ratio */
   max-width: 200px;
-  align-self: center;
   padding: var(--space-sm) var(--space-lg);
   background: var(--color-primary);
   color: #fff;
@@ -862,7 +901,6 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.25s ease;
-  margin-top: var(--space-md);
   text-align: center;
 }
 
@@ -1118,7 +1156,14 @@
     gap: var(--space-xl);
   }
   
-  /* Desktop CTA - Inline compact style */
+  /* Badge centered on desktop */
+  .pbk-package-badge {
+    left: 50%;
+    right: auto;
+    transform: translate(-50%, -50%);
+  }
+  
+  /* Desktop CTA - Inline compact style, centered */
   .pbk-sticky-cta {
     max-width: 520px;
     width: calc(100% - var(--space-4xl));
@@ -1126,7 +1171,9 @@
   
   .pbk-cta-glass {
     flex-direction: row;  /* Inline on desktop */
-    padding: var(--space-md) var(--space-lg);
+    justify-content: center;  /* Center all elements */
+    align-items: center;
+    padding: var(--space-md) var(--space-xl);
     gap: var(--space-lg);
     border-radius: var(--radius-full);  /* Pill shape on desktop */
   }
@@ -1134,6 +1181,7 @@
   .pbk-cta-price {
     padding-right: var(--space-lg);
     border-right: 1px solid var(--border);  /* Separator on desktop */
+    text-align: center;
   }
   
   .pbk-cta-label {
@@ -1146,6 +1194,7 @@
   
   .pbk-cta-buttons {
     width: auto;
+    justify-content: center;
   }
   
   .pbk-cta-book {

@@ -71,7 +71,7 @@ const getInitialFormData = () => ({
   testimonials: [{ text: '', author: '', rating: 5, image: '', role: '' }],
   
   // Packages (portfolio-booking)
-  packages: [{ name: '', description: '', price: '', duration: '' }],
+  packages: [{ name: '', description: '', price: '', duration: '', image: '' }],
   bookingNote: '',
   whyChooseUs: [''],
   whatsIncluded: [''],
@@ -332,8 +332,8 @@ export default function ProductsPage() {
       
       // Template-specific
       packages: data.packages?.length > 0 
-        ? data.packages 
-        : [{ name: '', description: '', price: '', duration: '' }],
+        ? data.packages.map(p => ({ ...p, image: p.image || '' }))
+        : [{ name: '', description: '', price: '', duration: '', image: '' }],
       bookingNote: data.bookingNote || '',
       whyChooseUs: data.whyChooseUs?.length > 0 ? data.whyChooseUs : [''],
       whatsIncluded: data.whatsIncluded?.length > 0 ? data.whatsIncluded : [''],
@@ -876,11 +876,23 @@ export default function ProductsPage() {
                             className="dashboard-input"
                             style={{ marginTop: '8px' }}
                           />
+                          <input
+                            type="text"
+                            value={pkg.image || ''}
+                            onChange={e => {
+                              const newP = [...formData.packages];
+                              newP[idx] = { ...newP[idx], image: e.target.value };
+                              updateField('packages', newP);
+                            }}
+                            placeholder="Image URL (optional)"
+                            className="dashboard-input"
+                            style={{ marginTop: '8px' }}
+                          />
                         </div>
                       ))}
                       <button
                         type="button"
-                        onClick={() => updateField('packages', [...formData.packages, { name: '', description: '', price: '', duration: '' }])}
+                        onClick={() => updateField('packages', [...formData.packages, { name: '', description: '', price: '', duration: '', image: '' }])}
                         style={styles.addBtn}
                       >
                         + Add Package
