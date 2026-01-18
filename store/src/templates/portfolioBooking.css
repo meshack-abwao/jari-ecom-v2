@@ -663,17 +663,18 @@
 
 .pbk-package-name {
   font-size: var(--fs-heading);
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-primary);
   margin-bottom: var(--space-sm);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
 }
 
 .pbk-package-price {
-  font-size: var(--fs-heading-lg);
-  font-weight: 700;
-  color: var(--text-primary);
+  font-size: var(--fs-heading-xl);
+  font-weight: 800;
+  color: var(--color-primary);
   margin-bottom: var(--space-md);
+  letter-spacing: -0.02em;
 }
 
 .pbk-package-duration {
