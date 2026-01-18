@@ -413,9 +413,16 @@
   height: var(--size-icon-lg);
   border-radius: 50%;
   padding: 3px;
-  /* Use theme color instead of hardcoded IG gradient */
-  background: linear-gradient(45deg, var(--color-primary), var(--color-primary-dark, var(--color-primary)));
+  background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+  background-size: 200% 200%;
+  animation: pbk-story-gradient 3s ease infinite;
   transition: transform 0.2s;
+}
+
+@keyframes pbk-story-gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 .pbk-story:hover .pbk-story-ring {
@@ -765,7 +772,7 @@
 }
 
 /* ===========================================
-   PACKAGES - Card design with horizontal header
+   PACKAGES - Clean card design (Level 2 hierarchy)
    Cards with subtle shadow = trust signal (rounded = safe)
    =========================================== */
 .pbk-packages {
@@ -815,16 +822,9 @@
   border-radius: var(--radius-full);
 }
 
-.pbk-package-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: var(--space-md);
-}
-
 .pbk-package-name {
   font-size: var(--fs-body-lg);
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-primary);
   letter-spacing: -0.01em;
 }
@@ -834,18 +834,11 @@
   font-weight: 700;
   color: var(--color-primary);
   letter-spacing: -0.02em;
-  white-space: nowrap;
 }
 
-/* Duration badge - colored to pop */
 .pbk-package-duration {
-  display: inline-block;
   font-size: var(--fs-small);
-  color: var(--color-primary);
-  background: rgba(var(--color-primary-rgb, 0,122,255), 0.1);
-  padding: var(--space-xs) var(--space-sm);
-  border-radius: var(--radius-full);
-  font-weight: 500;
+  color: var(--text-secondary);
 }
 
 .pbk-package-desc {
@@ -853,22 +846,20 @@
   color: var(--text-secondary);
   line-height: 1.5;
   margin: 0;
-  max-width: 50ch;
 }
 
-/* CTA - centered, smaller */
 .pbk-package-btn {
-  align-self: center;
-  padding: var(--space-sm) var(--space-xl);
+  padding: var(--space-md) var(--space-xl);
   background: var(--color-primary);
   color: #fff;
   border: none;
   border-radius: var(--radius-full);
-  font-size: var(--fs-small);
+  font-size: var(--fs-body-sm);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.25s ease;
   margin-top: var(--space-sm);
+  text-align: center;
 }
 
 .pbk-package-btn:hover {
@@ -1014,7 +1005,7 @@
 }
 
 /* ===========================================
-   STICKY CTA - Glass Style (narrower + taller on mobile)
+   STICKY CTA - Glass Style (centered elements)
    =========================================== */
 .pbk-sticky-cta {
   position: fixed;
@@ -1022,31 +1013,33 @@
   left: 50%;
   transform: translateX(-50%);
   z-index: 100;
-  width: calc(100% - var(--space-5xl));  /* Narrower */
-  max-width: 320px;  /* Narrower max */
+  width: calc(100% - var(--space-4xl));
+  max-width: 380px;
   pointer-events: none;
 }
 
 .pbk-cta-glass {
   display: flex;
-  flex-direction: column;  /* Stack on mobile for taller feel */
   align-items: center;
-  gap: var(--space-sm);
-  padding: var(--space-md) var(--space-lg);
+  justify-content: center;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-full);
   box-shadow: 0 4px 20px rgba(0,0,0,0.1), 0 1px 4px rgba(0,0,0,0.06);
   border: 1px solid rgba(0,0,0,0.06);
   pointer-events: all;
 }
 
-/* Price section */
+/* Price section - inline with border separator */
 .pbk-cta-price {
   display: flex;
   align-items: baseline;
   gap: var(--space-xs);
+  padding-right: var(--space-sm);
+  border-right: 1px solid var(--border);
 }
 
 .pbk-cta-label {
@@ -1064,13 +1057,11 @@
 
 .pbk-cta-buttons {
   display: flex;
-  gap: var(--space-sm);
-  width: 100%;
+  gap: var(--space-xs);
 }
 
 .pbk-cta-book {
-  flex: 1;
-  padding: var(--space-md) var(--space-lg);  /* Taller */
+  padding: var(--space-sm) var(--space-lg);
   background: var(--color-primary);
   color: #fff;
   border: none;
@@ -1087,7 +1078,7 @@
 }
 
 .pbk-cta-inquire {
-  padding: var(--space-md) var(--space-lg);  /* Taller */
+  padding: var(--space-sm) var(--space-md);
   background: #25D366;
   color: #fff;
   border: none;

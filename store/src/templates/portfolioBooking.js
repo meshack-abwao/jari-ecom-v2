@@ -260,16 +260,12 @@ function renderPbkPackages(packages) {
         ${packages.map((pkg, i) => `
           <div class="pbk-package ${i === 0 ? 'pbk-package-featured' : ''}">
             ${i === 0 ? '<span class="pbk-package-badge">Popular</span>' : ''}
-            <div class="pbk-package-header">
-              <div class="pbk-package-info">
-                <div class="pbk-package-name">${pkg.name}</div>
-                ${pkg.duration ? `<div class="pbk-package-duration">⏱ ${pkg.duration}</div>` : ''}
-              </div>
-              <div class="pbk-package-price">KES ${parseInt(pkg.price || 0).toLocaleString()}</div>
-            </div>
+            <div class="pbk-package-name">${pkg.name}</div>
+            <div class="pbk-package-price">KES ${parseInt(pkg.price || 0).toLocaleString()}</div>
+            ${pkg.duration ? `<div class="pbk-package-duration">⏱ ${pkg.duration}</div>` : ''}
             ${pkg.description ? `<p class="pbk-package-desc">${pkg.description}</p>` : ''}
             <button class="pbk-package-btn" data-pkg-index="${i}" data-pkg-name="${pkg.name}" data-pkg-price="${pkg.price}">
-              Select
+              Select Package
             </button>
           </div>
         `).join('')}
