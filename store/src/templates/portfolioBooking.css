@@ -639,81 +639,90 @@
 .pbk-packages-grid {
   display: flex;
   flex-direction: column;
-  gap: var(--space-xl);
+  gap: var(--space-lg);
 }
 
 .pbk-package {
   position: relative;
-  padding: var(--space-2xl);
+  padding: var(--space-xl) var(--space-2xl);
   background: var(--surface);
   border-radius: var(--radius-lg);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
   transition: all 0.25s ease;
 }
 
 .pbk-package:hover {
-  box-shadow: 0 8px 24px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04);
-  transform: translateY(-2px);
+  border-color: var(--color-primary);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
 }
 
 .pbk-package-featured {
-  box-shadow: 0 0 0 2px var(--color-primary), 0 4px 16px rgba(0,0,0,0.08);
+  border-color: var(--color-primary);
+  background: linear-gradient(135deg, rgba(var(--color-primary-rgb, 0,0,0), 0.02) 0%, transparent 100%);
 }
 
 .pbk-package-badge {
   position: absolute;
   top: 0;
-  left: var(--space-xl);
+  right: var(--space-xl);
   transform: translateY(-50%);
   background: var(--color-primary);
-  color: var(--surface);
+  color: #fff;
   font-size: var(--fs-tiny);
   font-weight: 600;
   padding: var(--space-xs) var(--space-md);
   border-radius: var(--radius-full);
 }
 
+.pbk-package-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-md);
+}
+
 .pbk-package-name {
-  font-size: var(--fs-heading);
-  font-weight: 700;
+  font-size: var(--fs-body-lg);
+  font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: var(--space-sm);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
 }
 
 .pbk-package-price {
-  font-size: var(--fs-heading-xl);
-  font-weight: 800;
+  font-size: var(--fs-heading);
+  font-weight: 700;
   color: var(--color-primary);
-  margin-bottom: var(--space-md);
   letter-spacing: -0.02em;
+  white-space: nowrap;
 }
 
 .pbk-package-duration {
-  font-size: var(--fs-body-sm);
+  font-size: var(--fs-small);
   color: var(--text-secondary);
-  margin-bottom: var(--space-sm);
 }
 
 .pbk-package-desc {
-  font-size: var(--fs-body);
+  font-size: var(--fs-body-sm);
   color: var(--text-secondary);
-  line-height: 1.6;
-  margin: 0 0 var(--space-xl);
-  max-width: 45ch;  /* Optimal reading length per typography psychology */
+  line-height: 1.5;
+  margin: 0;
 }
 
 .pbk-package-btn {
-  width: 100%;
-  padding: var(--space-lg) var(--space-xl);
+  align-self: flex-start;
+  padding: var(--space-md) var(--space-xl);
   background: var(--color-primary);
   color: #fff;
   border: none;
-  border-radius: var(--radius-full);  /* Fully rounded = friendly, safe to click */
-  font-size: var(--fs-body);
+  border-radius: var(--radius-full);
+  font-size: var(--fs-body-sm);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.25s ease;
+  margin-top: var(--space-sm);
 }
 
 .pbk-package-btn:hover {
