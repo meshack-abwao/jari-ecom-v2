@@ -149,16 +149,23 @@ function openBookingModal() {
   }));
 }
 
-// Story viewer (reuse existing if available, or simple implementation)
+// Story viewer - Opens lightbox with story images
 function openStoryViewer(index) {
   const stories = state.currentProduct?.media?.stories || [];
   if (stories.length === 0) return;
   
-  // Check if global story viewer exists
-  if (typeof window.openStoryViewer === 'function') {
-    window.openStoryViewer(index);
+  // Use the PBK lightbox instead of separate story viewer
+  // Stories are essentially gallery items
+  if (typeof window.openPbkLightbox === 'function') {
+    // Open lightbox at the story index (offset by gallery images if needed)
+    window.openPbkLightbox(index, 'stories');
   } else {
-    console.log('[PBK] Story viewer not available, index:', index);
+    console.log('[PBK] Opening story:', index);
+    // Fallback - just show the image in a simple modal
+    const story = stories[index];
+    if (story?.url) {
+      window.open(story.url, '_blank');
+    }
   }
 }
 
