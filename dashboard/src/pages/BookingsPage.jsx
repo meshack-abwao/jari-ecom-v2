@@ -243,6 +243,8 @@ export default function BookingsPage() {
         icon={Clock} 
         title="Working Schedule"
         description="Set your availability for each day of the week"
+        isExpanded={expandedSections.schedule}
+        onToggle={toggleSection}
       >
         <div style={styles.scheduleGrid}>
           {[1, 2, 3, 4, 5, 6, 0].map(day => {
@@ -295,6 +297,8 @@ export default function BookingsPage() {
         icon={Users} 
         title="Booking Slots"
         description="Configure how appointments are scheduled"
+        isExpanded={expandedSections.slots}
+        onToggle={toggleSection}
       >
         <SettingRow label="Duration per booking" hint="How long each appointment lasts">
           <select 
@@ -585,15 +589,62 @@ export default function BookingsPage() {
 
   // ==================== RENDER CALENDAR ====================
   
-  const renderCalendar = () => (
-    <div style={styles.emptyState}>
-      <div style={styles.emptyIcon}>
-        <Calendar size={48} />
+  const renderCalendar = () => {
+    if (bookings.length === 0) {
+      return (
+        <div style={styles.emptyState}>
+          <div style={styles.emptyIcon}>
+            <Calendar size={48} />
+          </div>
+          <h3 style={styles.emptyTitle}>No bookings yet</h3>
+          <p style={styles.emptyText}>When customers book your services, they'll appear here.</p>
+        </div>
+      );
+    }
+
+    return (
+      <div style={styles.bookingsList}>
+        {bookings.map(booking => (
+          <div key={booking.id} style={styles.bookingCard}>
+            <div style={styles.bookingHeader}>
+              <div style={styles.bookingDate}>
+                <span style={styles.bookingDay}>
+                  {new Date(booking.booking_date).toLocaleDateString('en-US', { weekday: 'short', day: 'numeric' })}
+                </span>
+                <span style={styles.bookingMonth}>
+                  {new Date(booking.booking_date).toLocaleDateString('en-US', { month: 'short' })}
+                </span>
+              </div>
+              <div style={styles.bookingInfo}>
+                <h4 style={styles.bookingCustomer}>{booking.customer_name}</h4>
+                <p style={styles.bookingService}>{booking.package_name || booking.service_name || 'Service'}</p>
+                <p style={styles.bookingTime}>
+                  <Clock size={14} /> {booking.booking_time?.substring(0, 5)} · {booking.customer_phone}
+                </p>
+              </div>
+              <div style={styles.bookingStatus}>
+                <span style={{
+                  ...styles.statusBadge,
+                  ...(booking.status === 'confirmed' ? styles.statusConfirmed : 
+                     booking.status === 'pending' ? styles.statusPending :
+                     booking.status === 'cancelled' ? styles.statusCancelled :
+                     styles.statusCompleted)
+                }}>
+                  {booking.status}
+                </span>
+                <span style={styles.bookingPrice}>
+                  KES {parseInt(booking.total_amount || booking.package_price || 0).toLocaleString()}
+                </span>
+              </div>
+            </div>
+            {booking.notes && (
+              <p style={styles.bookingNotes}>Note: {booking.notes}</p>
+            )}
+          </div>
+        ))}
       </div>
-      <h3 style={styles.emptyTitle}>No bookings yet</h3>
-      <p style={styles.emptyText}>When customers book your services, they'll appear here.</p>
-    </div>
-  );
+    );
+  };
 
   // ==================== MAIN RENDER ====================
   
@@ -1004,5 +1055,105 @@ const styles = {
     color: '#ef4444',
     fontSize: '14px',
     marginBottom: '20px',
+  },
+  
+  // Bookings List
+  bookingsList: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px',
+  },
+  bookingCard: {
+    background: 'var(--bg-secondary)',
+    borderRadius: '12px',
+    padding: '16px',
+    border: '1px solid var(--border-color)',
+  },
+  bookingHeader: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: '16px',
+  },
+  bookingDate: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    padding: '8px 12px',
+    background: 'var(--accent-light)',
+    borderRadius: '10px',
+    minWidth: '60px',
+  },
+  bookingDay: {
+    fontSize: '20px',
+    fontWeight: '700',
+    color: 'var(--accent-color)',
+  },
+  bookingMonth: {
+    fontSize: '12px',
+    color: 'var(--accent-color)',
+    textTransform: 'uppercase',
+  },
+  bookingInfo: {
+    flex: 1,
+  },
+  bookingCustomer: {
+    fontSize: '15px',
+    fontWeight: '600',
+    color: 'var(--text-primary)',
+    margin: '0 0 4px',
+  },
+  bookingService: {
+    fontSize: '13px',
+    color: 'var(--text-secondary)',
+    margin: '0 0 6px',
+  },
+  bookingTime: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+    fontSize: '13px',
+    color: 'var(--text-muted)',
+  },
+  bookingStatus: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-end',
+    gap: '6px',
+  },
+  statusBadge: {
+    padding: '4px 10px',
+    borderRadius: '20px',
+    fontSize: '12px',
+    fontWeight: '500',
+    textTransform: 'capitalize',
+  },
+  statusPending: {
+    background: 'rgba(245, 158, 11, 0.1)',
+    color: '#f59e0b',
+  },
+  statusConfirmed: {
+    background: 'rgba(16, 185, 129, 0.1)',
+    color: '#10b981',
+  },
+  statusCancelled: {
+    background: 'rgba(239, 68, 68, 0.1)',
+    color: '#ef4444',
+  },
+  statusCompleted: {
+    background: 'rgba(59, 130, 246, 0.1)',
+    color: '#3b82f6',
+  },
+  bookingPrice: {
+    fontSize: '14px',
+    fontWeight: '600',
+    color: 'var(--text-primary)',
+  },
+  bookingNotes: {
+    marginTop: '12px',
+    paddingTop: '12px',
+    borderTop: '1px solid var(--border-color)',
+    fontSize: '13px',
+    color: 'var(--text-muted)',
+    fontStyle: 'italic',
   },
 };
