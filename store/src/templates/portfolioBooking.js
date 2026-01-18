@@ -34,9 +34,19 @@ export function renderPortfolioBookingTemplate(product) {
       <div class="pbk-header">
         <h1 class="pbk-title">${data.name || 'Service'}</h1>
         <div class="pbk-meta">
-          <div class="pbk-meta-left">
-            <div class="pbk-rating">${renderPbkStars(4.8)}<span class="pbk-rating-count">4.8</span></div>
-          </div>
+          <div class="pbk-rating">${renderPbkStars(4.8)}<span class="pbk-rating-count">4.8</span></div>
+        </div>
+      </div>
+
+      <!-- 2. HERO - Emotional hook (visual impact) -->
+      <div class="pbk-hero">
+        ${renderPbkHero(media)}
+      </div>
+
+      <!-- 3. INTRO - "Why should I care?" (Value proposition) -->
+      <div class="pbk-intro">
+        <div class="pbk-intro-row">
+          <div class="pbk-price-from">From <strong>KES ${startingPrice.toLocaleString()}</strong></div>
           <div class="pbk-actions">
             <button class="pbk-action-btn" onclick="sharePbk()" title="Share">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -51,16 +61,6 @@ export function renderPortfolioBookingTemplate(product) {
             </button>
           </div>
         </div>
-      </div>
-
-      <!-- 2. HERO - Emotional hook (visual impact) -->
-      <div class="pbk-hero">
-        ${renderPbkHero(media)}
-      </div>
-
-      <!-- 3. INTRO - "Why should I care?" (Value proposition) -->
-      <div class="pbk-intro">
-        <div class="pbk-price-from">From <strong>KES ${startingPrice.toLocaleString()}</strong></div>
         ${data.description ? `<p class="pbk-description">${data.description}</p>` : ''}
       </div>
 
@@ -260,16 +260,12 @@ function renderPbkPackages(packages) {
         ${packages.map((pkg, i) => `
           <div class="pbk-package ${i === 0 ? 'pbk-package-featured' : ''}">
             ${i === 0 ? '<span class="pbk-package-badge">Popular</span>' : ''}
-            <div class="pbk-package-header">
-              <div class="pbk-package-info">
-                <div class="pbk-package-name">${pkg.name}</div>
-                ${pkg.duration ? `<div class="pbk-package-duration">⏱ ${pkg.duration}</div>` : ''}
-              </div>
-              <div class="pbk-package-price">KES ${parseInt(pkg.price || 0).toLocaleString()}</div>
-            </div>
+            <div class="pbk-package-name">${pkg.name}</div>
+            <div class="pbk-package-price">KES ${parseInt(pkg.price || 0).toLocaleString()}</div>
+            ${pkg.duration ? `<div class="pbk-package-duration">⏱ ${pkg.duration}</div>` : ''}
             ${pkg.description ? `<p class="pbk-package-desc">${pkg.description}</p>` : ''}
             <button class="pbk-package-btn" data-pkg-index="${i}" data-pkg-name="${pkg.name}" data-pkg-price="${pkg.price}">
-              Select Package
+              Select
             </button>
           </div>
         `).join('')}
