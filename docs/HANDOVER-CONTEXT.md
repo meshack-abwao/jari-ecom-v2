@@ -100,6 +100,18 @@ Tables created:
    - Added `generateDefaultSlots()` function
    - Creates 9am-5pm hourly slots client-side as fallback
 
+6. **Section Components Missing Props** ✅ FIXED
+   - Added `isExpanded` and `onToggle` to all Section components
+   - Premium, Payment, Reminders, Blocked sections now work correctly
+
+7. **Section Toggle Functions Recreated on Every Render** ✅ FIXED
+   - Added `useCallback` to `toggleSection` and `getWorkingHour`
+   - Prevents unnecessary child re-renders
+
+8. **Important Settings Hidden by Default** ✅ FIXED
+   - Premium (Jump the Line) and Payment sections now expanded by default
+   - Blocked dates and Reminders collapsed by default
+
 ---
 
 ## 4. DEBUG FORMULAS (Lessons Learned)
