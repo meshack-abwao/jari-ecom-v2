@@ -314,7 +314,7 @@
 }
 
 .pbk-price-from {
-  font-size: var(--fs-body);
+  font-size: var(--fs-body-lg);
   color: var(--text-secondary);
   margin-bottom: var(--space-md);
   display: flex;
@@ -324,7 +324,7 @@
 
 .pbk-price-from strong {
   color: var(--color-primary);
-  font-size: var(--fs-heading);
+  font-size: var(--fs-heading-lg);
   font-weight: 700;
 }
 

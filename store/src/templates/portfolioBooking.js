@@ -61,7 +61,7 @@ export function renderPortfolioBookingTemplate(product) {
 
       <!-- 3. INTRO - "Why should I care?" (Value proposition) -->
       <div class="pbk-intro">
-        <div class="pbk-price-from">Starting from <strong>KES ${startingPrice.toLocaleString()}</strong></div>
+        <div class="pbk-price-from">From <strong>KES ${startingPrice.toLocaleString()}</strong></div>
         ${data.description ? `<p class="pbk-description">${data.description}</p>` : ''}
       </div>
 
