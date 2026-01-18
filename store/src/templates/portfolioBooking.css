@@ -765,7 +765,7 @@
 }
 
 /* ===========================================
-   PACKAGES - Clean centered card design
+   PACKAGES - Card design with horizontal header
    Cards with subtle shadow = trust signal (rounded = safe)
    =========================================== */
 .pbk-packages {
@@ -782,33 +782,31 @@
 
 .pbk-package {
   position: relative;
-  padding: var(--space-2xl) var(--space-xl);
+  padding: var(--space-xl) var(--space-2xl);
   background: var(--surface);
   border-radius: var(--radius-lg);
   border: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  align-items: center;  /* Center all content */
-  text-align: center;
-  gap: var(--space-md);
+  gap: var(--space-sm);
   transition: all 0.25s ease;
 }
 
 .pbk-package:hover {
-  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-  transform: translateY(-2px);
+  border-color: var(--color-primary);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
 }
 
-/* Featured package - NO border highlight, just the badge */
 .pbk-package-featured {
-  /* Same as regular - no special border */
+  border-color: var(--color-primary);
+  background: linear-gradient(135deg, rgba(var(--color-primary-rgb, 0,0,0), 0.02) 0%, transparent 100%);
 }
 
-/* Badge - inside card, top-right corner */
 .pbk-package-badge {
   position: absolute;
-  top: var(--space-md);
-  right: var(--space-md);
+  top: 0;
+  right: var(--space-xl);
+  transform: translateY(-50%);
   background: var(--color-primary);
   color: #fff;
   font-size: var(--fs-tiny);
@@ -817,24 +815,37 @@
   border-radius: var(--radius-full);
 }
 
+.pbk-package-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-md);
+}
+
 .pbk-package-name {
-  font-size: var(--fs-heading);
+  font-size: var(--fs-body-lg);
   font-weight: 600;
   color: var(--text-primary);
   letter-spacing: -0.01em;
 }
 
 .pbk-package-price {
-  font-size: var(--fs-heading-lg);
+  font-size: var(--fs-heading);
   font-weight: 700;
   color: var(--color-primary);
   letter-spacing: -0.02em;
+  white-space: nowrap;
 }
 
+/* Duration badge - colored to pop */
 .pbk-package-duration {
+  display: inline-block;
   font-size: var(--fs-small);
-  color: var(--text-secondary);
-  margin-top: calc(-1 * var(--space-sm));  /* Tuck closer to price */
+  color: var(--color-primary);
+  background: rgba(var(--color-primary-rgb, 0,122,255), 0.1);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-full);
+  font-weight: 500;
 }
 
 .pbk-package-desc {
@@ -842,13 +853,13 @@
   color: var(--text-secondary);
   line-height: 1.5;
   margin: 0;
-  max-width: 45ch;  /* Line length limit */
+  max-width: 50ch;
 }
 
-/* CTA - smaller, justified right */
+/* CTA - centered, smaller */
 .pbk-package-btn {
-  align-self: flex-end;  /* Right-aligned */
-  padding: var(--space-sm) var(--space-lg);
+  align-self: center;
+  padding: var(--space-sm) var(--space-xl);
   background: var(--color-primary);
   color: #fff;
   border: none;
@@ -862,6 +873,7 @@
 
 .pbk-package-btn:hover {
   filter: brightness(1.1);
+  transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
@@ -1105,26 +1117,30 @@
     gap: var(--space-xl);
   }
   
-  /* Desktop CTA - Inline horizontal layout */
+  /* Desktop CTA - Inline compact style */
   .pbk-sticky-cta {
-    max-width: 480px;
+    max-width: 520px;
     width: calc(100% - var(--space-4xl));
   }
   
   .pbk-cta-glass {
-    flex-direction: row;  /* Horizontal on desktop */
-    padding: var(--space-sm) var(--space-md);
-    gap: var(--space-md);
+    flex-direction: row;
+    padding: var(--space-md) var(--space-lg);
+    gap: var(--space-lg);
     border-radius: var(--radius-full);
   }
   
   .pbk-cta-price {
-    padding-right: var(--space-md);
+    padding-right: var(--space-lg);
     border-right: 1px solid var(--border);
   }
   
+  .pbk-cta-label {
+    font-size: var(--fs-small);
+  }
+  
   .pbk-cta-amount {
-    font-size: var(--fs-heading);
+    font-size: var(--fs-heading-lg);
   }
   
   .pbk-cta-buttons {
@@ -1133,11 +1149,12 @@
   
   .pbk-cta-book {
     flex: none;
-    padding: var(--space-sm) var(--space-xl);
+    padding: var(--space-md) var(--space-2xl);
+    font-size: var(--fs-body-sm);
   }
   
   .pbk-cta-inquire {
-    padding: var(--space-sm) var(--space-md);
+    padding: var(--space-md) var(--space-lg);
   }
 }
 
