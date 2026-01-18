@@ -154,12 +154,17 @@ const rowStyles = {
 
 // ==================== MAIN COMPONENT ====================
 export default function BookingsPage() {
-  const [activeTab, setActiveTab] = useState('settings');
+  const [activeTab, setActiveTab] = useState('calendar');
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [error, setError] = useState(null);
+  
+  // Filter state for calendar view
+  const [viewFilter, setViewFilter] = useState('all'); // 'all', 'today', 'week', 'pending'
+  const [statusFilter, setStatusFilter] = useState('all'); // 'all', 'pending', 'confirmed', 'completed', 'cancelled'
+  const [selectedDay, setSelectedDay] = useState(null); // For week view day selection
   
   const [settings, setSettings] = useState({
     slot_duration_minutes: 60,
@@ -563,65 +568,203 @@ export default function BookingsPage() {
   };
 
   const renderCalendar = () => {
-    // Calculate stats
+    // ==================== CALCULATE STATS ====================
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const weekEnd = new Date(today);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    // Get start of week (Monday)
+    const weekStart = new Date(today);
+    const dayOfWeek = today.getDay();
+    const diff = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+    weekStart.setDate(today.getDate() - diff);
+    const weekEnd = new Date(weekStart);
     weekEnd.setDate(weekEnd.getDate() + 7);
     
-    const todayBookings = bookings.filter(b => {
-      const d = new Date(b.booking_date);
-      d.setHours(0, 0, 0, 0);
-      return d.getTime() === today.getTime() && b.status !== 'cancelled';
-    });
+    // Filter helpers
+    const isToday = (d) => {
+      const date = new Date(d);
+      date.setHours(0, 0, 0, 0);
+      return date.getTime() === today.getTime();
+    };
     
-    const thisWeekBookings = bookings.filter(b => {
-      const d = new Date(b.booking_date);
-      return d >= today && d < weekEnd && b.status !== 'cancelled';
-    });
+    const isThisWeek = (d) => {
+      const date = new Date(d);
+      return date >= weekStart && date < weekEnd;
+    };
     
-    const pendingCount = bookings.filter(b => b.status === 'pending').length;
+    // Stats counts
+    const todayBookings = bookings.filter(b => isToday(b.booking_date) && b.status !== 'cancelled');
+    const weekBookings = bookings.filter(b => isThisWeek(b.booking_date) && b.status !== 'cancelled');
+    const pendingBookings = bookings.filter(b => b.status === 'pending');
+    const confirmedBookings = bookings.filter(b => b.status === 'confirmed');
     const completedBookings = bookings.filter(b => b.status === 'completed');
-    const totalRevenue = completedBookings.reduce((sum, b) => sum + (Number(b.total_amount) || 0), 0);
+    const cancelledBookings = bookings.filter(b => b.status === 'cancelled');
     
-    // Stats cards at top
+    // Revenue calculation - from confirmed + completed (amount_paid field)
+    const paidBookings = bookings.filter(b => b.status === 'confirmed' || b.status === 'completed');
+    const totalRevenue = paidBookings.reduce((sum, b) => sum + (Number(b.amount_paid) || Number(b.total_amount) || 0), 0);
+    const fullPayments = paidBookings.filter(b => b.payment_type === 'full');
+    const depositPayments = paidBookings.filter(b => b.payment_type === 'deposit');
+    const inquiryPayments = paidBookings.filter(b => b.payment_type === 'inquiry');
+    
+    // ==================== WEEK DAYS DATA ====================
+    const weekDays = [];
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(weekStart);
+      date.setDate(weekStart.getDate() + i);
+      const dayBookings = bookings.filter(b => {
+        const bd = new Date(b.booking_date);
+        bd.setHours(0, 0, 0, 0);
+        return bd.getTime() === date.getTime() && b.status !== 'cancelled';
+      });
+      weekDays.push({
+        date,
+        dayName: date.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase(),
+        dayNum: date.getDate(),
+        month: date.toLocaleDateString('en-US', { month: 'short' }),
+        count: dayBookings.length,
+        isToday: date.getTime() === today.getTime(),
+        isPast: date < today
+      });
+    }
+    
+    // ==================== APPLY FILTERS ====================
+    let filteredBookings = [...bookings];
+    
+    // Time filter
+    if (viewFilter === 'today') {
+      filteredBookings = filteredBookings.filter(b => isToday(b.booking_date));
+    } else if (viewFilter === 'week') {
+      if (selectedDay !== null) {
+        const selectedDate = weekDays[selectedDay].date;
+        filteredBookings = filteredBookings.filter(b => {
+          const bd = new Date(b.booking_date);
+          bd.setHours(0, 0, 0, 0);
+          return bd.getTime() === selectedDate.getTime();
+        });
+      } else {
+        filteredBookings = filteredBookings.filter(b => isThisWeek(b.booking_date));
+      }
+    } else if (viewFilter === 'pending') {
+      filteredBookings = filteredBookings.filter(b => b.status === 'pending');
+    }
+    
+    // Status filter
+    if (statusFilter !== 'all') {
+      filteredBookings = filteredBookings.filter(b => b.status === statusFilter);
+    }
+    
+    // Sort by date
+    filteredBookings.sort((a, b) => new Date(a.booking_date) - new Date(b.booking_date));
+    
+    // ==================== STATS CARDS (Clickable) ====================
     const statsSection = (
       <div style={styles.statsGrid}>
-        <div style={styles.statCard}>
-          <div style={styles.statIcon}>📅</div>
+        <div 
+          style={{...styles.statCard, ...(viewFilter === 'today' ? styles.statCardActive : {})}}
+          onClick={() => { setViewFilter(viewFilter === 'today' ? 'all' : 'today'); setSelectedDay(null); }}
+        >
+          <div style={{...styles.statIconBox, background: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)'}}>
+            <Calendar size={20} color="white" />
+          </div>
           <div style={styles.statInfo}>
+            <div style={styles.statLabel}>TODAY</div>
             <div style={styles.statValue}>{todayBookings.length}</div>
-            <div style={styles.statLabel}>Today</div>
           </div>
         </div>
+        
+        <div 
+          style={{...styles.statCard, ...(viewFilter === 'week' ? styles.statCardActive : {})}}
+          onClick={() => { setViewFilter(viewFilter === 'week' ? 'all' : 'week'); setSelectedDay(null); }}
+        >
+          <div style={{...styles.statIconBox, background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'}}>
+            <Clock size={20} color="white" />
+          </div>
+          <div style={styles.statInfo}>
+            <div style={styles.statLabel}>THIS WEEK</div>
+            <div style={styles.statValue}>{weekBookings.length}</div>
+          </div>
+        </div>
+        
+        <div 
+          style={{...styles.statCard, ...(viewFilter === 'pending' ? styles.statCardActive : {}), ...(pendingBookings.length > 0 ? styles.statCardAlert : {})}}
+          onClick={() => { setViewFilter(viewFilter === 'pending' ? 'all' : 'pending'); setSelectedDay(null); }}
+        >
+          <div style={{...styles.statIconBox, background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)'}}>
+            <Bell size={20} color="white" />
+          </div>
+          <div style={styles.statInfo}>
+            <div style={styles.statLabel}>PENDING</div>
+            <div style={styles.statValue}>{pendingBookings.length}</div>
+          </div>
+        </div>
+        
         <div style={styles.statCard}>
-          <div style={styles.statIcon}>📆</div>
-          <div style={styles.statInfo}>
-            <div style={styles.statValue}>{thisWeekBookings.length}</div>
-            <div style={styles.statLabel}>This Week</div>
+          <div style={{...styles.statIconBox, background: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)'}}>
+            <DollarSign size={20} color="white" />
           </div>
-        </div>
-        <div style={{...styles.statCard, ...(pendingCount > 0 ? styles.statCardAlert : {})}}>
-          <div style={styles.statIcon}>🔔</div>
           <div style={styles.statInfo}>
-            <div style={styles.statValue}>{pendingCount}</div>
-            <div style={styles.statLabel}>Pending</div>
-          </div>
-        </div>
-        <div style={styles.statCard}>
-          <div style={styles.statIcon}>💰</div>
-          <div style={styles.statInfo}>
+            <div style={styles.statLabel}>REVENUE</div>
             <div style={styles.statValue}>KES {totalRevenue.toLocaleString()}</div>
-            <div style={styles.statLabel}>Revenue</div>
           </div>
         </div>
       </div>
     );
+    
+    // ==================== WEEK VIEW (When "This Week" selected) ====================
+    const weekViewSection = viewFilter === 'week' && (
+      <div style={styles.weekView}>
+        {weekDays.map((day, idx) => (
+          <div 
+            key={idx}
+            style={{
+              ...styles.weekDay,
+              ...(day.isToday ? styles.weekDayToday : {}),
+              ...(day.isPast ? styles.weekDayPast : {}),
+              ...(selectedDay === idx ? styles.weekDaySelected : {})
+            }}
+            onClick={() => setSelectedDay(selectedDay === idx ? null : idx)}
+          >
+            <div style={styles.weekDayName}>{day.dayName}</div>
+            <div style={styles.weekDayNum}>{day.dayNum}</div>
+            <div style={styles.weekDayCount}>{day.count > 0 ? day.count : '-'}</div>
+          </div>
+        ))}
+      </div>
+    );
+    
+    // ==================== STATUS FILTER PILLS ====================
+    const statusFilters = (
+      <div style={styles.filterRow}>
+        {[
+          { key: 'all', label: 'All', count: bookings.length },
+          { key: 'pending', label: 'Pending', count: pendingBookings.length },
+          { key: 'confirmed', label: 'Confirmed', count: confirmedBookings.length },
+          { key: 'completed', label: 'Completed', count: completedBookings.length },
+          { key: 'cancelled', label: 'Cancelled', count: cancelledBookings.length },
+        ].map(f => (
+          <button
+            key={f.key}
+            style={{
+              ...styles.filterPill,
+              ...(statusFilter === f.key ? styles.filterPillActive : {})
+            }}
+            onClick={() => setStatusFilter(f.key)}
+          >
+            {f.label} <span style={styles.filterCount}>{f.count}</span>
+          </button>
+        ))}
+      </div>
+    );
 
+    // ==================== EMPTY STATE ====================
     if (bookings.length === 0) {
       return (
         <div>
           {statsSection}
+          {statusFilters}
           <div style={styles.emptyState}>
             <div style={styles.emptyIcon}><Calendar size={40} /></div>
             <h3 style={styles.emptyTitle}>No bookings yet</h3>
@@ -631,15 +774,17 @@ export default function BookingsPage() {
       );
     }
 
-    // Group bookings by status
-    const pending = bookings.filter(b => b.status === 'pending');
-    const confirmed = bookings.filter(b => b.status === 'confirmed');
-    const completed = bookings.filter(b => b.status === 'completed');
+    // Group filtered bookings by status for display
+    const displayPending = filteredBookings.filter(b => b.status === 'pending');
+    const displayConfirmed = filteredBookings.filter(b => b.status === 'confirmed');
+    const displayCompleted = filteredBookings.filter(b => b.status === 'completed');
+    const displayCancelled = filteredBookings.filter(b => b.status === 'cancelled');
 
     const renderBookingCard = (booking) => {
       const isExpanded = expandedBooking === booking.id;
       const bookingDate = new Date(booking.booking_date);
       const isPast = bookingDate < new Date();
+      const dayName = bookingDate.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
       
       return (
         <div key={booking.id} style={styles.bookingCardWrap}>
@@ -649,9 +794,10 @@ export default function BookingsPage() {
             onClick={() => setExpandedBooking(isExpanded ? null : booking.id)}
           >
             <div style={styles.bookingDate}>
+              <span style={styles.bookingDayName}>{dayName}</span>
               <span style={styles.bookingDay}>{bookingDate.getDate()}</span>
               <span style={styles.bookingMonth}>
-                {bookingDate.toLocaleDateString('en-US', { month: 'short' })}
+                {bookingDate.toLocaleDateString('en-US', { month: 'short' }).toUpperCase()}
               </span>
             </div>
             
@@ -779,38 +925,62 @@ export default function BookingsPage() {
     return (
       <div>
         {statsSection}
+        {weekViewSection}
+        {statusFilters}
         
-        {/* Pending - Needs Attention */}
-        {pending.length > 0 && (
-          <div style={styles.bookingGroup}>
-            <div style={styles.groupHeader}>
-              <span style={styles.groupTitle}>🔔 Needs Attention</span>
-              <span style={styles.groupCount}>{pending.length}</span>
-            </div>
-            {pending.map(renderBookingCard)}
+        {filteredBookings.length === 0 ? (
+          <div style={styles.noResults}>
+            <p>No bookings match your filters.</p>
+            <button style={styles.clearFilters} onClick={() => { setViewFilter('all'); setStatusFilter('all'); setSelectedDay(null); }}>
+              Clear filters
+            </button>
           </div>
-        )}
-        
-        {/* Upcoming Confirmed */}
-        {confirmed.length > 0 && (
-          <div style={styles.bookingGroup}>
-            <div style={styles.groupHeader}>
-              <span style={styles.groupTitle}>✅ Upcoming</span>
-              <span style={styles.groupCount}>{confirmed.length}</span>
-            </div>
-            {confirmed.map(renderBookingCard)}
-          </div>
-        )}
-        
-        {/* Completed */}
-        {completed.length > 0 && (
-          <div style={styles.bookingGroup}>
-            <div style={styles.groupHeader}>
-              <span style={styles.groupTitle}>📋 Completed</span>
-              <span style={styles.groupCount}>{completed.length}</span>
-            </div>
-            {completed.map(renderBookingCard)}
-          </div>
+        ) : (
+          <>
+            {/* Pending - Needs Attention */}
+            {displayPending.length > 0 && (
+              <div style={styles.bookingGroup}>
+                <div style={styles.groupHeader}>
+                  <span style={styles.groupTitle}>🔔 Needs Attention</span>
+                  <span style={styles.groupCount}>{displayPending.length}</span>
+                </div>
+                {displayPending.map(renderBookingCard)}
+              </div>
+            )}
+            
+            {/* Upcoming Confirmed */}
+            {displayConfirmed.length > 0 && (
+              <div style={styles.bookingGroup}>
+                <div style={styles.groupHeader}>
+                  <span style={styles.groupTitle}>✅ Upcoming</span>
+                  <span style={styles.groupCount}>{displayConfirmed.length}</span>
+                </div>
+                {displayConfirmed.map(renderBookingCard)}
+              </div>
+            )}
+            
+            {/* Completed */}
+            {displayCompleted.length > 0 && (
+              <div style={styles.bookingGroup}>
+                <div style={styles.groupHeader}>
+                  <span style={styles.groupTitle}>📋 Completed</span>
+                  <span style={styles.groupCount}>{displayCompleted.length}</span>
+                </div>
+                {displayCompleted.map(renderBookingCard)}
+              </div>
+            )}
+            
+            {/* Cancelled */}
+            {displayCancelled.length > 0 && (
+              <div style={styles.bookingGroup}>
+                <div style={styles.groupHeader}>
+                  <span style={styles.groupTitle}>❌ Cancelled</span>
+                  <span style={styles.groupCount}>{displayCancelled.length}</span>
+                </div>
+                {displayCancelled.map(renderBookingCard)}
+              </div>
+            )}
+          </>
         )}
       </div>
     );
@@ -855,7 +1025,7 @@ export default function BookingsPage() {
 
 // ==================== STYLES ====================
 const styles = {
-  page: { maxWidth: '800px' },
+  page: { maxWidth: '900px' },
   header: { marginBottom: '28px' },
   pageTitle: { 
     fontSize: '28px', 
@@ -870,34 +1040,151 @@ const styles = {
     margin: 0 
   },
   
-  // Stats Grid
+  // Stats Grid (Orders-style cards)
   statsGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(4, 1fr)',
-    gap: '12px',
-    marginBottom: '24px',
+    gap: '16px',
+    marginBottom: '20px',
   },
   statCard: {
     display: 'flex',
     alignItems: 'center',
-    gap: '12px',
-    padding: '16px',
-    background: 'var(--bg-secondary, white)',
-    borderRadius: '12px',
-    border: '1px solid var(--border-light, #e5e7eb)',
+    gap: '16px',
+    padding: '20px',
+    background: 'var(--bg-secondary, #1a1a2e)',
+    borderRadius: '16px',
+    border: '1px solid var(--border-light, rgba(255,255,255,0.1))',
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+  },
+  statCardActive: {
+    border: '2px solid var(--accent-color, #8b5cf6)',
+    boxShadow: '0 0 20px rgba(139, 92, 246, 0.3)',
   },
   statCardAlert: {
-    background: '#fef3c7',
-    borderColor: '#f59e0b',
+    animation: 'pulse 2s infinite',
   },
-  statIcon: {
-    fontSize: '24px',
+  statIconBox: {
+    width: '48px',
+    height: '48px',
+    borderRadius: '12px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   statInfo: {
     flex: 1,
   },
+  statLabel: {
+    fontSize: '11px',
+    color: 'var(--text-muted)',
+    textTransform: 'uppercase',
+    letterSpacing: '0.5px',
+    marginBottom: '4px',
+  },
   statValue: {
-    fontSize: '20px',
+    fontSize: '24px',
+    fontWeight: '700',
+    color: 'var(--text-primary)',
+  },
+  
+  // Week View
+  weekView: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(7, 1fr)',
+    gap: '8px',
+    marginBottom: '20px',
+    padding: '16px',
+    background: 'var(--bg-secondary, #1a1a2e)',
+    borderRadius: '12px',
+  },
+  weekDay: {
+    textAlign: 'center',
+    padding: '12px 8px',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+    background: 'transparent',
+  },
+  weekDayToday: {
+    background: 'rgba(139, 92, 246, 0.2)',
+    border: '1px solid var(--accent-color, #8b5cf6)',
+  },
+  weekDayPast: {
+    opacity: 0.5,
+  },
+  weekDaySelected: {
+    background: 'var(--accent-color, #8b5cf6)',
+  },
+  weekDayName: {
+    fontSize: '10px',
+    color: 'var(--text-muted)',
+    marginBottom: '4px',
+  },
+  weekDayNum: {
+    fontSize: '18px',
+    fontWeight: '600',
+    color: 'var(--text-primary)',
+  },
+  weekDayCount: {
+    fontSize: '12px',
+    color: 'var(--text-muted)',
+    marginTop: '4px',
+  },
+  
+  // Filter Pills
+  filterRow: {
+    display: 'flex',
+    gap: '8px',
+    marginBottom: '20px',
+    flexWrap: 'wrap',
+  },
+  filterPill: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '8px 16px',
+    borderRadius: '20px',
+    border: '1px solid var(--border-light, rgba(255,255,255,0.1))',
+    background: 'transparent',
+    color: 'var(--text-muted)',
+    fontSize: '13px',
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+  },
+  filterPillActive: {
+    background: 'var(--accent-color, #8b5cf6)',
+    borderColor: 'var(--accent-color, #8b5cf6)',
+    color: 'white',
+  },
+  filterCount: {
+    fontSize: '12px',
+    opacity: 0.7,
+  },
+  
+  // No results
+  noResults: {
+    textAlign: 'center',
+    padding: '40px',
+    color: 'var(--text-muted)',
+  },
+  clearFilters: {
+    marginTop: '12px',
+    padding: '8px 16px',
+    background: 'var(--accent-color, #8b5cf6)',
+    border: 'none',
+    borderRadius: '8px',
+    color: 'white',
+    cursor: 'pointer',
+  },
+  
+  // Booking date with day name
+  bookingDayName: {
+    fontSize: '10px',
+    color: 'var(--text-muted)',
+    textTransform: 'uppercase',
+  },
     fontWeight: '700',
     color: 'var(--text-primary)',
   },
