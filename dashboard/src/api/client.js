@@ -126,6 +126,7 @@ export const bookingsAPI = {
     return api.get(`/bookings${params ? `?${params}` : ''}`);
   },
   update: (id, data) => api.put(`/bookings/${id}`, data),
+  updateStatus: (id, status) => api.put(`/bookings/${id}`, { status }),
 };
 
 // ===========================================

@@ -563,12 +563,70 @@ export default function BookingsPage() {
   };
 
   const renderCalendar = () => {
+    // Calculate stats
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const weekEnd = new Date(today);
+    weekEnd.setDate(weekEnd.getDate() + 7);
+    
+    const todayBookings = bookings.filter(b => {
+      const d = new Date(b.booking_date);
+      d.setHours(0, 0, 0, 0);
+      return d.getTime() === today.getTime() && b.status !== 'cancelled';
+    });
+    
+    const thisWeekBookings = bookings.filter(b => {
+      const d = new Date(b.booking_date);
+      return d >= today && d < weekEnd && b.status !== 'cancelled';
+    });
+    
+    const pendingCount = bookings.filter(b => b.status === 'pending').length;
+    const completedBookings = bookings.filter(b => b.status === 'completed');
+    const totalRevenue = completedBookings.reduce((sum, b) => sum + (Number(b.total_amount) || 0), 0);
+    
+    // Stats cards at top
+    const statsSection = (
+      <div style={styles.statsGrid}>
+        <div style={styles.statCard}>
+          <div style={styles.statIcon}>📅</div>
+          <div style={styles.statInfo}>
+            <div style={styles.statValue}>{todayBookings.length}</div>
+            <div style={styles.statLabel}>Today</div>
+          </div>
+        </div>
+        <div style={styles.statCard}>
+          <div style={styles.statIcon}>📆</div>
+          <div style={styles.statInfo}>
+            <div style={styles.statValue}>{thisWeekBookings.length}</div>
+            <div style={styles.statLabel}>This Week</div>
+          </div>
+        </div>
+        <div style={{...styles.statCard, ...(pendingCount > 0 ? styles.statCardAlert : {})}}>
+          <div style={styles.statIcon}>🔔</div>
+          <div style={styles.statInfo}>
+            <div style={styles.statValue}>{pendingCount}</div>
+            <div style={styles.statLabel}>Pending</div>
+          </div>
+        </div>
+        <div style={styles.statCard}>
+          <div style={styles.statIcon}>💰</div>
+          <div style={styles.statInfo}>
+            <div style={styles.statValue}>KES {totalRevenue.toLocaleString()}</div>
+            <div style={styles.statLabel}>Revenue</div>
+          </div>
+        </div>
+      </div>
+    );
+
     if (bookings.length === 0) {
       return (
-        <div style={styles.emptyState}>
-          <div style={styles.emptyIcon}><Calendar size={40} /></div>
-          <h3 style={styles.emptyTitle}>No bookings yet</h3>
-          <p style={styles.emptyText}>When customers book your services, they'll appear here.</p>
+        <div>
+          {statsSection}
+          <div style={styles.emptyState}>
+            <div style={styles.emptyIcon}><Calendar size={40} /></div>
+            <h3 style={styles.emptyTitle}>No bookings yet</h3>
+            <p style={styles.emptyText}>When customers book your services, they'll appear here.</p>
+          </div>
         </div>
       );
     }
@@ -720,6 +778,8 @@ export default function BookingsPage() {
 
     return (
       <div>
+        {statsSection}
+        
         {/* Pending - Needs Attention */}
         {pending.length > 0 && (
           <div style={styles.bookingGroup}>
@@ -808,6 +868,44 @@ const styles = {
     fontSize: '15px', 
     color: 'var(--text-muted)', 
     margin: 0 
+  },
+  
+  // Stats Grid
+  statsGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(4, 1fr)',
+    gap: '12px',
+    marginBottom: '24px',
+  },
+  statCard: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+    padding: '16px',
+    background: 'var(--bg-secondary, white)',
+    borderRadius: '12px',
+    border: '1px solid var(--border-light, #e5e7eb)',
+  },
+  statCardAlert: {
+    background: '#fef3c7',
+    borderColor: '#f59e0b',
+  },
+  statIcon: {
+    fontSize: '24px',
+  },
+  statInfo: {
+    flex: 1,
+  },
+  statValue: {
+    fontSize: '20px',
+    fontWeight: '700',
+    color: 'var(--text-primary)',
+  },
+  statLabel: {
+    fontSize: '12px',
+    color: 'var(--text-muted)',
+    textTransform: 'uppercase',
+    letterSpacing: '0.5px',
   },
   
   tabs: {
