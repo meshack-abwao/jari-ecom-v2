@@ -1,301 +1,305 @@
-# JARI.ECOM V2 - HANDOVER DOCUMENT
-### *Full Context for Continuation*
-
-**Last Updated:** January 16, 2026
-**Last Commit:** `26d7b6c` - Mobile layout fix for overview stats grid
+# JARI.ECOM V2 - HANDOVER CONTEXT DOCUMENT
+## Comprehensive Session Summary - January 18, 2026
 
 ---
 
-## PROJECT OVERVIEW
+## 1. PROJECT OVERVIEW
 
-**Jari.Ecom** is an e-commerce platform for Instagram/WhatsApp sellers in Kenya and East Africa. Built for solo entrepreneurs and small teams who sell via social media but need professional storefronts with M-Pesa integration.
+**Repository:** https://github.com/meshack-abwao/jari-ecom-v2
+**Stack:** React Dashboard + Vanilla JS Storefront + Express API + PostgreSQL (Railway)
+**Current Focus:** Portfolio/Booking (PBK) Template + Calendar System
 
-**Target Users:** Instagram sellers, WhatsApp merchants, small business owners
-**Key Differentiator:** JTBD-driven themes with checkout styles optimized for specific business types
-
----
-
-## PROJECT STRUCTURE
-
-```
-C:\Users\ADMIN\Desktop\jari-ecom-v2\
-├── api/                    # Backend (Node.js/Express)
-│   ├── src/
-│   │   ├── routes/         # API endpoints
-│   │   ├── middleware/     # Auth, validation
-│   │   └── index.js        # Entry point
-│   ├── migrations/         # Database migrations
-│   └── .env                # API environment vars
-│
-├── dashboard/              # Admin dashboard (React/Vite)
-│   ├── src/
-│   │   ├── api/
-│   │   │   └── client.js   # API client (settingsAPI, ordersAPI, etc.)
-│   │   ├── components/
-│   │   │   └── Layout.jsx  # Main layout with sidebar, modals
-│   │   ├── pages/
-│   │   │   ├── DashboardPage.jsx   # Overview/stats
-│   │   │   ├── OrdersPage.jsx      # Order management
-│   │   │   ├── ProductsPage.jsx    # Product CRUD
-│   │   │   ├── AdsPage.jsx         # UTM link generator
-│   │   │   ├── TemplatesPage.jsx   # Store templates
-│   │   │   ├── AddOnsPage.jsx      # Subscription add-ons
-│   │   │   └── SettingsPage.jsx    # Store settings
-│   │   ├── styles/
-│   │   │   └── globals.css         # Global styles + responsive
-│   │   └── contexts/               # Auth, Theme contexts
-│   └── .env                        # Dashboard environment vars
-│
-├── store/                  # Customer-facing storefront (React/Vite)
-│   ├── src/
-│   │   ├── pages/
-│   │   ├── components/
-│   │   └── themes/         # Theme components (TO BE BUILT)
-│   └── .env
-│
-├── shared/                 # Shared config
-│   ├── templates.json
-│   └── themes.json
-│
-└── docs/                   # Documentation
-    └── sales-materials/    # Pricing, field guide, worksheets
-```
+### Deployment URLs
+| Service | URL | Platform |
+|---------|-----|----------|
+| Dashboard | https://jari-dashboard.netlify.app | Netlify |
+| Storefront | https://jariecommstore.netlify.app | Netlify |
+| API | https://jari-ecom-v2-production.up.railway.app | Railway |
+| Database | PostgreSQL (turntable.proxy.rlwy.net) | Railway |
 
 ---
 
-## KEY TECHNICAL PATTERNS
+## 2. RECENT SESSION WORK (Jan 18, 2026)
 
-### API Response Pattern (CRITICAL)
+### What Was Built
+
+#### A. Booking Modal System (Store Frontend)
+Location: `store/src/booking/`
+
+**Files Created/Modified:**
+- `bookingState.js` - State management with payment options
+- `bookingModal.js` - 4-step modal UI with progress bar
+- `bookingModal.css` - Full styling including checkout options
+- `bookingHandlers.js` - All interaction logic
+- `bookingApi.js` - API calls to backend
+
+**Features Implemented:**
+1. **Step 1:** Select Service/Package
+2. **Step 2:** Pick Date & Time (Calendar + time slots)
+3. **Step 3:** Customer Details (name, phone, email, notes)
+4. **Step 4:** Review & Checkout with:
+   - ⚡ Jump the Line (priority booking) - toggle option
+   - 💰 Payment Options: Full / Deposit / Inquiry
+   - 🎟️ Discount Codes (client-side demo: SAVE10, WELCOME, VIP20)
+   - 📊 Price Breakdown (subtotal, fees, discounts, pay now/later)
+   - 📱 WhatsApp Fallback when API fails
+
+#### B. API Endpoints (Backend)
+Location: `api/src/routes/bookings.js`
+
+**Public Endpoints (no auth):**
+- `GET /api/bookings/public/:storeSlug/settings`
+- `GET /api/bookings/public/:storeSlug/working-hours`
+- `GET /api/bookings/public/:storeSlug/blocked-dates`
+- `GET /api/bookings/public/:storeSlug/availability?date=YYYY-MM-DD`
+- `POST /api/bookings/public/:storeSlug/bookings`
+
+**Authenticated Endpoints:**
+- Settings CRUD, Working hours CRUD, Blocked dates CRUD, Bookings management
+
+#### C. Database Tables
+Location: `api/migrations/003_booking_system.sql`
+
+Tables created:
+- `booking_settings` - Per-store config (slots, fees, deposits)
+- `working_hours` - Day-by-day schedule
+- `blocked_dates` - Holidays/personal days
+- `bookings` - Customer bookings
+- `service_packages` - Package options per service
+
+---
+
+## 3. KNOWN ISSUES & BUGS TO FIX
+
+### Critical (Breaking)
+
+1. **API 404 Errors** ❌
+   - **Problem:** API calls return 404 from Railway
+   - **Root Cause:** Was using wrong domain (`jari-api-production` vs `jari-ecom-v2-production`)
+   - **Fix Applied:** Updated `bookingApi.js` to use correct domain
+   - **Status:** Needs testing after Netlify rebuild
+
+### High Priority (UI/UX)
+
+2. **Progress Bar Stuck at Step 1** ✅ FIXED
+   - Added `updateProgressBar()` function to `bookingHandlers.js`
+   - Now updates when stepping through modal
+
+3. **Checkout Options Not Showing** ✅ FIXED
+   - Added default settings in `bookingState.js`
+   - Jump line, deposit, inquiry options now have defaults
+
+4. **BookingsPage Dashboard Choppy/Buggy** ⚠️ NEEDS WORK
+   - Settings tab scrolls to top on every input
+   - Re-renders too frequently
+   - **Recommended Fix:** Add debouncing to input handlers
+
+### Medium Priority
+
+5. **Time Slots Empty When API Fails** ✅ FIXED
+   - Added `generateDefaultSlots()` function
+   - Creates 9am-5pm hourly slots client-side as fallback
+
+---
+
+## 4. DEBUG FORMULAS (Lessons Learned)
+
+### Formula 1: API Response Pattern
 ```javascript
-// settingsAPI.getAll() returns store object DIRECTLY
+// CORRECT - API returns store object directly
 const response = await settingsAPI.getAll();
-const store = response.data;  // Direct access
-const slug = store?.slug;     // NOT response.data.store.slug
-const id = store?.id;         // NOT response.data.settings.id
+const store = response.data;  // ✅ Direct access
+
+// WRONG patterns that cause bugs:
+const store = response.data.store;     // ❌ Nested wrong
+const store = response.data.settings;  // ❌ Wrong key
 ```
 
-### Git Commands (PowerShell)
+### Formula 2: API URL Configuration
+```javascript
+// Use environment variable with correct Railway domain
+const API_BASE = (import.meta.env.VITE_API_URL || 'https://jari-ecom-v2-production.up.railway.app').replace(/\/$/, '') + '/api';
+```
+
+### Formula 3: CSS Isolation (Templates)
+- Always prefix template CSS: `pbk-` for Portfolio-Booking
+- Use CSS variables: `--fs-*`, `--space-*`
+- Never hardcode colors/sizes
+
+### Formula 4: Git on Windows
 ```powershell
 # Use semicolons, NOT &&
-cd C:\Users\ADMIN\Desktop\jari-ecom-v2; git add -A; git status
-cd C:\Users\ADMIN\Desktop\jari-ecom-v2; git commit -m "message"; git push origin main
+cd C:\path; git add -A; git commit -m "message"; git push origin main
+
+# Or use Git Bash
+cd /c/path && git add -A && git commit -m "message" && git push origin main
 ```
 
-### Debug Workflow
-1. `read_file` - Examine current code (use offset/length for large files)
-2. `edit_block` - Surgical edit with exact old_string match
-3. `git commit` - Commit immediately after each successful edit
-4. Test in browser → If error, check Netlify logs
+### Formula 5: State Updates Causing Scroll
+- Problem: `setSettings()` triggers re-render, loses scroll position
+- Solution: Use `useCallback` + `useMemo`, or debounce inputs
+- Or: Use `key` prop to preserve DOM elements
 
-### CSS Responsive Breakpoints
-```css
-/* Desktop: default styles */
-/* Tablet: @media (max-width: 900px) */
-/* Mobile: @media (max-width: 600px) */
+---
+
+## 5. FILE STRUCTURE REFERENCE
+
 ```
+store/src/booking/
+├── bookingState.js      # State + defaults (settings, payment options)
+├── bookingModal.js      # 4-step modal render functions
+├── bookingModal.css     # All modal styling (700+ lines)
+├── bookingHandlers.js   # Events, validation, API calls
+└── bookingApi.js        # API endpoint wrappers
 
----
+dashboard/src/pages/
+├── BookingsPage.jsx     # Calendar + Settings tabs (1009 lines - needs optimization)
+├── ProductsPage.jsx     # Product management
+├── SettingsPage.jsx     # Store settings
+└── ...
 
-## CURRENT STATE - DASHBOARD
-
-### Overview Page (DashboardPage.jsx)
-**Layout:** New wireframe-based grid
-- Row 1: Total Revenue (large) + 3 cards horizontal (Orders, Completed, Pending Revenue)
-- Row 2: Traffic (50%) + Share Your Store (50%)
-
-**CSS Classes:**
-- `.overview-stats-grid` - Main grid container
-- `.overview-stat-large` - Revenue card
-- `.overview-stat-row` - Container for 3 small cards
-- `.overview-stat-small` - Individual small cards
-- `.overview-stat-half` - Traffic/Share cards
-
-**Responsive:** Mobile uses flexbox stacking, 2-col grid for small cards
-
-### Sidebar (Layout.jsx)
-- User card is clickable → Opens Account & Billing modal
-- Theme toggle at bottom
-- Nav links: Overview, Orders, Products, Ads, Templates, Add-Ons, Settings
-
-### Orders Page (OrdersPage.jsx)
-- Period filter (Today/Week/Month/All) updates stats cards
-- Stats reflect filtered data, not global
-- Filter positioned below cards, minimal pill styling
-
----
-
-## WHAT'S NEXT - THEMES
-
-### Theme System Architecture (To Build)
-
-**Core Concept:** Themes = Checkout styles optimized for specific JTBDs
-
-| Theme | Job-to-be-Done | Checkout Style |
-|-------|----------------|----------------|
-| Quick Sell | Fast simple purchases | Minimal steps, impulse buy |
-| Visual Menu | Food/bakery display | Grid, quick add, cart |
-| Deep Dive | Premium/complex products | Gallery, specs, storytelling |
-| Events/Booking | Classes/appointments | Date picker, capacity |
-| Services | Consulting/freelance | Packages, inquiry flow |
-| Catalog | Browse-only | No checkout, WhatsApp inquiry |
-
-### Implementation Plan
-
-1. **Theme Selection in Dashboard**
-   - TemplatesPage.jsx shows available themes
-   - Preview each theme's checkout style
-   - Purchase/unlock themes (one-time)
-   - First theme FREE based on signup JTBD
-
-2. **Store Rendering**
-   - store/src/themes/ folder with theme components
-   - Each theme: ProductCard, ProductDetail, Checkout components
-   - Theme loaded based on store settings
-
-3. **Product-Theme Assignment**
-   - Each product card can use any owned theme
-   - Same store can have multiple themes (bakery cakes + classes)
-   - Flexible reassignment
-
-### Files to Create/Modify
-
-**Dashboard:**
-- `TemplatesPage.jsx` - Theme marketplace UI
-- `api/client.js` - Theme purchase endpoints
-
-**Store:**
-- `store/src/themes/QuickSell/` - Components
-- `store/src/themes/VisualMenu/` - Components
-- `store/src/themes/DeepDive/` - Components
-- `store/src/themes/EventsBooking/` - Components
-- `store/src/themes/Services/` - Components
-- `store/src/themes/Catalog/` - Components
-
-**API:**
-- Theme ownership/purchase endpoints
-- Product-theme assignment
-
----
-
-## PRICING MODEL (Finalized)
-
-### Subscription
-| Component | Price/Month |
-|-----------|-------------|
-| Base Platform | KES 1,200 |
-| + M-Pesa STK | +KES 300 |
-| + WhatsApp Auto | +KES 80 |
-| + Advanced Analytics | +KES 200 |
-
-### Product Cards
-| Bundle | Cards | Price |
-|--------|-------|-------|
-| Included | 3 | FREE |
-| Starter | 7 | KES 350 |
-| Growth | 10 | KES 550 |
-| Pro | 15 | KES 850 |
-
-**Beyond 15:**
-- 16-30 cards: +KES 200/month
-- 31-60 cards: +KES 500/month
-
-### Themes
-| Theme | Price |
-|-------|-------|
-| Quick Sell | KES 500 |
-| Visual Menu | KES 600 |
-| Deep Dive | KES 800 |
-| Events/Booking | KES 1,000 |
-| Services | KES 800 |
-| Catalog | KES 400 |
-
-**First theme FREE** (based on signup JTBD)
-
----
-
-## DEBUG FORMULAS & LESSONS LEARNED
-
-### 1. CSS Syntax Errors
-**Problem:** Orphaned braces after refactoring
-**Solution:** After any CSS edit, verify all media queries close properly
-**Check:** Count opening `{` and closing `}` in affected section
-
-### 2. API Response Structure
-**Problem:** `response.data.store.slug` returns undefined
-**Solution:** API returns flat object: `response.data.slug`
-**Memory:** Add to userMemories for future reference
-
-### 3. Mobile Layout Breaks
-**Problem:** Grid items overlap on small screens
-**Solution:** Use `display: flex; flex-direction: column` for mobile
-**Pattern:** Desktop=grid, Mobile=flexbox stacking
-
-### 4. Large File Edits
-**Problem:** edit_block fails on large replacements
-**Solution:** Break into smaller surgical edits
-**Rule:** Keep old_string and new_string under 50 lines each
-
-### 5. Git in PowerShell
-**Problem:** `&&` doesn't work in PowerShell
-**Solution:** Use semicolons: `cd path; git add -A; git commit -m "msg"`
-
----
-
-## ENVIRONMENT URLS
-
-| Service | URL |
-|---------|-----|
-| Dashboard (Netlify) | https://jariecomdash.netlify.app |
-| Store (Netlify) | https://jariecommstore.netlify.app |
-| API (Railway) | [Check .env for VITE_API_URL] |
-| GitHub Repo | https://github.com/meshack-abwao/jari-ecom-v2 |
-
----
-
-## TOOLS & ACCESS
-
-### Desktop Commander (Windows MCP)
-- Full filesystem access to project
-- Git commands via PowerShell
-- Process management
-
-### Key Commands
-```powershell
-# Check git status
-cd C:\Users\ADMIN\Desktop\jari-ecom-v2; git status
-
-# View recent commits
-cd C:\Users\ADMIN\Desktop\jari-ecom-v2; git log --oneline -5
-
-# Push changes
-cd C:\Users\ADMIN\Desktop\jari-ecom-v2; git add -A; git commit -m "msg"; git push origin main
+api/src/routes/
+├── bookings.js          # All booking endpoints (637 lines)
+├── stores.js            # Store management
+├── products.js          # Product CRUD
+└── ...
 ```
 
 ---
 
-## IMMEDIATE NEXT STEPS
+## 6. CHECKOUT FLOW LOGIC (JTBD)
 
-1. **Verify mobile layout** - Check Overview page on mobile after latest fix
-2. **Begin theme system** - Start with TemplatesPage.jsx UI
-3. **Create theme components** - Quick Sell first (simplest)
-4. **Wire up theme selection** - Dashboard → API → Store rendering
+```
+USER JOB: "Help me book a service with minimal friction"
+
+Step 1: Select Package
+├── Show packages from product.data.packages
+├── Or default to single service if no packages
+└── Validation: Must select one
+
+Step 2: Pick Date & Time  
+├── Calendar shows current month
+├── Dates before today = disabled
+├── Dates beyond max_advance_days = disabled
+├── Blocked dates = disabled
+├── On date select → fetch/generate time slots
+└── Validation: Must select date AND time
+
+Step 3: Your Details
+├── Name (required)
+├── Phone (required)
+├── Email (optional)
+├── Notes (optional)
+└── Validation: Name + Phone required
+
+Step 4: Review & Checkout
+├── Summary (service, date/time, contact)
+├── Jump the Line toggle (if enabled)
+├── Discount code input
+├── Payment options:
+│   ├── Pay Full (default)
+│   ├── Pay Deposit (X%)
+│   └── Inquiry Only
+├── Price breakdown
+└── Confirm button → API or WhatsApp fallback
+```
 
 ---
 
-## CONTACTS
+## 7. DEFAULT SETTINGS
 
-- **Mesh** - Developer, technical decisions
-- **Charles** - CEO, business/pricing decisions
+```javascript
+// Default booking settings (in bookingState.js)
+settings: {
+  min_notice_hours: 24,        // Minimum booking notice
+  max_advance_days: 30,        // Max days ahead to book
+  slot_duration_minutes: 60,   // Appointment length
+  deposit_enabled: true,       // Show deposit option
+  deposit_percentage: 30,      // Deposit amount %
+  jump_line_enabled: true,     // Show priority option
+  jump_line_fee: 500,          // KES for priority
+  inquiry_fee: 0               // KES for inquiry (0 = free)
+}
+
+// Default working hours (Mon-Fri 9am-5pm)
+workingHours: [
+  { day_of_week: 1, is_open: true, start_time: '09:00', end_time: '17:00' },
+  { day_of_week: 2, is_open: true, start_time: '09:00', end_time: '17:00' },
+  { day_of_week: 3, is_open: true, start_time: '09:00', end_time: '17:00' },
+  { day_of_week: 4, is_open: true, start_time: '09:00', end_time: '17:00' },
+  { day_of_week: 5, is_open: true, start_time: '09:00', end_time: '17:00' }
+]
+```
 
 ---
 
-## DOCUMENTS CREATED THIS SESSION
+## 8. IMMEDIATE NEXT STEPS
 
-Located in `C:\Users\ADMIN\Desktop\jari-ecom-v2\docs\sales-materials\`:
-1. `01-JARI-PRICING-STRUCTURE.md`
-2. `02-JARI-FIELD-GUIDE.md`
-3. `03-JARI-AFFILIATE-WORKSHEET.md`
+### Priority 1: Verify API Connection
+1. Wait for Netlify rebuild (~2 min)
+2. Test booking flow on storefront
+3. Check console for 200s instead of 404s
+4. If still 404: Check Railway deployment status
+
+### Priority 2: Fix Dashboard BookingsPage
+1. Add debouncing to input handlers
+2. Or use local state + save button pattern
+3. Prevent scroll-to-top on state updates
+
+### Priority 3: Test Full Flow
+1. Open storefront with PBK product
+2. Click "Check Availability"
+3. Step through all 4 steps
+4. Verify checkout options appear
+5. Complete booking (API or WhatsApp)
 
 ---
 
-*"Start with read_file, make surgical edits, commit immediately, test in browser"*
+## 9. GIT COMMIT HISTORY (Recent)
+
+```
+fd921c0 🔧 Add default settings in bookingState for checkout options
+34f2835 🔧 Fix: API URL to correct Railway domain, progress bar updates
+3f71e48 🔄 Booking: WhatsApp fallback when API unavailable
+1fb3fe3 ✨ Booking checkout: Add payment options, jump line, discounts
+b9077de 🐛 Fix missing closing brace in generateDefaultSlots function
+026dcfb 🐛 Fix booking: Generate client-side time slots when API unavailable
+3d0c21f 🐛 Fix route mismatch: /available -> /availability
+a5d8b58 🎨 BookingsPage: Complete redesign with on-brand styling
+384fd88 🔧 Make migrations resilient - wrap each in try-catch
+9f2e0b3 🔧 Booking system: Auto-migrate tables on startup
+```
+
+---
+
+## 10. ENVIRONMENT VARIABLES
+
+### Netlify (Dashboard)
+- `VITE_API_URL` = https://jari-ecom-v2-production.up.railway.app
+
+### Netlify (Store)
+- `VITE_API_URL` = https://jari-ecom-v2-production.up.railway.app
+
+### Railway (API)
+- `DATABASE_URL` = (auto-injected by Railway)
+- `PORT` = 808 (or Railway default)
+
+---
+
+## 11. TESTING CHECKLIST
+
+- [ ] API responds at https://jari-ecom-v2-production.up.railway.app
+- [ ] Booking modal opens on PBK template
+- [ ] Progress bar advances through steps
+- [ ] Time slots appear after selecting date
+- [ ] Step 4 shows Jump the Line option
+- [ ] Step 4 shows Payment options (Full/Deposit/Inquiry)
+- [ ] Step 4 shows Discount code input
+- [ ] Step 4 shows Price breakdown
+- [ ] Booking submits successfully OR WhatsApp fallback works
+- [ ] Dashboard BookingsPage loads without errors
+
+---
+
+*Document generated: January 18, 2026*
+*Session: Booking Modal + Checkout Flow Implementation*
