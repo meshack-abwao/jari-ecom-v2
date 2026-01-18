@@ -868,16 +868,16 @@
 }
 
 /* ===========================================
-   STICKY CTA - Glass Style (Deep Dive compact inline)
+   STICKY CTA - Glass Style (compact, not shouty)
    =========================================== */
 .pbk-sticky-cta {
   position: fixed;
-  bottom: var(--space-xl);
+  bottom: var(--space-lg);
   left: 50%;
   transform: translateX(-50%);
   z-index: 100;
-  width: calc(100% - var(--space-3xl));
-  max-width: 468px;
+  width: calc(100% - var(--space-4xl));
+  max-width: 380px;
   pointer-events: none;
 }
 
@@ -885,14 +885,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-lg);
-  padding: var(--space-md) var(--space-lg);
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-radius: var(--radius-full);  /* Pill shape = friendly, modern */
-  box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08);
-  border: 1px solid rgba(255,255,255,0.6);
+  border-radius: var(--radius-full);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1), 0 1px 4px rgba(0,0,0,0.06);
+  border: 1px solid rgba(0,0,0,0.06);
   pointer-events: all;
 }
 
@@ -901,7 +901,7 @@
   display: flex;
   align-items: baseline;
   gap: var(--space-xs);
-  padding-right: var(--space-md);
+  padding-right: var(--space-sm);
   border-right: 1px solid var(--border);
 }
 
@@ -912,7 +912,7 @@
 }
 
 .pbk-cta-amount {
-  font-size: var(--fs-heading);
+  font-size: var(--fs-body-lg);
   font-weight: 700;
   color: var(--color-primary);
   letter-spacing: -0.02em;
@@ -920,39 +920,38 @@
 
 .pbk-cta-buttons {
   display: flex;
-  gap: var(--space-sm);
+  gap: var(--space-xs);
 }
 
 .pbk-cta-book {
-  padding: var(--space-md) var(--space-2xl);
-  background: var(--gradient-primary);
+  padding: var(--space-sm) var(--space-lg);
+  background: var(--color-primary);
   color: #fff;
   border: none;
-  border-radius: var(--radius-full);  /* Fully rounded = safe, inviting */
-  font-size: var(--fs-body-sm);
+  border-radius: var(--radius-full);
+  font-size: var(--fs-small);
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: all 0.2s ease;
   white-space: nowrap;
 }
 
 .pbk-cta-book:hover {
-  transform: scale(1.03);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+  filter: brightness(1.1);
 }
 
 .pbk-cta-inquire {
-  padding: var(--space-md) var(--space-lg);
+  padding: var(--space-sm) var(--space-md);
   background: #25D366;
   color: #fff;
   border: none;
-  border-radius: var(--radius-full);  /* Match Book button */
-  font-size: var(--fs-body);
+  border-radius: var(--radius-full);
+  font-size: var(--fs-small);
   text-decoration: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.25s ease;
+  transition: all 0.2s ease;
 }
 
 .pbk-cta-inquire:hover {
