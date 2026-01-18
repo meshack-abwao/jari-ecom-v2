@@ -25,9 +25,36 @@ export function initPortfolioBookingHandlers() {
   }
   currentImageIndex = 0;
   
-  // Gallery navigation
+  // Gallery navigation (buttons)
   document.getElementById('pbkPrevImg')?.addEventListener('click', () => navigateGallery(-1));
   document.getElementById('pbkNextImg')?.addEventListener('click', () => navigateGallery(1));
+  
+  // Touch swipe support for hero images
+  const heroImage = document.querySelector('.pbk-hero-image');
+  if (heroImage && heroImages.length > 1) {
+    let touchStartX = 0;
+    let touchEndX = 0;
+    
+    heroImage.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+    
+    heroImage.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      const swipeThreshold = 50;
+      const diff = touchStartX - touchEndX;
+      
+      if (Math.abs(diff) > swipeThreshold) {
+        if (diff > 0) {
+          // Swipe left -> next image
+          navigateGallery(1);
+        } else {
+          // Swipe right -> prev image
+          navigateGallery(-1);
+        }
+      }
+    }, { passive: true });
+  }
   
   // Dots
   document.querySelectorAll('.pbk-dot').forEach(dot => {
