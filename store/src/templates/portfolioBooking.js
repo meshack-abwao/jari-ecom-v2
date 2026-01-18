@@ -175,7 +175,7 @@ function renderPbkStories(stories) {
   
   return `
     <div class="pbk-stories">
-      <h3 class="pbk-section-title">Our Work</h3>
+      <h3 class="pbk-section-title">More From Our Portfolio</h3>
       <div class="pbk-stories-row">
         ${valid.map((story, i) => `
           <div class="pbk-story" data-index="${i}">

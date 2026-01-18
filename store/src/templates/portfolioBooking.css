@@ -995,7 +995,7 @@
    Builds trust through differentiators
    =========================================== */
 .pbk-why-choose {
-  margin-bottom: var(--space-4xl);
+  margin-bottom: var(--space-5xl);
   padding-top: var(--space-4xl);
   border-top: 1px solid var(--border);
 }
@@ -1003,19 +1003,22 @@
 .pbk-why-content {
   display: flex;
   flex-direction: column;
-  gap: var(--space-lg);
+  gap: var(--space-xl);
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 .pbk-why-item {
   display: flex;
   align-items: flex-start;
   gap: var(--space-lg);
+  text-align: left;
 }
 
 .pbk-why-icon {
-  font-size: var(--fs-heading-lg);
+  font-size: var(--fs-heading-xl);
   flex-shrink: 0;
-  opacity: 0.8;
+  line-height: 1;
 }
 
 .pbk-why-text {
@@ -1023,7 +1026,7 @@
   line-height: 1.7;
   color: var(--text-secondary);
   margin: 0;
-  max-width: 55ch;  /* Optimal reading width */
+  max-width: 50ch;  /* Optimal reading width */
 }
 
 /* ===========================================
@@ -1031,18 +1034,19 @@
    Reassurance before booking decision
    =========================================== */
 .pbk-whats-included {
-  margin-bottom: var(--space-4xl);
+  margin-bottom: var(--space-5xl);
   padding-top: var(--space-4xl);
   border-top: 1px solid var(--border);
 }
 
 .pbk-included-list {
   list-style: none;
-  margin: 0;
+  margin: 0 auto;
   padding: 0;
   display: flex;
   flex-direction: column;
   gap: var(--space-lg);
+  max-width: 600px;
 }
 
 .pbk-included-item {
