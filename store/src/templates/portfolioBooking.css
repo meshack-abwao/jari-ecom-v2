@@ -58,25 +58,27 @@
 
 /* ===========================================
    HEADER - Premium Typography (Deep Dive style)
+   Level 1: Service Title - First impression
    =========================================== */
 .pbk-header {
-  padding: var(--space-xl) var(--space-xs) var(--space-2xl);
+  padding: var(--space-xl) var(--space-xs) var(--space-3xl);
+  text-align: center;
 }
 
 .pbk-title {
   font-size: var(--fs-display-xl);
-  font-weight: 700;
+  font-weight: 800;
   line-height: 1.1;
   color: var(--text-primary);
   letter-spacing: -0.03em;
-  margin-bottom: var(--space-md);
+  margin-bottom: var(--space-lg);
 }
 
 .pbk-meta {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  gap: var(--space-lg);
+  gap: var(--space-2xl);
 }
 
 .pbk-meta-left {
