@@ -186,6 +186,24 @@ function renderPbkStories(stories) {
         `).join('')}
       </div>
     </div>
+    
+    <!-- Story Viewer Modal (Instagram-style) -->
+    <div class="pbk-story-viewer" id="pbkStoryViewer">
+      <div class="pbk-story-viewer-backdrop" onclick="closePbkStoryViewer()"></div>
+      <div class="pbk-story-viewer-content">
+        <div class="pbk-story-progress">
+          ${valid.map((_, i) => `<div class="pbk-story-progress-bar" data-index="${i}"><div class="pbk-story-progress-fill"></div></div>`).join('')}
+        </div>
+        <button class="pbk-story-close" onclick="closePbkStoryViewer()">✕</button>
+        <img class="pbk-story-image" id="pbkStoryImage" src="" alt="">
+        <div class="pbk-story-label-overlay" id="pbkStoryLabel"></div>
+        <div class="pbk-story-nav">
+          <div class="pbk-story-nav-left" onclick="pbkStoryNav(-1)"></div>
+          <div class="pbk-story-nav-right" onclick="pbkStoryNav(1)"></div>
+        </div>
+      </div>
+    </div>
+    <script id="pbkStoriesData" type="application/json">${JSON.stringify(valid)}</script>
   `;
 }
 

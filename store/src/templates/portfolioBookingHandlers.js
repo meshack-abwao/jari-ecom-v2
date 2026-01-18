@@ -212,25 +212,84 @@ function openBookingModal() {
   }));
 }
 
-// Story viewer - Opens lightbox with story images
+// Story viewer state
+let storyData = [];
+let currentStoryIndex = 0;
+let storyTimer = null;
+
+// Story viewer - Instagram-style with auto-progress
 function openStoryViewer(index) {
-  const stories = state.currentProduct?.media?.stories || [];
-  if (stories.length === 0) return;
-  
-  // Use the PBK lightbox instead of separate story viewer
-  // Stories are essentially gallery items
-  if (typeof window.openPbkLightbox === 'function') {
-    // Open lightbox at the story index (offset by gallery images if needed)
-    window.openPbkLightbox(index, 'stories');
-  } else {
-    console.log('[PBK] Opening story:', index);
-    // Fallback - just show the image in a simple modal
-    const story = stories[index];
-    if (story?.url) {
-      window.open(story.url, '_blank');
+  const storiesDataEl = document.getElementById('pbkStoriesData');
+  if (storiesDataEl) {
+    try {
+      storyData = JSON.parse(storiesDataEl.textContent);
+    } catch (e) {
+      storyData = state.currentProduct?.media?.stories || [];
     }
+  } else {
+    storyData = state.currentProduct?.media?.stories || [];
+  }
+  
+  if (storyData.length === 0) return;
+  
+  currentStoryIndex = index;
+  const viewer = document.getElementById('pbkStoryViewer');
+  if (viewer) {
+    viewer.classList.add('active');
+    showStory(currentStoryIndex);
   }
 }
+
+function showStory(index) {
+  if (index < 0 || index >= storyData.length) {
+    closePbkStoryViewer();
+    return;
+  }
+  
+  currentStoryIndex = index;
+  const story = storyData[index];
+  
+  // Update image
+  const img = document.getElementById('pbkStoryImage');
+  if (img) img.src = story.url || story.thumbnail;
+  
+  // Update label
+  const label = document.getElementById('pbkStoryLabel');
+  if (label) label.textContent = story.label || '';
+  
+  // Update progress bars
+  document.querySelectorAll('.pbk-story-progress-bar').forEach((bar, i) => {
+    bar.classList.remove('active', 'completed');
+    if (i < index) bar.classList.add('completed');
+    if (i === index) bar.classList.add('active');
+  });
+  
+  // Auto-advance timer
+  clearTimeout(storyTimer);
+  storyTimer = setTimeout(() => {
+    if (currentStoryIndex < storyData.length - 1) {
+      showStory(currentStoryIndex + 1);
+    } else {
+      closePbkStoryViewer();
+    }
+  }, 5000);
+}
+
+window.closePbkStoryViewer = function() {
+  clearTimeout(storyTimer);
+  const viewer = document.getElementById('pbkStoryViewer');
+  if (viewer) viewer.classList.remove('active');
+};
+
+window.pbkStoryNav = function(direction) {
+  clearTimeout(storyTimer);
+  const newIndex = currentStoryIndex + direction;
+  if (newIndex >= 0 && newIndex < storyData.length) {
+    showStory(newIndex);
+  } else if (newIndex >= storyData.length) {
+    closePbkStoryViewer();
+  }
+};
 
 // Global helper functions (attached to window for onclick handlers)
 window.sharePbk = function() {
@@ -246,8 +305,7 @@ window.sharePbk = function() {
 };
 
 window.likePbk = function(btn) {
-  btn.textContent = btn.textContent === '♡' ? '♥' : '♡';
-  btn.style.color = btn.textContent === '♥' ? '#e74c3c' : '';
+  btn.classList.toggle('liked');
 };
 
 // Lightbox functions
