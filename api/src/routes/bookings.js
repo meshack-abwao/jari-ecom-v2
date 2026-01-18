@@ -310,6 +310,33 @@ router.put('/:id', auth, async (req, res, next) => {
 // PUBLIC BOOKING ENDPOINTS (Customer-facing)
 // ===========================================
 
+// Default settings when none exist
+const DEFAULT_BOOKING_SETTINGS = {
+  slot_duration_minutes: 60,
+  max_bookings_per_slot: 1,
+  max_bookings_per_day: 5,
+  min_notice_hours: 24,
+  max_advance_days: 30,
+  jump_line_enabled: false,
+  jump_line_fee: 0,
+  deposit_enabled: false,
+  deposit_percentage: 20,
+  inquiry_fee: 0,
+  reminders_enabled: false,
+  reminder_method: 'sms'
+};
+
+// Default working hours (Mon-Fri 9-5)
+const DEFAULT_WORKING_HOURS = [
+  { day_of_week: 0, is_open: false, start_time: '09:00', end_time: '17:00' }, // Sunday
+  { day_of_week: 1, is_open: true, start_time: '09:00', end_time: '17:00' },  // Monday
+  { day_of_week: 2, is_open: true, start_time: '09:00', end_time: '17:00' },  // Tuesday
+  { day_of_week: 3, is_open: true, start_time: '09:00', end_time: '17:00' },  // Wednesday
+  { day_of_week: 4, is_open: true, start_time: '09:00', end_time: '17:00' },  // Thursday
+  { day_of_week: 5, is_open: true, start_time: '09:00', end_time: '17:00' },  // Friday
+  { day_of_week: 6, is_open: false, start_time: '09:00', end_time: '17:00' }  // Saturday
+];
+
 // Get booking settings (public)
 router.get('/public/:storeSlug/settings', async (req, res, next) => {
   try {
@@ -329,7 +356,8 @@ router.get('/public/:storeSlug/settings', async (req, res, next) => {
       [storeResult.rows[0].id]
     );
     
-    res.json({ data: result.rows[0] || {} });
+    // Return settings or defaults
+    res.json({ data: result.rows[0] || DEFAULT_BOOKING_SETTINGS });
   } catch (err) {
     next(err);
   }
@@ -354,7 +382,8 @@ router.get('/public/:storeSlug/working-hours', async (req, res, next) => {
       [storeResult.rows[0].id]
     );
     
-    res.json({ data: result.rows });
+    // Return working hours or defaults
+    res.json({ data: result.rows.length > 0 ? result.rows : DEFAULT_WORKING_HOURS });
   } catch (err) {
     next(err);
   }
@@ -382,6 +411,7 @@ router.get('/public/:storeSlug/blocked-dates', async (req, res, next) => {
       [storeResult.rows[0].id]
     );
     
+    // Return empty array if no blocked dates (this is normal)
     res.json({ data: result.rows });
   } catch (err) {
     next(err);

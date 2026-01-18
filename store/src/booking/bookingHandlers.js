@@ -23,16 +23,17 @@ export async function openBookingModal(storeSlug, product, preSelectedPackage = 
   
   // Load booking data
   try {
-    const [settings, workingHours, blockedDates] = await Promise.all([
+    const [settingsRes, workingHoursRes, blockedDatesRes] = await Promise.all([
       bookingApi.getSettings(storeSlug),
       bookingApi.getWorkingHours(storeSlug),
       bookingApi.getBlockedDates(storeSlug)
     ]);
     
+    // Extract data from responses
     updateBookingState({
-      settings,
-      workingHours,
-      blockedDates,
+      settings: settingsRes.data || {},
+      workingHours: workingHoursRes.data || [],
+      blockedDates: blockedDatesRes.data || [],
       loading: false
     });
     
@@ -40,7 +41,24 @@ export async function openBookingModal(storeSlug, product, preSelectedPackage = 
     setupEventListeners();
   } catch (error) {
     console.error('[Booking] Failed to load data:', error);
-    updateBookingState({ loading: false, error: 'Failed to load booking data' });
+    // Set defaults on error so modal still works
+    updateBookingState({ 
+      loading: false, 
+      error: 'Failed to load booking data',
+      settings: {
+        min_notice_hours: 24,
+        max_advance_days: 30,
+        slot_duration_minutes: 60
+      },
+      workingHours: [
+        { day_of_week: 1, is_open: true, start_time: '09:00', end_time: '17:00' },
+        { day_of_week: 2, is_open: true, start_time: '09:00', end_time: '17:00' },
+        { day_of_week: 3, is_open: true, start_time: '09:00', end_time: '17:00' },
+        { day_of_week: 4, is_open: true, start_time: '09:00', end_time: '17:00' },
+        { day_of_week: 5, is_open: true, start_time: '09:00', end_time: '17:00' }
+      ],
+      blockedDates: []
+    });
     renderModal();
   }
 }
