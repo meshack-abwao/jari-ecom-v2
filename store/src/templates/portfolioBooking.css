@@ -725,11 +725,13 @@
 /* ===========================================
    TESTIMONIALS - Clean Apple Style (Social Proof)
    Psychology: Rounded cards = safe, trusted voices
+   Infinite scroll marquee for engagement
    =========================================== */
 .pbk-testimonials {
   margin-bottom: var(--space-5xl);
   padding-top: var(--space-4xl);
   border-top: 1px solid var(--border);
+  overflow: hidden;
 }
 
 .pbk-testimonials .pbk-section-title {
@@ -741,23 +743,25 @@
   margin-bottom: var(--space-3xl);
 }
 
-.pbk-testimonials-grid {
+/* Testimonials marquee container */
+.pbk-testimonials-track {
   display: flex;
   gap: var(--space-lg);
-  overflow-x: auto;
-  padding: var(--space-sm) var(--space-xs) var(--space-lg);
-  -webkit-overflow-scrolling: touch;
-  scroll-snap-type: x mandatory;
-  justify-content: center;
+  animation: pbk-marquee 30s linear infinite;
+  width: max-content;
 }
 
-/* Hide scrollbar */
-.pbk-testimonials-grid::-webkit-scrollbar {
-  display: none;
+.pbk-testimonials-track:hover {
+  animation-play-state: paused;
 }
-.pbk-testimonials-grid {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+
+@keyframes pbk-marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 .pbk-testimonial {
@@ -767,7 +771,6 @@
   background: var(--surface);
   border-radius: var(--radius-lg);
   flex-shrink: 0;
-  scroll-snap-align: start;
   box-shadow: 0 4px 20px rgba(0,0,0,0.06);
   border: 1px solid rgba(0,0,0,0.04);
   transition: all 0.3s ease;
@@ -840,10 +843,6 @@
 @media (min-width: 768px) {
   .pbk-testimonials .pbk-section-title {
     font-size: var(--fs-heading-xl);
-  }
-  
-  .pbk-testimonials-grid {
-    gap: var(--space-xl);
   }
 }
 
@@ -960,12 +959,6 @@
   .pbk-packages-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: var(--space-xl);
-  }
-  
-  .pbk-testimonials-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
     gap: var(--space-xl);
   }
   
@@ -1112,11 +1105,6 @@
   }
   
   .pbk-packages-grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-2xl);
-  }
-  
-  .pbk-testimonials-grid {
     grid-template-columns: repeat(3, 1fr);
     gap: var(--space-2xl);
   }

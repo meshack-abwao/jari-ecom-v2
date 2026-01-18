@@ -261,30 +261,37 @@ function renderPbkTestimonials(testimonials) {
   const valid = testimonials.filter(t => t.text?.trim());
   if (valid.length === 0) return '';
   
+  // Render single testimonial card
+  const renderCard = (t) => {
+    const initials = (t.author || 'H C').split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+    return `
+      <div class="pbk-testimonial">
+        <div class="pbk-testimonial-stars">★★★★★</div>
+        <p class="pbk-testimonial-text">"${t.text}"</p>
+        <div class="pbk-testimonial-author">
+          <div class="pbk-testimonial-avatar">${initials}</div>
+          <div class="pbk-testimonial-info">
+            <div class="pbk-testimonial-name">${t.author || 'Happy Client'}</div>
+            <div class="pbk-testimonial-role">${t.role || 'Verified Client'}</div>
+          </div>
+        </div>
+      </div>
+    `;
+  };
+  
+  // Duplicate testimonials for seamless infinite scroll
+  const testimonialCards = valid.map(renderCard).join('');
+  
   return `
     <div class="pbk-testimonials">
       <h3 class="pbk-section-title">What Clients Say</h3>
-      <div class="pbk-testimonials-grid">
-        ${valid.map(t => {
-          const initials = (t.author || 'H C').split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-          return `
-          <div class="pbk-testimonial">
-            <div class="pbk-testimonial-stars">★★★★★</div>
-            <p class="pbk-testimonial-text">"${t.text}"</p>
-            <div class="pbk-testimonial-author">
-              <div class="pbk-testimonial-avatar">${initials}</div>
-              <div class="pbk-testimonial-info">
-                <div class="pbk-testimonial-name">${t.author || 'Happy Client'}</div>
-                <div class="pbk-testimonial-role">${t.role || 'Verified Client'}</div>
-              </div>
-            </div>
-          </div>
-        `}).join('')}
+      <div class="pbk-testimonials-track">
+        ${testimonialCards}
+        ${testimonialCards}
       </div>
     </div>
   `;
 }
-
 
 // Gallery section wrapper - handles fallback from showcaseImages to images
 function renderPbkGallerySection(media, title) {
