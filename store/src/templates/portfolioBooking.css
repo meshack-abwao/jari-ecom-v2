@@ -62,6 +62,7 @@
    =========================================== */
 .pbk-header {
   padding: var(--space-xl) var(--space-xs) var(--space-2xl);
+  text-align: center;
 }
 
 .pbk-title {
@@ -75,9 +76,9 @@
 
 .pbk-meta {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  gap: var(--space-lg);
+  gap: var(--space-2xl);
 }
 
 .pbk-meta-left {
@@ -91,11 +92,11 @@
   align-items: center;
   gap: var(--space-xs);
   color: #f5a623;
-  font-size: var(--fs-small);
+  font-size: var(--fs-body);
 }
 
 .pbk-rating-count {
-  font-size: var(--fs-small);
+  font-size: var(--fs-body);
   font-weight: 600;
   color: var(--text-primary);
   margin-left: var(--space-sm);
