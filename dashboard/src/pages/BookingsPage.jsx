@@ -97,15 +97,15 @@ export default function BookingsPage() {
   const [newBlockedDate, setNewBlockedDate] = useState('');
   const [newBlockedReason, setNewBlockedReason] = useState('');
   
-  // Collapsed sections
+  // Collapsed sections - expand important ones by default
   const [expandedSections, setExpandedSections] = useState({
     schedule: true,
     slots: true,
-    advance: true,
-    premium: false,
-    payment: false,
+    advance: false,
+    premium: true,    // Show jump-the-line option
+    payment: true,    // Show deposit settings
     reminders: false,
-    blocked: true
+    blocked: false
   });
 
   const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
