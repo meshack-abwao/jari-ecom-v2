@@ -257,10 +257,16 @@
   left: 0;
   right: 0;
   transform: translateY(-50%);
-  display: flex;
+  display: none;  /* Hidden on mobile - use swipe */
   justify-content: space-between;
   padding: 0 var(--space-md);
   pointer-events: none;
+}
+
+@media (min-width: 768px) {
+  .pbk-hero-nav {
+    display: flex;  /* Show arrows on tablet+ */
+  }
 }
 
 .pbk-nav-btn {
