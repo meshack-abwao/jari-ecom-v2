@@ -40,9 +40,18 @@ async function start() {
 
 // Run migrations on startup
 async function runMigrations() {
+  // Helper to run migration with individual error handling
+  const runSafe = async (name, query) => {
+    try {
+      await db.query(query);
+    } catch (err) {
+      console.log(`⚠️ Migration ${name}:`, err.message);
+    }
+  };
+
   try {
-    // Create pixel_events table if not exists
-    await db.query(`
+    // Pixel events table
+    await runSafe('pixel_events', `
       CREATE TABLE IF NOT EXISTS pixel_events (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         store_id UUID NOT NULL REFERENCES stores(id) ON DELETE CASCADE,
@@ -59,17 +68,17 @@ async function runMigrations() {
       )
     `);
     
-    // Create indexes if not exist
-    await db.query(`CREATE INDEX IF NOT EXISTS idx_pixel_store_date ON pixel_events(store_id, created_at DESC)`);
-    await db.query(`CREATE INDEX IF NOT EXISTS idx_pixel_source ON pixel_events(store_id, utm_source)`);
-    await db.query(`CREATE INDEX IF NOT EXISTS idx_pixel_event ON pixel_events(store_id, event)`);
+    // Pixel indexes
+    await runSafe('pixel_idx_1', `CREATE INDEX IF NOT EXISTS idx_pixel_store_date ON pixel_events(store_id, created_at DESC)`);
+    await runSafe('pixel_idx_2', `CREATE INDEX IF NOT EXISTS idx_pixel_source ON pixel_events(store_id, utm_source)`);
+    await runSafe('pixel_idx_3', `CREATE INDEX IF NOT EXISTS idx_pixel_event ON pixel_events(store_id, event)`);
     
     // ===========================================
     // BOOKING SYSTEM TABLES
     // ===========================================
     
-    // Booking settings per store
-    await db.query(`
+    // Booking settings
+    await runSafe('booking_settings', `
       CREATE TABLE IF NOT EXISTS booking_settings (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         store_id UUID NOT NULL REFERENCES stores(id) ON DELETE CASCADE,
@@ -91,8 +100,8 @@ async function runMigrations() {
       )
     `);
     
-    // Working hours per store per day
-    await db.query(`
+    // Working hours
+    await runSafe('working_hours', `
       CREATE TABLE IF NOT EXISTS working_hours (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         store_id UUID NOT NULL REFERENCES stores(id) ON DELETE CASCADE,
@@ -106,8 +115,8 @@ async function runMigrations() {
       )
     `);
     
-    // Blocked dates (holidays, personal days)
-    await db.query(`
+    // Blocked dates
+    await runSafe('blocked_dates', `
       CREATE TABLE IF NOT EXISTS blocked_dates (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         store_id UUID NOT NULL REFERENCES stores(id) ON DELETE CASCADE,
@@ -119,7 +128,7 @@ async function runMigrations() {
     `);
     
     // Bookings
-    await db.query(`
+    await runSafe('bookings', `
       CREATE TABLE IF NOT EXISTS bookings (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         store_id UUID NOT NULL REFERENCES stores(id) ON DELETE CASCADE,
@@ -149,15 +158,16 @@ async function runMigrations() {
     `);
     
     // Booking indexes
-    await db.query(`CREATE INDEX IF NOT EXISTS idx_booking_settings_store ON booking_settings(store_id)`);
-    await db.query(`CREATE INDEX IF NOT EXISTS idx_working_hours_store ON working_hours(store_id)`);
-    await db.query(`CREATE INDEX IF NOT EXISTS idx_blocked_dates_store ON blocked_dates(store_id)`);
-    await db.query(`CREATE INDEX IF NOT EXISTS idx_bookings_store ON bookings(store_id)`);
-    await db.query(`CREATE INDEX IF NOT EXISTS idx_bookings_date ON bookings(booking_date)`);
+    await runSafe('booking_idx_1', `CREATE INDEX IF NOT EXISTS idx_booking_settings_store ON booking_settings(store_id)`);
+    await runSafe('booking_idx_2', `CREATE INDEX IF NOT EXISTS idx_working_hours_store ON working_hours(store_id)`);
+    await runSafe('booking_idx_3', `CREATE INDEX IF NOT EXISTS idx_blocked_dates_store ON blocked_dates(store_id)`);
+    await runSafe('booking_idx_4', `CREATE INDEX IF NOT EXISTS idx_bookings_store ON bookings(store_id)`);
+    await runSafe('booking_idx_5', `CREATE INDEX IF NOT EXISTS idx_bookings_date ON bookings(booking_date)`);
     
     console.log('✅ Migrations verified');
   } catch (err) {
-    console.error('⚠️ Migration warning:', err.message);
+    console.error('⚠️ Migration error:', err.message);
+    // Don't crash - continue starting the server
   }
 }
 
