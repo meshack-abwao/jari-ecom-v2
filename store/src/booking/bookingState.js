@@ -25,8 +25,17 @@ export const bookingState = {
   selectedDate: null,
   selectedTime: null,
   
-  // Booking settings (from API)
-  settings: {},
+  // Booking settings (from API, with sensible defaults)
+  settings: {
+    min_notice_hours: 24,
+    max_advance_days: 30,
+    slot_duration_minutes: 60,
+    deposit_enabled: true,
+    deposit_percentage: 30,
+    jump_line_enabled: true,
+    jump_line_fee: 500,
+    inquiry_fee: 0
+  },
   workingHours: [],
   blockedDates: [],
   availableSlots: [],
