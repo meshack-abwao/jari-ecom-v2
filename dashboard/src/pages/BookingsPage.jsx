@@ -1,10 +1,68 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { bookingsAPI } from '../api/client';
 import { 
   Calendar, Clock, Settings, Users, DollarSign, 
   ChevronDown, ChevronUp, Plus, X, Check,
   Bell, Zap, CalendarX, Save, AlertCircle
 } from 'lucide-react';
+
+// ==================== SUB-COMPONENTS (Outside main component to prevent re-creation) ====================
+
+const sectionStyles = {
+  card: { marginBottom: 16 },
+  sectionHeader: { 
+    display: 'flex', justifyContent: 'space-between', alignItems: 'center', 
+    padding: '16px', cursor: 'pointer', borderBottom: '1px solid #eee' 
+  },
+  sectionTitle: { display: 'flex', alignItems: 'center', gap: 12 },
+  sectionIcon: { 
+    width: 36, height: 36, borderRadius: 8, background: '#f0f0f0',
+    display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#666'
+  },
+  cardTitle: { fontSize: 15, fontWeight: 600, margin: 0 },
+  cardDesc: { fontSize: 13, color: '#888', margin: '4px 0 0' },
+  sectionContent: { padding: 16 }
+};
+
+const Section = memo(({ id, icon: Icon, title, description, isExpanded, onToggle, children }) => (
+  <div className="card" style={sectionStyles.card}>
+    <div style={sectionStyles.sectionHeader} onClick={() => onToggle(id)}>
+      <div style={sectionStyles.sectionTitle}>
+        <div style={sectionStyles.sectionIcon}>
+          <Icon size={18} />
+        </div>
+        <div>
+          <h3 style={sectionStyles.cardTitle}>{title}</h3>
+          {description && <p style={sectionStyles.cardDesc}>{description}</p>}
+        </div>
+      </div>
+      {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+    </div>
+    {isExpanded && <div style={sectionStyles.sectionContent}>{children}</div>}
+  </div>
+));
+
+const settingRowStyles = {
+  row: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0', borderBottom: '1px solid #f0f0f0' },
+  info: { flex: 1 },
+  label: { fontSize: 14, color: '#333' },
+  hint: { fontSize: 12, color: '#888', marginTop: 2 },
+  control: { marginLeft: 16 }
+};
+
+const SettingRow = memo(({ label, hint, children }) => (
+  <div style={settingRowStyles.row}>
+    <div style={settingRowStyles.info}>
+      <span style={settingRowStyles.label}>{label}</span>
+      {hint && <p style={settingRowStyles.hint}>{hint}</p>}
+    </div>
+    <div style={settingRowStyles.control}>
+      {children}
+    </div>
+  </div>
+));
+
+// ==================== MAIN COMPONENT ====================
 
 export default function BookingsPage() {
   // Tab state
@@ -154,47 +212,18 @@ export default function BookingsPage() {
            { is_open: false, start_time: '09:00', end_time: '17:00' };
   };
 
-  // ==================== COMPONENTS ====================
-
-  const Section = ({ id, icon: Icon, title, description, children }) => {
-    const isExpanded = expandedSections[id];
-    return (
-      <div className="card" style={styles.card}>
-        <div style={styles.sectionHeader} onClick={() => toggleSection(id)}>
-          <div style={styles.sectionTitle}>
-            <div style={styles.sectionIcon}>
-              <Icon size={18} />
-            </div>
-            <div>
-              <h3 style={styles.cardTitle}>{title}</h3>
-              {description && <p style={styles.cardDesc}>{description}</p>}
-            </div>
-          </div>
-          {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-        </div>
-        {isExpanded && <div style={styles.sectionContent}>{children}</div>}
-      </div>
-    );
-  };
-
-  const FormRow = ({ label, hint, children }) => (
-    <div style={styles.formGroup}>
-      <label style={styles.label}>{label}</label>
+  // Helper to render Section with expanded state
+  const renderSection = (id, icon, title, description, children) => (
+    <Section
+      id={id}
+      icon={icon}
+      title={title}
+      description={description}
+      isExpanded={expandedSections[id]}
+      onToggle={toggleSection}
+    >
       {children}
-      {hint && <p style={styles.hint}>{hint}</p>}
-    </div>
-  );
-
-  const SettingRow = ({ label, hint, children }) => (
-    <div style={styles.settingRow}>
-      <div style={styles.settingInfo}>
-        <span style={styles.settingLabel}>{label}</span>
-        {hint && <span style={styles.settingHint}>{hint}</span>}
-      </div>
-      <div style={styles.settingControl}>
-        {children}
-      </div>
-    </div>
+    </Section>
   );
 
   // ==================== RENDER SETTINGS ====================

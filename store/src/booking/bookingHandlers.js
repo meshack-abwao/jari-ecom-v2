@@ -48,7 +48,13 @@ export async function openBookingModal(storeSlug, product, preSelectedPackage = 
       settings: {
         min_notice_hours: 24,
         max_advance_days: 30,
-        slot_duration_minutes: 60
+        slot_duration_minutes: 60,
+        // Payment settings defaults
+        deposit_enabled: true,
+        deposit_percentage: 30,
+        jump_line_enabled: true,
+        jump_line_fee: 500,
+        inquiry_fee: 0
       },
       workingHours: [
         { day_of_week: 1, is_open: true, start_time: '09:00', end_time: '17:00' },
@@ -90,13 +96,37 @@ function renderModal() {
   setupEventListeners();
 }
 
-// Update just the content area
+// Update just the content area and progress bar
 function updateContent() {
   const content = document.getElementById('bkmContent');
   if (content) {
     content.innerHTML = renderStep(bookingState.step);
     setupStepListeners();
   }
+  
+  // Also update progress bar
+  updateProgressBar();
+}
+
+// Update progress bar to reflect current step
+function updateProgressBar() {
+  const { step } = bookingState;
+  document.querySelectorAll('.bkm-step').forEach((el, index) => {
+    const stepNum = index + 1;
+    if (stepNum <= step) {
+      el.classList.add('active');
+    } else {
+      el.classList.remove('active');
+    }
+  });
+  document.querySelectorAll('.bkm-line').forEach((el, index) => {
+    const stepNum = index + 1;
+    if (stepNum < step) {
+      el.classList.add('active');
+    } else {
+      el.classList.remove('active');
+    }
+  });
 }
 
 

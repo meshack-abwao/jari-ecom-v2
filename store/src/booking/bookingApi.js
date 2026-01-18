@@ -4,7 +4,8 @@
 // API routes: /api/bookings/public/:storeSlug/...
 // ===========================================
 
-const API_BASE = window.JARI_API_URL || 'https://jari-api-production.up.railway.app/api';
+// Use same API URL as main store API
+const API_BASE = (import.meta.env.VITE_API_URL || 'https://jari-ecom-v2-production.up.railway.app').replace(/\/$/, '') + '/api';
 
 export const bookingApi = {
   // Get booking settings for a store (public)
