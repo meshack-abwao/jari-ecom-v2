@@ -300,28 +300,37 @@
   background: var(--surface);
 }
 
-/* Intro */
+/* Intro - "Why should I care?" Value proposition */
 .pbk-intro {
-  margin-bottom: var(--space-2xl);
+  margin-bottom: var(--space-4xl);
+  text-align: center;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .pbk-price-from {
-  font-size: var(--fs-body);
+  font-size: var(--fs-body-lg);
   color: var(--text-secondary);
-  margin-bottom: var(--space-md);
+  margin-bottom: var(--space-lg);
 }
 
 .pbk-price-from strong {
-  color: var(--text-primary);
-  font-size: var(--fs-heading);
+  color: var(--color-primary);
+  font-size: var(--fs-heading-lg);
   font-weight: 700;
+  display: block;
+  margin-top: var(--space-xs);
 }
 
 .pbk-description {
-  font-size: var(--fs-body);
-  line-height: 1.6;
+  font-size: var(--fs-body-lg);
+  line-height: 1.7;
   color: var(--text-secondary);
   margin: 0;
+  max-width: 50ch;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 
