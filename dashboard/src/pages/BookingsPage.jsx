@@ -2,19 +2,22 @@ import { useState, useEffect } from 'react';
 import { bookingsAPI } from '../api/client';
 import { 
   Calendar, Clock, Settings, Users, DollarSign, 
-  ChevronDown, ChevronRight, Plus, X, Check,
-  Bell, Zap, CalendarX, RefreshCw
+  ChevronDown, ChevronUp, Plus, X, Check,
+  Bell, Zap, CalendarX, Save, AlertCircle
 } from 'lucide-react';
 
 export default function BookingsPage() {
   // Tab state
-  const [activeTab, setActiveTab] = useState('calendar'); // 'calendar', 'settings'
+  const [activeTab, setActiveTab] = useState('calendar');
   
-  // Bookings data
+  // Data
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+  const [error, setError] = useState(null);
   
-  // Settings data
+  // Settings
   const [settings, setSettings] = useState({
     slot_duration_minutes: 60,
     max_bookings_per_slot: 1,
@@ -30,15 +33,13 @@ export default function BookingsPage() {
     reminder_method: 'sms'
   });
 
-  // Working hours
+  // Working hours & blocked dates
   const [workingHours, setWorkingHours] = useState([]);
   const [blockedDates, setBlockedDates] = useState([]);
   const [newBlockedDate, setNewBlockedDate] = useState('');
   const [newBlockedReason, setNewBlockedReason] = useState('');
   
-  // UI state
-  const [savingSettings, setSavingSettings] = useState(false);
-  const [saveSuccess, setSaveSuccess] = useState(false);
+  // Collapsed sections
   const [expandedSections, setExpandedSections] = useState({
     schedule: true,
     slots: true,
@@ -51,18 +52,17 @@ export default function BookingsPage() {
 
   const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-  useEffect(() => {
-    loadData();
-  }, []);
+  useEffect(() => { loadData(); }, []);
 
   const loadData = async () => {
     setLoading(true);
+    setError(null);
     try {
       const [bookingsRes, settingsRes, hoursRes, blockedRes] = await Promise.all([
-        bookingsAPI.getAll(),
-        bookingsAPI.getSettings(),
-        bookingsAPI.getWorkingHours(),
-        bookingsAPI.getBlockedDates()
+        bookingsAPI.getAll().catch(() => ({ data: [] })),
+        bookingsAPI.getSettings().catch(() => ({ data: {} })),
+        bookingsAPI.getWorkingHours().catch(() => ({ data: [] })),
+        bookingsAPI.getBlockedDates().catch(() => ({ data: [] }))
       ]);
       
       setBookings(bookingsRes.data || []);
@@ -71,26 +71,26 @@ export default function BookingsPage() {
       }
       setWorkingHours(hoursRes.data || []);
       setBlockedDates(blockedRes.data || []);
-    } catch (error) {
-      console.error('Failed to load booking data:', error);
+    } catch (err) {
+      console.error('Failed to load booking data:', err);
+      setError('Failed to load settings. Please refresh the page.');
     } finally {
       setLoading(false);
     }
   };
 
-
   const saveSettings = async () => {
-    setSavingSettings(true);
+    setSaving(true);
     setSaveSuccess(false);
     try {
       await bookingsAPI.updateSettings(settings);
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
-    } catch (error) {
-      console.error('Failed to save settings:', error);
+    } catch (err) {
+      console.error('Failed to save settings:', err);
       alert('Failed to save settings. Please try again.');
     } finally {
-      setSavingSettings(false);
+      setSaving(false);
     }
   };
 
@@ -100,18 +100,23 @@ export default function BookingsPage() {
     const currentHour = existingHour || defaultHour;
     const newData = { ...currentHour, [field]: value };
     
+    // Optimistic update
+    if (existingHour) {
+      setWorkingHours(prev => prev.map(h => h.day_of_week === day ? newData : h));
+    } else {
+      setWorkingHours(prev => [...prev, newData]);
+    }
+    
     try {
       const result = await bookingsAPI.updateWorkingHours(day, newData);
-      if (existingHour) {
-        setWorkingHours(prev => 
-          prev.map(h => h.day_of_week === day ? { ...h, ...result.data } : h)
-        );
-      } else {
-        // New entry created
-        setWorkingHours(prev => [...prev, result.data]);
-      }
-    } catch (error) {
-      console.error('Failed to update working hours:', error);
+      // Update with server response
+      setWorkingHours(prev => 
+        prev.map(h => h.day_of_week === day ? { ...h, ...result.data } : h)
+      );
+    } catch (err) {
+      console.error('Failed to update working hours:', err);
+      // Revert on error
+      loadData();
     }
   };
 
@@ -125,8 +130,9 @@ export default function BookingsPage() {
       setBlockedDates(prev => [...prev, result.data]);
       setNewBlockedDate('');
       setNewBlockedReason('');
-    } catch (error) {
-      console.error('Failed to add blocked date:', error);
+    } catch (err) {
+      console.error('Failed to add blocked date:', err);
+      alert('Failed to add blocked date. Please try again.');
     }
   };
 
@@ -134,8 +140,8 @@ export default function BookingsPage() {
     try {
       await bookingsAPI.removeBlockedDate(id);
       setBlockedDates(prev => prev.filter(d => d.id !== id));
-    } catch (error) {
-      console.error('Failed to remove blocked date:', error);
+    } catch (err) {
+      console.error('Failed to remove blocked date:', err);
     }
   };
 
@@ -144,309 +150,131 @@ export default function BookingsPage() {
   };
 
   const getWorkingHour = (day) => {
-    return workingHours.find(h => h.day_of_week === day) || { is_open: false, start_time: '09:00', end_time: '17:00' };
+    return workingHours.find(h => h.day_of_week === day) || 
+           { is_open: false, start_time: '09:00', end_time: '17:00' };
   };
 
+  // ==================== COMPONENTS ====================
 
-  // ==================== STYLES ====================
-  const styles = {
-    container: { padding: '0' },
-    header: {
-      marginBottom: '24px',
-    },
-    title: {
-      fontSize: '28px',
-      fontWeight: '700',
-      color: 'var(--text-primary)',
-      marginBottom: '4px',
-    },
-    subtitle: {
-      color: 'var(--text-secondary)',
-      fontSize: '14px',
-    },
-    tabs: {
-      display: 'flex',
-      gap: '8px',
-      marginBottom: '24px',
-      borderBottom: '1px solid var(--border-color)',
-      paddingBottom: '12px',
-    },
-    tab: {
-      padding: '10px 20px',
-      borderRadius: '8px',
-      border: 'none',
-      background: 'transparent',
-      color: 'var(--text-secondary)',
-      cursor: 'pointer',
-      fontSize: '14px',
-      fontWeight: '500',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '8px',
-      transition: 'all 0.2s',
-    },
-    tabActive: {
-      background: 'var(--primary-color)',
-      color: 'white',
-    },
-    section: {
-      background: 'var(--card-bg)',
-      borderRadius: '12px',
-      border: '1px solid var(--border-color)',
-      marginBottom: '16px',
-      overflow: 'hidden',
-    },
-    sectionHeader: {
-      padding: '16px 20px',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      cursor: 'pointer',
-      borderBottom: '1px solid transparent',
-    },
-    sectionHeaderExpanded: {
-      borderBottom: '1px solid var(--border-color)',
-    },
-    sectionTitle: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: '12px',
-      fontSize: '15px',
-      fontWeight: '600',
-      color: 'var(--text-primary)',
-    },
-    sectionContent: {
-      padding: '20px',
-    },
-    row: {
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      padding: '12px 0',
-      borderBottom: '1px solid var(--border-color)',
-    },
-    rowLast: {
-      borderBottom: 'none',
-    },
-    label: {
-      fontSize: '14px',
-      color: 'var(--text-primary)',
-    },
-    sublabel: {
-      fontSize: '12px',
-      color: 'var(--text-secondary)',
-      marginTop: '2px',
-    },
-    input: {
-      padding: '8px 12px',
-      borderRadius: '8px',
-      border: '1px solid var(--border-color)',
-      background: 'var(--bg-color)',
-      color: 'var(--text-primary)',
-      fontSize: '14px',
-      width: '120px',
-    },
-    select: {
-      padding: '8px 12px',
-      borderRadius: '8px',
-      border: '1px solid var(--border-color)',
-      background: 'var(--bg-color)',
-      color: 'var(--text-primary)',
-      fontSize: '14px',
-      cursor: 'pointer',
-    },
-    toggle: {
-      position: 'relative',
-      width: '44px',
-      height: '24px',
-      borderRadius: '12px',
-      background: 'var(--border-color)',
-      cursor: 'pointer',
-      transition: 'background 0.2s',
-    },
-    toggleActive: {
-      background: 'var(--primary-color)',
-    },
-    toggleKnob: {
-      position: 'absolute',
-      top: '2px',
-      left: '2px',
-      width: '20px',
-      height: '20px',
-      borderRadius: '50%',
-      background: 'white',
-      transition: 'transform 0.2s',
-    },
-    toggleKnobActive: {
-      transform: 'translateX(20px)',
-    },
-    dayRow: {
-      display: 'grid',
-      gridTemplateColumns: '100px 50px 1fr',
-      alignItems: 'center',
-      gap: '16px',
-      padding: '10px 0',
-      borderBottom: '1px solid var(--border-color)',
-    },
-    dayName: {
-      fontSize: '14px',
-      fontWeight: '500',
-      color: 'var(--text-primary)',
-    },
-    timeInputs: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: '8px',
-    },
-    timeInput: {
-      padding: '6px 10px',
-      borderRadius: '6px',
-      border: '1px solid var(--border-color)',
-      background: 'var(--bg-color)',
-      color: 'var(--text-primary)',
-      fontSize: '13px',
-      width: '90px',
-    },
-    saveButton: {
-      padding: '12px 24px',
-      borderRadius: '10px',
-      border: 'none',
-      background: 'var(--primary-color)',
-      color: 'white',
-      fontSize: '14px',
-      fontWeight: '600',
-      cursor: 'pointer',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '8px',
-      marginTop: '20px',
-    },
-    blockedItem: {
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      padding: '10px 14px',
-      background: 'var(--bg-color)',
-      borderRadius: '8px',
-      marginBottom: '8px',
-    },
-    addBlockedRow: {
-      display: 'flex',
-      gap: '10px',
-      marginTop: '12px',
-    },
-    addButton: {
-      padding: '8px 16px',
-      borderRadius: '8px',
-      border: 'none',
-      background: 'var(--primary-color)',
-      color: 'white',
-      fontSize: '13px',
-      cursor: 'pointer',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '6px',
-    },
-    removeButton: {
-      padding: '4px',
-      borderRadius: '6px',
-      border: 'none',
-      background: 'transparent',
-      color: 'var(--text-secondary)',
-      cursor: 'pointer',
-    },
-    emptyState: {
-      textAlign: 'center',
-      padding: '60px 20px',
-      color: 'var(--text-secondary)',
-    },
+  const Section = ({ id, icon: Icon, title, description, children }) => {
+    const isExpanded = expandedSections[id];
+    return (
+      <div className="card" style={styles.card}>
+        <div style={styles.sectionHeader} onClick={() => toggleSection(id)}>
+          <div style={styles.sectionTitle}>
+            <div style={styles.sectionIcon}>
+              <Icon size={18} />
+            </div>
+            <div>
+              <h3 style={styles.cardTitle}>{title}</h3>
+              {description && <p style={styles.cardDesc}>{description}</p>}
+            </div>
+          </div>
+          {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+        </div>
+        {isExpanded && <div style={styles.sectionContent}>{children}</div>}
+      </div>
+    );
   };
 
-
-  // ==================== RENDER COMPONENTS ====================
-  
-  const Toggle = ({ checked, onChange }) => (
-    <div 
-      style={{ ...styles.toggle, ...(checked ? styles.toggleActive : {}) }}
-      onClick={() => onChange(!checked)}
-    >
-      <div style={{ ...styles.toggleKnob, ...(checked ? styles.toggleKnobActive : {}) }} />
+  const FormRow = ({ label, hint, children }) => (
+    <div style={styles.formGroup}>
+      <label style={styles.label}>{label}</label>
+      {children}
+      {hint && <p style={styles.hint}>{hint}</p>}
     </div>
   );
 
-  const Section = ({ id, icon: Icon, title, children }) => (
-    <div style={styles.section}>
-      <div 
-        style={{ 
-          ...styles.sectionHeader, 
-          ...(expandedSections[id] ? styles.sectionHeaderExpanded : {}) 
-        }}
-        onClick={() => toggleSection(id)}
-      >
-        <div style={styles.sectionTitle}>
-          <Icon size={18} />
-          {title}
-        </div>
-        {expandedSections[id] ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
+  const SettingRow = ({ label, hint, children }) => (
+    <div style={styles.settingRow}>
+      <div style={styles.settingInfo}>
+        <span style={styles.settingLabel}>{label}</span>
+        {hint && <span style={styles.settingHint}>{hint}</span>}
       </div>
-      {expandedSections[id] && (
-        <div style={styles.sectionContent}>
-          {children}
+      <div style={styles.settingControl}>
+        {children}
+      </div>
+    </div>
+  );
+
+  // ==================== RENDER SETTINGS ====================
+  
+  const renderSettings = () => (
+    <form onSubmit={(e) => { e.preventDefault(); saveSettings(); }}>
+      {error && (
+        <div style={styles.errorBanner}>
+          <AlertCircle size={18} />
+          <span>{error}</span>
         </div>
       )}
-    </div>
-  );
 
-
-  const renderSettings = () => (
-    <div>
       {/* Working Schedule */}
-      <Section id="schedule" icon={Clock} title="Working Schedule">
-        {[1, 2, 3, 4, 5, 6, 0].map(day => {
-          const hour = getWorkingHour(day);
-          return (
-            <div key={day} style={{ ...styles.dayRow, ...(day === 0 ? styles.rowLast : {}) }}>
-              <span style={styles.dayName}>{dayNames[day]}</span>
-              <Toggle 
-                checked={hour.is_open} 
-                onChange={(val) => updateWorkingHour(day, 'is_open', val)} 
-              />
-              {hour.is_open && (
-                <div style={styles.timeInputs}>
-                  <input 
-                    type="time" 
-                    value={hour.start_time?.substring(0, 5) || '09:00'} 
-                    onChange={(e) => updateWorkingHour(day, 'start_time', e.target.value)}
-                    style={styles.timeInput}
-                  />
-                  <span style={{ color: 'var(--text-secondary)' }}>to</span>
-                  <input 
-                    type="time" 
-                    value={hour.end_time?.substring(0, 5) || '17:00'} 
-                    onChange={(e) => updateWorkingHour(day, 'end_time', e.target.value)}
-                    style={styles.timeInput}
-                  />
+      <Section 
+        id="schedule" 
+        icon={Clock} 
+        title="Working Schedule"
+        description="Set your availability for each day of the week"
+      >
+        <div style={styles.scheduleGrid}>
+          {[1, 2, 3, 4, 5, 6, 0].map(day => {
+            const hour = getWorkingHour(day);
+            const isOpen = hour.is_open;
+            return (
+              <div key={day} style={styles.dayRow}>
+                <div style={styles.dayInfo}>
+                  <span style={{ ...styles.dayName, opacity: isOpen ? 1 : 0.5 }}>
+                    {dayNames[day]}
+                  </span>
+                  <label style={styles.toggleLabel}>
+                    <input
+                      type="checkbox"
+                      checked={isOpen}
+                      onChange={(e) => updateWorkingHour(day, 'is_open', e.target.checked)}
+                      style={styles.checkbox}
+                    />
+                    <span style={styles.toggleText}>{isOpen ? 'Open' : 'Closed'}</span>
+                  </label>
                 </div>
-              )}
-            </div>
-          );
-        })}
+                {isOpen && (
+                  <div style={styles.timeInputs}>
+                    <input 
+                      type="time" 
+                      value={hour.start_time?.substring(0, 5) || '09:00'} 
+                      onChange={(e) => updateWorkingHour(day, 'start_time', e.target.value)}
+                      className="input"
+                      style={styles.timeInput}
+                    />
+                    <span style={styles.timeSeparator}>to</span>
+                    <input 
+                      type="time" 
+                      value={hour.end_time?.substring(0, 5) || '17:00'} 
+                      onChange={(e) => updateWorkingHour(day, 'end_time', e.target.value)}
+                      className="input"
+                      style={styles.timeInput}
+                    />
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </Section>
 
-
       {/* Slot Settings */}
-      <Section id="slots" icon={Users} title="Slot Settings">
-        <div style={styles.row}>
-          <div>
-            <div style={styles.label}>Duration per booking</div>
-            <div style={styles.sublabel}>How long each appointment slot lasts</div>
-          </div>
+      <Section 
+        id="slots" 
+        icon={Users} 
+        title="Booking Slots"
+        description="Configure how appointments are scheduled"
+      >
+        <SettingRow label="Duration per booking" hint="How long each appointment lasts">
           <select 
             value={settings.slot_duration_minutes} 
             onChange={(e) => setSettings(s => ({ ...s, slot_duration_minutes: parseInt(e.target.value) }))}
+            className="input"
             style={styles.select}
           >
-            <option value={30}>30 minutes</option>
+            <option value={30}>30 min</option>
             <option value={60}>1 hour</option>
             <option value={90}>1.5 hours</option>
             <option value={120}>2 hours</option>
@@ -454,48 +282,45 @@ export default function BookingsPage() {
             <option value={240}>4 hours</option>
             <option value={480}>Full day</option>
           </select>
-        </div>
-        <div style={styles.row}>
-          <div>
-            <div style={styles.label}>Max bookings per slot</div>
-            <div style={styles.sublabel}>1 for exclusive, higher for group classes</div>
-          </div>
+        </SettingRow>
+
+        <SettingRow label="Max bookings per slot" hint="1 = exclusive, higher for group classes">
           <input 
             type="number" 
             min={1} 
             max={50}
             value={settings.max_bookings_per_slot}
-            onChange={(e) => setSettings(s => ({ ...s, max_bookings_per_slot: parseInt(e.target.value) }))}
-            style={{ ...styles.input, width: '80px' }}
+            onChange={(e) => setSettings(s => ({ ...s, max_bookings_per_slot: parseInt(e.target.value) || 1 }))}
+            className="input"
+            style={styles.numberInput}
           />
-        </div>
-        <div style={{ ...styles.row, ...styles.rowLast }}>
-          <div>
-            <div style={styles.label}>Max bookings per day</div>
-            <div style={styles.sublabel}>Total appointments you can handle daily</div>
-          </div>
+        </SettingRow>
+
+        <SettingRow label="Max bookings per day" hint="Total appointments you can handle">
           <input 
             type="number" 
             min={1} 
             max={100}
             value={settings.max_bookings_per_day}
-            onChange={(e) => setSettings(s => ({ ...s, max_bookings_per_day: parseInt(e.target.value) }))}
-            style={{ ...styles.input, width: '80px' }}
+            onChange={(e) => setSettings(s => ({ ...s, max_bookings_per_day: parseInt(e.target.value) || 1 }))}
+            className="input"
+            style={styles.numberInput}
           />
-        </div>
+        </SettingRow>
       </Section>
 
-
       {/* Advance Booking Rules */}
-      <Section id="advance" icon={Calendar} title="Advance Booking Rules">
-        <div style={styles.row}>
-          <div>
-            <div style={styles.label}>Minimum notice</div>
-            <div style={styles.sublabel}>How far in advance clients must book</div>
-          </div>
+      <Section 
+        id="advance" 
+        icon={Calendar} 
+        title="Advance Booking"
+        description="Control when clients can book"
+      >
+        <SettingRow label="Minimum notice" hint="How far in advance clients must book">
           <select 
             value={settings.min_notice_hours} 
             onChange={(e) => setSettings(s => ({ ...s, min_notice_hours: parseInt(e.target.value) }))}
+            className="input"
             style={styles.select}
           >
             <option value={0}>No minimum</option>
@@ -505,18 +330,15 @@ export default function BookingsPage() {
             <option value={24}>24 hours</option>
             <option value={48}>2 days</option>
             <option value={72}>3 days</option>
-            <option value={120}>5 days</option>
             <option value={168}>1 week</option>
           </select>
-        </div>
-        <div style={{ ...styles.row, ...styles.rowLast }}>
-          <div>
-            <div style={styles.label}>Book up to</div>
-            <div style={styles.sublabel}>How far in the future clients can book</div>
-          </div>
+        </SettingRow>
+
+        <SettingRow label="Book up to" hint="How far in the future clients can book">
           <select 
             value={settings.max_advance_days} 
             onChange={(e) => setSettings(s => ({ ...s, max_advance_days: parseInt(e.target.value) }))}
+            className="input"
             style={styles.select}
           >
             <option value={7}>1 week</option>
@@ -525,61 +347,66 @@ export default function BookingsPage() {
             <option value={60}>2 months</option>
             <option value={90}>3 months</option>
           </select>
-        </div>
+        </SettingRow>
       </Section>
 
-
       {/* Premium: Jump the Line */}
-      <Section id="premium" icon={Zap} title="Premium: Jump the Line">
-        <div style={styles.row}>
-          <div>
-            <div style={styles.label}>Enable "Jump the Line"</div>
-            <div style={styles.sublabel}>Let clients pay extra to book within minimum notice</div>
-          </div>
-          <Toggle 
-            checked={settings.jump_line_enabled} 
-            onChange={(val) => setSettings(s => ({ ...s, jump_line_enabled: val }))} 
-          />
-        </div>
+      <Section 
+        id="premium" 
+        icon={Zap} 
+        title="Jump the Line"
+        description="Let clients pay extra for urgent bookings"
+      >
+        <SettingRow label="Enable skip-the-wait fee" hint="Clients can pay to book within minimum notice">
+          <label style={styles.toggleLabel}>
+            <input
+              type="checkbox"
+              checked={settings.jump_line_enabled}
+              onChange={(e) => setSettings(s => ({ ...s, jump_line_enabled: e.target.checked }))}
+              style={styles.checkbox}
+            />
+          </label>
+        </SettingRow>
+
         {settings.jump_line_enabled && (
-          <div style={{ ...styles.row, ...styles.rowLast }}>
-            <div>
-              <div style={styles.label}>Skip wait fee (KES)</div>
-              <div style={styles.sublabel}>Extra charge for urgent bookings</div>
-            </div>
+          <SettingRow label="Skip wait fee (KES)" hint="Extra charge for urgent bookings">
             <input 
               type="number" 
               min={0}
               value={settings.jump_line_fee}
               onChange={(e) => setSettings(s => ({ ...s, jump_line_fee: parseFloat(e.target.value) || 0 }))}
-              style={styles.input}
+              className="input"
+              style={styles.numberInput}
+              placeholder="0"
             />
-          </div>
+          </SettingRow>
         )}
       </Section>
 
-
       {/* Payment Settings */}
-      <Section id="payment" icon={DollarSign} title="Payment Settings">
-        <div style={styles.row}>
-          <div>
-            <div style={styles.label}>Accept deposits</div>
-            <div style={styles.sublabel}>Let clients pay a portion upfront</div>
-          </div>
-          <Toggle 
-            checked={settings.deposit_enabled} 
-            onChange={(val) => setSettings(s => ({ ...s, deposit_enabled: val }))} 
-          />
-        </div>
+      <Section 
+        id="payment" 
+        icon={DollarSign} 
+        title="Payment"
+        description="Configure deposits and fees"
+      >
+        <SettingRow label="Accept deposits" hint="Let clients pay a portion upfront">
+          <label style={styles.toggleLabel}>
+            <input
+              type="checkbox"
+              checked={settings.deposit_enabled}
+              onChange={(e) => setSettings(s => ({ ...s, deposit_enabled: e.target.checked }))}
+              style={styles.checkbox}
+            />
+          </label>
+        </SettingRow>
+
         {settings.deposit_enabled && (
-          <div style={styles.row}>
-            <div>
-              <div style={styles.label}>Deposit percentage</div>
-              <div style={styles.sublabel}>Portion of total required upfront</div>
-            </div>
+          <SettingRow label="Deposit percentage" hint="Portion required upfront">
             <select 
               value={settings.deposit_percentage} 
               onChange={(e) => setSettings(s => ({ ...s, deposit_percentage: parseInt(e.target.value) }))}
+              className="input"
               style={styles.select}
             >
               <option value={10}>10%</option>
@@ -588,134 +415,176 @@ export default function BookingsPage() {
               <option value={30}>30%</option>
               <option value={50}>50%</option>
             </select>
-          </div>
+          </SettingRow>
         )}
-        <div style={{ ...styles.row, ...styles.rowLast }}>
-          <div>
-            <div style={styles.label}>Inquiry fee (KES)</div>
-            <div style={styles.sublabel}>Charge for serious inquiries (0 = free)</div>
-          </div>
+
+        <SettingRow label="Inquiry fee (KES)" hint="Charge for serious inquiries (0 = free)">
           <input 
             type="number" 
             min={0}
             value={settings.inquiry_fee}
             onChange={(e) => setSettings(s => ({ ...s, inquiry_fee: parseFloat(e.target.value) || 0 }))}
-            style={styles.input}
+            className="input"
+            style={styles.numberInput}
+            placeholder="0"
           />
-        </div>
+        </SettingRow>
       </Section>
 
-
       {/* Reminders */}
-      <Section id="reminders" icon={Bell} title="Reminders">
-        <div style={styles.row}>
-          <div>
-            <div style={styles.label}>Enable reminders</div>
-            <div style={styles.sublabel}>Send notifications before appointments</div>
-          </div>
-          <Toggle 
-            checked={settings.reminders_enabled} 
-            onChange={(val) => setSettings(s => ({ ...s, reminders_enabled: val }))} 
-          />
-        </div>
+      <Section 
+        id="reminders" 
+        icon={Bell} 
+        title="Reminders"
+        description="Notify clients before appointments"
+      >
+        <SettingRow label="Enable reminders" hint="Send notifications before appointments">
+          <label style={styles.toggleLabel}>
+            <input
+              type="checkbox"
+              checked={settings.reminders_enabled}
+              onChange={(e) => setSettings(s => ({ ...s, reminders_enabled: e.target.checked }))}
+              style={styles.checkbox}
+            />
+          </label>
+        </SettingRow>
+
         {settings.reminders_enabled && (
-          <div style={{ ...styles.row, ...styles.rowLast }}>
-            <div>
-              <div style={styles.label}>Reminder method</div>
-              <div style={styles.sublabel}>How to notify clients</div>
-            </div>
+          <SettingRow label="Reminder method" hint="How to notify clients">
             <select 
               value={settings.reminder_method} 
               onChange={(e) => setSettings(s => ({ ...s, reminder_method: e.target.value }))}
+              className="input"
               style={styles.select}
             >
               <option value="sms">SMS</option>
               <option value="whatsapp">WhatsApp</option>
               <option value="both">Both</option>
             </select>
-          </div>
+          </SettingRow>
         )}
       </Section>
 
-
       {/* Blocked Dates */}
-      <Section id="blocked" icon={CalendarX} title="Blocked Dates">
+      <Section 
+        id="blocked" 
+        icon={CalendarX} 
+        title="Blocked Dates"
+        description="Mark days you're unavailable"
+      >
         {blockedDates.length > 0 ? (
-          blockedDates.map(date => (
-            <div key={date.id} style={styles.blockedItem}>
-              <div>
-                <div style={styles.label}>
-                  {new Date(date.blocked_date).toLocaleDateString('en-US', { 
-                    weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' 
-                  })}
+          <div style={styles.blockedList}>
+            {blockedDates.map(date => (
+              <div key={date.id} style={styles.blockedItem}>
+                <div style={styles.blockedInfo}>
+                  <span style={styles.blockedDate}>
+                    {new Date(date.blocked_date).toLocaleDateString('en-US', { 
+                      weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' 
+                    })}
+                  </span>
+                  {date.reason && <span style={styles.blockedReason}>{date.reason}</span>}
                 </div>
-                {date.reason && <div style={styles.sublabel}>{date.reason}</div>}
+                <button 
+                  type="button"
+                  style={styles.removeBtn}
+                  onClick={() => removeBlockedDate(date.id)}
+                >
+                  <X size={14} />
+                </button>
               </div>
-              <button 
-                style={styles.removeButton}
-                onClick={() => removeBlockedDate(date.id)}
-              >
-                <X size={16} />
-              </button>
-            </div>
-          ))
-        ) : (
-          <div style={{ color: 'var(--text-secondary)', fontSize: '14px', marginBottom: '12px' }}>
-            No blocked dates
+            ))}
           </div>
+        ) : (
+          <p style={styles.emptyText}>No blocked dates</p>
         )}
-        <div style={styles.addBlockedRow}>
+        
+        <div style={styles.addBlockedForm}>
           <input 
             type="date" 
             value={newBlockedDate}
             onChange={(e) => setNewBlockedDate(e.target.value)}
-            style={{ ...styles.input, width: '150px' }}
+            className="input"
+            style={styles.dateInput}
           />
           <input 
             type="text" 
             placeholder="Reason (optional)"
             value={newBlockedReason}
             onChange={(e) => setNewBlockedReason(e.target.value)}
-            style={{ ...styles.input, flex: 1 }}
+            className="input"
+            style={styles.reasonInput}
           />
-          <button style={styles.addButton} onClick={addBlockedDate}>
-            <Plus size={14} /> Add
+          <button 
+            type="button" 
+            style={styles.addBtn} 
+            onClick={addBlockedDate}
+            disabled={!newBlockedDate}
+          >
+            <Plus size={16} /> Add
           </button>
         </div>
       </Section>
 
       {/* Save Button */}
       <button 
+        type="submit"
         style={{
-          ...styles.saveButton,
+          ...styles.saveBtn,
           ...(saveSuccess ? { background: '#10b981' } : {})
         }} 
-        onClick={saveSettings} 
-        disabled={savingSettings}
+        disabled={saving}
       >
-        {savingSettings ? <RefreshCw size={16} className="spin" /> : <Check size={16} />}
-        {savingSettings ? 'Saving...' : saveSuccess ? 'Saved!' : 'Save Settings'}
+        {saving ? (
+          <>
+            <div style={styles.spinner} />
+            Saving...
+          </>
+        ) : saveSuccess ? (
+          <>
+            <Check size={18} />
+            Saved!
+          </>
+        ) : (
+          <>
+            <Save size={18} />
+            Save Settings
+          </>
+        )}
       </button>
+    </form>
+  );
+
+  // ==================== RENDER CALENDAR ====================
+  
+  const renderCalendar = () => (
+    <div style={styles.emptyState}>
+      <div style={styles.emptyIcon}>
+        <Calendar size={48} />
+      </div>
+      <h3 style={styles.emptyTitle}>No bookings yet</h3>
+      <p style={styles.emptyText}>When customers book your services, they'll appear here.</p>
     </div>
   );
 
   // ==================== MAIN RENDER ====================
+  
   if (loading) {
     return (
-      <div style={styles.container}>
-        <div style={styles.header}>
-          <h1 style={styles.title}>Bookings</h1>
-          <p style={styles.subtitle}>Loading...</p>
-        </div>
+      <div style={styles.loadingContainer}>
+        <div style={styles.loadingSpinner} />
+        <span>Loading bookings...</span>
       </div>
     );
   }
 
   return (
-    <div style={styles.container}>
+    <div>
+      {/* Header */}
       <div style={styles.header}>
-        <h1 style={styles.title}>Bookings</h1>
-        <p style={styles.subtitle}>Manage your calendar and booking settings</p>
+        <div>
+          <h1 style={styles.title}>Bookings</h1>
+          <p style={styles.subtitle}>Manage your calendar and booking settings</p>
+        </div>
       </div>
 
       {/* Tabs */}
@@ -724,26 +593,387 @@ export default function BookingsPage() {
           style={{ ...styles.tab, ...(activeTab === 'calendar' ? styles.tabActive : {}) }}
           onClick={() => setActiveTab('calendar')}
         >
-          <Calendar size={18} /> Calendar
+          <Calendar size={18} />
+          <span>Calendar</span>
         </button>
         <button 
           style={{ ...styles.tab, ...(activeTab === 'settings' ? styles.tabActive : {}) }}
           onClick={() => setActiveTab('settings')}
         >
-          <Settings size={18} /> Settings
+          <Settings size={18} />
+          <span>Settings</span>
         </button>
       </div>
 
-      {/* Tab Content */}
-      {activeTab === 'calendar' ? (
-        <div style={styles.emptyState}>
-          <Calendar size={48} style={{ marginBottom: '16px', opacity: 0.5 }} />
-          <h3 style={{ marginBottom: '8px', color: 'var(--text-primary)' }}>No bookings yet</h3>
-          <p>When customers book your services, they'll appear here.</p>
-        </div>
-      ) : (
-        renderSettings()
-      )}
+      {/* Content */}
+      {activeTab === 'calendar' ? renderCalendar() : renderSettings()}
     </div>
   );
 }
+
+// ==================== STYLES ====================
+
+const styles = {
+  // Loading
+  loadingContainer: { 
+    display: 'flex', 
+    flexDirection: 'column', 
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    minHeight: '60vh', 
+    color: 'var(--text-muted)',
+    gap: '16px'
+  },
+  loadingSpinner: { 
+    width: '40px', 
+    height: '40px', 
+    border: '3px solid var(--border-color)', 
+    borderTopColor: 'var(--accent-color)', 
+    borderRadius: '50%', 
+    animation: 'spin 1s linear infinite'
+  },
+  
+  // Header
+  header: { 
+    marginBottom: '32px'
+  },
+  title: { 
+    fontSize: '34px', 
+    fontWeight: '700', 
+    marginBottom: '6px', 
+    color: 'var(--text-primary)', 
+    letterSpacing: '-0.025em' 
+  },
+  subtitle: { 
+    fontSize: '15px', 
+    color: 'var(--text-muted)' 
+  },
+  
+  // Tabs
+  tabs: {
+    display: 'flex',
+    gap: '8px',
+    marginBottom: '28px',
+    borderBottom: '1px solid var(--border-color)',
+    paddingBottom: '0',
+  },
+  tab: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    padding: '14px 20px',
+    border: 'none',
+    borderBottom: '2px solid transparent',
+    marginBottom: '-1px',
+    background: 'transparent',
+    color: 'var(--text-muted)',
+    fontSize: '14px',
+    fontWeight: '600',
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+  },
+  tabActive: {
+    color: 'var(--accent-color)',
+    borderBottomColor: 'var(--accent-color)',
+  },
+  
+  // Cards / Sections
+  card: { 
+    padding: '0', 
+    marginBottom: '20px',
+    overflow: 'hidden'
+  },
+  sectionHeader: { 
+    display: 'flex', 
+    justifyContent: 'space-between', 
+    alignItems: 'center', 
+    padding: '20px 24px',
+    cursor: 'pointer',
+    color: 'var(--text-muted)',
+    transition: 'background 0.2s',
+  },
+  sectionTitle: { 
+    display: 'flex', 
+    alignItems: 'center', 
+    gap: '14px' 
+  },
+  sectionIcon: {
+    width: '40px',
+    height: '40px',
+    borderRadius: '10px',
+    background: 'var(--accent-light)',
+    color: 'var(--accent-color)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  cardTitle: { 
+    fontSize: '16px', 
+    fontWeight: '600', 
+    color: 'var(--text-primary)', 
+    margin: 0 
+  },
+  cardDesc: { 
+    fontSize: '13px', 
+    color: 'var(--text-muted)', 
+    margin: '4px 0 0'
+  },
+  sectionContent: { 
+    padding: '20px 24px', 
+    borderTop: '1px solid var(--border-color)'
+  },
+  
+  // Form elements
+  formGroup: { 
+    marginBottom: '20px' 
+  },
+  label: { 
+    fontSize: '11px', 
+    fontWeight: '700', 
+    color: 'var(--text-muted)', 
+    textTransform: 'uppercase', 
+    letterSpacing: '0.5px', 
+    marginBottom: '8px', 
+    display: 'block' 
+  },
+  hint: { 
+    fontSize: '12px', 
+    color: 'var(--text-muted)', 
+    marginTop: '6px' 
+  },
+  
+  // Setting rows
+  settingRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '16px 0',
+    borderBottom: '1px solid var(--border-color)',
+  },
+  settingInfo: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '4px',
+  },
+  settingLabel: {
+    fontSize: '14px',
+    fontWeight: '500',
+    color: 'var(--text-primary)',
+  },
+  settingHint: {
+    fontSize: '12px',
+    color: 'var(--text-muted)',
+  },
+  settingControl: {
+    flexShrink: 0,
+  },
+  
+  // Inputs
+  select: {
+    minWidth: '140px',
+    padding: '10px 14px',
+    fontSize: '14px',
+  },
+  numberInput: {
+    width: '100px',
+    padding: '10px 14px',
+    fontSize: '14px',
+    textAlign: 'center',
+  },
+  dateInput: {
+    width: '160px',
+    padding: '10px 14px',
+    fontSize: '14px',
+  },
+  reasonInput: {
+    flex: 1,
+    padding: '10px 14px',
+    fontSize: '14px',
+  },
+  
+  // Toggle / Checkbox
+  toggleLabel: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    cursor: 'pointer',
+  },
+  checkbox: {
+    width: '20px',
+    height: '20px',
+    cursor: 'pointer',
+    accentColor: 'var(--accent-color)',
+  },
+  toggleText: {
+    fontSize: '13px',
+    color: 'var(--text-muted)',
+    fontWeight: '500',
+  },
+  
+  // Schedule
+  scheduleGrid: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '0',
+  },
+  dayRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '14px 0',
+    borderBottom: '1px solid var(--border-color)',
+  },
+  dayInfo: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '16px',
+  },
+  dayName: {
+    fontSize: '14px',
+    fontWeight: '600',
+    color: 'var(--text-primary)',
+    width: '100px',
+  },
+  timeInputs: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+  },
+  timeInput: {
+    width: '110px',
+    padding: '8px 12px',
+    fontSize: '14px',
+  },
+  timeSeparator: {
+    color: 'var(--text-muted)',
+    fontSize: '13px',
+  },
+  
+  // Blocked dates
+  blockedList: {
+    marginBottom: '16px',
+  },
+  blockedItem: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '12px 16px',
+    background: 'var(--bg-tertiary)',
+    borderRadius: '10px',
+    marginBottom: '8px',
+  },
+  blockedInfo: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '2px',
+  },
+  blockedDate: {
+    fontSize: '14px',
+    fontWeight: '500',
+    color: 'var(--text-primary)',
+  },
+  blockedReason: {
+    fontSize: '12px',
+    color: 'var(--text-muted)',
+  },
+  removeBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '28px',
+    height: '28px',
+    border: 'none',
+    borderRadius: '8px',
+    background: 'rgba(239, 68, 68, 0.1)',
+    color: '#ef4444',
+    cursor: 'pointer',
+  },
+  addBlockedForm: {
+    display: 'flex',
+    gap: '10px',
+    marginTop: '12px',
+  },
+  addBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '10px 18px',
+    background: 'var(--accent-light)',
+    border: '1px solid var(--accent-color)',
+    borderRadius: '10px',
+    color: 'var(--accent-color)',
+    fontSize: '14px',
+    fontWeight: '600',
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
+  },
+  
+  // Save button
+  saveBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '10px',
+    width: '100%',
+    padding: '16px',
+    background: 'var(--accent-color)',
+    border: 'none',
+    borderRadius: '12px',
+    color: 'white',
+    fontSize: '15px',
+    fontWeight: '600',
+    cursor: 'pointer',
+    marginTop: '8px',
+    transition: 'all 0.2s',
+  },
+  spinner: {
+    width: '18px',
+    height: '18px',
+    border: '2px solid rgba(255,255,255,0.3)',
+    borderTopColor: 'white',
+    borderRadius: '50%',
+    animation: 'spin 1s linear infinite',
+  },
+  
+  // Empty state
+  emptyState: {
+    textAlign: 'center',
+    padding: '80px 20px',
+  },
+  emptyIcon: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '80px',
+    height: '80px',
+    borderRadius: '20px',
+    background: 'var(--bg-tertiary)',
+    color: 'var(--text-muted)',
+    marginBottom: '20px',
+  },
+  emptyTitle: {
+    fontSize: '18px',
+    fontWeight: '600',
+    color: 'var(--text-primary)',
+    marginBottom: '8px',
+  },
+  emptyText: {
+    fontSize: '14px',
+    color: 'var(--text-muted)',
+    margin: 0,
+  },
+  
+  // Error
+  errorBanner: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    padding: '14px 18px',
+    background: 'rgba(239, 68, 68, 0.1)',
+    border: '1px solid rgba(239, 68, 68, 0.2)',
+    borderRadius: '10px',
+    color: '#ef4444',
+    fontSize: '14px',
+    marginBottom: '20px',
+  },
+};
