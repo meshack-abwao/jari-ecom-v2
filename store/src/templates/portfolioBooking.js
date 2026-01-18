@@ -197,7 +197,7 @@ function renderPbkGallery(images, title) {
   
   return `
     <div class="pbk-gallery">
-      <h3 class="pbk-section-title">${title || 'Gallery'}</h3>
+      <h3 class="pbk-section-title">${title || 'Our Work in Action'}</h3>
       <div class="pbk-gallery-grid">
         ${valid.map((img, i) => `
           <div class="pbk-gallery-item ${i === 0 ? 'pbk-gallery-large' : ''}" data-index="${i}">
