@@ -102,6 +102,9 @@ service_packages  - Package options
 | 6 | Toggle functions recreated | ✅ FIXED | Added `useCallback` wrappers |
 | 7 | Important settings hidden | ✅ FIXED | Premium & Payment expanded by default |
 | 8 | Missing closing brace | ✅ FIXED | Syntax error in generateDefaultSlots |
+| 9 | **Price string concatenation** | ✅ FIXED | Use `Number()` instead of `parseInt()` |
+| 10 | **Jump Line always showing** | ✅ FIXED | Only show when `dayFullyBooked=true` |
+| 11 | **Time slots no availability info** | ✅ FIXED | Show spots count and "Full" badges |
 
 ### Still Needs Testing:
 - API connection after Netlify rebuild
