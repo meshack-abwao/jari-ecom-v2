@@ -349,10 +349,11 @@
 
 /* ===========================================
    STORIES - Clean Apple style (no pill container)
+   Section spacing: 48px top padding for breathing room
    =========================================== */
 .pbk-stories {
-  margin-bottom: var(--space-3xl);
-  padding-top: var(--space-2xl);
+  margin-bottom: var(--space-4xl);
+  padding-top: var(--space-4xl);
   border-top: 1px solid var(--border);
 }
 
@@ -424,19 +425,20 @@
 
 /* ===========================================
    GALLERY - Magazine grid like Deep Dive showcase
+   Section spacing: 48px for visual breathing
    =========================================== */
 .pbk-gallery {
-  margin-bottom: var(--space-4xl);
-  padding-top: var(--space-2xl);
+  margin-bottom: var(--space-5xl);
+  padding-top: var(--space-4xl);
   border-top: 1px solid var(--border);
 }
 
 .pbk-gallery .pbk-section-title {
   text-align: center;
-  font-size: var(--fs-display);
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  margin-bottom: var(--space-2xl);
+  font-size: var(--fs-heading-xl);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin-bottom: var(--space-3xl);
 }
 
 .pbk-gallery-grid {
@@ -610,27 +612,28 @@
 }
 
 /* ===========================================
-   PACKAGES - Clean card design
+   PACKAGES - Clean card design (Level 2 hierarchy)
+   Cards with subtle shadow = trust signal (rounded = safe)
    =========================================== */
 .pbk-packages {
-  margin-bottom: var(--space-4xl);
-  padding-top: var(--space-2xl);
+  margin-bottom: var(--space-5xl);
+  padding-top: var(--space-4xl);
   border-top: 1px solid var(--border);
 }
 
 .pbk-packages-grid {
   display: flex;
   flex-direction: column;
-  gap: var(--space-lg);
+  gap: var(--space-xl);
 }
 
 .pbk-package {
   position: relative;
-  padding: var(--space-xl);
+  padding: var(--space-2xl);
   background: var(--surface);
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
   box-shadow: 0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
-  transition: all 0.2s;
+  transition: all 0.25s ease;
 }
 
 .pbk-package:hover {
@@ -656,17 +659,18 @@
 }
 
 .pbk-package-name {
-  font-size: var(--fs-heading-sm);
+  font-size: var(--fs-heading);
   font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: var(--space-xs);
+  margin-bottom: var(--space-sm);
+  letter-spacing: -0.01em;
 }
 
 .pbk-package-price {
-  font-size: var(--fs-heading-xl);
+  font-size: var(--fs-heading-lg);
   font-weight: 700;
   color: var(--text-primary);
-  margin-bottom: var(--space-sm);
+  margin-bottom: var(--space-md);
 }
 
 .pbk-package-duration {
@@ -676,28 +680,30 @@
 }
 
 .pbk-package-desc {
-  font-size: var(--fs-body-sm);
+  font-size: var(--fs-body);
   color: var(--text-secondary);
-  line-height: 1.5;
-  margin: 0 0 var(--space-lg);
+  line-height: 1.6;
+  margin: 0 0 var(--space-xl);
+  max-width: 45ch;  /* Optimal reading length per typography psychology */
 }
 
 .pbk-package-btn {
   width: 100%;
-  padding: var(--space-md) var(--space-lg);
+  padding: var(--space-lg) var(--space-xl);
   background: var(--text-primary);
   color: var(--surface);
   border: none;
-  border-radius: var(--radius);
+  border-radius: var(--radius-full);  /* Fully rounded = friendly, safe to click */
   font-size: var(--fs-body);
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.25s ease;
 }
 
 .pbk-package-btn:hover {
-  opacity: 0.85;
-  transform: translateY(-1px);
+  opacity: 0.9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
 
