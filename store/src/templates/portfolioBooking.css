@@ -20,7 +20,7 @@
 
 @media (min-width: 1024px) {
   .pbk-container {
-    max-width: 800px;
+    max-width: 1100px;
   }
 }
 
@@ -646,41 +646,142 @@
 }
 
 
-/* Testimonials */
+/* ===========================================
+   TESTIMONIALS - Apple Style (matches Deep Dive)
+   Uses CSS vars from base.css for consistency
+   =========================================== */
 .pbk-testimonials {
-  margin-bottom: 28px;
+  margin: var(--space-3xl) 0;
+  padding: var(--space-4xl) var(--space-2xl);
+  background: linear-gradient(180deg, var(--bg-gray) 0%, rgba(255,255,255,0) 100%);
+  border-radius: var(--radius-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Gradient accent bar at top */
+.pbk-testimonials::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 3px;
+  background: var(--gradient-primary);
+  border-radius: 0 0 4px 4px;
+  opacity: 0.6;
+}
+
+.pbk-testimonials .pbk-section-title {
+  font-size: var(--fs-heading-lg);
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  text-align: center;
+  margin-bottom: var(--space-2xl);
 }
 
 .pbk-testimonials-grid {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  gap: var(--space-lg);
+  overflow-x: auto;
+  padding: var(--space-sm) var(--space-xs) var(--space-lg);
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+  justify-content: center;
+}
+
+/* Hide scrollbar */
+.pbk-testimonials-grid::-webkit-scrollbar {
+  display: none;
+}
+.pbk-testimonials-grid {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 .pbk-testimonial {
-  padding: 16px;
-  background: #f8f8f8;
-  border-radius: 12px;
+  min-width: 280px;
+  max-width: 300px;
+  padding: var(--space-2xl);
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  flex-shrink: 0;
+  scroll-snap-align: start;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  border: 1px solid rgba(0,0,0,0.04);
+  transition: all 0.3s ease;
+}
+
+.pbk-testimonial:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+}
+
+.pbk-testimonial-stars {
+  color: #ffb800;
+  margin-bottom: var(--space-md);
+  font-size: var(--fs-body-sm);
+  letter-spacing: 2px;
+  text-align: center;
 }
 
 .pbk-testimonial-text {
-  font-size: 14px;
-  line-height: 1.5;
-  color: #333;
-  margin: 0 0 10px;
-  font-style: italic;
+  font-size: var(--fs-body);
+  color: var(--text-primary);
+  line-height: 1.6;
+  margin: 0 0 var(--space-lg);
+  font-weight: 400;
+  text-align: center;
 }
 
 .pbk-testimonial-author {
-  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+}
+
+.pbk-testimonial-avatar {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary) 0%, #ffb347 100%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--fs-body-sm);
   font-weight: 600;
-  color: #000;
+  color: white;
+  flex-shrink: 0;
+}
+
+.pbk-testimonial-info {
+  text-align: left;
+}
+
+.pbk-testimonial-name {
+  font-size: var(--fs-body-sm);
+  font-weight: 600;
+  color: var(--text-primary);
 }
 
 .pbk-testimonial-role {
-  font-weight: 400;
-  color: #666;
-  margin-left: 6px;
+  font-size: var(--fs-small);
+  color: var(--text-secondary);
+}
+
+@media (min-width: 768px) {
+  .pbk-testimonials .pbk-section-title {
+    font-size: var(--fs-heading-xl);
+  }
+  
+  .pbk-testimonials-grid {
+    gap: var(--space-xl);
+  }
 }
 
 /* Note */
