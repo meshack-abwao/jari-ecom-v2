@@ -258,7 +258,10 @@ function renderPbkPackages(packages) {
       <h3 class="pbk-section-title">Packages</h3>
       <div class="pbk-packages-grid">
         ${packages.map((pkg, i) => `
-          <div class="pbk-package ${i === 0 ? 'pbk-package-featured' : ''}">
+          <div class="pbk-package ${i === 0 ? 'pbk-package-featured' : ''}" 
+               onclick="this.querySelector('.pbk-package-btn').click()" 
+               role="button" 
+               tabindex="0">
             ${i === 0 ? '<span class="pbk-package-badge">Popular</span>' : ''}
             ${pkg.image ? `
               <div class="pbk-package-image">
@@ -340,16 +343,14 @@ function renderPbkWhyChooseUs(content) {
   // Support both string and array format
   const items = Array.isArray(content) ? content : [content];
   
-  // Default icons if none provided - rotating set of relevant icons
-  const defaultIcons = ['✓', '⭐', '🎯', '💎', '🏆', '✨'];
-  
   return `
     <div class="pbk-why-choose">
       <h3 class="pbk-section-title">Why Choose Us</h3>
       <div class="pbk-why-content">
-        ${items.map((item, index) => {
+        ${items.map((item) => {
           const text = typeof item === 'string' ? item : (item.text || item);
-          const icon = (typeof item === 'object' && item.icon) ? item.icon : defaultIcons[index % defaultIcons.length];
+          // Default to checkmark like What's Included, unless icon provided
+          const icon = (typeof item === 'object' && item.icon) ? item.icon : '✓';
           return `
             <div class="pbk-why-item">
               <span class="pbk-why-icon">${icon}</span>
