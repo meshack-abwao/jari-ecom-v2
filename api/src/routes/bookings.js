@@ -538,6 +538,7 @@ router.post('/public/:storeSlug/bookings', async (req, res, next) => {
     const { storeSlug } = req.params;
     const {
       service_id,
+      product_id, // Accept both service_id and product_id
       package_name,
       customer_name,
       customer_phone,
@@ -545,9 +546,14 @@ router.post('/public/:storeSlug/bookings', async (req, res, next) => {
       booking_date,
       booking_time,
       customer_notes,
+      notes, // Accept both customer_notes and notes
       jumped_line,
       payment_type // 'full', 'deposit', 'inquiry'
     } = req.body;
+    
+    // Use service_id or product_id (frontend sends product_id)
+    const serviceId = service_id || product_id;
+    const customerNotes = customer_notes || notes || '';
     
     // Get store
     const storeResult = await db.query(
@@ -573,10 +579,10 @@ router.post('/public/:storeSlug/bookings', async (req, res, next) => {
     let depositAmount = 0;
     let durationMinutes = settings.slot_duration_minutes || 60;
     
-    if (service_id) {
+    if (serviceId) {
       const productResult = await db.query(
         'SELECT data FROM products WHERE id = $1',
-        [service_id]
+        [serviceId]
       );
       if (productResult.rows.length > 0) {
         const productData = productResult.rows[0].data;
@@ -614,10 +620,10 @@ router.post('/public/:storeSlug/bookings', async (req, res, next) => {
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, 'pending', 'unpaid')
       RETURNING *
     `, [
-      storeId, service_id, customer_name, customer_phone, customer_email,
+      storeId, serviceId, customer_name, customer_phone, customer_email,
       booking_date, booking_time, durationMinutes, package_name,
       totalAmount, depositAmount, jumped_line || false, jumpFeePaid,
-      customer_notes
+      customerNotes
     ]);
     
     // TODO: Send notification to provider (SMS/WhatsApp)
