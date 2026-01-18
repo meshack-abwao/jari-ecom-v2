@@ -98,6 +98,42 @@ export function initPortfolioBookingHandlers() {
       window.openPbkLightbox(index);
     });
   });
+  
+  // Sticky CTA - stop at footer
+  initStickyCTABehavior();
+}
+
+// Sticky CTA behavior - stops before footer
+function initStickyCTABehavior() {
+  const stickyCTA = document.querySelector('.pbk-sticky-cta');
+  const footer = document.querySelector('.site-footer') || document.querySelector('footer');
+  
+  if (!stickyCTA || !footer) return;
+  
+  const handleScroll = () => {
+    const footerRect = footer.getBoundingClientRect();
+    const ctaHeight = stickyCTA.offsetHeight;
+    const windowHeight = window.innerHeight;
+    const bottomOffset = 20; // Same as CSS bottom value
+    
+    // When footer is about to enter viewport
+    if (footerRect.top < windowHeight) {
+      // Calculate how much footer is visible
+      const footerVisibleHeight = windowHeight - footerRect.top;
+      // Move CTA up by that amount + some padding
+      const newBottom = footerVisibleHeight + bottomOffset;
+      stickyCTA.style.bottom = `${newBottom}px`;
+      stickyCTA.style.transition = 'bottom 0.15s ease';
+    } else {
+      // Reset to normal position
+      stickyCTA.style.bottom = '';
+      stickyCTA.style.transition = '';
+    }
+  };
+  
+  window.addEventListener('scroll', handleScroll, { passive: true });
+  // Initial check
+  handleScroll();
 }
 
 // Gallery navigation
