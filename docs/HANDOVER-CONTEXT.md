@@ -1,6 +1,6 @@
 # JARI.ECOM V2 - HANDOVER CONTEXT DOCUMENT
 ## Comprehensive Session Summary - January 18, 2026
-## Last Updated: January 18, 2026 (Evening Session)
+## Last Updated: January 19, 2026 (Morning Session)
 
 ---
 
@@ -8,7 +8,7 @@
 
 **Repository:** https://github.com/meshack-abwao/jari-ecom-v2
 **Stack:** React Dashboard + Vanilla JS Storefront + Express API + PostgreSQL (Railway)
-**Current Focus:** Portfolio/Booking (PBK) Template + Calendar System
+**Current Focus:** Portfolio/Booking (PBK) Template + Dashboard Booking Management
 
 ### Deployment URLs
 | Service | URL | Platform |
@@ -22,9 +22,38 @@
 
 ---
 
-## 2. WHAT WAS BUILT THIS SESSION
+## 2. LATEST SESSION - BOOKING DASHBOARD ENHANCEMENTS
 
-### A. Booking Modal System (Store Frontend)
+### A. Interactive Stats Cards (Orders-style)
+- **Click to filter**: Today, This Week, Pending cards filter the view
+- **Visual design**: Gradient icon boxes matching Orders page
+- **Active state**: Purple glow when filter is active
+- **Revenue calculation**: From `amount_paid` field (confirmed + completed)
+
+### B. Week View Calendar
+- Shows Mon-Sun with booking counts per day
+- Click a day to see only that day's bookings
+- Today highlighted, past days dimmed
+- Selected day highlighted in purple
+
+### C. Status Filter Pills
+- All, Pending, Confirmed, Completed, Cancelled
+- Click to filter, shows count for each
+- Active pill highlighted
+
+### D. Enhanced Booking Cards
+- Day name added (MON, TUE, etc.) for quick scanning
+- Expandable with full details
+- Action buttons: Confirm, Decline, Mark Complete, Call, WhatsApp
+
+### E. Bugs Fixed
+- `bookingsAPI.updateStatus()` was missing - now added
+- Syntax error in bookingModal.js (escaped backticks) - fixed
+- Confirmation receipt showing "undefined" - added API fallbacks
+
+---
+
+## 3. BOOKING MODAL SYSTEM (Storefront)
 Location: `store/src/booking/`
 
 **Files:**
