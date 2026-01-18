@@ -283,17 +283,19 @@ router.get('/', auth, async (req, res, next) => {
 router.put('/:id', auth, async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { status, provider_notes, payment_status } = req.body;
+    const { status, provider_notes, payment_status, booking_date, booking_time } = req.body;
     
     const result = await db.query(`
       UPDATE bookings SET
         status = COALESCE($2, status),
         provider_notes = COALESCE($3, provider_notes),
         payment_status = COALESCE($4, payment_status),
+        booking_date = COALESCE($5, booking_date),
+        booking_time = COALESCE($6, booking_time),
         updated_at = NOW()
       WHERE id = $1
       RETURNING *
-    `, [id, status, provider_notes, payment_status]);
+    `, [id, status, provider_notes, payment_status, booking_date, booking_time]);
     
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Booking not found' });

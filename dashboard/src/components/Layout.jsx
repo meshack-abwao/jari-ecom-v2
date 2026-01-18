@@ -16,6 +16,7 @@ export default function Layout() {
     businessName: user?.business_name || '',
     instagramHandle: user?.instagram_handle || '',
     mpesaNumber: '',
+    whatsappNumber: '',
   });
   const [saving, setSaving] = useState(false);
 
@@ -55,9 +56,10 @@ export default function Layout() {
       setAccountData(prev => ({
         ...prev,
         mpesaNumber: response.data.settings?.mpesa_number || '',
+        whatsappNumber: response.data.settings?.whatsapp_number || '',
       }));
     } catch (error) {
-      console.error('Failed to load M-Pesa number:', error);
+      console.error('Failed to load account data:', error);
     }
   };
 
@@ -71,7 +73,10 @@ export default function Layout() {
     e.preventDefault();
     setSaving(true);
     try {
-      await settingsAPI.update({ mpesa_number: accountData.mpesaNumber });
+      await settingsAPI.update({ 
+        mpesa_number: accountData.mpesaNumber,
+        whatsapp_number: accountData.whatsappNumber 
+      });
       alert('Account settings saved successfully!');
       setShowAccountModal(false);
     } catch (error) {
@@ -123,6 +128,18 @@ export default function Layout() {
                 </div>
               </div>
               <form onSubmit={handleSaveAccount} style={styles.modalForm}>
+                <div style={styles.formGroup}>
+                  <label style={styles.label}>WHATSAPP NUMBER</label>
+                  <input
+                    type="tel"
+                    value={accountData.whatsappNumber}
+                    onChange={(e) => setAccountData({ ...accountData, whatsappNumber: e.target.value })}
+                    placeholder="254712345678"
+                    pattern="254[0-9]{9}"
+                    className="dashboard-input"
+                  />
+                  <p style={styles.hint}>Receive booking notifications & customer inquiries</p>
+                </div>
                 <div style={styles.formGroup}>
                   <label style={styles.label}>M-PESA NUMBER</label>
                   <input

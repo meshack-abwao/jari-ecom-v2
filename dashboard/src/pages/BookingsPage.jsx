@@ -165,6 +165,7 @@ export default function BookingsPage() {
   const [viewFilter, setViewFilter] = useState('all'); // 'all', 'today', 'week', 'pending'
   const [statusFilter, setStatusFilter] = useState('all'); // 'all', 'pending', 'confirmed', 'completed', 'cancelled'
   const [selectedDay, setSelectedDay] = useState(null); // For week view day selection
+  const [searchQuery, setSearchQuery] = useState(''); // Search by name/phone
   
   const [settings, setSettings] = useState({
     slot_duration_minutes: 60,
@@ -185,6 +186,11 @@ export default function BookingsPage() {
   const [blockedDates, setBlockedDates] = useState([]);
   const [newBlockedDate, setNewBlockedDate] = useState('');
   const [newBlockedReason, setNewBlockedReason] = useState('');
+  
+  // Reschedule modal state
+  const [rescheduleBooking, setRescheduleBooking] = useState(null);
+  const [rescheduleDate, setRescheduleDate] = useState('');
+  const [rescheduleTime, setRescheduleTime] = useState('');
   
   // Responsive: track window width
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -576,6 +582,73 @@ export default function BookingsPage() {
     }
   };
 
+  // Export bookings to CSV
+  const exportToCSV = () => {
+    if (bookings.length === 0) {
+      alert('No bookings to export');
+      return;
+    }
+    
+    const headers = ['Date', 'Time', 'Customer Name', 'Phone', 'Email', 'Service', 'Package', 'Amount', 'Status', 'Payment Type'];
+    const rows = bookings.map(b => [
+      new Date(b.booking_date).toLocaleDateString(),
+      b.booking_time,
+      b.customer_name,
+      b.customer_phone,
+      b.customer_email || '',
+      b.service_name || '',
+      b.package_name || '',
+      b.total_amount || 0,
+      b.status,
+      b.payment_type || 'full'
+    ]);
+    
+    const csvContent = [headers, ...rows]
+      .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+      .join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `bookings-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  // Reschedule booking
+  const handleReschedule = async () => {
+    if (!rescheduleDate || !rescheduleTime) {
+      alert('Please select both date and time');
+      return;
+    }
+    try {
+      await bookingsAPI.update(rescheduleBooking.id, {
+        booking_date: rescheduleDate,
+        booking_time: rescheduleTime
+      });
+      setBookings(prev => prev.map(b => 
+        b.id === rescheduleBooking.id 
+          ? { ...b, booking_date: rescheduleDate, booking_time: rescheduleTime }
+          : b
+      ));
+      setRescheduleBooking(null);
+      setRescheduleDate('');
+      setRescheduleTime('');
+    } catch (err) {
+      alert('Failed to reschedule booking');
+    }
+  };
+
+  // Open reschedule modal
+  const openRescheduleModal = (booking) => {
+    setRescheduleBooking(booking);
+    setRescheduleDate(booking.booking_date?.split('T')[0] || '');
+    setRescheduleTime(booking.booking_time || '');
+  };
+
   const renderCalendar = () => {
     // ==================== CALCULATE STATS ====================
     const now = new Date();
@@ -668,6 +741,18 @@ export default function BookingsPage() {
     // Status filter
     if (statusFilter !== 'all') {
       filteredBookings = filteredBookings.filter(b => b.status === statusFilter);
+    }
+    
+    // Search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
+      filteredBookings = filteredBookings.filter(b => 
+        b.customer_name?.toLowerCase().includes(query) ||
+        b.customer_phone?.includes(query) ||
+        b.customer_email?.toLowerCase().includes(query) ||
+        b.service_name?.toLowerCase().includes(query) ||
+        b.package_name?.toLowerCase().includes(query)
+      );
     }
     
     // Sort by date
@@ -782,6 +867,25 @@ export default function BookingsPage() {
             {f.label} <span style={styles.filterCount}>{f.count}</span>
           </button>
         ))}
+        
+        {/* Search Bar */}
+        <div style={styles.searchBox}>
+          <input
+            type="text"
+            placeholder="Search by name, phone, email..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={styles.searchInput}
+          />
+          {searchQuery && (
+            <button 
+              onClick={() => setSearchQuery('')}
+              style={styles.searchClear}
+            >
+              <X size={16} />
+            </button>
+          )}
+        </div>
       </div>
     );
 
@@ -925,6 +1029,14 @@ export default function BookingsPage() {
                     <Check size={16} /> Mark Complete
                   </button>
                 )}
+                {(booking.status === 'pending' || booking.status === 'confirmed') && !isPast && (
+                  <button 
+                    style={styles.actionBtnReschedule}
+                    onClick={(e) => { e.stopPropagation(); openRescheduleModal(booking); }}
+                  >
+                    <Clock size={16} /> Reschedule
+                  </button>
+                )}
                 <a 
                   href={`tel:${booking.customer_phone}`} 
                   style={styles.actionBtnCall}
@@ -1025,8 +1137,13 @@ export default function BookingsPage() {
   return (
     <div style={styles.page}>
       <div style={styles.header}>
-        <h1 style={styles.pageTitle}>Bookings</h1>
-        <p style={styles.pageDesc}>Manage your calendar and booking settings</p>
+        <div style={{ flex: 1 }}>
+          <h1 style={styles.pageTitle}>Bookings</h1>
+          <p style={styles.pageDesc}>Manage your calendar and booking settings</p>
+        </div>
+        <button onClick={exportToCSV} style={styles.exportBtn}>
+          <span style={{ marginRight: '6px' }}>📥</span> Export CSV
+        </button>
       </div>
 
       <div style={styles.tabs}>
@@ -1045,6 +1162,54 @@ export default function BookingsPage() {
       </div>
 
       {activeTab === 'calendar' ? renderCalendar() : renderSettings()}
+      
+      {/* Reschedule Modal */}
+      {rescheduleBooking && (
+        <div style={styles.modalOverlay} onClick={() => setRescheduleBooking(null)}>
+          <div style={styles.rescheduleModal} onClick={(e) => e.stopPropagation()}>
+            <h3 style={styles.modalTitle}>Reschedule Booking</h3>
+            <p style={styles.modalSubtitle}>
+              {rescheduleBooking.customer_name} - {rescheduleBooking.service_name || rescheduleBooking.package_name}
+            </p>
+            
+            <div style={styles.modalField}>
+              <label style={styles.modalLabel}>New Date</label>
+              <input
+                type="date"
+                value={rescheduleDate}
+                onChange={(e) => setRescheduleDate(e.target.value)}
+                min={new Date().toISOString().split('T')[0]}
+                style={styles.modalInput}
+              />
+            </div>
+            
+            <div style={styles.modalField}>
+              <label style={styles.modalLabel}>New Time</label>
+              <input
+                type="time"
+                value={rescheduleTime}
+                onChange={(e) => setRescheduleTime(e.target.value)}
+                style={styles.modalInput}
+              />
+            </div>
+            
+            <div style={styles.modalActions}>
+              <button 
+                style={styles.modalBtnCancel} 
+                onClick={() => setRescheduleBooking(null)}
+              >
+                Cancel
+              </button>
+              <button 
+                style={styles.modalBtnConfirm} 
+                onClick={handleReschedule}
+              >
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -1055,7 +1220,13 @@ const styles = {
     maxWidth: '100%',
     padding: '0',
   },
-  header: { marginBottom: '28px' },
+  header: { 
+    marginBottom: '28px',
+    display: 'flex',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    gap: '16px',
+  },
   pageTitle: { 
     fontSize: '28px', 
     fontWeight: '700', 
@@ -1067,6 +1238,19 @@ const styles = {
     fontSize: '15px', 
     color: 'var(--text-muted)', 
     margin: 0 
+  },
+  exportBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    padding: '10px 16px',
+    borderRadius: '10px',
+    border: '1px solid var(--border-light, rgba(255,255,255,0.1))',
+    background: 'var(--bg-secondary, #1a1a2e)',
+    color: 'var(--text-primary)',
+    fontSize: '14px',
+    fontWeight: '500',
+    cursor: 'pointer',
+    transition: 'all 0.2s',
   },
   
   // Stats Grid (Orders-style cards)
@@ -1169,6 +1353,7 @@ const styles = {
     gap: '8px',
     marginBottom: '20px',
     flexWrap: 'wrap',
+    alignItems: 'center',
   },
   filterPill: {
     display: 'flex',
@@ -1191,6 +1376,33 @@ const styles = {
   filterCount: {
     fontSize: '12px',
     opacity: 0.7,
+  },
+  searchBox: {
+    display: 'flex',
+    alignItems: 'center',
+    marginLeft: 'auto',
+    position: 'relative',
+  },
+  searchInput: {
+    padding: '8px 36px 8px 14px',
+    borderRadius: '20px',
+    border: '1px solid var(--border-light, rgba(255,255,255,0.1))',
+    background: 'var(--bg-secondary, #1a1a2e)',
+    color: 'var(--text-primary)',
+    fontSize: '13px',
+    width: '220px',
+    outline: 'none',
+  },
+  searchClear: {
+    position: 'absolute',
+    right: '10px',
+    background: 'none',
+    border: 'none',
+    color: 'var(--text-muted)',
+    cursor: 'pointer',
+    padding: '4px',
+    display: 'flex',
+    alignItems: 'center',
   },
   
   // No results
@@ -1713,5 +1925,98 @@ const styles = {
     fontSize: '13px',
     fontWeight: '500',
     textDecoration: 'none',
+  },
+  actionBtnReschedule: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '8px 16px',
+    background: '#f59e0b',
+    border: 'none',
+    borderRadius: '8px',
+    color: 'white',
+    fontSize: '13px',
+    fontWeight: '500',
+    cursor: 'pointer',
+  },
+  
+  // Modal styles
+  modalOverlay: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: 'rgba(0,0,0,0.7)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1000,
+  },
+  rescheduleModal: {
+    background: 'var(--bg-primary, #1a1a2e)',
+    borderRadius: '16px',
+    padding: '24px',
+    width: '90%',
+    maxWidth: '400px',
+    border: '1px solid var(--border-light)',
+  },
+  modalTitle: {
+    fontSize: '20px',
+    fontWeight: '600',
+    color: 'var(--text-primary)',
+    margin: '0 0 4px',
+  },
+  modalSubtitle: {
+    fontSize: '14px',
+    color: 'var(--text-muted)',
+    margin: '0 0 20px',
+  },
+  modalField: {
+    marginBottom: '16px',
+  },
+  modalLabel: {
+    display: 'block',
+    fontSize: '12px',
+    fontWeight: '600',
+    color: 'var(--text-muted)',
+    textTransform: 'uppercase',
+    marginBottom: '6px',
+  },
+  modalInput: {
+    width: '100%',
+    padding: '12px',
+    borderRadius: '8px',
+    border: '1px solid var(--border-light)',
+    background: 'var(--bg-secondary)',
+    color: 'var(--text-primary)',
+    fontSize: '14px',
+  },
+  modalActions: {
+    display: 'flex',
+    gap: '12px',
+    marginTop: '24px',
+  },
+  modalBtnCancel: {
+    flex: 1,
+    padding: '12px',
+    borderRadius: '8px',
+    border: '1px solid var(--border-light)',
+    background: 'transparent',
+    color: 'var(--text-primary)',
+    fontSize: '14px',
+    fontWeight: '500',
+    cursor: 'pointer',
+  },
+  modalBtnConfirm: {
+    flex: 1,
+    padding: '12px',
+    borderRadius: '8px',
+    border: 'none',
+    background: 'var(--accent-color, #8b5cf6)',
+    color: 'white',
+    fontSize: '14px',
+    fontWeight: '500',
+    cursor: 'pointer',
   },
 };
