@@ -491,3 +491,245 @@
   margin: 4px 0;
   color: #333;
 }
+
+
+/* ================================================
+   STEP 4: CHECKOUT STYLES (JTBD: Clear, Flexible)
+   ================================================ */
+
+/* Review Summary */
+.bkm-review {
+  background: var(--bg-gray, #f8f8f8);
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 16px;
+}
+
+.bkm-review-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  font-size: 14px;
+}
+
+.bkm-review-row span {
+  color: var(--text-secondary, #666);
+}
+
+.bkm-review-row strong {
+  color: var(--text-primary, #333);
+}
+
+/* Jump the Line Option */
+.bkm-option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px;
+  border: 2px solid var(--border, #e0e0e0);
+  border-radius: 10px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.bkm-option:hover {
+  border-color: var(--color-primary, #007AFF);
+}
+
+.bkm-option.selected {
+  border-color: var(--color-primary, #007AFF);
+  background: color-mix(in srgb, var(--color-primary, #007AFF) 5%, white);
+}
+
+.bkm-option-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.bkm-option-icon {
+  font-size: 22px;
+}
+
+.bkm-option-info div strong {
+  display: block;
+  font-size: 14px;
+  color: var(--text-primary, #333);
+}
+
+.bkm-option-info div p {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--text-secondary, #666);
+}
+
+.bkm-option-price {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bkm-option-price span:first-child {
+  font-weight: 600;
+  color: var(--text-primary, #333);
+}
+
+.bkm-checkbox {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border, #ccc);
+  border-radius: 4px;
+  position: relative;
+}
+
+.bkm-checkbox.checked {
+  background: var(--color-primary, #007AFF);
+  border-color: var(--color-primary, #007AFF);
+}
+
+.bkm-checkbox.checked::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 12px;
+}
+
+/* Discount Code */
+.bkm-discount {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.bkm-discount input {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid var(--border, #ddd);
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.bkm-btn-sm {
+  padding: 10px 16px;
+  background: var(--bg-gray, #f0f0f0);
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.bkm-btn-sm:hover {
+  background: var(--border, #e0e0e0);
+}
+
+.bkm-discount-applied {
+  font-size: 13px;
+  color: #10b981;
+  margin: 0 0 12px;
+}
+
+/* Payment Options */
+.bkm-payment-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.bkm-payment-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px;
+  border: 2px solid var(--border, #e0e0e0);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.bkm-payment-option:hover {
+  border-color: var(--color-primary, #007AFF);
+}
+
+.bkm-payment-option.selected {
+  border-color: var(--color-primary, #007AFF);
+  background: color-mix(in srgb, var(--color-primary, #007AFF) 5%, white);
+}
+
+.bkm-payment-option input[type="radio"] {
+  margin-top: 3px;
+  accent-color: var(--color-primary, #007AFF);
+}
+
+.bkm-payment-option-content {
+  flex: 1;
+}
+
+.bkm-payment-option-content strong {
+  display: block;
+  font-size: 14px;
+  color: var(--text-primary, #333);
+  margin-bottom: 2px;
+}
+
+.bkm-payment-amount {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-primary, #007AFF);
+}
+
+.bkm-payment-option-content small {
+  display: block;
+  font-size: 12px;
+  color: var(--text-secondary, #666);
+  margin-top: 2px;
+}
+
+/* Price Breakdown */
+.bkm-price-breakdown {
+  background: var(--bg-gray, #f8f8f8);
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 16px;
+}
+
+.bkm-price-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-size: 14px;
+  color: var(--text-secondary, #666);
+}
+
+.bkm-price-row.discount {
+  color: #10b981;
+}
+
+.bkm-price-row.total {
+  border-top: 1px solid var(--border, #e0e0e0);
+  margin-top: 8px;
+  padding-top: 10px;
+  font-size: 16px;
+}
+
+.bkm-price-row.total strong {
+  color: var(--text-primary, #333);
+}
+
+.bkm-price-row.later {
+  font-size: 13px;
+  color: var(--text-muted, #999);
+}
+
+/* Confirm Button States */
+.bkm-btn-confirm:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}

@@ -37,8 +37,15 @@ export const bookingState = {
   customerEmail: '',
   notes: '',
   
+  // Payment options (JTBD: flexible payment)
+  paymentType: 'full', // 'full', 'deposit', 'inquiry'
+  jumpLine: false,     // Priority booking
+  discountCode: '',
+  discountAmount: 0,
+  
   // UI state
   loading: false,
+  submitting: false,
   error: null
 };
 
@@ -53,7 +60,12 @@ export function resetBookingState() {
   bookingState.customerPhone = '';
   bookingState.customerEmail = '';
   bookingState.notes = '';
+  bookingState.paymentType = 'full';
+  bookingState.jumpLine = false;
+  bookingState.discountCode = '';
+  bookingState.discountAmount = 0;
   bookingState.error = null;
+  bookingState.submitting = false;
   bookingState.viewMonth = new Date().getMonth();
   bookingState.viewYear = new Date().getFullYear();
 }

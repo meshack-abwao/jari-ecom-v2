@@ -157,6 +157,29 @@ function setupStepListeners() {
       updateBookingState({ notes: e.target.value });
     });
   }
+  
+  // Step 4: Payment options, Jump the Line, Discount
+  if (step === 4) {
+    // Payment type selection
+    document.querySelectorAll('input[name="paymentType"]').forEach(el => {
+      el.addEventListener('change', (e) => {
+        updateBookingState({ paymentType: e.target.value });
+        updateContent();
+      });
+    });
+    
+    // Jump the Line toggle
+    document.getElementById('bkmJumpLine')?.addEventListener('click', () => {
+      updateBookingState({ jumpLine: !bookingState.jumpLine });
+      updateContent();
+    });
+    
+    // Discount code
+    document.getElementById('bkmApplyDiscount')?.addEventListener('click', applyDiscountCode);
+    document.getElementById('bkmDiscountCode')?.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') applyDiscountCode();
+    });
+  }
 }
 
 // Handle next step
@@ -315,41 +338,87 @@ function selectTime(time) {
   if (nextBtn) nextBtn.disabled = false;
 }
 
+// Apply discount code (placeholder - would need API validation)
+function applyDiscountCode() {
+  const code = document.getElementById('bkmDiscountCode')?.value?.trim().toUpperCase();
+  if (!code) return;
+  
+  // Simple client-side validation for demo
+  // In production, this would call an API to validate
+  const discounts = {
+    'SAVE10': 10,
+    'WELCOME': 15,
+    'VIP20': 20
+  };
+  
+  const percent = discounts[code];
+  if (percent) {
+    const { selectedPackage, product } = bookingState;
+    const basePrice = selectedPackage?.price || product?.data?.price || 0;
+    const discountAmount = Math.round(basePrice * percent / 100);
+    updateBookingState({ discountCode: code, discountAmount });
+    updateContent();
+  } else {
+    alert('Invalid discount code');
+  }
+}
+
 // Confirm booking
 async function handleConfirm() {
-  const { storeSlug, product, selectedPackage, selectedDate, selectedTime, customerName, customerPhone, customerEmail, notes } = bookingState;
+  const { 
+    storeSlug, product, selectedPackage, selectedDate, selectedTime, 
+    customerName, customerPhone, customerEmail, notes,
+    paymentType, jumpLine, discountCode, discountAmount, settings
+  } = bookingState;
   
-  const confirmBtn = document.getElementById('bkmConfirm');
-  if (confirmBtn) {
-    confirmBtn.disabled = true;
-    confirmBtn.textContent = 'Booking...';
+  // Prevent double submission
+  if (bookingState.submitting) return;
+  updateBookingState({ submitting: true });
+  updateContent();
+  
+  // Calculate final amounts
+  const basePrice = selectedPackage?.price || product?.data?.price || 0;
+  const jumpLineFee = jumpLine ? (settings.jump_line_fee || 0) : 0;
+  const totalAmount = basePrice + jumpLineFee - discountAmount;
+  
+  let payNow = totalAmount;
+  if (paymentType === 'deposit') {
+    payNow = Math.round(totalAmount * (settings.deposit_percentage || 20) / 100);
+  } else if (paymentType === 'inquiry') {
+    payNow = settings.inquiry_fee || 0;
   }
   
   try {
     const booking = await bookingApi.createBooking(storeSlug, {
       product_id: product?.id,
       package_name: selectedPackage?.name || product?.data?.name,
-      package_price: selectedPackage?.price || product?.data?.price,
+      package_price: basePrice,
+      total_amount: totalAmount,
+      amount_paid: payNow,
       booking_date: selectedDate,
       booking_time: selectedTime,
       customer_name: customerName,
       customer_phone: customerPhone,
       customer_email: customerEmail,
-      notes
+      notes,
+      payment_type: paymentType,
+      jumped_line: jumpLine,
+      discount_code: discountCode,
+      discount_amount: discountAmount
     });
     
     // Show success
+    updateBookingState({ submitting: false });
     const content = document.getElementById('bkmContent');
     if (content) {
       content.innerHTML = renderBookingSuccess(booking);
       document.getElementById('bkmDone')?.addEventListener('click', closeBookingModal);
     }
   } catch (error) {
-    alert(error.message || 'Failed to create booking');
-    if (confirmBtn) {
-      confirmBtn.disabled = false;
-      confirmBtn.textContent = 'Confirm Booking';
-    }
+    console.error('[Booking] Failed to create booking:', error);
+    updateBookingState({ submitting: false });
+    updateContent();
+    alert(error.message || 'Failed to create booking. Please try again.');
   }
 }
 

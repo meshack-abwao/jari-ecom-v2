@@ -241,60 +241,150 @@ function renderStep3() {
   `;
 }
 
-// Step 4: Review & Confirm
+// Step 4: Review & Confirm (JTBD: Clear pricing, flexible payment, priority option)
 function renderStep4() {
-  const { product, selectedPackage, selectedDate, selectedTime, customerName, customerPhone, settings } = bookingState;
+  const { 
+    product, selectedPackage, selectedDate, selectedTime, 
+    customerName, customerPhone, settings, 
+    paymentType, jumpLine, discountCode, discountAmount, submitting 
+  } = bookingState;
   const data = product?.data || {};
   
-  const price = selectedPackage?.price || data.price || 0;
+  // Price calculation
+  const basePrice = selectedPackage?.price || data.price || 0;
+  const jumpLineFee = settings.jump_line_fee || 0;
+  const jumpLineEnabled = settings.jump_line_enabled && jumpLineFee > 0;
   const depositEnabled = settings.deposit_enabled;
   const depositPercent = settings.deposit_percentage || 20;
-  const depositAmount = depositEnabled ? Math.round(price * depositPercent / 100) : price;
+  const inquiryFee = settings.inquiry_fee || 0;
+  
+  // Calculate totals
+  const subtotal = basePrice + (jumpLine && jumpLineEnabled ? jumpLineFee : 0) - discountAmount;
+  const depositAmount = Math.round(subtotal * depositPercent / 100);
+  
+  // What customer pays now
+  let payNow = subtotal;
+  let payLater = 0;
+  if (paymentType === 'deposit' && depositEnabled) {
+    payNow = depositAmount;
+    payLater = subtotal - depositAmount;
+  } else if (paymentType === 'inquiry') {
+    payNow = inquiryFee;
+    payLater = subtotal - inquiryFee;
+  }
   
   return `
     <div class="bkm-step-content">
       <h3 class="bkm-title">Review & Confirm</h3>
       
+      <!-- Booking Summary -->
       <div class="bkm-review">
         <div class="bkm-review-row">
           <span>Service</span>
           <strong>${selectedPackage?.name || data.name}</strong>
         </div>
         <div class="bkm-review-row">
-          <span>Date</span>
-          <strong>${formatDate(selectedDate)}</strong>
+          <span>Date & Time</span>
+          <strong>${formatDate(selectedDate)} at ${selectedTime}</strong>
         </div>
         <div class="bkm-review-row">
-          <span>Time</span>
-          <strong>${selectedTime}</strong>
-        </div>
-        <div class="bkm-review-row">
-          <span>Name</span>
-          <strong>${customerName}</strong>
-        </div>
-        <div class="bkm-review-row">
-          <span>Phone</span>
-          <strong>${customerPhone}</strong>
+          <span>Contact</span>
+          <strong>${customerName} · ${customerPhone}</strong>
         </div>
       </div>
       
-      <div class="bkm-payment">
-        <div class="bkm-payment-row total">
-          <span>Total</span>
-          <span>KES ${parseInt(price).toLocaleString()}</span>
-        </div>
-        ${depositEnabled ? `
-          <div class="bkm-payment-row deposit">
-            <span>Deposit (${depositPercent}%)</span>
-            <span>KES ${depositAmount.toLocaleString()}</span>
+      <!-- Jump the Line Option -->
+      ${jumpLineEnabled ? `
+        <div class="bkm-option bkm-jump-line ${jumpLine ? 'selected' : ''}" id="bkmJumpLine">
+          <div class="bkm-option-info">
+            <span class="bkm-option-icon">⚡</span>
+            <div>
+              <strong>Jump the Line</strong>
+              <p>Get priority booking confirmation</p>
+            </div>
           </div>
-          <p class="bkm-deposit-note">Pay remaining KES ${(price - depositAmount).toLocaleString()} on arrival</p>
+          <div class="bkm-option-price">
+            <span>+KES ${parseInt(jumpLineFee).toLocaleString()}</span>
+            <span class="bkm-checkbox ${jumpLine ? 'checked' : ''}"></span>
+          </div>
+        </div>
+      ` : ''}
+      
+      <!-- Discount Code -->
+      <div class="bkm-discount">
+        <input type="text" id="bkmDiscountCode" value="${discountCode}" placeholder="Discount code">
+        <button class="bkm-btn-sm" id="bkmApplyDiscount">Apply</button>
+      </div>
+      ${discountAmount > 0 ? `<p class="bkm-discount-applied">-KES ${discountAmount.toLocaleString()} discount applied</p>` : ''}
+      
+      <!-- Payment Options -->
+      <div class="bkm-payment-options">
+        <label class="bkm-payment-option ${paymentType === 'full' ? 'selected' : ''}">
+          <input type="radio" name="paymentType" value="full" ${paymentType === 'full' ? 'checked' : ''}>
+          <div class="bkm-payment-option-content">
+            <strong>Pay Full Amount</strong>
+            <span class="bkm-payment-amount">KES ${parseInt(subtotal).toLocaleString()}</span>
+          </div>
+        </label>
+        
+        ${depositEnabled ? `
+          <label class="bkm-payment-option ${paymentType === 'deposit' ? 'selected' : ''}">
+            <input type="radio" name="paymentType" value="deposit" ${paymentType === 'deposit' ? 'checked' : ''}>
+            <div class="bkm-payment-option-content">
+              <strong>Pay Deposit (${depositPercent}%)</strong>
+              <span class="bkm-payment-amount">KES ${depositAmount.toLocaleString()}</span>
+              <small>Pay KES ${(subtotal - depositAmount).toLocaleString()} on arrival</small>
+            </div>
+          </label>
+        ` : ''}
+        
+        ${inquiryFee >= 0 ? `
+          <label class="bkm-payment-option ${paymentType === 'inquiry' ? 'selected' : ''}">
+            <input type="radio" name="paymentType" value="inquiry" ${paymentType === 'inquiry' ? 'checked' : ''}>
+            <div class="bkm-payment-option-content">
+              <strong>Inquiry Only</strong>
+              <span class="bkm-payment-amount">${inquiryFee > 0 ? `KES ${parseInt(inquiryFee).toLocaleString()}` : 'Free'}</span>
+              <small>Request booking, pay later</small>
+            </div>
+          </label>
+        ` : ''}
+      </div>
+      
+      <!-- Price Breakdown -->
+      <div class="bkm-price-breakdown">
+        <div class="bkm-price-row">
+          <span>Service</span>
+          <span>KES ${parseInt(basePrice).toLocaleString()}</span>
+        </div>
+        ${jumpLine && jumpLineEnabled ? `
+          <div class="bkm-price-row">
+            <span>Jump the Line</span>
+            <span>+KES ${parseInt(jumpLineFee).toLocaleString()}</span>
+          </div>
+        ` : ''}
+        ${discountAmount > 0 ? `
+          <div class="bkm-price-row discount">
+            <span>Discount</span>
+            <span>-KES ${discountAmount.toLocaleString()}</span>
+          </div>
+        ` : ''}
+        <div class="bkm-price-row total">
+          <strong>Pay Now</strong>
+          <strong>KES ${parseInt(payNow).toLocaleString()}</strong>
+        </div>
+        ${payLater > 0 ? `
+          <div class="bkm-price-row later">
+            <span>Pay on arrival</span>
+            <span>KES ${parseInt(payLater).toLocaleString()}</span>
+          </div>
         ` : ''}
       </div>
       
       <div class="bkm-actions">
-        <button class="bkm-btn bkm-btn-secondary" id="bkmBack">← Back</button>
-        <button class="bkm-btn bkm-btn-primary bkm-btn-confirm" id="bkmConfirm">Confirm Booking</button>
+        <button class="bkm-btn bkm-btn-secondary" id="bkmBack" ${submitting ? 'disabled' : ''}>← Back</button>
+        <button class="bkm-btn bkm-btn-primary bkm-btn-confirm" id="bkmConfirm" ${submitting ? 'disabled' : ''}>
+          ${submitting ? 'Booking...' : paymentType === 'inquiry' ? 'Send Inquiry' : 'Confirm & Pay'}
+        </button>
       </div>
     </div>
   `;
