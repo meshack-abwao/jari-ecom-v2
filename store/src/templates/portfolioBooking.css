@@ -773,7 +773,8 @@
 
 /* ===========================================
    PACKAGES - Clean card design (Level 2 hierarchy)
-   Cards with subtle shadow = trust signal (rounded = safe)
+   Cards with shadow = trust signal (rounded = safe)
+   Typography psychology: bolder = more important
    =========================================== */
 .pbk-packages {
   margin-bottom: var(--space-5xl);
@@ -793,6 +794,8 @@
   background: var(--surface);
   border-radius: var(--radius-lg);
   border: 1px solid var(--border);
+  /* Subtle shadow for depth/contrast from bg */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
@@ -801,7 +804,8 @@
 
 .pbk-package:hover {
   border-color: var(--color-primary);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1), 0 2px 8px rgba(0,0,0,0.06);
+  transform: translateY(-2px);
 }
 
 .pbk-package-featured {
@@ -822,15 +826,16 @@
   border-radius: var(--radius-full);
 }
 
+/* Package name - larger, bolder for impact */
 .pbk-package-name {
-  font-size: var(--fs-body-lg);
-  font-weight: 700;
+  font-size: var(--fs-heading);  /* Larger */
+  font-weight: 700;  /* Bolder */
   color: var(--text-primary);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
 }
 
 .pbk-package-price {
-  font-size: var(--fs-heading);
+  font-size: var(--fs-heading-lg);
   font-weight: 700;
   color: var(--color-primary);
   letter-spacing: -0.02em;
@@ -839,6 +844,7 @@
 .pbk-package-duration {
   font-size: var(--fs-small);
   color: var(--text-secondary);
+  font-weight: 500;  /* Slightly bolder */
 }
 
 .pbk-package-desc {
@@ -846,19 +852,24 @@
   color: var(--text-secondary);
   line-height: 1.5;
   margin: 0;
+  font-weight: 450;  /* Slightly bolder for readability */
 }
 
+/* CTA - Golden ratio sizing (61.8% of card width), compact */
 .pbk-package-btn {
-  padding: var(--space-md) var(--space-xl);
+  width: 61.8%;  /* Golden ratio */
+  max-width: 200px;
+  align-self: center;
+  padding: var(--space-sm) var(--space-lg);
   background: var(--color-primary);
   color: #fff;
   border: none;
   border-radius: var(--radius-full);
-  font-size: var(--fs-body-sm);
+  font-size: var(--fs-small);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.25s ease;
-  margin-top: var(--space-sm);
+  margin-top: var(--space-md);
   text-align: center;
 }
 
@@ -1005,7 +1016,7 @@
 }
 
 /* ===========================================
-   STICKY CTA - Glass Style (centered elements)
+   STICKY CTA - Glass Style (inline on all devices)
    =========================================== */
 .pbk-sticky-cta {
   position: fixed;
