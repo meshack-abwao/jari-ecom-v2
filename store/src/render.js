@@ -1,5 +1,6 @@
 import { state } from './state.js';
 import { renderPortfolioBookingTemplate } from './templates/portfolioBooking.js';
+import { renderDeepDive as renderDeepDiveTemplate } from './templates/deep-dive/index.js';
 
 // ===========================================
 // HEADER
@@ -251,7 +252,7 @@ export function renderSingleProduct(product) {
   switch (template) {
     case 'portfolio-booking': return renderPortfolioBookingTemplate(product);
     case 'visual-menu': return renderVisualMenu(product);
-    case 'deep-dive': return renderDeepDive(product);
+    case 'deep-dive': return renderDeepDiveTemplate(product);
     case 'event-landing': return renderEventLanding(product);
     case 'quick-decision':
     default: 
