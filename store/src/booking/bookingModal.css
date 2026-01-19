@@ -968,3 +968,89 @@
   border: 1px solid var(--border, #e5e7eb);
   color: var(--text-primary, #333);
 }
+
+
+/* ===========================================
+   M-PESA PAYMENT INSTRUCTIONS
+   =========================================== */
+.bkm-mpesa-instructions {
+  background: linear-gradient(135deg, rgba(37, 211, 102, 0.08) 0%, rgba(37, 211, 102, 0.03) 100%);
+  border: 1px solid rgba(37, 211, 102, 0.3);
+  border-radius: 12px;
+  padding: 16px;
+  margin: 16px 0;
+}
+
+.bkm-mpesa-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  color: #128C7E;
+  font-size: 15px;
+}
+
+.bkm-mpesa-icon {
+  font-size: 20px;
+}
+
+.bkm-mpesa-details {
+  background: white;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.bkm-mpesa-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+
+.bkm-mpesa-row:last-child {
+  border-bottom: none;
+}
+
+.bkm-mpesa-row span {
+  color: var(--text-secondary, #666);
+  font-size: 13px;
+}
+
+.bkm-mpesa-row strong {
+  color: var(--text-primary, #333);
+  font-size: 14px;
+  font-family: monospace;
+  letter-spacing: 0.5px;
+}
+
+.bkm-mpesa-steps {
+  background: rgba(255,255,255,0.7);
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.bkm-mpesa-steps p {
+  margin: 4px 0;
+  color: var(--text-secondary, #666);
+}
+
+.bkm-mpesa-steps strong {
+  color: #128C7E;
+}
+
+.bkm-mpesa-business {
+  text-align: center;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed rgba(37, 211, 102, 0.3);
+  font-size: 13px;
+  color: var(--text-secondary, #666);
+}
+
+.bkm-mpesa-business strong {
+  color: var(--text-primary, #333);
+}

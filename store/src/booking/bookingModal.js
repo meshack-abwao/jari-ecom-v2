@@ -263,11 +263,15 @@ function renderStep3() {
 function renderStep4() {
   const { 
     product, selectedPackage, selectedDate, selectedTime, 
-    customerName, customerPhone, settings, 
+    customerName, customerPhone, settings, storeConfig,
     paymentType, jumpLine, discountCode, discountAmount, submitting,
     dayFullyBooked
   } = bookingState;
   const data = product?.data || {};
+  
+  // Payment config from store
+  const payment = storeConfig?.payment || {};
+  const hasPaymentConfig = payment.type && (payment.paybill_number || payment.till_number);
   
   // Price calculation - FORCE ALL VALUES TO NUMBERS using Number() and ||0
   const basePrice = Number(selectedPackage?.price) || Number(data.price) || 0;
@@ -403,6 +407,57 @@ function renderStep4() {
           </div>
         ` : ''}
       </div>
+      
+      <!-- M-Pesa Payment Instructions -->
+      ${hasPaymentConfig && paymentType !== 'inquiry' ? `
+        <div class="bkm-mpesa-instructions">
+          <div class="bkm-mpesa-header">
+            <span class="bkm-mpesa-icon">📱</span>
+            <strong>Pay via M-Pesa</strong>
+          </div>
+          ${payment.type === 'paybill' ? `
+            <div class="bkm-mpesa-details">
+              <div class="bkm-mpesa-row">
+                <span>Paybill Number</span>
+                <strong>${payment.paybill_number}</strong>
+              </div>
+              <div class="bkm-mpesa-row">
+                <span>Account Number</span>
+                <strong>${payment.paybill_account || customerPhone || 'Your Phone'}</strong>
+              </div>
+              <div class="bkm-mpesa-row">
+                <span>Amount</span>
+                <strong>KES ${Number(payNow).toLocaleString()}</strong>
+              </div>
+            </div>
+            <div class="bkm-mpesa-steps">
+              <p>1. Go to M-Pesa → Lipa na M-Pesa → Paybill</p>
+              <p>2. Enter Business No: <strong>${payment.paybill_number}</strong></p>
+              <p>3. Enter Account: <strong>${payment.paybill_account || customerPhone || 'Your Phone'}</strong></p>
+              <p>4. Enter Amount: <strong>KES ${Number(payNow).toLocaleString()}</strong></p>
+              <p>5. Enter PIN and confirm</p>
+            </div>
+          ` : `
+            <div class="bkm-mpesa-details">
+              <div class="bkm-mpesa-row">
+                <span>Till Number</span>
+                <strong>${payment.till_number}</strong>
+              </div>
+              <div class="bkm-mpesa-row">
+                <span>Amount</span>
+                <strong>KES ${Number(payNow).toLocaleString()}</strong>
+              </div>
+            </div>
+            <div class="bkm-mpesa-steps">
+              <p>1. Go to M-Pesa → Lipa na M-Pesa → Buy Goods</p>
+              <p>2. Enter Till No: <strong>${payment.till_number}</strong></p>
+              <p>3. Enter Amount: <strong>KES ${Number(payNow).toLocaleString()}</strong></p>
+              <p>4. Enter PIN and confirm</p>
+            </div>
+          `}
+          ${payment.business_name ? `<p class="bkm-mpesa-business">Paying to: <strong>${payment.business_name}</strong></p>` : ''}
+        </div>
+      ` : ''}
       
       <div class="bkm-actions">
         <button class="bkm-btn bkm-btn-secondary" id="bkmBack" ${submitting ? 'disabled' : ''}>← Back</button>
