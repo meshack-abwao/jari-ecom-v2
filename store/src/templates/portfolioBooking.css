@@ -1232,7 +1232,11 @@
 
 /* CTA Book button - Theme gradient */
 .pbk-cta-book {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   flex: 1;
+  justify-content: center;
   padding: var(--space-md) var(--space-lg);
   /* Theme color with subtle gradient */
   background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark, color-mix(in srgb, var(--color-primary) 80%, #000)) 100%);
@@ -1244,6 +1248,10 @@
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
+}
+
+.pbk-cta-book svg {
+  flex-shrink: 0;
 }
 
 .pbk-cta-book:hover {
