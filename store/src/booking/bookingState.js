@@ -52,6 +52,8 @@ export const bookingState = {
   jumpLine: false,     // Priority booking
   discountCode: '',
   discountAmount: 0,
+  mpesaCode: '',       // M-Pesa transaction code (optional)
+  paymentConfirmed: false, // "I've sent payment" checkbox
   
   // Availability tracking
   dayFullyBooked: false,  // True when all slots for day are taken

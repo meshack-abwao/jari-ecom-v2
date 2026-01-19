@@ -265,7 +265,7 @@ function renderStep4() {
     product, selectedPackage, selectedDate, selectedTime, 
     customerName, customerPhone, settings, storeConfig,
     paymentType, jumpLine, discountCode, discountAmount, submitting,
-    dayFullyBooked
+    dayFullyBooked, mpesaCode, paymentConfirmed
   } = bookingState;
   const data = product?.data || {};
   
@@ -456,6 +456,24 @@ function renderStep4() {
             </div>
           `}
           ${payment.business_name ? `<p class="bkm-mpesa-business">Paying to: <strong>${payment.business_name}</strong></p>` : ''}
+          
+          <!-- Payment Confirmation -->
+          <div class="bkm-payment-confirm">
+            <label class="bkm-confirm-checkbox ${paymentConfirmed ? 'checked' : ''}" id="bkmPaymentConfirm">
+              <span class="bkm-checkbox-icon">${paymentConfirmed ? '✓' : ''}</span>
+              <span>I've sent the payment</span>
+            </label>
+            <div class="bkm-mpesa-code">
+              <input 
+                type="text" 
+                id="bkmMpesaCode" 
+                value="${mpesaCode || ''}" 
+                placeholder="M-Pesa code (optional, e.g., SCI4XXXXXX)"
+                maxlength="20"
+              />
+              <small>Paste your M-Pesa confirmation code for faster verification</small>
+            </div>
+          </div>
         </div>
       ` : ''}
       

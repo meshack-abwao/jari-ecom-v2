@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { settingsAPI } from '../api/client';
 import { 
   Save, Check, Crown, Palette, Type, ChevronDown, ChevronUp, 
-  ExternalLink, Plus, Trash2, Image, FileText, Star, Globe
+  ExternalLink, Plus, Trash2, Image, FileText, Star, Globe, Wallet
 } from 'lucide-react';
 
 const DEFAULT_THEMES = [
@@ -352,7 +352,7 @@ export default function SettingsPage() {
         <div style={styles.card} className="glass-card">
           <div style={styles.sectionHeader} onClick={() => toggleSection('payment')}>
             <div style={styles.sectionTitle}>
-              <span style={{ fontSize: '20px' }}>💳</span>
+              <Wallet size={20} style={{ color: '#25D366' }} />
               <h3 style={styles.cardTitle}>Payment Settings (M-Pesa)</h3>
             </div>
             {expandedSections.payment ? <ChevronUp size={20} /> : <ChevronDown size={20} />}

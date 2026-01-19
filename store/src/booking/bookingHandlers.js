@@ -210,6 +210,17 @@ function setupStepListeners() {
     document.getElementById('bkmDiscountCode')?.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') applyDiscountCode();
     });
+    
+    // Payment confirmation checkbox
+    document.getElementById('bkmPaymentConfirm')?.addEventListener('click', () => {
+      updateBookingState({ paymentConfirmed: !bookingState.paymentConfirmed });
+      updateContent();
+    });
+    
+    // M-Pesa code input
+    document.getElementById('bkmMpesaCode')?.addEventListener('input', (e) => {
+      updateBookingState({ mpesaCode: e.target.value.toUpperCase() });
+    });
   }
 }
 
@@ -424,7 +435,8 @@ async function handleConfirm() {
   const { 
     storeSlug, product, selectedPackage, selectedDate, selectedTime, 
     customerName, customerPhone, customerEmail, notes,
-    paymentType, jumpLine, discountCode, discountAmount, settings
+    paymentType, jumpLine, discountCode, discountAmount, settings,
+    mpesaCode, paymentConfirmed
   } = bookingState;
   
   // Prevent double submission
@@ -460,7 +472,9 @@ async function handleConfirm() {
       payment_type: paymentType,
       jumped_line: jumpLine,
       discount_code: discountCode,
-      discount_amount: discountAmount
+      discount_amount: discountAmount,
+      mpesa_code: mpesaCode || null,
+      payment_confirmed: paymentConfirmed
     });
     
     // Show success
