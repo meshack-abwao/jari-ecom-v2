@@ -90,24 +90,20 @@ export function renderCheckoutModal() {
           <button class="btn btn-secondary" id="backToStep2">Back</button>
         </div>
         
-        <!-- Step 4: M-Pesa Payment Instructions -->
+        <!-- Step 4: M-Pesa Payment Instructions (COMPACT) -->
         <div class="checkout-step" id="step4Mpesa">
-          <h2 class="step-title">Complete M-Pesa Payment</h2>
-          <div class="mpesa-payment-box" id="mpesaPaymentBox">
-            <!-- Will be populated dynamically -->
+          <h2 class="step-title">Pay via M-Pesa</h2>
+          <div class="mpesa-payment-box compact" id="mpesaPaymentBox">
+            <!-- Populated dynamically -->
           </div>
-          <div class="mpesa-confirm-section">
+          <div class="mpesa-confirm-row">
             <label class="mpesa-confirm-checkbox" id="mpesaConfirmCheckbox">
               <span class="checkbox-icon" id="confirmIcon"></span>
-              <span>I've sent the payment</span>
+              <span>I've paid</span>
             </label>
-            <div class="mpesa-code-input">
-              <label>M-Pesa Code <span class="optional">(optional)</span></label>
-              <input type="text" id="mpesaCodeInput" placeholder="e.g., SCI4XXXXXX" maxlength="20">
-              <small>Paste your M-Pesa code for faster verification</small>
-            </div>
+            <input type="text" id="mpesaCodeInput" class="mpesa-code-inline" placeholder="M-Pesa code" maxlength="20">
           </div>
-          <button class="complete-order-btn show" id="completeMpesaOrder">
+          <button class="complete-order-btn show" id="completeMpesaOrder" disabled>
             <span>Complete Order</span>
           </button>
           <button class="btn btn-secondary" id="backToStep3">Back</button>
@@ -196,7 +192,7 @@ function handleCompleteClick() {
   }
 }
 
-// Show M-Pesa payment step with instructions
+// Show M-Pesa payment step with instructions (COMPACT)
 function showMpesaStep() {
   const storeConfig = window.JARI_STORE_CONFIG || {};
   const payment = storeConfig.payment || {};
@@ -204,55 +200,26 @@ function showMpesaStep() {
   const data = currentProduct?.data || {};
   const price = selectedPrice || Number(data.price || 0);
   const total = price * quantity;
+  const acct = payment.paybill_account || document.getElementById('customerPhone')?.value || 'Your Phone';
   
   const mpesaBox = document.getElementById('mpesaPaymentBox');
   if (mpesaBox) {
     mpesaBox.innerHTML = `
-      <div class="mpesa-header">
-        <span class="mpesa-icon">📱</span>
-        <span>Pay via M-Pesa</span>
-      </div>
       ${payment.type === 'paybill' ? `
-        <div class="mpesa-details">
-          <div class="mpesa-row">
-            <span>Paybill Number</span>
-            <strong>${payment.paybill_number}</strong>
-          </div>
-          <div class="mpesa-row">
-            <span>Account Number</span>
-            <strong>${payment.paybill_account || document.getElementById('customerPhone')?.value || 'Your Phone'}</strong>
-          </div>
-          <div class="mpesa-row mpesa-amount">
-            <span>Amount</span>
-            <strong>KES ${total.toLocaleString()}</strong>
-          </div>
+        <div class="mpesa-grid">
+          <div class="mpesa-item"><span>Paybill</span><strong>${payment.paybill_number}</strong></div>
+          <div class="mpesa-item"><span>Account</span><strong>${acct}</strong></div>
+          <div class="mpesa-item mpesa-highlight"><span>Amount</span><strong>KES ${total.toLocaleString()}</strong></div>
         </div>
-        <div class="mpesa-steps">
-          <p>1. Go to M-Pesa → Lipa na M-Pesa → Paybill</p>
-          <p>2. Enter Business No: <strong>${payment.paybill_number}</strong></p>
-          <p>3. Enter Account: <strong>${payment.paybill_account || document.getElementById('customerPhone')?.value || 'Your Phone'}</strong></p>
-          <p>4. Enter Amount: <strong>KES ${total.toLocaleString()}</strong></p>
-          <p>5. Enter PIN and confirm</p>
-        </div>
+        <p class="mpesa-hint">M-Pesa → Lipa na M-Pesa → Paybill → ${payment.paybill_number}</p>
       ` : `
-        <div class="mpesa-details">
-          <div class="mpesa-row">
-            <span>Till Number</span>
-            <strong>${payment.till_number}</strong>
-          </div>
-          <div class="mpesa-row mpesa-amount">
-            <span>Amount</span>
-            <strong>KES ${total.toLocaleString()}</strong>
-          </div>
+        <div class="mpesa-grid">
+          <div class="mpesa-item"><span>Till No</span><strong>${payment.till_number}</strong></div>
+          <div class="mpesa-item mpesa-highlight"><span>Amount</span><strong>KES ${total.toLocaleString()}</strong></div>
         </div>
-        <div class="mpesa-steps">
-          <p>1. Go to M-Pesa → Lipa na M-Pesa → Buy Goods</p>
-          <p>2. Enter Till No: <strong>${payment.till_number}</strong></p>
-          <p>3. Enter Amount: <strong>KES ${total.toLocaleString()}</strong></p>
-          <p>4. Enter PIN and confirm</p>
-        </div>
+        <p class="mpesa-hint">M-Pesa → Lipa na M-Pesa → Buy Goods → ${payment.till_number}</p>
       `}
-      ${payment.business_name ? `<p class="mpesa-business">Paying to: <strong>${payment.business_name}</strong></p>` : ''}
+      ${payment.business_name ? `<p class="mpesa-to">To: <strong>${payment.business_name}</strong></p>` : ''}
     `;
   }
   
@@ -260,6 +227,7 @@ function showMpesaStep() {
   paymentConfirmed = false;
   mpesaCode = '';
   updateConfirmCheckbox();
+  updateMpesaButton();
   document.getElementById('mpesaCodeInput').value = '';
   
   goToStep('step4Mpesa');
@@ -269,6 +237,7 @@ function showMpesaStep() {
 function togglePaymentConfirmed() {
   paymentConfirmed = !paymentConfirmed;
   updateConfirmCheckbox();
+  updateMpesaButton();
 }
 
 function updateConfirmCheckbox() {
@@ -277,6 +246,13 @@ function updateConfirmCheckbox() {
   if (checkbox && icon) {
     checkbox.classList.toggle('checked', paymentConfirmed);
     icon.textContent = paymentConfirmed ? '✓' : '';
+  }
+}
+
+function updateMpesaButton() {
+  const btn = document.getElementById('completeMpesaOrder');
+  if (btn) {
+    btn.disabled = !paymentConfirmed;
   }
 }
 

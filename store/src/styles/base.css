@@ -1633,6 +1633,119 @@ body {
 }
 
 /* ===========================================
+   M-PESA COMPACT LAYOUT (Product Checkout)
+   =========================================== */
+.mpesa-payment-box.compact {
+    padding: 14px;
+}
+
+.mpesa-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.mpesa-item {
+    background: white;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+}
+
+.mpesa-item span {
+    display: block;
+    font-size: 10px;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+}
+
+.mpesa-item strong {
+    font-family: monospace;
+    font-size: 14px;
+    color: #1b5e20;
+}
+
+.mpesa-item.mpesa-highlight {
+    background: #1b5e20;
+}
+
+.mpesa-item.mpesa-highlight span {
+    color: rgba(255,255,255,0.8);
+}
+
+.mpesa-item.mpesa-highlight strong {
+    color: white;
+    font-size: 16px;
+}
+
+.mpesa-hint {
+    font-size: 11px;
+    color: #2e7d32;
+    text-align: center;
+    margin: 0;
+    padding: 6px;
+    background: rgba(255,255,255,0.5);
+    border-radius: 6px;
+}
+
+.mpesa-to {
+    text-align: center;
+    font-size: 12px;
+    color: #2e7d32;
+    margin: 8px 0 0;
+}
+
+.mpesa-confirm-row {
+    display: flex;
+    gap: 10px;
+    align-items: stretch;
+    margin-bottom: 16px;
+}
+
+.mpesa-confirm-row .mpesa-confirm-checkbox {
+    flex: 1;
+    margin: 0;
+    padding: 12px;
+    font-size: 13px;
+}
+
+.mpesa-confirm-row .checkbox-icon {
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+}
+
+.mpesa-code-inline {
+    flex: 1;
+    max-width: 130px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: monospace;
+    text-transform: uppercase;
+}
+
+.mpesa-code-inline:focus {
+    outline: none;
+    border-color: #25D366;
+}
+
+.mpesa-code-inline::placeholder {
+    text-transform: none;
+    font-family: inherit;
+    font-size: 11px;
+}
+
+.complete-order-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ===========================================
    EMPTY STATE
    =========================================== */
 .empty-state {
