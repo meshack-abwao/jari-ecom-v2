@@ -9,6 +9,7 @@ import { formatPrice } from '../../shared/utils.js';
 import { renderGallery, renderStories, renderStoryViewer } from '../../shared/media-components.js';
 import { renderTestimonials } from '../../shared/testimonials.js';
 import { renderProductPolicyLinks, renderProductPolicyModals } from '../../shared/policy-modals.js';
+import { renderShowcaseViewer } from './dd-showcase-viewer.js';
 
 /**
  * Render Deep Dive template (premium product page)
