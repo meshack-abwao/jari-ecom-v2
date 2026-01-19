@@ -164,6 +164,19 @@ async function runMigrations() {
     await runSafe('booking_idx_4', `CREATE INDEX IF NOT EXISTS idx_bookings_store ON bookings(store_id)`);
     await runSafe('booking_idx_5', `CREATE INDEX IF NOT EXISTS idx_bookings_date ON bookings(booking_date)`);
     
+    // ===========================================
+    // ADDITIONAL COLUMNS (004, 005 migrations)
+    // ===========================================
+    
+    // M-Pesa tracking columns (migration 004)
+    await runSafe('mpesa_code_col', `ALTER TABLE bookings ADD COLUMN IF NOT EXISTS mpesa_code VARCHAR(50)`);
+    await runSafe('payment_confirmed_col', `ALTER TABLE bookings ADD COLUMN IF NOT EXISTS payment_confirmed BOOLEAN DEFAULT false`);
+    await runSafe('mpesa_idx', `CREATE INDEX IF NOT EXISTS idx_bookings_mpesa_code ON bookings(mpesa_code) WHERE mpesa_code IS NOT NULL`);
+    
+    // Payment type column (migration 005)
+    await runSafe('payment_type_col', `ALTER TABLE bookings ADD COLUMN IF NOT EXISTS payment_type VARCHAR(20) DEFAULT 'full'`);
+    await runSafe('payment_type_idx', `CREATE INDEX IF NOT EXISTS idx_bookings_payment_type ON bookings(payment_type)`);
+    
     console.log('✅ Migrations verified');
   } catch (err) {
     console.error('⚠️ Migration error:', err.message);

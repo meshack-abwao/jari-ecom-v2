@@ -77,6 +77,51 @@ const payment = window.JARI_STORE_CONFIG?.payment || {};
 const hasPaymentConfig = payment.type && (payment.paybill_number || payment.till_number);
 ```
 
+### Formula 6: Database Column Must Exist Before INSERT
+```javascript
+// ❌ WRONG - Column doesn't exist, INSERT fails silently
+INSERT INTO bookings (..., payment_type, ...) VALUES (...)
+// Error: column "payment_type" does not exist
+
+// ✅ FIX - Create migration first
+// api/migrations/005_payment_type.sql
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS payment_type VARCHAR(20) DEFAULT 'full';
+
+// Then deploy to run migration before API uses the column
+```
+
+### Formula 7: Progress Bar Must Update on Step Change
+```javascript
+// When using perceived steps (3 visible) but internal steps (5 actual):
+function getPerceivedStep(internalStep) {
+  if (internalStep <= 2) return 1;  // Package + Date/Time = SELECT
+  if (internalStep <= 4) return 2;  // Details + Review = DETAILS
+  return 3;                          // Payment = PAY
+}
+
+// updateContent() must call updateProgressBar()
+// updateProgressBar() must target correct selectors (.bkm-step-group not .bkm-step)
+```
+
+### Formula 8: Two Migration Systems - Keep Both in Sync!
+```javascript
+// ❌ PROBLEM: migrations/*.sql files exist BUT index.js has inline migrations
+// The SQL files run via package.json "start" script
+// The inline migrations run on every server startup
+// If they're out of sync, columns are missing!
+
+// ✅ FIX: When adding columns, update BOTH:
+// 1. api/migrations/00X_name.sql  (for full migration runs)
+// 2. api/src/index.js runMigrations() (for inline startup)
+
+// Example - adding payment_type column:
+// In migrations/005_payment_type.sql:
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS payment_type VARCHAR(20) DEFAULT 'full';
+
+// In index.js runMigrations():
+await runSafe('payment_type_col', `ALTER TABLE bookings ADD COLUMN IF NOT EXISTS payment_type VARCHAR(20) DEFAULT 'full'`);
+```
+
 ---
 
 ## 3. TEMPLATE SYSTEM
