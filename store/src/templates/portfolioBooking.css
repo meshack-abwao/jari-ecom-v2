@@ -166,10 +166,10 @@
 
 .pbk-title {
   font-size: var(--fs-display-xl);
-  font-weight: 700;
+  font-weight: 300;  /* Light weight = elegance */
   line-height: 1.1;
   color: var(--text-primary);
-  letter-spacing: -0.03em;
+  letter-spacing: -0.04em;  /* Tighter tracking = premium */
   margin-bottom: var(--space-md);
 }
 
@@ -200,13 +200,13 @@
   flex-shrink: 0;
 }
 
-/* Action buttons - Deep Dive style with SVG icons */
+/* Action buttons - Larger, more visible */
 .pbk-action-btn {
-  width: var(--size-icon-md);
-  height: var(--size-icon-md);
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
-  background: var(--bg-gray);
-  border: none;
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.08);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -216,14 +216,15 @@
 }
 
 .pbk-action-btn svg {
-  width: var(--space-xl);
-  height: var(--space-xl);
+  width: 22px;
+  height: 22px;
 }
 
 .pbk-action-btn:hover {
-  transform: scale(1.1);
-  background: var(--border);
+  transform: scale(1.08);
+  background: rgba(0, 0, 0, 0.1);
   color: var(--text-primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .pbk-action-btn:active {
@@ -231,7 +232,8 @@
 }
 
 .pbk-action-btn.liked {
-  background: rgba(255, 59, 48, 0.1);
+  background: rgba(255, 59, 48, 0.12);
+  border-color: rgba(255, 59, 48, 0.2);
   color: #ff3b30;
 }
 
