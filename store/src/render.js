@@ -3,6 +3,7 @@ import { renderPortfolioBookingTemplate } from './templates/portfolioBooking.js'
 import { renderDeepDive as renderDeepDiveTemplate } from './templates/deep-dive/index.js';
 import { renderVisualMenu as renderVisualMenuTemplate } from './templates/visual-menu/index.js';
 import { renderQuickDecision as renderQuickDecisionTemplate } from './templates/quick-decision/index.js';
+import { renderEventLanding as renderEventLandingTemplate } from './templates/event-landing/index.js';
 
 // ===========================================
 // HEADER
@@ -255,7 +256,7 @@ export function renderSingleProduct(product) {
     case 'portfolio-booking': return renderPortfolioBookingTemplate(product);
     case 'visual-menu': return renderVisualMenuTemplate(product);
     case 'deep-dive': return renderDeepDiveTemplate(product);
-    case 'event-landing': return renderEventLanding(product);
+    case 'event-landing': return renderEventLandingTemplate(product);
     case 'quick-decision':
     default: 
       return renderQuickDecisionTemplate(product);
