@@ -349,23 +349,32 @@ function renderStep4() {
   // Debug log (remove after testing)
   console.log('[Booking] Price calc:', { basePrice, jumpLineFee, jumpFeeApplied, discount, subtotal, payNow });
   
+  // Format date nicely
+  const dateObj = new Date(selectedDate);
+  const formattedDate = dateObj.toLocaleDateString('en-GB', {
+    weekday: 'long',
+    day: 'numeric', 
+    month: 'long',
+    year: 'numeric'
+  });
+  
   return `
     <div class="bkm-step-content">
       <h3 class="bkm-title">Review & Confirm</h3>
       
-      <!-- Booking Summary -->
-      <div class="bkm-review">
-        <div class="bkm-review-row">
-          <span>Service</span>
-          <strong>${selectedPackage?.name || data.name}</strong>
+      <!-- Booking Summary - Clean Card Layout -->
+      <div class="bkm-review-card">
+        <div class="bkm-review-item">
+          <span class="bkm-review-label">Service</span>
+          <span class="bkm-review-value">${selectedPackage?.name || data.name}</span>
         </div>
-        <div class="bkm-review-row">
-          <span>Date & Time</span>
-          <strong>${formatDate(selectedDate)} at ${selectedTime}</strong>
+        <div class="bkm-review-item">
+          <span class="bkm-review-label">Date & Time</span>
+          <span class="bkm-review-value">${formattedDate} at ${selectedTime}</span>
         </div>
-        <div class="bkm-review-row">
-          <span>Contact</span>
-          <strong>${customerName} · ${customerPhone}</strong>
+        <div class="bkm-review-item">
+          <span class="bkm-review-label">Contact</span>
+          <span class="bkm-review-value">${customerName} · ${customerPhone}</span>
         </div>
       </div>
       

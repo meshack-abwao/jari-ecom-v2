@@ -620,14 +620,14 @@ router.post('/public/:storeSlug/bookings', async (req, res, next) => {
         store_id, product_id, customer_name, customer_phone, customer_email,
         booking_date, booking_time, duration_minutes, package_name,
         total_amount, deposit_amount, jumped_line, jump_fee_paid,
-        customer_notes, status, payment_status, mpesa_code, payment_confirmed
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, 'pending', 'unpaid', $15, $16)
+        customer_notes, status, payment_status, payment_type, mpesa_code, payment_confirmed
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, 'pending', 'unpaid', $15, $16, $17)
       RETURNING *
     `, [
       storeId, serviceId, customer_name, customer_phone, customer_email,
       booking_date, booking_time, durationMinutes, package_name,
       totalAmount, depositAmount, jumped_line || false, jumpFeePaid,
-      customerNotes, mpesa_code || null, payment_confirmed || false
+      customerNotes, payment_type || 'full', mpesa_code || null, payment_confirmed || false
     ]);
     
     // TODO: Send notification to provider (SMS/WhatsApp)

@@ -109,20 +109,41 @@ function updateContent() {
   updateProgressBar();
 }
 
-// Update progress bar to reflect current step
+// Map internal steps (1-5) to perceived steps (1-3)
+function getPerceivedStep(internalStep) {
+  if (internalStep <= 2) return 1;      // Package + Date/Time = SELECT
+  if (internalStep <= 4) return 2;      // Details + Review = DETAILS  
+  return 3;                              // Payment = PAY
+}
+
+// Update progress bar to reflect current perceived step
 function updateProgressBar() {
   const { step } = bookingState;
-  document.querySelectorAll('.bkm-step').forEach((el, index) => {
+  const perceivedStep = getPerceivedStep(step);
+  
+  // Update step dots
+  document.querySelectorAll('.bkm-step-group').forEach((el, index) => {
     const stepNum = index + 1;
-    if (stepNum <= step) {
+    el.classList.remove('active', 'current');
+    
+    if (perceivedStep >= stepNum) {
       el.classList.add('active');
-    } else {
-      el.classList.remove('active');
+    }
+    if (perceivedStep === stepNum) {
+      el.classList.add('current');
+    }
+    
+    // Update dot content (checkmark or number)
+    const dot = el.querySelector('.bkm-step-dot');
+    if (dot) {
+      dot.textContent = perceivedStep > stepNum ? '✓' : stepNum;
     }
   });
-  document.querySelectorAll('.bkm-line').forEach((el, index) => {
+  
+  // Update lines
+  document.querySelectorAll('.bkm-progress .bkm-line').forEach((el, index) => {
     const stepNum = index + 1;
-    if (stepNum < step) {
+    if (perceivedStep > stepNum) {
       el.classList.add('active');
     } else {
       el.classList.remove('active');
