@@ -1139,3 +1139,31 @@
   color: var(--text-secondary, #666);
   font-size: 12px;
 }
+
+
+/* Step 5: Payment Confirmation Section */
+.bkm-payment-confirm-section {
+  margin-top: 20px;
+  padding: 20px;
+  background: var(--bg-secondary, #f9fafb);
+  border-radius: 12px;
+  border: 1px solid var(--border, #e5e7eb);
+}
+
+.bkm-mpesa-amount strong {
+  font-size: 1.25em;
+  color: #128C7E;
+}
+
+.bkm-mpesa-code label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: var(--text-primary, #1f2937);
+}
+
+.bkm-optional {
+  font-weight: 400;
+  color: var(--text-secondary, #6b7280);
+  font-size: 0.875em;
+}

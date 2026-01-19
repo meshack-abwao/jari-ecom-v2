@@ -7,7 +7,7 @@ export const bookingState = {
   // Modal visibility
   isOpen: false,
   
-  // Current step (1-4)
+  // Current step (1-5: Package → Date → Details → Review → Payment)
   step: 1,
   
   // Store info

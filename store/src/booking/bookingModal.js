@@ -5,11 +5,17 @@
 import { bookingState } from './bookingState.js';
 
 export function renderBookingModal() {
-  const { isOpen, step, product, selectedPackage, loading } = bookingState;
+  const { isOpen, step, product, selectedPackage, loading, storeConfig, paymentType } = bookingState;
   if (!isOpen) return '';
   
   const data = product?.data || {};
   const packages = data.packages || [];
+  
+  // Check if we need payment step (Step 5)
+  const payment = storeConfig?.payment || {};
+  const hasPaymentConfig = payment.type && (payment.paybill_number || payment.till_number);
+  const needsPaymentStep = hasPaymentConfig && paymentType !== 'inquiry';
+  const totalSteps = needsPaymentStep ? 5 : 4;
   
   return `
     <div class="bkm-overlay" id="bkmOverlay">
@@ -18,9 +24,9 @@ export function renderBookingModal() {
         
         <!-- Progress -->
         <div class="bkm-progress">
-          ${[1, 2, 3, 4].map(s => `
+          ${Array.from({length: totalSteps}, (_, i) => i + 1).map(s => `
             <div class="bkm-step ${step >= s ? 'active' : ''}">${s}</div>
-            ${s < 4 ? `<div class="bkm-line ${step > s ? 'active' : ''}"></div>` : ''}
+            ${s < totalSteps ? `<div class="bkm-line ${step > s ? 'active' : ''}"></div>` : ''}
           `).join('')}
         </div>
         
@@ -43,6 +49,7 @@ export function renderStep(step) {
     case 2: return renderStep2();
     case 3: return renderStep3();
     case 4: return renderStep4();
+    case 5: return renderStep5();
     default: return renderStep1();
   }
 }
@@ -408,79 +415,120 @@ function renderStep4() {
         ` : ''}
       </div>
       
-      <!-- M-Pesa Payment Instructions -->
-      ${hasPaymentConfig && paymentType !== 'inquiry' ? `
-        <div class="bkm-mpesa-instructions">
-          <div class="bkm-mpesa-header">
-            <span class="bkm-mpesa-icon">📱</span>
-            <strong>Pay via M-Pesa</strong>
-          </div>
-          ${payment.type === 'paybill' ? `
-            <div class="bkm-mpesa-details">
-              <div class="bkm-mpesa-row">
-                <span>Paybill Number</span>
-                <strong>${payment.paybill_number}</strong>
-              </div>
-              <div class="bkm-mpesa-row">
-                <span>Account Number</span>
-                <strong>${payment.paybill_account || customerPhone || 'Your Phone'}</strong>
-              </div>
-              <div class="bkm-mpesa-row">
-                <span>Amount</span>
-                <strong>KES ${Number(payNow).toLocaleString()}</strong>
-              </div>
-            </div>
-            <div class="bkm-mpesa-steps">
-              <p>1. Go to M-Pesa → Lipa na M-Pesa → Paybill</p>
-              <p>2. Enter Business No: <strong>${payment.paybill_number}</strong></p>
-              <p>3. Enter Account: <strong>${payment.paybill_account || customerPhone || 'Your Phone'}</strong></p>
-              <p>4. Enter Amount: <strong>KES ${Number(payNow).toLocaleString()}</strong></p>
-              <p>5. Enter PIN and confirm</p>
-            </div>
-          ` : `
-            <div class="bkm-mpesa-details">
-              <div class="bkm-mpesa-row">
-                <span>Till Number</span>
-                <strong>${payment.till_number}</strong>
-              </div>
-              <div class="bkm-mpesa-row">
-                <span>Amount</span>
-                <strong>KES ${Number(payNow).toLocaleString()}</strong>
-              </div>
-            </div>
-            <div class="bkm-mpesa-steps">
-              <p>1. Go to M-Pesa → Lipa na M-Pesa → Buy Goods</p>
-              <p>2. Enter Till No: <strong>${payment.till_number}</strong></p>
-              <p>3. Enter Amount: <strong>KES ${Number(payNow).toLocaleString()}</strong></p>
-              <p>4. Enter PIN and confirm</p>
-            </div>
-          `}
-          ${payment.business_name ? `<p class="bkm-mpesa-business">Paying to: <strong>${payment.business_name}</strong></p>` : ''}
-          
-          <!-- Payment Confirmation -->
-          <div class="bkm-payment-confirm">
-            <label class="bkm-confirm-checkbox ${paymentConfirmed ? 'checked' : ''}" id="bkmPaymentConfirm">
-              <span class="bkm-checkbox-icon">${paymentConfirmed ? '✓' : ''}</span>
-              <span>I've sent the payment</span>
-            </label>
-            <div class="bkm-mpesa-code">
-              <input 
-                type="text" 
-                id="bkmMpesaCode" 
-                value="${mpesaCode || ''}" 
-                placeholder="M-Pesa code (optional, e.g., SCI4XXXXXX)"
-                maxlength="20"
-              />
-              <small>Paste your M-Pesa confirmation code for faster verification</small>
-            </div>
-          </div>
+      <div class="bkm-actions">
+        <button class="bkm-btn bkm-btn-secondary" id="bkmBack" ${submitting ? 'disabled' : ''}>← Back</button>
+        ${hasPaymentConfig && paymentType !== 'inquiry' ? `
+          <button class="bkm-btn bkm-btn-primary" id="bkmNext">Continue to Payment →</button>
+        ` : `
+          <button class="bkm-btn bkm-btn-primary bkm-btn-confirm" id="bkmConfirm" ${submitting ? 'disabled' : ''}>
+            ${submitting ? 'Booking...' : paymentType === 'inquiry' ? 'Send Inquiry' : 'Confirm Booking'}
+          </button>
+        `}
+      </div>
+    </div>
+  `;
+}
+
+// Step 5: Payment Confirmation - JTBD: "Confirm I've paid before booking"
+function renderStep5() {
+  const { 
+    product, selectedPackage, storeConfig, customerPhone,
+    paymentType, jumpLine, discountAmount, settings,
+    mpesaCode, paymentConfirmed, submitting
+  } = bookingState;
+  const data = product?.data || {};
+  
+  // Payment config
+  const payment = storeConfig?.payment || {};
+  
+  // Price calculation
+  const basePrice = Number(selectedPackage?.price) || Number(data.price) || 0;
+  const jumpLineFee = Number(settings.jump_line_fee) || 0;
+  const totalPrice = basePrice + (jumpLine ? jumpLineFee : 0) - (Number(discountAmount) || 0);
+  
+  let payNow = totalPrice;
+  if (paymentType === 'deposit') {
+    payNow = Math.round(totalPrice * (Number(settings.deposit_percentage) || 20) / 100);
+  }
+  
+  return `
+    <div class="bkm-step-content">
+      <h3 class="bkm-title">Complete Payment</h3>
+      
+      <div class="bkm-mpesa-box">
+        <div class="bkm-mpesa-header">
+          <span class="bkm-mpesa-icon">📱</span>
+          <span>Pay via M-Pesa</span>
         </div>
-      ` : ''}
+        
+        ${payment.type === 'paybill' ? `
+          <div class="bkm-mpesa-details">
+            <div class="bkm-mpesa-row">
+              <span>Paybill Number</span>
+              <strong>${payment.paybill_number}</strong>
+            </div>
+            <div class="bkm-mpesa-row">
+              <span>Account Number</span>
+              <strong>${payment.paybill_account || customerPhone || 'Your Phone'}</strong>
+            </div>
+            <div class="bkm-mpesa-row bkm-mpesa-amount">
+              <span>Amount</span>
+              <strong>KES ${Number(payNow).toLocaleString()}</strong>
+            </div>
+          </div>
+          <div class="bkm-mpesa-steps">
+            <p>1. Go to M-Pesa → Lipa na M-Pesa → Paybill</p>
+            <p>2. Enter Business No: <strong>${payment.paybill_number}</strong></p>
+            <p>3. Enter Account: <strong>${payment.paybill_account || customerPhone || 'Your Phone'}</strong></p>
+            <p>4. Enter Amount: <strong>KES ${Number(payNow).toLocaleString()}</strong></p>
+            <p>5. Enter PIN and confirm</p>
+          </div>
+        ` : `
+          <div class="bkm-mpesa-details">
+            <div class="bkm-mpesa-row">
+              <span>Till Number</span>
+              <strong>${payment.till_number}</strong>
+            </div>
+            <div class="bkm-mpesa-row bkm-mpesa-amount">
+              <span>Amount</span>
+              <strong>KES ${Number(payNow).toLocaleString()}</strong>
+            </div>
+          </div>
+          <div class="bkm-mpesa-steps">
+            <p>1. Go to M-Pesa → Lipa na M-Pesa → Buy Goods</p>
+            <p>2. Enter Till No: <strong>${payment.till_number}</strong></p>
+            <p>3. Enter Amount: <strong>KES ${Number(payNow).toLocaleString()}</strong></p>
+            <p>4. Enter PIN and confirm</p>
+          </div>
+        `}
+        
+        ${payment.business_name ? `<p class="bkm-mpesa-business">Paying to: <strong>${payment.business_name}</strong></p>` : ''}
+      </div>
+      
+      <!-- Payment Confirmation -->
+      <div class="bkm-payment-confirm-section">
+        <label class="bkm-confirm-checkbox ${paymentConfirmed ? 'checked' : ''}" id="bkmPaymentConfirm">
+          <span class="bkm-checkbox-icon">${paymentConfirmed ? '✓' : ''}</span>
+          <span>I've sent the payment</span>
+        </label>
+        
+        <div class="bkm-mpesa-code">
+          <label>M-Pesa Confirmation Code <span class="bkm-optional">(optional)</span></label>
+          <input 
+            type="text" 
+            id="bkmMpesaCode" 
+            value="${mpesaCode || ''}" 
+            placeholder="e.g., SCI4XXXXXX"
+            maxlength="20"
+          />
+          <small>Paste your M-Pesa code for faster verification</small>
+        </div>
+      </div>
       
       <div class="bkm-actions">
         <button class="bkm-btn bkm-btn-secondary" id="bkmBack" ${submitting ? 'disabled' : ''}>← Back</button>
         <button class="bkm-btn bkm-btn-primary bkm-btn-confirm" id="bkmConfirm" ${submitting ? 'disabled' : ''}>
-          ${submitting ? 'Booking...' : paymentType === 'inquiry' ? 'Send Inquiry' : 'Confirm & Pay'}
+          ${submitting ? 'Submitting...' : 'Complete Booking'}
         </button>
       </div>
     </div>

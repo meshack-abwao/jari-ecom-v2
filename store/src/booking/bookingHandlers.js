@@ -210,7 +210,10 @@ function setupStepListeners() {
     document.getElementById('bkmDiscountCode')?.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') applyDiscountCode();
     });
-    
+  }
+  
+  // Step 5: Payment confirmation
+  if (step === 5) {
     // Payment confirmation checkbox
     document.getElementById('bkmPaymentConfirm')?.addEventListener('click', () => {
       updateBookingState({ paymentConfirmed: !bookingState.paymentConfirmed });
