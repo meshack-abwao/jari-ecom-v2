@@ -1461,6 +1461,178 @@ body {
 }
 
 /* ===========================================
+   M-PESA PAYMENT STEP (Checkout)
+   =========================================== */
+.mpesa-payment-box {
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.mpesa-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: var(--fs-body-lg);
+    margin-bottom: 16px;
+    color: #1b5e20;
+}
+
+.mpesa-icon {
+    font-size: 24px;
+}
+
+.mpesa-details {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.mpesa-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.mpesa-row:last-child {
+    border-bottom: none;
+}
+
+.mpesa-row span:first-child {
+    color: var(--text-secondary);
+}
+
+.mpesa-row strong {
+    font-family: monospace;
+    font-size: 1.1em;
+}
+
+.mpesa-row.mpesa-amount strong {
+    color: #2e7d32;
+    font-size: 1.25em;
+}
+
+.mpesa-steps {
+    background: rgba(255,255,255,0.7);
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.mpesa-steps p {
+    margin: 8px 0;
+    font-size: var(--fs-small);
+    color: #333;
+}
+
+.mpesa-business {
+    margin-top: 12px;
+    text-align: center;
+    font-size: var(--fs-small);
+    color: #2e7d32;
+}
+
+.mpesa-confirm-section {
+    background: var(--bg-gray);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.mpesa-confirm-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    padding: 14px;
+    background: white;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    transition: all 0.2s;
+    font-weight: 500;
+    margin-bottom: 16px;
+}
+
+.mpesa-confirm-checkbox:hover {
+    border-color: #25D366;
+}
+
+.mpesa-confirm-checkbox.checked {
+    background: rgba(37, 211, 102, 0.1);
+    border-color: #25D366;
+    color: #128C7E;
+}
+
+.checkbox-icon {
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+    color: white;
+    background: white;
+    transition: all 0.2s;
+}
+
+.mpesa-confirm-checkbox.checked .checkbox-icon {
+    background: #25D366;
+    border-color: #25D366;
+}
+
+.mpesa-code-input {
+    margin-top: 8px;
+}
+
+.mpesa-code-input label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 8px;
+    font-size: var(--fs-small);
+}
+
+.mpesa-code-input .optional {
+    font-weight: 400;
+    color: var(--text-secondary);
+}
+
+.mpesa-code-input input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: var(--fs-body);
+    font-family: monospace;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.mpesa-code-input input:focus {
+    outline: none;
+    border-color: #25D366;
+    box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.1);
+}
+
+.mpesa-code-input input::placeholder {
+    text-transform: none;
+    letter-spacing: normal;
+    font-family: inherit;
+}
+
+.mpesa-code-input small {
+    display: block;
+    margin-top: 6px;
+    color: var(--text-secondary);
+    font-size: var(--fs-micro);
+}
+
+/* ===========================================
    EMPTY STATE
    =========================================== */
 .empty-state {

@@ -3,6 +3,8 @@ import { createOrder } from './api.js';
 import { pixel } from './pixel.js';
 
 let selectedPaymentMethod = null;
+let mpesaCode = '';
+let paymentConfirmed = false;
 
 // ===========================================
 // CHECKOUT MODAL HTML
@@ -88,7 +90,30 @@ export function renderCheckoutModal() {
           <button class="btn btn-secondary" id="backToStep2">Back</button>
         </div>
         
-        <!-- Step 4: Loading -->
+        <!-- Step 4: M-Pesa Payment Instructions -->
+        <div class="checkout-step" id="step4Mpesa">
+          <h2 class="step-title">Complete M-Pesa Payment</h2>
+          <div class="mpesa-payment-box" id="mpesaPaymentBox">
+            <!-- Will be populated dynamically -->
+          </div>
+          <div class="mpesa-confirm-section">
+            <label class="mpesa-confirm-checkbox" id="mpesaConfirmCheckbox">
+              <span class="checkbox-icon" id="confirmIcon"></span>
+              <span>I've sent the payment</span>
+            </label>
+            <div class="mpesa-code-input">
+              <label>M-Pesa Code <span class="optional">(optional)</span></label>
+              <input type="text" id="mpesaCodeInput" placeholder="e.g., SCI4XXXXXX" maxlength="20">
+              <small>Paste your M-Pesa code for faster verification</small>
+            </div>
+          </div>
+          <button class="complete-order-btn show" id="completeMpesaOrder">
+            <span>Complete Order</span>
+          </button>
+          <button class="btn btn-secondary" id="backToStep3">Back</button>
+        </div>
+        
+        <!-- Step 5: Loading -->
         <div class="checkout-step" id="stepLoading">
           <div class="loading-spinner"></div>
           <p class="loading-text">Processing your order...</p>
@@ -128,14 +153,131 @@ export function initCheckout() {
   document.getElementById('backToStep1')?.addEventListener('click', () => goToStep('step1'));
   document.getElementById('toStep3')?.addEventListener('click', validateAndGoToStep3);
   document.getElementById('backToStep2')?.addEventListener('click', () => goToStep('step2'));
+  document.getElementById('backToStep3')?.addEventListener('click', () => goToStep('step3'));
   
   // Payment options
   document.querySelectorAll('.payment-option').forEach(option => {
     option.addEventListener('click', () => selectPayment(option.dataset.method));
   });
   
-  // Complete order
-  document.getElementById('completeOrderBtn')?.addEventListener('click', completeOrder);
+  // M-Pesa confirmation checkbox
+  document.getElementById('mpesaConfirmCheckbox')?.addEventListener('click', togglePaymentConfirmed);
+  
+  // M-Pesa code input
+  document.getElementById('mpesaCodeInput')?.addEventListener('input', (e) => {
+    mpesaCode = e.target.value.toUpperCase();
+  });
+  
+  // Complete M-Pesa order
+  document.getElementById('completeMpesaOrder')?.addEventListener('click', completeOrder);
+  
+  // Complete order (or go to M-Pesa step if M-Pesa selected)
+  document.getElementById('completeOrderBtn')?.addEventListener('click', handleCompleteClick);
+}
+
+// Handle complete button click - go to M-Pesa step or complete order
+function handleCompleteClick() {
+  if (!selectedPaymentMethod) {
+    alert('Please select a payment method');
+    return;
+  }
+  
+  // Check if store has M-Pesa config
+  const storeConfig = window.JARI_STORE_CONFIG || {};
+  const payment = storeConfig.payment || {};
+  const hasPaymentConfig = payment.type && (payment.paybill_number || payment.till_number);
+  
+  if (selectedPaymentMethod === 'mpesa' && hasPaymentConfig) {
+    // Show M-Pesa payment instructions
+    showMpesaStep();
+  } else {
+    // Complete order directly
+    completeOrder();
+  }
+}
+
+// Show M-Pesa payment step with instructions
+function showMpesaStep() {
+  const storeConfig = window.JARI_STORE_CONFIG || {};
+  const payment = storeConfig.payment || {};
+  const { currentProduct, quantity, selectedPrice } = state;
+  const data = currentProduct?.data || {};
+  const price = selectedPrice || Number(data.price || 0);
+  const total = price * quantity;
+  
+  const mpesaBox = document.getElementById('mpesaPaymentBox');
+  if (mpesaBox) {
+    mpesaBox.innerHTML = `
+      <div class="mpesa-header">
+        <span class="mpesa-icon">📱</span>
+        <span>Pay via M-Pesa</span>
+      </div>
+      ${payment.type === 'paybill' ? `
+        <div class="mpesa-details">
+          <div class="mpesa-row">
+            <span>Paybill Number</span>
+            <strong>${payment.paybill_number}</strong>
+          </div>
+          <div class="mpesa-row">
+            <span>Account Number</span>
+            <strong>${payment.paybill_account || document.getElementById('customerPhone')?.value || 'Your Phone'}</strong>
+          </div>
+          <div class="mpesa-row mpesa-amount">
+            <span>Amount</span>
+            <strong>KES ${total.toLocaleString()}</strong>
+          </div>
+        </div>
+        <div class="mpesa-steps">
+          <p>1. Go to M-Pesa → Lipa na M-Pesa → Paybill</p>
+          <p>2. Enter Business No: <strong>${payment.paybill_number}</strong></p>
+          <p>3. Enter Account: <strong>${payment.paybill_account || document.getElementById('customerPhone')?.value || 'Your Phone'}</strong></p>
+          <p>4. Enter Amount: <strong>KES ${total.toLocaleString()}</strong></p>
+          <p>5. Enter PIN and confirm</p>
+        </div>
+      ` : `
+        <div class="mpesa-details">
+          <div class="mpesa-row">
+            <span>Till Number</span>
+            <strong>${payment.till_number}</strong>
+          </div>
+          <div class="mpesa-row mpesa-amount">
+            <span>Amount</span>
+            <strong>KES ${total.toLocaleString()}</strong>
+          </div>
+        </div>
+        <div class="mpesa-steps">
+          <p>1. Go to M-Pesa → Lipa na M-Pesa → Buy Goods</p>
+          <p>2. Enter Till No: <strong>${payment.till_number}</strong></p>
+          <p>3. Enter Amount: <strong>KES ${total.toLocaleString()}</strong></p>
+          <p>4. Enter PIN and confirm</p>
+        </div>
+      `}
+      ${payment.business_name ? `<p class="mpesa-business">Paying to: <strong>${payment.business_name}</strong></p>` : ''}
+    `;
+  }
+  
+  // Reset confirmation state
+  paymentConfirmed = false;
+  mpesaCode = '';
+  updateConfirmCheckbox();
+  document.getElementById('mpesaCodeInput').value = '';
+  
+  goToStep('step4Mpesa');
+}
+
+// Toggle payment confirmed checkbox
+function togglePaymentConfirmed() {
+  paymentConfirmed = !paymentConfirmed;
+  updateConfirmCheckbox();
+}
+
+function updateConfirmCheckbox() {
+  const checkbox = document.getElementById('mpesaConfirmCheckbox');
+  const icon = document.getElementById('confirmIcon');
+  if (checkbox && icon) {
+    checkbox.classList.toggle('checked', paymentConfirmed);
+    icon.textContent = paymentConfirmed ? '✓' : '';
+  }
 }
 
 // ===========================================
@@ -290,7 +432,9 @@ async function completeOrder() {
     }],
     payment: {
       method: selectedPaymentMethod,
-      status: 'pending'
+      status: 'pending',
+      mpesa_code: mpesaCode || null,
+      payment_confirmed: paymentConfirmed
     },
     total_amount: total
   };
