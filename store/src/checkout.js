@@ -207,14 +207,18 @@ function showMpesaStep() {
     mpesaBox.innerHTML = `
       ${payment.type === 'paybill' ? `
         <div class="mpesa-grid">
-          <div class="mpesa-item"><span>Paybill</span><strong>${payment.paybill_number}</strong></div>
-          <div class="mpesa-item"><span>Account</span><strong>${acct}</strong></div>
+          <div class="mpesa-grid-row">
+            <div class="mpesa-item"><span>Paybill</span><strong>${payment.paybill_number}</strong></div>
+            <div class="mpesa-item"><span>Account</span><strong>${acct}</strong></div>
+          </div>
           <div class="mpesa-item mpesa-highlight"><span>Amount</span><strong>KES ${total.toLocaleString()}</strong></div>
         </div>
         <p class="mpesa-hint">M-Pesa → Lipa na M-Pesa → Paybill → ${payment.paybill_number}</p>
       ` : `
         <div class="mpesa-grid">
-          <div class="mpesa-item"><span>Till No</span><strong>${payment.till_number}</strong></div>
+          <div class="mpesa-grid-row">
+            <div class="mpesa-item"><span>Till No</span><strong>${payment.till_number}</strong></div>
+          </div>
           <div class="mpesa-item mpesa-highlight"><span>Amount</span><strong>KES ${total.toLocaleString()}</strong></div>
         </div>
         <p class="mpesa-hint">M-Pesa → Lipa na M-Pesa → Buy Goods → ${payment.till_number}</p>

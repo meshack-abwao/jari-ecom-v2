@@ -457,17 +457,19 @@ function renderStep5() {
     <div class="bkm-step-content bkm-step-compact">
       <h3 class="bkm-title">Pay via M-Pesa</h3>
       
-      <!-- Compact M-Pesa Details -->
+      <!-- Compact M-Pesa Details - Golden Ratio Layout -->
       <div class="bkm-mpesa-compact">
         ${payment.type === 'paybill' ? `
           <div class="bkm-mpesa-grid">
-            <div class="bkm-mpesa-item">
-              <span class="bkm-label">Paybill</span>
-              <strong>${payment.paybill_number}</strong>
-            </div>
-            <div class="bkm-mpesa-item">
-              <span class="bkm-label">Account</span>
-              <strong>${acct}</strong>
+            <div class="bkm-mpesa-grid-row">
+              <div class="bkm-mpesa-item">
+                <span class="bkm-label">Paybill</span>
+                <strong>${payment.paybill_number}</strong>
+              </div>
+              <div class="bkm-mpesa-item">
+                <span class="bkm-label">Account</span>
+                <strong>${acct}</strong>
+              </div>
             </div>
             <div class="bkm-mpesa-item bkm-mpesa-highlight">
               <span class="bkm-label">Amount</span>
@@ -477,9 +479,11 @@ function renderStep5() {
           <p class="bkm-mpesa-hint">M-Pesa → Lipa na M-Pesa → Paybill → ${payment.paybill_number}</p>
         ` : `
           <div class="bkm-mpesa-grid">
-            <div class="bkm-mpesa-item">
-              <span class="bkm-label">Till No</span>
-              <strong>${payment.till_number}</strong>
+            <div class="bkm-mpesa-grid-row">
+              <div class="bkm-mpesa-item">
+                <span class="bkm-label">Till No</span>
+                <strong>${payment.till_number}</strong>
+              </div>
             </div>
             <div class="bkm-mpesa-item bkm-mpesa-highlight">
               <span class="bkm-label">Amount</span>

@@ -1634,32 +1634,41 @@ body {
 
 /* ===========================================
    M-PESA COMPACT LAYOUT (Product Checkout)
+   Golden Ratio: 1:1.618 for visual hierarchy
    =========================================== */
 .mpesa-payment-box.compact {
     padding: 14px;
 }
 
+/* Grid: Small cards side by side, Amount centered below */
 .mpesa-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
-    gap: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
     margin-bottom: 10px;
+}
+
+.mpesa-grid-row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
 }
 
 .mpesa-item {
     background: white;
     border-radius: 8px;
-    padding: 10px;
+    padding: 10px 14px;
     text-align: center;
+    min-width: 90px;
 }
 
 .mpesa-item span {
     display: block;
-    font-size: 10px;
+    font-size: 9px;
     color: #666;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    margin-bottom: 4px;
+    margin-bottom: 3px;
 }
 
 .mpesa-item strong {
@@ -1668,17 +1677,24 @@ body {
     color: #1b5e20;
 }
 
+/* Amount card: Golden ratio scaling (1.618x larger) */
 .mpesa-item.mpesa-highlight {
     background: #1b5e20;
+    padding: 12px 24px;
+    border-radius: 10px;
+    margin: 0 auto;
+    min-width: 145px;
 }
 
 .mpesa-item.mpesa-highlight span {
-    color: rgba(255,255,255,0.8);
+    color: rgba(255,255,255,0.85);
+    font-size: 10px;
+    letter-spacing: 1px;
 }
 
 .mpesa-item.mpesa-highlight strong {
     color: white;
-    font-size: 16px;
+    font-size: 18px;
 }
 
 .mpesa-hint {
