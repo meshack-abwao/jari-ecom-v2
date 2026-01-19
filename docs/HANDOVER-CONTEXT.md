@@ -1,6 +1,6 @@
 # JARI.ECOM V2 - HANDOVER CONTEXT DOCUMENT
-## Comprehensive Session Summary - January 18, 2026
-## Last Updated: January 19, 2026 (Morning Session)
+## Comprehensive Session Summary
+## Last Updated: January 19, 2026 (Evening Session)
 
 ---
 
@@ -8,7 +8,7 @@
 
 **Repository:** https://github.com/meshack-abwao/jari-ecom-v2
 **Stack:** React Dashboard + Vanilla JS Storefront + Express API + PostgreSQL (Railway)
-**Current Focus:** Portfolio/Booking (PBK) Template + Dashboard Booking Management
+**Current Focus:** Portfolio/Booking (PBK) Template Polish + M-Pesa Integration Planning
 
 ### Deployment URLs
 | Service | URL | Platform |
@@ -22,296 +22,197 @@
 
 ---
 
-## 2. LATEST SESSION - BOOKING DASHBOARD ENHANCEMENTS
+## 2. LATEST SESSION (Jan 19 Evening) - CTA POLISH
 
-### A. Interactive Stats Cards (Orders-style)
-- **Click to filter**: Today, This Week, Pending cards filter the view
-- **Visual design**: Gradient icon boxes matching Orders page
-- **Active state**: Purple glow when filter is active
-- **Revenue calculation**: From `amount_paid` field (confirmed + completed)
+### Commit: `97285c7`
+**Changes Made:**
+| Fix | Description |
+|-----|-------------|
+| **Hero CTAs** | Centered with `justify-content: center`, compact padding (10px 18px) |
+| **Call button** | White background + dark text/icon - now legible on any hero |
+| **PBK "Check Availability"** | Replaced 📅 emoji with SVG calendar icon |
+| **PBK WhatsApp button** | Replaced 💬 emoji with proper WhatsApp SVG icon |
+| **Section reorder** | Packages → What's Included → Gallery → Why Choose Us |
 
-### B. Week View Calendar
-- Shows Mon-Sun with booking counts per day
-- Click a day to see only that day's bookings
-- Today highlighted, past days dimmed
-- Selected day highlighted in purple
-
-### C. Status Filter Pills
-- All, Pending, Confirmed, Completed, Cancelled
-- Click to filter, shows count for each
-- Active pill highlighted
-
-### D. Enhanced Booking Cards
-- Day name added (MON, TUE, etc.) for quick scanning
-- Expandable with full details
-- Action buttons: Confirm, Decline, Mark Complete, Call, WhatsApp
-
-### E. Bugs Fixed
-- `bookingsAPI.updateStatus()` was missing - now added
-- Syntax error in bookingModal.js (escaped backticks) - fixed
-- Confirmation receipt showing "undefined" - added API fallbacks
+### Previous Session Highlights:
+- Contact Phone field added to Dashboard Settings
+- Hero WhatsApp + Call buttons using store phone
+- PBK title font lightened (weight 300)
+- Share/Like icons enlarged to 44x44px
 
 ---
 
-## 3. BOOKING MODAL SYSTEM (Storefront)
-Location: `store/src/booking/`
+## 3. TEMPLATE ISOLATION STATUS ✅ COMPLETE
 
-**Files:**
-| File | Purpose | Lines |
-|------|---------|-------|
-| `bookingState.js` | State management + defaults | ~86 |
-| `bookingModal.js` | 4-step modal render | ~416 |
-| `bookingModal.css` | Modal styling | ~700+ |
-| `bookingHandlers.js` | Events, validation, API | ~520 |
-| `bookingApi.js` | API endpoint wrappers | ~52 |
+render.js reduced from **926 lines → 289 lines** (69% reduction)
 
-**4-Step Booking Flow:**
-1. **Step 1:** Select Service/Package
-2. **Step 2:** Pick Date & Time (Calendar + time slots)
-3. **Step 3:** Customer Details (name, phone, email, notes)
-4. **Step 4:** Review & Checkout
-
-**Step 4 Features:**
-- ⚡ Jump the Line (priority booking toggle)
-- 💰 Payment Options: Full / Deposit / Inquiry
-- 🎟️ Discount Codes (demo: SAVE10, WELCOME, VIP20)
-- 📊 Price Breakdown (subtotal, fees, discounts)
-- 📱 WhatsApp Fallback when API fails
-
-### B. Dashboard BookingsPage
-Location: `dashboard/src/pages/BookingsPage.jsx` (~1170 lines)
-
-**Tabs:**
-- **Calendar Tab:** Shows upcoming bookings
-- **Settings Tab:** Configure booking settings
-
-**Settings Sections:**
-1. Working Schedule (day-by-day hours)
-2. Booking Slots (duration, max per slot/day)
-3. Advance Booking (min notice, max advance days)
-4. Jump the Line (priority fee)
-5. Payment (deposits, inquiry fee)
-6. Reminders (SMS/WhatsApp)
-7. Blocked Dates (holidays, personal days)
-
-### C. API Endpoints
-Location: `api/src/routes/bookings.js` (~637 lines)
-
-**Public Endpoints (no auth):**
-```
-GET  /api/bookings/public/:storeSlug/settings
-GET  /api/bookings/public/:storeSlug/working-hours
-GET  /api/bookings/public/:storeSlug/blocked-dates
-GET  /api/bookings/public/:storeSlug/availability?date=YYYY-MM-DD
-POST /api/bookings/public/:storeSlug/bookings
-```
-
-### D. Database Tables
-Location: `api/migrations/003_booking_system.sql`
-
-```
-booking_settings  - Per-store config
-working_hours     - Day-by-day schedule
-blocked_dates     - Holidays/unavailable
-bookings          - Customer bookings
-service_packages  - Package options
-```
+| Template | Module Location | Status |
+|----------|-----------------|--------|
+| Deep Dive | `templates/deep-dive/` | ✅ Isolated |
+| Visual Menu | `templates/visual-menu/` | ✅ Isolated |
+| Quick Decision | `templates/quick-decision/` | ✅ Isolated |
+| Event Landing | `templates/event-landing/` | ✅ Isolated |
+| Portfolio/Booking | `templates/portfolioBooking.js` | ✅ Isolated |
 
 ---
 
-## 3. BUGS FIXED THIS SESSION
+## 4. BOOKING SYSTEM STATUS
 
-| # | Issue | Status | Fix |
-|---|-------|--------|-----|
-| 1 | API URL wrong domain | ✅ FIXED | Changed to `jari-ecom-v2-production` |
-| 2 | Progress bar stuck at step 1 | ✅ FIXED | Added `updateProgressBar()` function |
-| 3 | Checkout options not showing | ✅ FIXED | Added defaults in `bookingState.js` |
-| 4 | Time slots empty when API fails | ✅ FIXED | Added `generateDefaultSlots()` fallback |
-| 5 | Section components missing props | ✅ FIXED | Added `isExpanded`/`onToggle` to all |
-| 6 | Toggle functions recreated | ✅ FIXED | Added `useCallback` wrappers |
-| 7 | Important settings hidden | ✅ FIXED | Premium & Payment expanded by default |
-| 8 | Missing closing brace | ✅ FIXED | Syntax error in generateDefaultSlots |
-| 9 | **Price string concatenation** | ✅ FIXED | Use `Number()` instead of `parseInt()` |
-| 10 | **Jump Line always showing** | ✅ FIXED | Only show when `dayFullyBooked=true` |
-| 11 | **Time slots no availability info** | ✅ FIXED | Show spots count and "Full" badges |
-| 12 | **Duplicate payNow declaration** | ✅ FIXED | Removed duplicate code block |
-| 13 | **Poor booking confirmation** | ✅ FIXED | Full receipt with payment breakdown |
-| 14 | **Dashboard bookings hard to manage** | ✅ FIXED | Expandable cards with action buttons |
+### Storefront (`store/src/booking/`)
+| File | Purpose | Status |
+|------|---------|--------|
+| `bookingState.js` | State + defaults | ✅ Complete |
+| `bookingModal.js` | 4-step modal | ✅ Complete |
+| `bookingModal.css` | Styling | ✅ Complete |
+| `bookingHandlers.js` | Events, validation | ✅ Complete |
+| `bookingApi.js` | API wrappers | ✅ Complete |
 
-### New Features Added:
-- **Booking Confirmation Receipt** - Service, date/time, customer, payment breakdown, "What's Next" steps
-- **Dashboard Booking Cards** - Expandable with full details, grouped by status (Pending/Upcoming/Completed)
-- **Booking Actions** - Confirm, Decline, Mark Complete, Call, WhatsApp buttons
-- **Modern Settings UI** - Toggle switches, color-coded sections, stepper inputs
+### Dashboard (`dashboard/src/pages/BookingsPage.jsx`)
+- Calendar tab with interactive stats
+- Settings tab with working hours, blocked dates
+- Booking cards with Confirm/Decline/Complete actions
+
+### API (`api/src/routes/bookings.js`)
+- Public endpoints for storefront
+- Protected endpoints for dashboard
+- 5 database tables migrated
 
 ---
 
-## 4. DEBUG FORMULAS
+## 5. DEBUG FORMULAS
 
 ### Formula 1: API Response Pattern
 ```javascript
-// CORRECT
 const response = await settingsAPI.getAll();
-const store = response.data;  // ✅ Direct access
-
-// WRONG
-const store = response.data.store;     // ❌
-const store = response.data.settings;  // ❌
+const store = response.data;  // ✅ Direct access (NOT response.data.store)
 ```
 
-### Formula 2: API URL
-```javascript
-const API_BASE = (import.meta.env.VITE_API_URL || 
-  'https://jari-ecom-v2-production.up.railway.app').replace(/\/$/, '') + '/api';
-```
-
-### Formula 3: CSS Isolation
+### Formula 2: CSS Isolation
 - Prefix: `pbk-` for Portfolio-Booking, `bkm-` for Booking Modal
 - Use variables: `--fs-*`, `--space-*`
 - Never hardcode colors/sizes
 
-### Formula 4: Git on Windows
-```bash
-# Git Bash
-cd /c/Users/ADMIN/Desktop/jari-ecom-v2 && git add -A && git commit -m "msg" && git push origin main
+### Formula 3: Git on Windows (use batch file)
+```batch
+@echo off
+cd /d C:\Users\ADMIN\Desktop\jari-ecom-v2
+git add -A
+git commit -m "message here"
+git push origin main
 ```
 
-### Formula 5: React Re-render Issues
-- Use `useCallback` for event handlers
-- Use `memo` for child components
-- Add `key` props to preserve DOM elements
+### Formula 4: Surgical Edit Workflow
+1. `read_file` with offset/length
+2. `edit_block` with exact string match
+3. Commit immediately after each fix
 
 ---
 
-## 5. DEFAULT SETTINGS
+## 6. SHELVED IDEAS (Future Development)
 
-```javascript
-// Storefront defaults (bookingState.js)
-settings: {
-  min_notice_hours: 24,
-  max_advance_days: 30,
-  slot_duration_minutes: 60,
-  deposit_enabled: true,
-  deposit_percentage: 30,
-  jump_line_enabled: true,
-  jump_line_fee: 500,
-  inquiry_fee: 0
-}
+### 🔴 HIGH PRIORITY (Ready to Build)
 
-// Working hours (Mon-Fri 9am-5pm)
-workingHours: [
-  { day_of_week: 1, is_open: true, start_time: '09:00', end_time: '17:00' },
-  { day_of_week: 2, is_open: true, start_time: '09:00', end_time: '17:00' },
-  { day_of_week: 3, is_open: true, start_time: '09:00', end_time: '17:00' },
-  { day_of_week: 4, is_open: true, start_time: '09:00', end_time: '17:00' },
-  { day_of_week: 5, is_open: true, start_time: '09:00', end_time: '17:00' }
-]
-```
+#### M-Pesa STK Push Integration
+- **Job:** "Let customers pay instantly via M-Pesa"
+- **Scope:** 
+  - Daraja API integration
+  - STK push for deposits and full payments
+  - Payment confirmation webhooks
+  - Transaction history in dashboard
+- **Notes:** Discussed as premium add-on feature
 
----
+#### User Accounts & Authentication
+- **Job:** "Let customers track their orders/bookings"
+- **Scope:**
+  - Customer registration/login
+  - Order history
+  - Saved addresses
+  - Booking history
+- **Notes:** Currently stores are single-user (merchant only)
 
-## 6. GIT COMMITS (This Session)
+### 🟡 MEDIUM PRIORITY (Planned)
 
-```
-3bdccd5 📝 Update handover document with latest fixes
-f3b2259 🎨 BookingsPage: Expand premium & payment sections by default
-12fbec9 🐛 Fix BookingsPage: Add missing Section props + useCallback
-58b7c11 🔧 BookingsPage: Additional improvements and fixes
-38990e1 📝 Comprehensive handover document
-fd921c0 🔧 Add default settings in bookingState
-34f2835 🔧 Fix: API URL to correct Railway domain, progress bar updates
-3f71e48 🔄 Booking: WhatsApp fallback when API unavailable
-1fb3fe3 ✨ Booking checkout: Add payment options, jump line, discounts
-b9077de 🐛 Fix missing closing brace in generateDefaultSlots
-026dcfb 🐛 Fix booking: Generate client-side time slots when API unavailable
-3d0c21f 🐛 Fix route mismatch: /available -> /availability
-```
+#### SMS/WhatsApp Reminders
+- **Job:** "Remind customers of upcoming bookings"
+- **Scope:**
+  - 5 hours, 2 hours, 30 min before
+  - Provider notification on new booking
+  - Africa's Talking or Twilio integration
+- **Notes:** Toggle in booking settings already exists
+
+#### Real Discount Code System
+- **Job:** "Let merchants create promotional codes"
+- **Scope:**
+  - Dashboard UI to create/manage codes
+  - Percentage or fixed amount discounts
+  - Expiry dates, usage limits
+  - API validation
+- **Notes:** Currently demo codes only (SAVE10, VIP20)
+
+#### Multi-Select Categories
+- **Job:** "Let products appear in multiple filters"
+- **Scope:**
+  - Change `category` from string to array
+  - Update filter logic
+  - Dashboard UI for multi-select
+- **Notes:** Requested for services appearing in multiple categories
+
+### 🟢 LOW PRIORITY (Nice to Have)
+
+#### Dashboard Debouncing
+- **Job:** "Reduce input lag on settings pages"
+- **Scope:** Add debounce to input handlers
+- **Notes:** BookingsPage settings feel choppy
+
+#### Booking Confirmation Emails
+- **Job:** "Send professional email receipts"
+- **Scope:** SendGrid/Mailgun integration
+- **Notes:** WhatsApp fallback currently works
+
+#### Image CDN
+- **Job:** "Faster image loading"
+- **Scope:** Cloudinary or S3+CloudFront
+- **Notes:** Important for scaling to 1000+ users
+
+#### CSS Splitting
+- **Job:** "Load only needed CSS per template"
+- **Scope:** Extract template CSS from base.css
+- **Notes:** base.css still 3716 lines
 
 ---
 
 ## 7. FILE LOCATIONS
 
-### Storefront Booking
-```
-store/src/booking/
-├── bookingState.js      # State + defaults
-├── bookingModal.js      # 4-step modal render
-├── bookingModal.css     # Modal styling
-├── bookingHandlers.js   # Events, validation
-└── bookingApi.js        # API calls
-```
+### Key Files
+| File | Purpose |
+|------|---------|
+| `store/src/render.js` | Template dispatcher (289 lines) |
+| `store/src/templates/portfolioBooking.js` | PBK template |
+| `store/src/templates/portfolioBooking.css` | PBK styles |
+| `store/src/booking/` | Booking modal system |
+| `dashboard/src/pages/SettingsPage.jsx` | Store settings |
+| `dashboard/src/pages/BookingsPage.jsx` | Booking management |
+| `api/src/routes/bookings.js` | Booking API |
+| `api/src/routes/public.js` | Public store API |
 
-### Dashboard
-```
-dashboard/src/pages/
-├── BookingsPage.jsx     # Calendar + Settings (1170 lines)
-├── ProductsPage.jsx     # Product management
-└── SettingsPage.jsx     # Store settings
-```
+---
 
-### API
-```
-api/src/routes/
-├── bookings.js          # Booking endpoints (637 lines)
-├── stores.js            # Store CRUD
-└── products.js          # Product CRUD
+## 8. RECENT COMMITS
 
-api/migrations/
-├── 001_initial.sql
-├── 002_pixel_tracking.sql
-└── 003_booking_system.sql
+```
+97285c7 CTA polish: centered hero CTAs, calendar+WhatsApp icons in PBK, section reorder
+06df7d9 Add Contact Phone field to Settings for hero WhatsApp/Call buttons
+e949584 PBK: Light title font + larger share/like icons
+2dbafc9 Hero CTAs: WhatsApp + Call buttons with icons (uses store phone)
+f267d31 docs: Update handover v2.1 - JS isolation complete, render.js now 289 lines
+18c9468 Phase6c: Remove old Event Landing and helper functions from render.js
 ```
 
 ---
 
-## 8. NEXT STEPS
+## 9. ENVIRONMENT
 
-### Immediate (Test First)
-1. Wait for Netlify rebuild (~2 min)
-2. Test booking modal on storefront
-3. Verify progress bar advances
-4. Verify checkout options show (Jump Line, Deposit, etc.)
-5. Test WhatsApp fallback
-
-### If Still Broken
-1. Check browser console for errors
-2. Verify API URL is correct
-3. Check Railway logs for 404s
-4. Test API directly: `curl https://jari-ecom-v2-production.up.railway.app/api/bookings/public/nimoration/settings`
-
-### Future Improvements
-1. Add debouncing to dashboard inputs (reduce choppiness)
-2. Break BookingsPage into smaller components
-3. Add real discount code validation via API
-4. Implement SMS/WhatsApp reminders
-5. Add booking confirmation emails
-
----
-
-## 9. TESTING CHECKLIST
-
-### Storefront
-- [ ] Booking modal opens on PBK product
-- [ ] Progress bar advances 1 → 2 → 3 → 4
-- [ ] Time slots appear after selecting date
-- [ ] Jump the Line toggle visible
-- [ ] Payment options visible (Full/Deposit/Inquiry)
-- [ ] Discount code input works
-- [ ] Price breakdown shows correctly
-- [ ] Confirm button works (API or WhatsApp)
-
-### Dashboard
-- [ ] BookingsPage loads without errors
-- [ ] Settings sections expand/collapse
-- [ ] Working hours can be edited
-- [ ] Blocked dates can be added/removed
-- [ ] Save button works
-
----
-
-## 10. ENVIRONMENT VARIABLES
-
-### Netlify (Both Dashboard & Store)
+### Netlify (Dashboard & Store)
 ```
 VITE_API_URL = https://jari-ecom-v2-production.up.railway.app
 ```
@@ -324,5 +225,5 @@ PORT = 808
 
 ---
 
-*Last Updated: January 18, 2026 (Evening)*
-*Session Focus: Booking System + Checkout Flow*
+*Last Updated: January 19, 2026 (Evening)*
+*Next Focus: M-Pesa Integration Discussion*
