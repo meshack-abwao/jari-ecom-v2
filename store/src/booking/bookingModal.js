@@ -1,8 +1,18 @@
 // ===========================================
 // BOOKING MODAL RENDER
 // Prefix: bkm- (booking modal)
+// 3-Step Perception: SELECT → DETAILS → PAY
 // ===========================================
 import { bookingState } from './bookingState.js';
+
+// Map internal steps (1-5) to perceived steps (1-3)
+function getPerceivedStep(internalStep) {
+  if (internalStep <= 2) return 1;      // Package + Date/Time = SELECT
+  if (internalStep <= 4) return 2;      // Details + Review = DETAILS  
+  return 3;                              // Payment = PAY
+}
+
+const STEP_LABELS = ['SELECT', 'DETAILS', 'PAY'];
 
 export function renderBookingModal() {
   const { isOpen, step, product, selectedPackage, loading, storeConfig, paymentType } = bookingState;
@@ -11,22 +21,28 @@ export function renderBookingModal() {
   const data = product?.data || {};
   const packages = data.packages || [];
   
-  // Check if we need payment step (Step 5)
+  // Check if we need payment step
   const payment = storeConfig?.payment || {};
   const hasPaymentConfig = payment.type && (payment.paybill_number || payment.till_number);
   const needsPaymentStep = hasPaymentConfig && paymentType !== 'inquiry';
-  const totalSteps = needsPaymentStep ? 5 : 4;
+  
+  // Always show 3 perceived steps (or 2 if no payment)
+  const totalPerceivedSteps = needsPaymentStep ? 3 : 2;
+  const currentPerceivedStep = getPerceivedStep(step);
   
   return `
     <div class="bkm-overlay" id="bkmOverlay">
       <div class="bkm-modal">
         <button class="bkm-close" id="bkmClose">✕</button>
         
-        <!-- Progress -->
+        <!-- Progress: 3 Steps Perception -->
         <div class="bkm-progress">
-          ${Array.from({length: totalSteps}, (_, i) => i + 1).map(s => `
-            <div class="bkm-step ${step >= s ? 'active' : ''}">${s}</div>
-            ${s < totalSteps ? `<div class="bkm-line ${step > s ? 'active' : ''}"></div>` : ''}
+          ${Array.from({length: totalPerceivedSteps}, (_, i) => i + 1).map(s => `
+            <div class="bkm-step-group ${currentPerceivedStep >= s ? 'active' : ''} ${currentPerceivedStep === s ? 'current' : ''}">
+              <div class="bkm-step-dot">${currentPerceivedStep > s ? '✓' : s}</div>
+              <span class="bkm-step-label">${STEP_LABELS[s-1]}</span>
+            </div>
+            ${s < totalPerceivedSteps ? `<div class="bkm-line ${currentPerceivedStep > s ? 'active' : ''}"></div>` : ''}
           `).join('')}
         </div>
         
@@ -231,13 +247,38 @@ function getMonthYear() {
 }
 
 
-// Step 3: Customer Details
+// Step 3: Customer Details + Inline Review Summary
 function renderStep3() {
-  const { customerName, customerPhone, customerEmail, notes } = bookingState;
+  const { customerName, customerPhone, customerEmail, notes,
+          product, selectedPackage, selectedDate, selectedTime } = bookingState;
+  const data = product?.data || {};
+  const serviceName = selectedPackage?.name || data.name || 'Service';
+  const price = selectedPackage?.price || data.price || 0;
+  
+  // Format date for display
+  const dateDisplay = selectedDate ? new Date(selectedDate).toLocaleDateString('en-GB', {
+    weekday: 'short', day: 'numeric', month: 'short'
+  }) : '';
   
   return `
     <div class="bkm-step-content">
       <h3 class="bkm-title">Your Details</h3>
+      
+      <!-- Inline Booking Summary -->
+      <div class="bkm-inline-summary">
+        <div class="bkm-summary-item">
+          <span class="bkm-summary-label">Service</span>
+          <span class="bkm-summary-value">${serviceName}</span>
+        </div>
+        <div class="bkm-summary-item">
+          <span class="bkm-summary-label">When</span>
+          <span class="bkm-summary-value">${dateDisplay} at ${selectedTime || ''}</span>
+        </div>
+        <div class="bkm-summary-item bkm-summary-price">
+          <span class="bkm-summary-label">Price</span>
+          <span class="bkm-summary-value">KES ${Number(price).toLocaleString()}</span>
+        </div>
+      </div>
       
       <div class="bkm-form">
         <div class="bkm-field">
@@ -429,7 +470,7 @@ function renderStep4() {
   `;
 }
 
-// Step 5: Payment Confirmation - JTBD: "Confirm I've paid before booking"
+// Step 5: Payment Confirmation - Trust & Confidence
 function renderStep5() {
   const { 
     product, selectedPackage, storeConfig, customerPhone,
@@ -440,6 +481,7 @@ function renderStep5() {
   
   // Payment config
   const payment = storeConfig?.payment || {};
+  const businessName = payment.business_name || storeConfig?.name || 'Business';
   
   // Price calculation
   const basePrice = Number(selectedPackage?.price) || Number(data.price) || 0;
@@ -455,7 +497,12 @@ function renderStep5() {
   
   return `
     <div class="bkm-step-content bkm-step-compact">
-      <h3 class="bkm-title">Pay via M-Pesa</h3>
+      <!-- Trust Header -->
+      <div class="bkm-trust-header">
+        <span class="bkm-secure-badge">🔒 Secure Payment</span>
+        <h3 class="bkm-title">Pay via M-Pesa</h3>
+        <p class="bkm-paying-to">Paying to: <strong>${businessName}</strong></p>
+      </div>
       
       <!-- Compact M-Pesa Details - Golden Ratio Layout -->
       <div class="bkm-mpesa-compact">
@@ -492,7 +539,6 @@ function renderStep5() {
           </div>
           <p class="bkm-mpesa-hint">M-Pesa → Lipa na M-Pesa → Buy Goods → ${payment.till_number}</p>
         `}
-        ${payment.business_name ? `<p class="bkm-mpesa-to">To: <strong>${payment.business_name}</strong></p>` : ''}
       </div>
       
       <!-- Confirmation Required -->
@@ -501,13 +547,13 @@ function renderStep5() {
           <span class="bkm-checkbox-icon">${paymentConfirmed ? '✓' : ''}</span>
           <span>I've sent the payment</span>
         </label>
-        <input type="text" id="bkmMpesaCode" class="bkm-code-input" value="${mpesaCode || ''}" placeholder="M-Pesa code (optional)" maxlength="20" />
+        <input type="text" id="bkmMpesaCode" class="bkm-code-input" value="${mpesaCode || ''}" placeholder="M-Pesa code" maxlength="20" />
       </div>
       
       <div class="bkm-actions">
         <button class="bkm-btn bkm-btn-secondary" id="bkmBack" ${submitting ? 'disabled' : ''}>← Back</button>
         <button class="bkm-btn bkm-btn-primary bkm-btn-confirm" id="bkmConfirm" ${!paymentConfirmed || submitting ? 'disabled' : ''}>
-          ${submitting ? 'Submitting...' : 'Complete Booking'}
+          ${submitting ? 'Completing...' : 'Complete Booking'}
         </button>
       </div>
     </div>
