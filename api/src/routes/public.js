@@ -97,6 +97,8 @@ router.get('/:slug', async (req, res, next) => {
         },
         // Font
         font_family: config.font_family || config.fontFamily || 'Inter',
+        // Contact
+        contact_phone: config.contact_phone || config.contactPhone || '',
       },
       theme,
       products: productsResult.rows

@@ -57,6 +57,7 @@ export default function SettingsPage() {
     tagline: '',
     slug: '',
     logoUrl: '',
+    contactPhone: '',
     // Hero
     heroTitle: '',
     heroSubtitle: '',
@@ -91,6 +92,7 @@ export default function SettingsPage() {
         tagline: config.tagline || '',
         slug: store?.slug || '',
         logoUrl: config.logo_url || config.logoUrl || '',
+        contactPhone: config.contact_phone || config.contactPhone || '',
         // Hero
         heroTitle: config.hero_title || config.heroTitle || '',
         heroSubtitle: config.hero_subtitle || config.heroSubtitle || '',
@@ -153,6 +155,7 @@ export default function SettingsPage() {
         store_name: storeSettings.storeName,
         tagline: storeSettings.tagline,
         logo_url: storeSettings.logoUrl,
+        contact_phone: storeSettings.contactPhone,
         // Hero
         hero_title: storeSettings.heroTitle,
         hero_subtitle: storeSettings.heroSubtitle,
@@ -308,6 +311,19 @@ export default function SettingsPage() {
                     />
                   </div>
                 )}
+              </div>
+
+              {/* Contact Phone */}
+              <div style={styles.formGroup}>
+                <label style={styles.label}>CONTACT PHONE <span style={styles.optional}>(For WhatsApp & Call buttons)</span></label>
+                <input
+                  type="tel"
+                  value={storeSettings.contactPhone}
+                  onChange={(e) => setStoreSettings({ ...storeSettings, contactPhone: e.target.value })}
+                  placeholder="+254712345678"
+                  className="dashboard-input"
+                />
+                <p style={styles.hint}>Used for hero WhatsApp & Call buttons. Include country code (e.g., +254)</p>
               </div>
             </div>
           )}
