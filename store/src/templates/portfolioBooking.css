@@ -166,7 +166,7 @@
 
 .pbk-title {
   font-size: var(--fs-display-xl);
-  font-weight: 300;  /* Light weight = elegance */
+  font-weight: 700;  /* Bold weight for strong presence */
   line-height: 1.1;
   color: var(--text-primary);
   letter-spacing: -0.04em;  /* Tighter tracking = premium */
