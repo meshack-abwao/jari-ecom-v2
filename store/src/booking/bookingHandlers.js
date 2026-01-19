@@ -480,8 +480,17 @@ async function handleConfirm() {
       payment_confirmed: paymentConfirmed
     });
     
-    // Show success
-    updateBookingState({ submitting: false });
+    // Show success - update step to show all complete
+    updateBookingState({ submitting: false, step: 6 }); // Step 6 = success (all perceived steps complete)
+    
+    // Update entire modal to show completed progress + success content
+    const modal = document.querySelector('.bkm-modal');
+    if (modal) {
+      // Hide progress bar on success
+      const progress = modal.querySelector('.bkm-progress');
+      if (progress) progress.style.display = 'none';
+    }
+    
     const content = document.getElementById('bkmContent');
     if (content) {
       content.innerHTML = renderBookingSuccess(booking);

@@ -983,8 +983,23 @@ export default function BookingsPage() {
                 <div style={styles.expandedSection}>
                   <span style={styles.expandedLabel}>Payment</span>
                   <span style={styles.expandedValue}>
-                    {booking.payment_type === 'deposit' ? `Deposit (${booking.deposit_percentage || 20}%)` :
-                     booking.payment_type === 'inquiry' ? 'Inquiry' : 'Full Payment'}
+                    {(() => {
+                      const total = parseInt(booking.total_amount || booking.package_price || 0);
+                      const depositPct = booking.deposit_percentage || 20;
+                      
+                      if (booking.payment_type === 'deposit') {
+                        const paid = Math.round(total * depositPct / 100);
+                        const due = total - paid;
+                        return `Deposit KES ${paid.toLocaleString()} · Due: KES ${due.toLocaleString()}`;
+                      } else if (booking.payment_type === 'inquiry') {
+                        const inquiryFee = parseInt(booking.inquiry_fee || 0);
+                        return inquiryFee > 0 
+                          ? `Inquiry Fee KES ${inquiryFee.toLocaleString()} · Due: KES ${(total - inquiryFee).toLocaleString()}`
+                          : `Inquiry · Due: KES ${total.toLocaleString()}`;
+                      } else {
+                        return `Full Payment · KES ${total.toLocaleString()}`;
+                      }
+                    })()}
                   </span>
                 </div>
                 
