@@ -7,12 +7,13 @@ import { bookingApi } from './bookingApi.js';
 import { renderBookingModal, renderStep, renderCalendarDays, renderTimeSlots, renderBookingSuccess } from './bookingModal.js';
 
 // Open the booking modal
-export async function openBookingModal(storeSlug, product, preSelectedPackage = null) {
+export async function openBookingModal(storeSlug, product, preSelectedPackage = null, storeConfig = null) {
   resetBookingState();
   
   updateBookingState({
     isOpen: true,
     storeSlug,
+    storeConfig,
     product,
     selectedPackage: preSelectedPackage,
     loading: true
@@ -597,7 +598,8 @@ END:VCALENDAR`;
 window.addEventListener('pbk:openBooking', (e) => {
   const { product, selectedPackage } = e.detail;
   const slug = window.JARI_STORE_SLUG;
+  const storeConfig = window.JARI_STORE_CONFIG || null;
   if (slug && product) {
-    openBookingModal(slug, product, selectedPackage);
+    openBookingModal(slug, product, selectedPackage, storeConfig);
   }
 });

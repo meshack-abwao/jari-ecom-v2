@@ -12,6 +12,7 @@ export const bookingState = {
   
   // Store info
   storeSlug: null,
+  storeConfig: null, // Store config including payment details
   
   // Product info
   product: null,

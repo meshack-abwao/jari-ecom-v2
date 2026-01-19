@@ -32,6 +32,9 @@ async function init() {
       products: data.products
     });
     
+    // Set global store config for booking system (includes payment info)
+    window.JARI_STORE_CONFIG = data.store || null;
+    
     // Update page title
     document.title = data.store.name || 'Store';
     

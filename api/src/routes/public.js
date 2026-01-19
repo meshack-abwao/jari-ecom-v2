@@ -99,6 +99,14 @@ router.get('/:slug', async (req, res, next) => {
         font_family: config.font_family || config.fontFamily || 'Inter',
         // Contact
         contact_phone: config.contact_phone || config.contactPhone || '',
+        // Payment (M-Pesa)
+        payment: {
+          type: config.payment_type || config.paymentType || '',
+          paybill_number: config.paybill_number || config.paybillNumber || '',
+          paybill_account: config.paybill_account_number || config.paybillAccountNumber || '',
+          till_number: config.till_number || config.tillNumber || '',
+          business_name: config.payment_business_name || config.paymentBusinessName || '',
+        },
       },
       theme,
       products: productsResult.rows

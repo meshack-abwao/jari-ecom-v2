@@ -8,7 +8,7 @@
 
 **Repository:** https://github.com/meshack-abwao/jari-ecom-v2
 **Stack:** React Dashboard + Vanilla JS Storefront + Express API + PostgreSQL (Railway)
-**Current Focus:** Portfolio/Booking (PBK) Template Polish + M-Pesa Integration Planning
+**Current Focus:** M-Pesa Phase 1 (Manual Display) + Template Polish
 
 ### Deployment URLs
 | Service | URL | Platform |
@@ -22,177 +22,151 @@
 
 ---
 
-## 2. LATEST SESSION (Jan 19 Evening) - CTA POLISH
+## 2. LATEST SESSION (Jan 19 Evening)
 
-### Commit: `97285c7`
-**Changes Made:**
+### CTA Polish - Commit `97285c7`
 | Fix | Description |
 |-----|-------------|
-| **Hero CTAs** | Centered with `justify-content: center`, compact padding (10px 18px) |
-| **Call button** | White background + dark text/icon - now legible on any hero |
-| **PBK "Check Availability"** | Replaced 📅 emoji with SVG calendar icon |
-| **PBK WhatsApp button** | Replaced 💬 emoji with proper WhatsApp SVG icon |
+| **Hero CTAs** | Centered, compact padding (10px 18px) |
+| **Call button** | White background + dark text - now legible |
+| **PBK "Check Availability"** | SVG calendar icon (no emoji) |
+| **PBK WhatsApp button** | SVG WhatsApp icon (no emoji) |
 | **Section reorder** | Packages → What's Included → Gallery → Why Choose Us |
 
-### Previous Session Highlights:
-- Contact Phone field added to Dashboard Settings
-- Hero WhatsApp + Call buttons using store phone
-- PBK title font lightened (weight 300)
-- Share/Like icons enlarged to 44x44px
+### M-Pesa Discussion - SHELVED FOR LATER
+Comprehensive discussion on payment integration - see Section 6.
 
 ---
 
 ## 3. TEMPLATE ISOLATION STATUS ✅ COMPLETE
 
-render.js reduced from **926 lines → 289 lines** (69% reduction)
+render.js: **926 → 289 lines** (69% reduction)
 
-| Template | Module Location | Status |
-|----------|-----------------|--------|
-| Deep Dive | `templates/deep-dive/` | ✅ Isolated |
-| Visual Menu | `templates/visual-menu/` | ✅ Isolated |
-| Quick Decision | `templates/quick-decision/` | ✅ Isolated |
-| Event Landing | `templates/event-landing/` | ✅ Isolated |
-| Portfolio/Booking | `templates/portfolioBooking.js` | ✅ Isolated |
+| Template | Location | Status |
+|----------|----------|--------|
+| Deep Dive | `templates/deep-dive/` | ✅ |
+| Visual Menu | `templates/visual-menu/` | ✅ |
+| Quick Decision | `templates/quick-decision/` | ✅ |
+| Event Landing | `templates/event-landing/` | ✅ |
+| Portfolio/Booking | `templates/portfolioBooking.js` | ✅ |
 
 ---
 
-## 4. BOOKING SYSTEM STATUS
+## 4. BOOKING SYSTEM STATUS ✅ COMPLETE
 
 ### Storefront (`store/src/booking/`)
-| File | Purpose | Status |
-|------|---------|--------|
-| `bookingState.js` | State + defaults | ✅ Complete |
-| `bookingModal.js` | 4-step modal | ✅ Complete |
-| `bookingModal.css` | Styling | ✅ Complete |
-| `bookingHandlers.js` | Events, validation | ✅ Complete |
-| `bookingApi.js` | API wrappers | ✅ Complete |
+- `bookingState.js` - State + defaults
+- `bookingModal.js` - 4-step modal
+- `bookingModal.css` - Styling
+- `bookingHandlers.js` - Events, validation
+- `bookingApi.js` - API wrappers
 
-### Dashboard (`dashboard/src/pages/BookingsPage.jsx`)
-- Calendar tab with interactive stats
-- Settings tab with working hours, blocked dates
-- Booking cards with Confirm/Decline/Complete actions
+### Dashboard
+- BookingsPage.jsx - Calendar + Settings tabs
+- Booking cards with Confirm/Decline/Complete
 
-### API (`api/src/routes/bookings.js`)
-- Public endpoints for storefront
-- Protected endpoints for dashboard
+### API
 - 5 database tables migrated
+- Public + protected endpoints
 
 ---
 
 ## 5. DEBUG FORMULAS
 
-### Formula 1: API Response Pattern
+### Formula 1: API Response
 ```javascript
-const response = await settingsAPI.getAll();
-const store = response.data;  // ✅ Direct access (NOT response.data.store)
+const store = response.data;  // ✅ Direct (NOT response.data.store)
 ```
 
 ### Formula 2: CSS Isolation
-- Prefix: `pbk-` for Portfolio-Booking, `bkm-` for Booking Modal
-- Use variables: `--fs-*`, `--space-*`
-- Never hardcode colors/sizes
+- Prefix: `pbk-`, `bkm-`
+- Use: `--fs-*`, `--space-*`
 
-### Formula 3: Git on Windows (use batch file)
+### Formula 3: Git on Windows
 ```batch
-@echo off
 cd /d C:\Users\ADMIN\Desktop\jari-ecom-v2
-git add -A
-git commit -m "message here"
-git push origin main
+git add -A && git commit -m "msg" && git push origin main
 ```
 
-### Formula 4: Surgical Edit Workflow
-1. `read_file` with offset/length
-2. `edit_block` with exact string match
-3. Commit immediately after each fix
+### Formula 4: Surgical Edits
+read_file → edit_block → commit immediately
 
 ---
 
-## 6. SHELVED IDEAS (Future Development)
+## 6. SHELVED IDEAS (Retrieve on Request)
 
-### 🔴 HIGH PRIORITY (Ready to Build)
+### 🔴 HIGH PRIORITY
 
-#### M-Pesa STK Push Integration
-- **Job:** "Let customers pay instantly via M-Pesa"
-- **Scope:** 
-  - Daraja API integration
-  - STK push for deposits and full payments
-  - Payment confirmation webhooks
-  - Transaction history in dashboard
-- **Notes:** Discussed as premium add-on feature
+#### M-Pesa WaaS Integration (IntaSend Partnership)
+**Status:** Email drafted, awaiting send
+**Job:** "Let customers pay instantly, merchants receive to wallet"
+
+**Architecture Decided:**
+```
+Phase 1: Manual Paybill/Till display (BUILD NOW)
+Phase 2: IntaSend WaaS integration (after partnership confirmed)
+Phase 3: Direct Daraja BYOC (for merchants with own Paybill)
+Phase 4: Jari as Aggregator (long-term, needs CBK PSP license)
+```
+
+**Key Insights from Discussion:**
+- WaaS = Each store gets virtual wallet
+- IntaSend handles STK Push via THEIR shortcode
+- Merchant just needs phone number for settlement (no Paybill needed!)
+- KYC likely tiered (light verification for lower limits)
+
+**IntaSend Questions to Clarify:**
+1. Wallet creation limits?
+2. KYC for receiving vs withdrawing?
+3. Settlement fees (M-Pesa vs Bank)?
+4. White-label options?
+5. Sandbox availability?
+
+**Draft Email:** Ready to send (see chat history)
+
+**Database Schema Planned:**
+- `store_wallets` - Link stores to IntaSend wallets
+- `wallet_transactions` - Track all money movement
 
 #### User Accounts & Authentication
-- **Job:** "Let customers track their orders/bookings"
-- **Scope:**
-  - Customer registration/login
-  - Order history
-  - Saved addresses
-  - Booking history
-- **Notes:** Currently stores are single-user (merchant only)
+**Job:** "Let customers track orders/bookings"
+- Customer registration/login
+- Order history, saved addresses
+- Currently stores are merchant-only
 
-### 🟡 MEDIUM PRIORITY (Planned)
+### 🟡 MEDIUM PRIORITY
 
 #### SMS/WhatsApp Reminders
-- **Job:** "Remind customers of upcoming bookings"
-- **Scope:**
-  - 5 hours, 2 hours, 30 min before
-  - Provider notification on new booking
-  - Africa's Talking or Twilio integration
-- **Notes:** Toggle in booking settings already exists
+- 5hr, 2hr, 30min before booking
+- Africa's Talking or Twilio
+- Toggle exists in booking settings
 
-#### Real Discount Code System
-- **Job:** "Let merchants create promotional codes"
-- **Scope:**
-  - Dashboard UI to create/manage codes
-  - Percentage or fixed amount discounts
-  - Expiry dates, usage limits
-  - API validation
-- **Notes:** Currently demo codes only (SAVE10, VIP20)
+#### Real Discount Codes
+- Dashboard UI to create codes
+- API validation (currently demo only)
 
 #### Multi-Select Categories
-- **Job:** "Let products appear in multiple filters"
-- **Scope:**
-  - Change `category` from string to array
-  - Update filter logic
-  - Dashboard UI for multi-select
-- **Notes:** Requested for services appearing in multiple categories
+- Products in multiple filters
+- Change category from string to array
 
-### 🟢 LOW PRIORITY (Nice to Have)
+### 🟢 LOW PRIORITY
 
-#### Dashboard Debouncing
-- **Job:** "Reduce input lag on settings pages"
-- **Scope:** Add debounce to input handlers
-- **Notes:** BookingsPage settings feel choppy
-
-#### Booking Confirmation Emails
-- **Job:** "Send professional email receipts"
-- **Scope:** SendGrid/Mailgun integration
-- **Notes:** WhatsApp fallback currently works
-
-#### Image CDN
-- **Job:** "Faster image loading"
-- **Scope:** Cloudinary or S3+CloudFront
-- **Notes:** Important for scaling to 1000+ users
-
-#### CSS Splitting
-- **Job:** "Load only needed CSS per template"
-- **Scope:** Extract template CSS from base.css
-- **Notes:** base.css still 3716 lines
+- Dashboard debouncing (reduce lag)
+- Booking confirmation emails
+- Image CDN (Cloudinary/S3)
+- CSS splitting per template
 
 ---
 
-## 7. FILE LOCATIONS
+## 7. KEY FILE LOCATIONS
 
-### Key Files
 | File | Purpose |
 |------|---------|
-| `store/src/render.js` | Template dispatcher (289 lines) |
+| `store/src/render.js` | Template dispatcher |
 | `store/src/templates/portfolioBooking.js` | PBK template |
-| `store/src/templates/portfolioBooking.css` | PBK styles |
 | `store/src/booking/` | Booking modal system |
 | `dashboard/src/pages/SettingsPage.jsx` | Store settings |
 | `dashboard/src/pages/BookingsPage.jsx` | Booking management |
-| `api/src/routes/bookings.js` | Booking API |
 | `api/src/routes/public.js` | Public store API |
 
 ---
@@ -200,30 +174,29 @@ git push origin main
 ## 8. RECENT COMMITS
 
 ```
-97285c7 CTA polish: centered hero CTAs, calendar+WhatsApp icons in PBK, section reorder
-06df7d9 Add Contact Phone field to Settings for hero WhatsApp/Call buttons
+27faabd docs: Update handover with shelved ideas
+97285c7 CTA polish: centered hero CTAs, calendar+WhatsApp icons
+06df7d9 Add Contact Phone field to Settings
 e949584 PBK: Light title font + larger share/like icons
-2dbafc9 Hero CTAs: WhatsApp + Call buttons with icons (uses store phone)
-f267d31 docs: Update handover v2.1 - JS isolation complete, render.js now 289 lines
-18c9468 Phase6c: Remove old Event Landing and helper functions from render.js
+2dbafc9 Hero CTAs: WhatsApp + Call buttons
+f267d31 docs: Update handover v2.1 - JS isolation complete
 ```
 
 ---
 
-## 9. ENVIRONMENT
+## 9. IMMEDIATE NEXT STEPS
 
-### Netlify (Dashboard & Store)
-```
-VITE_API_URL = https://jari-ecom-v2-production.up.railway.app
-```
+### M-Pesa Phase 1 (Manual Display) - BUILD NOW
+1. Add Paybill/Till fields to Dashboard Settings
+2. Save to store config
+3. Display on checkout page
+4. "I've Sent Payment" button
 
-### Railway (API)
-```
-DATABASE_URL = (auto-injected)
-PORT = 808
-```
+### Then Continue With:
+- Template debugging/polish
+- Any pending UI issues
 
 ---
 
 *Last Updated: January 19, 2026 (Evening)*
-*Next Focus: M-Pesa Integration Discussion*
+*Next Focus: M-Pesa Phase 1 + Template Polish*

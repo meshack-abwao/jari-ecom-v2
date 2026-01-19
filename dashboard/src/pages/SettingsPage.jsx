@@ -45,6 +45,7 @@ export default function SettingsPage() {
   // Collapsible sections
   const [expandedSections, setExpandedSections] = useState({
     basic: true,
+    payment: false,
     hero: false,
     testimonials: false,
     policies: false,
@@ -58,6 +59,12 @@ export default function SettingsPage() {
     slug: '',
     logoUrl: '',
     contactPhone: '',
+    // Payment (M-Pesa)
+    paymentType: '', // 'paybill', 'till', or ''
+    paybillNumber: '',
+    paybillAccountNumber: '',
+    tillNumber: '',
+    paymentBusinessName: '',
     // Hero
     heroTitle: '',
     heroSubtitle: '',
@@ -93,6 +100,12 @@ export default function SettingsPage() {
         slug: store?.slug || '',
         logoUrl: config.logo_url || config.logoUrl || '',
         contactPhone: config.contact_phone || config.contactPhone || '',
+        // Payment (M-Pesa)
+        paymentType: config.payment_type || config.paymentType || '',
+        paybillNumber: config.paybill_number || config.paybillNumber || '',
+        paybillAccountNumber: config.paybill_account_number || config.paybillAccountNumber || '',
+        tillNumber: config.till_number || config.tillNumber || '',
+        paymentBusinessName: config.payment_business_name || config.paymentBusinessName || '',
         // Hero
         heroTitle: config.hero_title || config.heroTitle || '',
         heroSubtitle: config.hero_subtitle || config.heroSubtitle || '',
@@ -156,6 +169,12 @@ export default function SettingsPage() {
         tagline: storeSettings.tagline,
         logo_url: storeSettings.logoUrl,
         contact_phone: storeSettings.contactPhone,
+        // Payment (M-Pesa)
+        payment_type: storeSettings.paymentType,
+        paybill_number: storeSettings.paybillNumber,
+        paybill_account_number: storeSettings.paybillAccountNumber,
+        till_number: storeSettings.tillNumber,
+        payment_business_name: storeSettings.paymentBusinessName,
         // Hero
         hero_title: storeSettings.heroTitle,
         hero_subtitle: storeSettings.heroSubtitle,
@@ -329,7 +348,115 @@ export default function SettingsPage() {
           )}
         </div>
 
-        {/* ========== HERO SECTION ========== */}
+        {/* ========== PAYMENT SETTINGS (M-Pesa) ========== */}
+        <div style={styles.card} className="glass-card">
+          <div style={styles.sectionHeader} onClick={() => toggleSection('payment')}>
+            <div style={styles.sectionTitle}>
+              <span style={{ fontSize: '20px' }}>💳</span>
+              <h3 style={styles.cardTitle}>Payment Settings (M-Pesa)</h3>
+            </div>
+            {expandedSections.payment ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+          </div>
+          
+          {expandedSections.payment && (
+            <div style={styles.sectionContent}>
+              <p style={{ ...styles.hint, marginBottom: '20px', padding: '12px', background: 'rgba(37, 211, 102, 0.1)', borderRadius: '8px', border: '1px solid rgba(37, 211, 102, 0.2)' }}>
+                📱 Your payment details will be shown to customers at checkout so they can pay via M-Pesa.
+              </p>
+
+              {/* Payment Type Selection */}
+              <div style={styles.formGroup}>
+                <label style={styles.label}>PAYMENT METHOD</label>
+                <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', padding: '12px 16px', border: storeSettings.paymentType === 'paybill' ? '2px solid var(--accent-color)' : '1px solid var(--border)', borderRadius: '8px', background: storeSettings.paymentType === 'paybill' ? 'rgba(139, 92, 246, 0.1)' : 'transparent' }}>
+                    <input
+                      type="radio"
+                      name="paymentType"
+                      value="paybill"
+                      checked={storeSettings.paymentType === 'paybill'}
+                      onChange={(e) => setStoreSettings({ ...storeSettings, paymentType: e.target.value })}
+                    />
+                    <span>Paybill</span>
+                  </label>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', padding: '12px 16px', border: storeSettings.paymentType === 'till' ? '2px solid var(--accent-color)' : '1px solid var(--border)', borderRadius: '8px', background: storeSettings.paymentType === 'till' ? 'rgba(139, 92, 246, 0.1)' : 'transparent' }}>
+                    <input
+                      type="radio"
+                      name="paymentType"
+                      value="till"
+                      checked={storeSettings.paymentType === 'till'}
+                      onChange={(e) => setStoreSettings({ ...storeSettings, paymentType: e.target.value })}
+                    />
+                    <span>Till Number (Buy Goods)</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Paybill Fields */}
+              {storeSettings.paymentType === 'paybill' && (
+                <>
+                  <div style={styles.formGroup}>
+                    <label style={styles.label}>PAYBILL NUMBER</label>
+                    <input
+                      type="text"
+                      value={storeSettings.paybillNumber}
+                      onChange={(e) => setStoreSettings({ ...storeSettings, paybillNumber: e.target.value })}
+                      placeholder="e.g., 522522"
+                      className="dashboard-input"
+                      maxLength={10}
+                    />
+                  </div>
+                  <div style={styles.formGroup}>
+                    <label style={styles.label}>ACCOUNT NUMBER <span style={styles.optional}>(Optional)</span></label>
+                    <input
+                      type="text"
+                      value={storeSettings.paybillAccountNumber}
+                      onChange={(e) => setStoreSettings({ ...storeSettings, paybillAccountNumber: e.target.value })}
+                      placeholder="e.g., Your Store Name or Order ID"
+                      className="dashboard-input"
+                    />
+                    <p style={styles.hint}>Leave empty to use customer's order/booking reference</p>
+                  </div>
+                </>
+              )}
+
+              {/* Till Number Fields */}
+              {storeSettings.paymentType === 'till' && (
+                <div style={styles.formGroup}>
+                  <label style={styles.label}>TILL NUMBER</label>
+                  <input
+                    type="text"
+                    value={storeSettings.tillNumber}
+                    onChange={(e) => setStoreSettings({ ...storeSettings, tillNumber: e.target.value })}
+                    placeholder="e.g., 1234567"
+                    className="dashboard-input"
+                    maxLength={10}
+                  />
+                </div>
+              )}
+
+              {/* Business Name (for both) */}
+              {storeSettings.paymentType && (
+                <div style={styles.formGroup}>
+                  <label style={styles.label}>BUSINESS NAME <span style={styles.optional}>(Shown to customer)</span></label>
+                  <input
+                    type="text"
+                    value={storeSettings.paymentBusinessName}
+                    onChange={(e) => setStoreSettings({ ...storeSettings, paymentBusinessName: e.target.value })}
+                    placeholder="e.g., Nimoration Photography"
+                    className="dashboard-input"
+                  />
+                  <p style={styles.hint}>Helps customers confirm they're paying the right business</p>
+                </div>
+              )}
+
+              {!storeSettings.paymentType && (
+                <p style={{ ...styles.hint, textAlign: 'center', padding: '20px', color: 'var(--text-secondary)' }}>
+                  Select a payment method above to configure M-Pesa details
+                </p>
+              )}
+            </div>
+          )}
+        </div>
         <div style={styles.card} className="glass-card">
           <div style={styles.sectionHeader} onClick={() => toggleSection('hero')}>
             <div style={styles.sectionTitle}>
