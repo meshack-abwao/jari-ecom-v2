@@ -1,5 +1,6 @@
 @echo off
 cd /d C:\Users\ADMIN\Desktop\jari-ecom-v2
 git add -A
-git commit -m "Phase6c: Remove old Event Landing and helper functions from render.js - 239 lines removed, now 289 lines total"
+git commit -m "docs: Update handover v2.1 - JS isolation complete, render.js now 289 lines"
+git push origin main
 git log --oneline -5

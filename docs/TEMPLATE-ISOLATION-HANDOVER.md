@@ -1,5 +1,5 @@
 # JARI.ECOM V2 - Template Isolation Project
-## Comprehensive Handover Document v2.0
+## Comprehensive Handover Document v2.1
 ### Last Updated: January 19, 2026
 
 ---
@@ -22,34 +22,36 @@ Surgically separate the monolithic storefront code into isolated, independent te
 | Phase 4 | Create Quick Decision module | `5baeedc` | ✅ Done |
 | Phase 5a | Remove old renderQuickDecision | `f157e41` | ✅ Done |
 | Phase 5b | Remove dead VM+DD code | `83ca6ca` | ✅ Done |
+| Phase 6a | Create Event Landing module | `b02c38b` | ✅ Done |
+| Phase 6b | Wire Event Landing to dispatcher | `b3caec8` | ✅ Done |
+| Phase 6c | Remove old Event Landing code | `18c9468` | ✅ Done |
 
-### Results After Phase 5:
-- `render.js`: 926 → **527 lines** (-43%)
-- Templates isolated: 1 → **4** (QD, DD, VM, PBK)
-- Shared modules created: **6** (utils, media, policy, testimonials, quantity, index)
+### 🎉 JS ISOLATION COMPLETE!
+- `render.js`: 926 → **289 lines** (-69%)
+- Templates isolated: 1 → **5** (QD, DD, VM, EL, PBK)
+- Shared modules: **6** (utils, media, policy, testimonials, quantity, index)
 
 ---
 
-## 📊 CURRENT STATE (Post Phase 5)
+## 📊 CURRENT STATE (Post Phase 6 - JS Complete)
 
 ### File Sizes
 | File | Lines | Size | Status |
 |------|-------|------|--------|
-| `store/src/render.js` | 527 lines | 21KB | ⚠️ Still has Event Landing |
-| `store/src/styles/base.css` | 3,716 lines | 84KB | ❌ Not yet split |
+| `store/src/render.js` | **289 lines** | 12KB | ✅ JS Isolation Complete |
+| `store/src/styles/base.css` | 3,716 lines | 84KB | ❌ CSS not yet split |
 
 ### Current Architecture
 ```
 store/src/
-├── render.js              # DISPATCHER + Event Landing + Shared (~527 lines)
-│   ├── renderHeader()           # Shared - KEEP
-│   ├── renderFooter()           # Shared - KEEP
-│   ├── renderProductCard()      # Shared - KEEP
-│   ├── renderSingleProduct()    # Dispatcher - KEEP
-│   ├── renderEventLanding()     # ⚠️ NOT YET ISOLATED
-│   └── Helper functions         # Used by Event Landing
+├── render.js              # SLIM DISPATCHER (~289 lines) ✅
+│   ├── renderHeader()           # Shared
+│   ├── renderFooter()           # Shared
+│   ├── renderProductCard()      # Shared (collection)
+│   ├── renderSingleProduct()    # Dispatcher
+│   └── renderError()            # Error display
 │
-├── shared/                # ✅ NEW - Extracted utilities
+├── shared/                # ✅ Extracted utilities
 │   ├── index.js
 │   ├── utils.js
 │   ├── media-components.js
@@ -74,13 +76,18 @@ store/src/
 │   │   ├── vm-render.js
 │   │   └── vm-handlers.js
 │   │
+│   ├── event-landing/     # ✅ ISOLATED (NEW)
+│   │   ├── index.js
+│   │   ├── el-render.js
+│   │   └── el-handlers.js
+│   │
 │   └── portfolio-booking/ # ✅ WAS ALREADY ISOLATED
 │       ├── portfolioBooking.js
 │       ├── portfolioBooking.css
 │       └── portfolioBookingHandlers.js
 │
 ├── styles/
-│   └── base.css           # ❌ MONOLITH - 3716 lines (not yet split)
+│   └── base.css           # ❌ MONOLITH - 3716 lines (CSS extraction pending)
 │
 └── booking/               # ✅ ALREADY ISOLATED
 ```
@@ -89,11 +96,7 @@ store/src/
 
 ## 🔴 REMAINING WORK
 
-### Phase 6: Isolate Event Landing (JS)
-**Goal:** Move `renderEventLanding()` and its helpers to `templates/event-landing/`
-**Impact:** render.js reduced to ~200 lines (target achieved)
-
-### Phase 7-9: CSS Extraction
+### Phase 7-9: CSS Extraction (OPTIONAL - Lower Priority)
 **Goal:** Split base.css (3716 lines) into template-specific files
 
 | Phase | Task | Lines to Extract |
@@ -104,7 +107,13 @@ store/src/
 
 **Target:** base.css reduced to ~800 lines (shared only)
 
-### Phase 10: CSS Prefix Audit
+**Note:** CSS extraction is OPTIONAL. The JS isolation is complete and working.
+The CSS is already prefixed and working correctly. CSS extraction provides:
+- Slightly faster load times (load only needed CSS)
+- Easier CSS maintenance
+- But also adds complexity (dynamic CSS loading)
+
+### Phase 10: CSS Prefix Audit (OPTIONAL)
 Ensure all templates use proper prefixes to prevent conflicts.
 
 ---
