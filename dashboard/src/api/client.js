@@ -155,7 +155,6 @@ export const uploadAPI = {
     formData.append('timestamp', timestamp);
     formData.append('signature', signature);
     formData.append('folder', uploadFolder);
-    formData.append('transformation', 'q_auto,f_auto');
     
     // 3. Upload directly to Cloudinary
     const xhr = new XMLHttpRequest();

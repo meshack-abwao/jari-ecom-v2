@@ -37,8 +37,6 @@ router.post('/signature', auth, async (req, res, next) => {
     const paramsToSign = {
       timestamp,
       folder: uploadFolder,
-      // Auto-optimize images
-      transformation: 'q_auto,f_auto',
     };
     
     // Add public_id if provided (for replacing existing images)
