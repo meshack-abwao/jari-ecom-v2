@@ -1909,7 +1909,7 @@ body {
 .stories-row {
     display: flex;
     justify-content: center;
-    gap: var(--space-lg);
+    gap: clamp(var(--space-lg), 4vw, var(--space-2xl));
     overflow-x: auto;
     padding-bottom: var(--space-sm);
     -webkit-overflow-scrolling: touch;
