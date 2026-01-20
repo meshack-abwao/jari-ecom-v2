@@ -899,27 +899,38 @@
 .pbk-package {
   position: relative;
   background: var(--surface);
-  width: 280px;  /* Narrower than before */
-  min-height: 360px;  /* Taller - portrait orientation */
-  border-radius: var(--radius-xl);
-  border: 1px solid var(--border);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  width: 300px;
+  min-height: 280px;
+  /* Beautiful Apple-style rounded corners */
+  border-radius: 28px;
+  border: none;
+  /* Soft, diffused shadow like macOS/iOS */
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.04),
+    0 8px 24px rgba(0, 0, 0, 0.06),
+    0 20px 40px rgba(0, 0, 0, 0.04);
   display: flex;
   flex-direction: column;
-  overflow: visible;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+              box-shadow 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   cursor: pointer;
 }
 
-/* Hover: Lift effect */
+/* Hover: Gentle lift with enhanced shadow */
 .pbk-package:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+  transform: translateY(-6px);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.06),
+    0 16px 32px rgba(0, 0, 0, 0.1),
+    0 32px 64px rgba(0, 0, 0, 0.06);
 }
 
 .pbk-package-featured {
-  border-color: var(--color-primary);
-  box-shadow: 0 8px 24px color-mix(in srgb, var(--color-primary) 15%, transparent);
+  box-shadow: 
+    0 2px 8px color-mix(in srgb, var(--color-primary) 10%, transparent),
+    0 12px 32px color-mix(in srgb, var(--color-primary) 15%, transparent),
+    0 24px 48px rgba(0, 0, 0, 0.05);
 }
 
 /* Package image - Golden ratio aspect, optional */
@@ -943,10 +954,10 @@
   transform: scale(1.03);
 }
 
-/* Package content - Theme-aware spacing */
+/* Package content - Generous Apple-style padding */
 .pbk-package-content {
-  padding: var(--space-xl);
-  padding-bottom: calc(var(--space-xl) + 56px); /* Space for absolute CTA */
+  padding: 28px 24px;
+  padding-bottom: 88px; /* Space for absolute CTA */
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -954,48 +965,48 @@
   z-index: 1;
 }
 
-/* Header row - Name + Badge inline */
-.pbk-package-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--space-sm);
-}
-
-/* Badge - Inline with name, uses theme color */
-.pbk-package-badge {
-  background: color-mix(in srgb, var(--color-primary) 12%, transparent);
-  color: var(--color-primary);
-  padding: var(--space-xs) var(--space-md);
-  border-radius: var(--radius-full);
-  font-size: var(--fs-tiny);
-  font-weight: 600;
-  flex-shrink: 0;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-/* Package name - Uses theme text color */
+/* Package name - Clean, bold */
 .pbk-package-name {
   font-size: var(--fs-heading);
   font-weight: 600;
   color: var(--text-primary);
   letter-spacing: -0.02em;
-  margin: 0;
+  margin: 0 0 var(--space-xl) 0;
   line-height: 1.2;
 }
 
-/* Price - Uses theme primary color */
+/* Price row - Price + Duration badge inline */
+.pbk-package-price-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+/* Price - Large, prominent */
 .pbk-package-price {
   font-size: var(--fs-heading-xl);
   font-weight: 700;
-  color: var(--color-primary);
+  color: var(--text-primary);
   letter-spacing: -0.03em;
-  margin-bottom: var(--space-md);
   line-height: 1;
+  margin: 0;
 }
 
-/* Description - Uses theme secondary text */
+/* Duration badge - Soft pill next to price */
+.pbk-package-duration {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+  color: var(--color-primary);
+  border-radius: 100px;
+  font-size: var(--fs-small);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* Description - Subtle gray */
 .pbk-package-desc {
   font-size: var(--fs-body-sm);
   line-height: 1.6;
@@ -1004,29 +1015,30 @@
   font-weight: 400;
 }
 
-/* CTA - Full width, theme-aware */
+/* CTA - Beautiful rounded pill button */
 .pbk-package-btn {
   position: absolute;
-  bottom: var(--space-xl);
-  left: var(--space-xl);
-  right: var(--space-xl);
+  bottom: 24px;
+  left: 24px;
+  right: 24px;
   width: auto;
-  transform: none;
-  max-width: none;
-  padding: var(--space-md) 0;
+  padding: 14px 24px;
   background: var(--color-primary);
   color: #fff;
   border: none;
-  border-radius: var(--radius-full);
+  /* Nice rounded pill shape */
+  border-radius: 100px;
   font-size: var(--fs-body);
   font-weight: 600;
   cursor: pointer;
   text-align: center;
-  transition: background 0.2s ease, transform 0.1s ease;
+  /* Smooth Apple-style transition */
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .pbk-package-btn:hover {
   background: color-mix(in srgb, var(--color-primary) 85%, #000);
+  transform: scale(1.02);
 }
 
 .pbk-package-btn:active {

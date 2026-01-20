@@ -282,11 +282,11 @@ function renderPbkPackages(packages) {
               </div>
             ` : ''}
             <div class="pbk-package-content">
-              <div class="pbk-package-header">
-                <h2 class="pbk-package-name">${pkg.name}</h2>
-                ${pkg.duration ? `<span class="pbk-package-badge">${pkg.duration}</span>` : ''}
+              <h2 class="pbk-package-name">${pkg.name}</h2>
+              <div class="pbk-package-price-row">
+                <div class="pbk-package-price">KES ${parseInt(pkg.price || 0).toLocaleString()}</div>
+                ${pkg.duration ? `<span class="pbk-package-duration">${pkg.duration}</span>` : ''}
               </div>
-              <div class="pbk-package-price">KES ${parseInt(pkg.price || 0).toLocaleString()}</div>
               ${pkg.description ? `<p class="pbk-package-desc">${pkg.description}</p>` : ''}
               <button class="pbk-package-btn" data-pkg-index="${i}" data-pkg-name="${pkg.name}" data-pkg-price="${pkg.price}">
                 Select Package
