@@ -122,6 +122,28 @@ ALTER TABLE bookings ADD COLUMN IF NOT EXISTS payment_type VARCHAR(20) DEFAULT '
 await runSafe('payment_type_col', `ALTER TABLE bookings ADD COLUMN IF NOT EXISTS payment_type VARCHAR(20) DEFAULT 'full'`);
 ```
 
+### Formula 9: API Must Use Defaults When No DB Records Exist
+```javascript
+// ❌ PROBLEM: Availability endpoint returns "Closed" when no working_hours in DB
+// New stores have no working_hours records yet!
+
+// ✅ FIX: Fall back to DEFAULT_WORKING_HOURS when no DB records
+let workingHours = hoursResult.rows[0];
+if (!workingHours) {
+  workingHours = DEFAULT_WORKING_HOURS.find(h => h.day_of_week === dayOfWeek);
+}
+```
+
+### Formula 10: PostgreSQL TIME Format Comparison
+```javascript
+// ❌ PROBLEM: PostgreSQL TIME returns 'HH:MM:SS' but we compare with 'HH:MM'
+// b.booking_time === '09:00' fails when DB has '09:00:00'
+
+// ✅ FIX: Normalize to HH:MM before comparing
+const bookingTime = String(b.booking_time).substring(0, 5); // Get HH:MM
+return bookingTime === timeStr;
+```
+
 ---
 
 ## 3. TEMPLATE SYSTEM
