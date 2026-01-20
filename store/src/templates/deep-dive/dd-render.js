@@ -41,7 +41,7 @@ export function renderDeepDive(product) {
       
       <!-- STEP 2: LOCATE - Hero Gallery with Dock-style thumbnails -->
       <div class="deep-dive-hero">
-        ${renderGallery(media.images || [])}
+        ${renderGallery(media.images || [], { useDots: true })}
       </div>
       
       <!-- STEP 3: PREPARE - Price Row (Inline KES + Share/Like) -->

@@ -364,14 +364,21 @@ function initGalleryHandlers(product) {
   const mainImage = document.getElementById('mainImage');
   const galleryIndex = document.getElementById('galleryIndex');
   const thumbnails = document.querySelectorAll('.thumbnail');
+  const dots = document.querySelectorAll('.gallery-dot');
   
   function setImage(index) {
     currentImageIndex = index;
     if (mainImage) mainImage.src = images[index];
     if (galleryIndex) galleryIndex.textContent = index + 1;
     
+    // Update thumbnails
     thumbnails.forEach((thumb, i) => {
       thumb.classList.toggle('active', i === index);
+    });
+    
+    // Update dots if present
+    dots.forEach((dot, i) => {
+      dot.classList.toggle('active', i === index);
     });
   }
   
@@ -390,6 +397,14 @@ function initGalleryHandlers(product) {
   thumbnails.forEach(thumb => {
     thumb.addEventListener('click', () => {
       const index = parseInt(thumb.dataset.index);
+      setImage(index);
+    });
+  });
+  
+  // Dot clicks
+  dots.forEach(dot => {
+    dot.addEventListener('click', () => {
+      const index = parseInt(dot.dataset.index);
       setImage(index);
     });
   });

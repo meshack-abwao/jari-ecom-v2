@@ -7,9 +7,12 @@
 /**
  * Render product image gallery with thumbnails
  * @param {string[]} images - Array of image URLs
+ * @param {object} options - Gallery options { useDots: boolean }
  * @returns {string} HTML string
  */
-export function renderGallery(images) {
+export function renderGallery(images, options = {}) {
+  const { useDots = false } = options;
+  
   if (!images || images.length === 0) {
     return `
       <div class="product-gallery">
@@ -22,14 +25,27 @@ export function renderGallery(images) {
   
   const showNav = images.length > 1;
   
+  // Generate dots HTML
+  const dotsHTML = useDots && showNav ? `
+    <div class="gallery-dots">
+      ${images.map((_, i) => `<span class="gallery-dot ${i === 0 ? 'active' : ''}" data-index="${i}"></span>`).join('')}
+    </div>
+  ` : '';
+  
+  // Counter HTML (hidden if useDots)
+  const counterHTML = !useDots && showNav ? `
+    <div class="gallery-counter"><span id="galleryIndex">1</span> / ${images.length}</div>
+  ` : '';
+  
   return `
-    <div class="product-gallery">
+    <div class="product-gallery" ${useDots ? 'data-use-dots="true"' : ''}>
       <div class="main-image-container">
         <img src="${images[0]}" alt="Product" class="main-image" id="mainImage">
         ${showNav ? `
           <button class="gallery-nav prev" id="galleryPrev">‹</button>
           <button class="gallery-nav next" id="galleryNext">›</button>
-          <div class="gallery-counter"><span id="galleryIndex">1</span> / ${images.length}</div>
+          ${counterHTML}
+          ${dotsHTML}
         ` : ''}
       </div>
       ${showNav ? `
