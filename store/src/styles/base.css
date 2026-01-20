@@ -2560,11 +2560,11 @@ body {
 }
 
 .showcase-title {
-    font-size: var(--fs-heading-xl);
+    font-size: var(--fs-heading);
     font-weight: 600;
     letter-spacing: -0.02em;
     color: var(--text-primary);
-    margin-bottom: var(--space-2xl);
+    margin-bottom: var(--space-xl);
     text-align: center;
 }
 
