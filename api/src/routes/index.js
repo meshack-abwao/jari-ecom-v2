@@ -5,6 +5,7 @@ import ordersRoutes from './orders.js';
 import publicRoutes from './public.js';
 import pixelRoutes from './pixel.js';
 import bookingsRoutes from './bookings.js';
+import uploadRoutes from './upload.js';
 
 export function setupRoutes(app) {
   // Health check
@@ -22,6 +23,7 @@ export function setupRoutes(app) {
   app.use('/api/products', productsRoutes);
   app.use('/api/orders', ordersRoutes);
   app.use('/api/bookings', bookingsRoutes);
+  app.use('/api/upload', uploadRoutes);
   
   // Public store routes (no /api prefix for cleaner URLs)
   app.use('/s', publicRoutes);

@@ -130,6 +130,68 @@ export const bookingsAPI = {
 };
 
 // ===========================================
+// UPLOAD/CLOUDINARY API
+// ===========================================
+export const uploadAPI = {
+  // Get signature for client-side upload
+  getSignature: (folder = 'products') => api.post('/upload/signature', { folder }),
+  
+  // Delete image from Cloudinary
+  deleteImage: (publicId) => api.delete(`/upload/${encodeURIComponent(publicId)}`),
+  
+  // Get upload stats
+  getStats: () => api.get('/upload/stats'),
+  
+  // Helper: Upload file to Cloudinary using signature
+  uploadToCloudinary: async (file, folder = 'products', onProgress) => {
+    // 1. Get signature from our API
+    const sigResponse = await api.post('/upload/signature', { folder });
+    const { signature, timestamp, folder: uploadFolder, cloudName, apiKey } = sigResponse.data;
+    
+    // 2. Build FormData for Cloudinary
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('api_key', apiKey);
+    formData.append('timestamp', timestamp);
+    formData.append('signature', signature);
+    formData.append('folder', uploadFolder);
+    formData.append('transformation', 'q_auto,f_auto');
+    
+    // 3. Upload directly to Cloudinary
+    const xhr = new XMLHttpRequest();
+    
+    return new Promise((resolve, reject) => {
+      xhr.upload.addEventListener('progress', (e) => {
+        if (e.lengthComputable && onProgress) {
+          onProgress(Math.round((e.loaded / e.total) * 100));
+        }
+      });
+      
+      xhr.addEventListener('load', () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          const result = JSON.parse(xhr.responseText);
+          resolve({
+            url: result.secure_url,
+            publicId: result.public_id,
+            width: result.width,
+            height: result.height,
+            format: result.format,
+            bytes: result.bytes
+          });
+        } else {
+          reject(new Error(`Upload failed: ${xhr.status}`));
+        }
+      });
+      
+      xhr.addEventListener('error', () => reject(new Error('Upload failed')));
+      
+      xhr.open('POST', `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`);
+      xhr.send(formData);
+    });
+  }
+};
+
+// ===========================================
 // LEGACY API (for backwards compatibility)
 // ===========================================
 export const legacyApi = {
