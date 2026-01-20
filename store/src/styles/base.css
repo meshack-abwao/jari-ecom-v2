@@ -2732,7 +2732,7 @@ body {
 }
 
 .specs-card .specs-title {
-    font-size: var(--fs-body-lg);
+    font-size: var(--fs-body);
     font-weight: 600;
     color: var(--text-primary);
     margin-bottom: var(--space-md);
@@ -2764,12 +2764,12 @@ body {
 }
 
 .spec-row .spec-label {
-    font-size: var(--fs-small);
+    font-size: var(--fs-body);
     color: var(--text-secondary);
 }
 
 .spec-row .spec-value {
-    font-size: var(--fs-small);
+    font-size: var(--fs-body);
     font-weight: 600;
     color: var(--text-primary);
     text-align: right;
