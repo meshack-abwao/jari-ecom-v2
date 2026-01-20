@@ -2368,11 +2368,11 @@ body {
     stroke: #ff375f;
 }
 
-/* Product Meta - Rating & Stock */
-/* Stories Section - Centered */
+/* ===== Stories Section - Centered ===== */
 .deep-dive-stories {
-    margin-top: 24px;
-    padding: 0 4px;
+    margin-top: var(--space-2xl);
+    padding-top: var(--space-2xl);
+    border-top: 1px solid var(--border);
 }
 
 .deep-dive-stories .stories-container {
@@ -2383,59 +2383,80 @@ body {
     text-align: center;
 }
 
-/* Showcase Masonry Gallery */
+/* ===== Showcase Masonry Gallery - Apple Style ===== */
 .deep-dive-showcase {
-    margin-top: 32px;
-    padding: 0 4px;
+    margin-top: var(--space-3xl);
+    padding-top: var(--space-2xl);
+    border-top: 1px solid var(--border);
 }
 
 .showcase-title {
-    font-size: 32px;
-    font-weight: 700;
-    letter-spacing: -0.03em;
+    font-size: var(--fs-heading-xl);
+    font-weight: 600;
+    letter-spacing: -0.02em;
     color: var(--text-primary);
-    margin-bottom: 20px;
+    margin-bottom: var(--space-2xl);
     text-align: center;
 }
 
 .showcase-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+    gap: var(--space-md);
 }
 
 .showcase-item {
     position: relative;
-    border-radius: 16px;
+    border-radius: 20px;
     overflow: hidden;
-    background: #f5f5f7;
+    background: var(--bg-gray);
     aspect-ratio: 1;
     cursor: pointer;
-    overflow: hidden;
+    box-shadow: 
+        0 2px 8px rgba(0, 0, 0, 0.06),
+        0 8px 24px rgba(0, 0, 0, 0.08);
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .showcase-item:hover {
-    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.1),
+        0 16px 40px rgba(0, 0, 0, 0.15);
 }
 
-/* Image zoom on hover, not card */
 .showcase-item img,
 .showcase-item video {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
-    transition: transform 0.4s ease;
+    transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .showcase-item:hover img,
 .showcase-item:hover video {
-    transform: scale(1.05);
+    transform: scale(1.08);
 }
 
 .showcase-item.showcase-large {
     grid-column: span 2;
     aspect-ratio: 16/9;
+    border-radius: 24px;
+}
+
+@media (min-width: 768px) {
+    .showcase-grid {
+        gap: var(--space-lg);
+    }
+    
+    .showcase-item {
+        border-radius: 24px;
+    }
+    
+    .showcase-item.showcase-large {
+        border-radius: 28px;
+    }
 }
 
 .showcase-item img,
