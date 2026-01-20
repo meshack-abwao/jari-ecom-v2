@@ -8,7 +8,7 @@ import { getInitials } from './utils.js';
 
 /**
  * Render testimonials section (product-level)
- * Horizontal scrolling cards
+ * Unified card style - title INSIDE card
  * @param {object[]} testimonials - Array of testimonial objects
  * @returns {string} HTML string
  */
@@ -20,12 +20,11 @@ export function renderTestimonials(testimonials) {
   
   return `
     <div class="testimonials-section">
-      <div class="testimonials-header">
-        <h4>Testimonials</h4>
-        <p class="section-title">What Our Customers Say</p>
-      </div>
-      <div class="testimonials-scroll">
-        ${filtered.map(t => renderTestimonialCard(t)).join('')}
+      <div class="testimonials-card">
+        <h3 class="testimonials-title">What Customers Say</h3>
+        <div class="testimonials-scroll">
+          ${filtered.map(t => renderTestimonialCard(t)).join('')}
+        </div>
       </div>
     </div>
   `;
