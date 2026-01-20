@@ -505,10 +505,12 @@ router.get('/public/:storeSlug/availability', async (req, res, next) => {
       const mins = currentMinutes % 60;
       const timeStr = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
       
-      // Count bookings at this slot
-      const bookingsAtSlot = bookingsResult.rows.filter(b => 
-        b.booking_time === timeStr || b.booking_time === `${timeStr}:00`
-      ).length;
+      // Count bookings at this slot - normalize time format for comparison
+      // PostgreSQL TIME can return HH:MM:SS format
+      const bookingsAtSlot = bookingsResult.rows.filter(b => {
+        const bookingTime = String(b.booking_time).substring(0, 5); // Get HH:MM
+        return bookingTime === timeStr;
+      }).length;
       
       if (bookingsAtSlot < maxPerSlot) {
         slots.push({
