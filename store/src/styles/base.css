@@ -2714,8 +2714,9 @@ body {
 
 /* ===== Specifications - Unified Card Style (matches PBK) ===== */
 .deep-dive-specs {
-    margin-top: var(--space-3xl);
+    margin-top: var(--space-2xl);
     margin-bottom: var(--space-2xl);
+    padding-top: var(--space-lg);
 }
 
 /* Specs card container with title inside */
