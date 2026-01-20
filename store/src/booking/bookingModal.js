@@ -212,8 +212,19 @@ export function renderTimeSlots() {
   if (dayFullyBooked && settings.jump_line_enabled) {
     return `
       <div class="bkm-fully-booked">
-        <p class="bkm-fully-booked-msg">⚡ This day is fully booked</p>
-        <p class="bkm-jump-hint">Enable "Jump the Line" at checkout for priority booking</p>
+        <div class="bkm-fully-booked-icon">📅</div>
+        <h4 class="bkm-fully-booked-title">This Day is Fully Booked</h4>
+        <p class="bkm-fully-booked-hint">Select another date, or enable <strong>Jump the Line</strong> at checkout for priority booking.</p>
+      </div>
+    `;
+  }
+  
+  if (dayFullyBooked) {
+    return `
+      <div class="bkm-fully-booked">
+        <div class="bkm-fully-booked-icon">📅</div>
+        <h4 class="bkm-fully-booked-title">This Day is Fully Booked</h4>
+        <p class="bkm-fully-booked-hint">Please select another date.</p>
       </div>
     `;
   }

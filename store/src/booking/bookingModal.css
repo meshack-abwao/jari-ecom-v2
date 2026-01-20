@@ -762,23 +762,34 @@
 /* Fully Booked Day Message */
 .bkm-fully-booked {
   text-align: center;
-  padding: 24px 16px;
-  background: linear-gradient(135deg, #fef3c7, #fde68a);
-  border-radius: 12px;
-  border: 1px solid #f59e0b;
+  padding: 32px 24px;
+  background: #f8fafc;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
 }
 
-.bkm-fully-booked-msg {
-  font-size: 15px;
+.bkm-fully-booked-icon {
+  font-size: 40px;
+  margin-bottom: 12px;
+  opacity: 0.8;
+}
+
+.bkm-fully-booked-title {
+  font-size: 16px;
   font-weight: 600;
-  color: #92400e;
+  color: #1e293b;
   margin: 0 0 8px;
 }
 
-.bkm-jump-hint {
-  font-size: 13px;
-  color: #b45309;
+.bkm-fully-booked-hint {
+  font-size: 14px;
+  color: #64748b;
   margin: 0;
+  line-height: 1.5;
+}
+
+.bkm-fully-booked-hint strong {
+  color: #f59e0b;
 }
 
 /* Time Slot Improvements */
