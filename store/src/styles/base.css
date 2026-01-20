@@ -2465,9 +2465,10 @@ body {
     max-width: 60ch;
 }
 
-/* ===== Stories Section - Inline flow (no wrapper needed) ===== */
+/* ===== Stories Section - Inline flow with breathing room ===== */
 .template-deep-dive .stories-section {
     margin-top: var(--space-2xl);
+    margin-bottom: var(--space-3xl);
     padding: 0;
     background: transparent;
 }
@@ -2476,7 +2477,7 @@ body {
     justify-content: center;
 }
 
-.template-deep-dive .story-title {
+.template-deep-dive .stories-title {
     text-align: center;
 }
 

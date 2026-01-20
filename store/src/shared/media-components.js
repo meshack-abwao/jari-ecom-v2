@@ -60,25 +60,29 @@ export function renderGallery(images, options = {}) {
 }
 
 /**
- * Render stories section (Instagram-style circles with optional titles)
- * @param {object[]} stories - Array of story objects { url, type, title }
+ * Render stories section (Instagram-style circles with optional captions)
+ * @param {object[]} stories - Array of story objects { url, type, caption }
  * @param {string} sectionTitle - Section title
  * @returns {string} HTML string
  */
 export function renderStories(stories, sectionTitle = 'See it in Action') {
   if (!stories || stories.length === 0) return '';
   
+  // Filter only stories with valid URLs
+  const validStories = stories.filter(s => s.url?.trim());
+  if (validStories.length === 0) return '';
+  
   return `
     <div class="stories-section">
       <h3 class="stories-title">${sectionTitle}</h3>
       <div class="stories-row">
-        ${stories.map((story, i) => `
+        ${validStories.map((story, i) => `
           <div class="story-item" data-story-index="${i}">
             <div class="story-bubble">
               <img src="${story.url}" alt="Story ${i + 1}">
               ${story.type === 'video' ? '<span class="story-play">▶</span>' : ''}
             </div>
-            ${story.title ? `<span class="story-label">${story.title}</span>` : ''}
+            ${story.caption ? `<span class="story-label">${story.caption}</span>` : ''}
           </div>
         `).join('')}
       </div>
