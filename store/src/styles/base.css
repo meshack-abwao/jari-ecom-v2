@@ -2253,49 +2253,8 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: var(--space-lg);
-}
-
-.deep-dive-header .meta-left {
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-}
-
-/* Social buttons - Apple-style soft shadows */
-.deep-dive-header .social-actions {
-    display: flex;
-    gap: var(--space-sm);
-    flex-shrink: 0;
-}
-
-.deep-dive-header .social-btn {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: var(--surface);
-    border: none;
-    box-shadow: 
-        0 2px 8px rgba(0, 0, 0, 0.06),
-        0 4px 16px rgba(0, 0, 0, 0.04);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    color: var(--text-secondary);
-    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-.deep-dive-header .social-btn:hover {
-    transform: scale(1.1);
-    box-shadow: 
-        0 4px 12px rgba(0, 0, 0, 0.1),
-        0 8px 24px rgba(0, 0, 0, 0.08);
-    color: var(--text-primary);
-}
-
-.deep-dive-header .social-btn:active {
-    transform: scale(0.95);
+    gap: var(--space-md);
+    flex-wrap: wrap;
 }
 
 .deep-dive-header .rating-stars {
@@ -2305,14 +2264,14 @@ body {
 }
 
 .deep-dive-header .rating-count {
-    font-size: 14px;
+    font-size: var(--fs-small);
     font-weight: 600;
-    color: #1d1d1f;
-    margin-left: 6px;
+    color: var(--text-primary);
+    margin-left: var(--space-xs);
 }
 
 .deep-dive-header .meta-dot {
-    color: #d2d2d7;
+    color: var(--text-muted);
     font-size: 8px;
 }
 
