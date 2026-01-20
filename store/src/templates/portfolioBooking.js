@@ -129,15 +129,17 @@ function renderPbkStars(rating) {
 }
 
 // Helper: Intelligent text split for captions (like Deep Dive lightbox)
+// Stacks light word(s) on top, bold word below (screenshot 2 style)
 function splitCaptionText(caption) {
   if (!caption) return '';
   const words = caption.split(' ');
   if (words.length > 1) {
     const lastWord = words.pop();
     const firstPart = words.join(' ');
-    return `<span class="caption-light">${firstPart}</span> <span class="caption-bold">${lastWord}</span>`;
+    // Stacked: light on top, bold below (no space between, CSS handles layout)
+    return `<span class="caption-light">${firstPart}</span><span class="caption-bold">${lastWord}</span>`;
   }
-  return caption;
+  return `<span class="caption-bold">${caption}</span>`;
 }
 
 function renderPbkHero(media) {
