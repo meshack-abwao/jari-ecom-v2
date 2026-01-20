@@ -597,6 +597,7 @@ body {
     transition: opacity 0.3s;
 }
 
+/* Gallery Navigation - Apple-style, hidden on mobile */
 .gallery-nav {
     position: absolute;
     top: 50%;
@@ -604,35 +605,57 @@ body {
     width: 44px;
     height: 44px;
     border: none;
-    background: rgba(255,255,255,0.9);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border-radius: 50%;
-    font-size: 20px;
+    font-size: var(--fs-body-lg);
+    color: var(--text-primary);
     cursor: pointer;
-    transition: all 0.3s;
-    display: flex;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    display: none; /* Hidden on mobile */
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    box-shadow: 
+        0 2px 8px rgba(0, 0, 0, 0.1),
+        0 8px 24px rgba(0, 0, 0, 0.1);
     z-index: 10;
 }
 
-.gallery-nav:hover {
-    background: white;
-    transform: translateY(-50%) scale(1.1);
+/* Show nav arrows on tablet+ */
+@media (min-width: 768px) {
+    .gallery-nav {
+        display: flex;
+    }
 }
 
-.gallery-nav.prev { left: 12px; }
-.gallery-nav.next { right: 12px; }
+.gallery-nav:hover {
+    background: #fff;
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.15),
+        0 12px 32px rgba(0, 0, 0, 0.12);
+}
 
+.gallery-nav:active {
+    transform: translateY(-50%) scale(0.95);
+}
+
+.gallery-nav.prev { left: 16px; }
+.gallery-nav.next { right: 16px; }
+
+/* Gallery dots - Glassmorphic pill like PBK */
 .gallery-counter {
     position: absolute;
-    bottom: 12px;
+    bottom: var(--space-lg);
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(0,0,0,0.6);
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     color: white;
-    padding: 6px 14px;
-    border-radius: 20px;
+    padding: 8px 14px;
+    border-radius: 100px;
     font-size: var(--fs-small);
     font-weight: 600;
 }
