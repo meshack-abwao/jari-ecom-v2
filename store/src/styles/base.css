@@ -2329,7 +2329,7 @@ body {
 
 /* ===== Product Info - Price & Description ===== */
 .deep-dive-info {
-    padding: 28px 4px 20px;
+    padding: var(--space-2xl) 0 var(--space-xl);
 }
 
 .deep-dive-info .price-row {
@@ -2337,27 +2337,30 @@ body {
     flex-direction: column;
     align-items: flex-start;
     gap: 0;
-    margin-bottom: 20px;
+    margin-bottom: var(--space-lg);
 }
 
 .deep-dive-info .price-currency {
-    font-size: 18px;
+    font-size: var(--fs-body);
     font-weight: 600;
-    color: #86868b;
+    color: var(--text-secondary);
+    letter-spacing: 0.02em;
 }
 
 .deep-dive-info .price-main {
-    font-size: 38px;
+    font-size: var(--fs-display-xl);
     font-weight: 700;
     color: var(--color-primary);
     letter-spacing: -0.03em;
+    line-height: 1;
 }
 
 .deep-dive-info .product-description {
-    font-size: 16px;
-    color: #6e6e73;
-    line-height: 1.65;
-    letter-spacing: -0.01em;
+    font-size: var(--fs-body);
+    color: var(--text-secondary);
+    line-height: 1.7;
+    letter-spacing: 0.01em;
+    max-width: 60ch;
 }
 
 .deep-dive-info .social-btn.liked svg {
