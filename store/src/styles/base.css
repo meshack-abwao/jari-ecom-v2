@@ -797,31 +797,31 @@ body {
 }
 
 /* ===========================================
-   TESTIMONIALS - Unified Card Style
+   TESTIMONIALS - Unified Card Style (matches Specs/Included)
    =========================================== */
 .testimonials-section {
-    margin: var(--space-2xl) 0;
+    margin: var(--space-3xl) 0;
 }
 
 /* Testimonials card container - title INSIDE */
 .testimonials-card {
     background: var(--surface);
-    border-radius: 24px;
-    padding: var(--space-xl);
+    border-radius: 20px;
+    padding: var(--space-lg) var(--space-xl);
     box-shadow: 
         0 2px 8px rgba(0, 0, 0, 0.04),
         0 8px 24px rgba(0, 0, 0, 0.06);
-    max-width: 600px;
+    max-width: 520px;
     margin: 0 auto;
 }
 
 .testimonials-title {
-    font-size: var(--fs-heading);
+    font-size: var(--fs-body-lg);
     font-weight: 600;
     color: var(--text-primary);
-    margin-bottom: var(--space-lg);
-    letter-spacing: -0.02em;
-    padding-bottom: var(--space-md);
+    margin-bottom: var(--space-md);
+    letter-spacing: -0.01em;
+    padding-bottom: var(--space-sm);
     border-bottom: 1px solid var(--border);
     text-align: center;
 }
