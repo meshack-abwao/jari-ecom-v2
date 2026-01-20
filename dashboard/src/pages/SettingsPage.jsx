@@ -4,6 +4,7 @@ import {
   Save, Check, Crown, Palette, Type, ChevronDown, ChevronUp, 
   ExternalLink, Plus, Trash2, Image, FileText, Star, Globe, Wallet
 } from 'lucide-react';
+import ImageUploader from '../components/ImageUploader';
 
 const DEFAULT_THEMES = [
   { slug: 'warm-sunset', name: 'Warm Sunset', colors: { gradient: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)' }, is_premium: false },
@@ -312,23 +313,14 @@ export default function SettingsPage() {
               </div>
 
               <div style={styles.formGroup}>
-                <label style={styles.label}>LOGO IMAGE URL <span style={styles.optional}>(Optional)</span></label>
-                <input
-                  type="url"
+                <label style={styles.label}>LOGO IMAGE <span style={styles.optional}>(Optional)</span></label>
+                <ImageUploader
                   value={storeSettings.logoUrl}
-                  onChange={(e) => setStoreSettings({ ...storeSettings, logoUrl: e.target.value })}
-                  placeholder="https://example.com/logo.png"
-                  className="dashboard-input"
+                  onChange={(newUrl) => setStoreSettings({ ...storeSettings, logoUrl: newUrl })}
+                  folder="branding"
+                  placeholder="Logo image URL"
+                  allowUrl={true}
                 />
-                {storeSettings.logoUrl && (
-                  <div style={styles.imagePreview}>
-                    <img 
-                      src={storeSettings.logoUrl} 
-                      alt="Logo preview" 
-                      style={styles.previewImg}
-                      onError={(e) => e.target.style.display = 'none'}
-                    />
-                  </div>
                 )}
               </div>
 
@@ -492,36 +484,26 @@ export default function SettingsPage() {
               </div>
 
               <div style={styles.formGroup}>
-                <label style={styles.label}>PROFILE PHOTO URL</label>
-                <input
-                  type="url"
+                <label style={styles.label}>PROFILE PHOTO</label>
+                <ImageUploader
                   value={storeSettings.heroPhotoUrl}
-                  onChange={(e) => setStoreSettings({ ...storeSettings, heroPhotoUrl: e.target.value })}
-                  placeholder="https://example.com/photo.jpg"
-                  className="dashboard-input"
+                  onChange={(newUrl) => setStoreSettings({ ...storeSettings, heroPhotoUrl: newUrl })}
+                  folder="branding"
+                  placeholder="Profile photo URL"
+                  allowUrl={true}
                 />
                 <p style={styles.hint}>Circular photo displayed in hero section</p>
               </div>
 
               <div style={styles.formGroup}>
-                <label style={styles.label}>HERO BACKGROUND IMAGE URL</label>
-                <input
-                  type="url"
+                <label style={styles.label}>HERO BACKGROUND IMAGE</label>
+                <ImageUploader
                   value={storeSettings.headerBgUrl}
-                  onChange={(e) => setStoreSettings({ ...storeSettings, headerBgUrl: e.target.value })}
-                  placeholder="https://example.com/background.jpg"
-                  className="dashboard-input"
+                  onChange={(newUrl) => setStoreSettings({ ...storeSettings, headerBgUrl: newUrl })}
+                  folder="branding"
+                  placeholder="Background image URL"
+                  allowUrl={true}
                 />
-                {storeSettings.headerBgUrl && (
-                  <div style={styles.bgPreview}>
-                    <img 
-                      src={storeSettings.headerBgUrl} 
-                      alt="Background preview" 
-                      style={styles.bgPreviewImg}
-                      onError={(e) => e.target.style.display = 'none'}
-                    />
-                  </div>
-                )}
               </div>
 
               <div style={styles.formRow}>

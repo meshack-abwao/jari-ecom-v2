@@ -702,16 +702,19 @@ export default function ProductsPage() {
                       <div style={styles.storiesGrid}>
                         {formData.stories.map((story, idx) => (
                           <div key={idx} style={styles.storyInput}>
-                            <input
-                              type="url"
+                            <label style={{ fontSize: '12px', color: '#666', marginBottom: '4px', display: 'block' }}>
+                              Story {idx + 1}
+                            </label>
+                            <ImageUploader
                               value={story.url}
-                              onChange={e => {
+                              onChange={(newUrl) => {
                                 const newStories = [...formData.stories];
-                                newStories[idx] = { ...newStories[idx], url: e.target.value };
+                                newStories[idx] = { ...newStories[idx], url: newUrl };
                                 updateField('stories', newStories);
                               }}
+                              folder="stories"
                               placeholder={`Story ${idx + 1} URL`}
-                              className="dashboard-input"
+                              allowUrl={true}
                             />
                             <input
                               type="text"
@@ -723,7 +726,7 @@ export default function ProductsPage() {
                               }}
                               placeholder="Label (e.g. Living Room)"
                               className="dashboard-input"
-                              style={{ marginTop: '4px' }}
+                              style={{ marginTop: '8px' }}
                             />
                             <select
                               value={story.type}
@@ -789,18 +792,22 @@ export default function ProductsPage() {
                               {[5,4,3,2,1].map(n => <option key={n} value={n}>{n} Stars</option>)}
                             </select>
                           </div>
-                          <input
-                            type="url"
-                            value={testimonial.image || ''}
-                            onChange={e => {
-                              const newT = [...formData.testimonials];
-                              newT[idx] = { ...newT[idx], image: e.target.value };
-                              updateField('testimonials', newT);
-                            }}
-                            placeholder="Avatar image URL (optional)"
-                            className="dashboard-input"
-                            style={{ marginTop: '8px' }}
-                          />
+                          <div style={{ marginTop: '8px' }}>
+                            <label style={{ fontSize: '12px', color: '#666', marginBottom: '4px', display: 'block' }}>
+                              Avatar Image (optional)
+                            </label>
+                            <ImageUploader
+                              value={testimonial.image || ''}
+                              onChange={(newUrl) => {
+                                const newT = [...formData.testimonials];
+                                newT[idx] = { ...newT[idx], image: newUrl };
+                                updateField('testimonials', newT);
+                              }}
+                              folder="testimonials"
+                              placeholder="Avatar image URL"
+                              allowUrl={true}
+                            />
+                          </div>
                           <textarea
                             value={testimonial.text}
                             onChange={e => {
@@ -892,18 +899,22 @@ export default function ProductsPage() {
                             className="dashboard-input"
                             style={{ marginTop: '8px' }}
                           />
-                          <input
-                            type="text"
-                            value={pkg.image || ''}
-                            onChange={e => {
-                              const newP = [...formData.packages];
-                              newP[idx] = { ...newP[idx], image: e.target.value };
-                              updateField('packages', newP);
-                            }}
-                            placeholder="Image URL (optional)"
-                            className="dashboard-input"
-                            style={{ marginTop: '8px' }}
-                          />
+                          <div style={{ marginTop: '8px' }}>
+                            <label style={{ fontSize: '12px', color: '#666', marginBottom: '4px', display: 'block' }}>
+                              Package Image (optional)
+                            </label>
+                            <ImageUploader
+                              value={pkg.image || ''}
+                              onChange={(newUrl) => {
+                                const newP = [...formData.packages];
+                                newP[idx] = { ...newP[idx], image: newUrl };
+                                updateField('packages', newP);
+                              }}
+                              folder="packages"
+                              placeholder="Package image URL"
+                              allowUrl={true}
+                            />
+                          </div>
                         </div>
                       ))}
                       <button
@@ -1119,12 +1130,12 @@ export default function ProductsPage() {
                       <div style={{ ...styles.formGroup, marginTop: '20px', paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
                         <label style={styles.label}>SPECS IMAGE (OPTIONAL)</label>
                         <p style={styles.hint}>Add a diagram, size chart, or detail shot</p>
-                        <input
-                          type="url"
+                        <ImageUploader
                           value={formData.specsImage || ''}
-                          onChange={e => updateField('specsImage', e.target.value)}
-                          placeholder="https://example.com/specs-diagram.jpg"
-                          className="dashboard-input"
+                          onChange={(newUrl) => updateField('specsImage', newUrl)}
+                          folder="specs"
+                          placeholder="Specs diagram URL"
+                          allowUrl={true}
                         />
                       </div>
                     </div>
@@ -1178,12 +1189,12 @@ export default function ProductsPage() {
                       </div>
                       <div style={styles.formGroup}>
                         <label style={styles.label}>SHOWCASE VIDEO (OPTIONAL)</label>
-                        <input
-                          type="url"
+                        <ImageUploader
                           value={formData.showcaseVideo || ''}
-                          onChange={e => updateField('showcaseVideo', e.target.value)}
-                          placeholder="https://video-url.com/product-video.mp4"
-                          className="dashboard-input"
+                          onChange={(newUrl) => updateField('showcaseVideo', newUrl)}
+                          folder="videos"
+                          placeholder="Video URL"
+                          allowUrl={true}
                         />
                         <p style={styles.hint}>Add a product video - it will appear first in the gallery</p>
                       </div>
@@ -1193,32 +1204,34 @@ export default function ProductsPage() {
                       </div>
                       {(formData.showcaseImages || [{ url: '', caption: '', description: '' }]).map((item, idx) => (
                         <div key={idx} style={{ marginBottom: '16px', paddingBottom: '16px', borderBottom: '1px solid var(--border-color, #333)' }}>
-                          <div style={{ display: 'flex', gap: '12px', marginBottom: '8px' }}>
-                            <input
-                              type="url"
+                          <div style={{ marginBottom: '8px' }}>
+                            <label style={{ fontSize: '12px', color: '#666', marginBottom: '4px', display: 'block' }}>
+                              Showcase Image {idx + 1}
+                            </label>
+                            <ImageUploader
                               value={item.url || ''}
-                              onChange={e => {
+                              onChange={(newUrl) => {
                                 const newImgs = [...(formData.showcaseImages || [])];
-                                newImgs[idx] = { ...newImgs[idx], url: e.target.value };
+                                newImgs[idx] = { ...newImgs[idx], url: newUrl };
                                 updateField('showcaseImages', newImgs);
                               }}
-                              placeholder="https://image-url.com/detail.jpg"
-                              style={{ flex: 2 }}
-                              className="dashboard-input"
-                            />
-                            <input
-                              type="text"
-                              value={item.caption || ''}
-                              onChange={e => {
-                                const newImgs = [...(formData.showcaseImages || [])];
-                                newImgs[idx] = { ...newImgs[idx], caption: e.target.value };
-                                updateField('showcaseImages', newImgs);
-                              }}
-                              placeholder="Title (shows on image)"
-                              style={{ flex: 1 }}
-                              className="dashboard-input"
+                              folder="showcase"
+                              placeholder="Image URL"
+                              allowUrl={true}
                             />
                           </div>
+                          <input
+                            type="text"
+                            value={item.caption || ''}
+                            onChange={e => {
+                              const newImgs = [...(formData.showcaseImages || [])];
+                              newImgs[idx] = { ...newImgs[idx], caption: e.target.value };
+                              updateField('showcaseImages', newImgs);
+                            }}
+                            placeholder="Title (shows on image)"
+                            className="dashboard-input"
+                            style={{ marginTop: '8px' }}
+                          />
                           <textarea
                             value={item.description || ''}
                             onChange={e => {
