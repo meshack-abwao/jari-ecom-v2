@@ -172,6 +172,52 @@ return bookingTime === timeStr;
 */
 ```
 
+### Formula 12: Commit Frequently to Prevent Memory Loss
+```bash
+# ❌ PROBLEM: Making many edits before committing
+# Context window fills up, AI loses progress, work is lost
+
+# ✅ FIX: Commit after EACH successful change
+# Pattern: Edit → Test → Commit → Next Edit
+cd C:\Users\ADMIN\Desktop\jari-ecom-v2
+git add -A
+git commit -m "PREFIX: Short description of single change"
+
+# Push every 2-3 commits to prevent total loss
+git push origin main
+
+# Prefixes: DD: (Deep Dive), PBK: (Portfolio Booking), Fix:, docs:
+```
+
+### Formula 13: What's Included Comma Split
+```javascript
+// ❌ PROBLEM: User enters all items in ONE field with commas
+// "Remote, TV stand, Cable" should become 3 separate items
+
+// ✅ FIX: Auto-split comma-separated items in render function
+items.forEach(item => {
+  if (item && item.includes(',')) {
+    const splitItems = item.split(',').map(i => i.trim()).filter(i => i);
+    allItems.push(...splitItems);
+  } else if (item && item.trim()) {
+    allItems.push(item.trim());
+  }
+});
+```
+
+### Formula 14: Apple Dynamic Spacing with clamp()
+```css
+/* ❌ PROBLEM: Fixed gap values don't scale with screen size */
+gap: 24px;
+
+/* ✅ FIX: Use clamp() for responsive scaling */
+gap: clamp(var(--space-lg), 4vw, var(--space-2xl));
+/* Minimum: 24px, Preferred: 4% viewport, Maximum: 48px */
+
+/* Same pattern for margins, padding, font-sizes */
+margin: clamp(32px, 5vw, 64px);
+```
+
 ---
 
 ## 3. TEMPLATE SYSTEM
