@@ -886,61 +886,39 @@
 
 .pbk-package {
   position: relative;
-  background: var(--surface);
+  background: #fff;
   border-radius: 24px;
-  border: 1px solid var(--border);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.03);
+  border: none;
+  box-shadow: 
+    0 2px 4px rgba(0,0,0,0.02),
+    0 8px 24px rgba(0,0,0,0.06),
+    0 24px 48px rgba(0,0,0,0.04);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: visible;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   cursor: pointer;
 }
 
-/* Bold spectrum gradient - Claid.ai inspired, modern & vibrant */
+/* No gradient overlay - clean Apple style */
 .pbk-package::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: conic-gradient(
-    from 180deg at 50% 50%,
-    rgba(255, 59, 48, 0.08) 0deg,      /* Red */
-    rgba(255, 149, 0, 0.08) 60deg,     /* Orange */
-    rgba(255, 204, 0, 0.06) 120deg,    /* Yellow */
-    rgba(52, 199, 89, 0.06) 180deg,    /* Green */
-    rgba(0, 122, 255, 0.08) 240deg,    /* Blue */
-    rgba(175, 82, 222, 0.08) 300deg,   /* Purple */
-    rgba(255, 59, 48, 0.08) 360deg     /* Back to Red */
-  );
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.7;
-  transition: opacity 0.3s ease;
+  display: none;
 }
 
-/* Hover: Gradient intensifies */
-.pbk-package:hover::before {
-  opacity: 1;
-}
-
-/* Hover: Lift effect */
+/* Hover: Lift with enhanced shadow */
 .pbk-package:hover {
-  transform: translateY(-4px);
-  border-color: color-mix(in srgb, var(--color-primary) 40%, transparent);
+  transform: translateY(-8px);
   box-shadow: 
-    0 16px 48px rgba(0,0,0,0.08),
-    0 4px 12px rgba(0,0,0,0.04);
+    0 4px 8px rgba(0,0,0,0.04),
+    0 16px 40px rgba(0,0,0,0.1),
+    0 32px 64px rgba(0,0,0,0.06);
 }
 
 .pbk-package-featured {
-  border-color: color-mix(in srgb, var(--color-primary) 50%, transparent);
-}
-
-.pbk-package-featured::before {
-  opacity: 1;
+  box-shadow: 
+    0 2px 4px rgba(0,0,0,0.02),
+    0 12px 32px rgba(0,0,0,0.08),
+    0 24px 48px rgba(0,0,0,0.05);
 }
 
 /* Package image - Golden ratio aspect, optional */
@@ -993,77 +971,81 @@
   box-shadow: 0 2px 8px color-mix(in srgb, var(--color-primary) 40%, transparent);
 }
 
-/* Package name - Hierarchy Level 2 */
+/* Package name - Clean, dark, prominent */
 .pbk-package-name {
   font-size: var(--fs-heading);
   font-weight: 700;
-  color: var(--text-primary);
+  color: #1a1a2e;
   letter-spacing: -0.02em;
-  margin-bottom: var(--space-sm);
+  margin-bottom: var(--space-lg);
   line-height: 1.2;
 }
 
-/* Price - Primary draws eye (warm advances) */
-.pbk-package-price {
-  font-size: var(--fs-heading-lg);
-  font-weight: 700;
-  color: var(--color-primary);
-  letter-spacing: -0.03em;
-  margin-bottom: var(--space-sm);
-  line-height: 1.1;
+/* Price row - Price and duration inline */
+.pbk-package-price-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
 }
 
-/* Duration pill - Soft, rounded = approachable */
+/* Price - Bold, dark like reference */
+.pbk-package-price {
+  font-size: var(--fs-heading-xl);
+  font-weight: 800;
+  color: #1a1a2e;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+/* Duration pill - Soft teal/sage like reference */
 .pbk-package-duration {
   display: inline-flex;
   align-items: center;
   gap: var(--space-xs);
   font-size: var(--fs-small);
-  color: var(--color-primary);
+  color: #3d8b8b;
   font-weight: 600;
-  background: color-mix(in srgb, var(--color-primary) 8%, transparent);
-  padding: 6px 12px;
+  background: rgba(61, 139, 139, 0.12);
+  padding: 6px 14px;
   border-radius: var(--radius-full);
-  margin-bottom: var(--space-md);
   width: fit-content;
 }
 
-/* Description - Secondary hierarchy, comfortable reading */
+/* Description - Subtle gray */
 .pbk-package-desc {
   font-size: var(--fs-body-sm);
-  color: var(--text-secondary);
-  line-height: 1.6;
+  color: #8e8e93;
+  line-height: 1.5;
   margin: 0;
   font-weight: 400;
 }
 
-/* CTA - Refined glassmorphism button */
+/* CTA - Filled button like reference (teal/primary) */
 .pbk-package-btn {
   position: absolute;
   bottom: var(--space-xl);
   left: 50%;
   transform: translateX(-50%);
   width: calc(100% - var(--space-xl) * 2);
-  max-width: 220px;
-  padding: 12px var(--space-xl);
-  background: var(--surface);
-  color: var(--color-primary);
-  border: 1.5px solid color-mix(in srgb, var(--color-primary) 30%, transparent);
+  max-width: 200px;
+  padding: 14px var(--space-xl);
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
   border-radius: var(--radius-full);
   font-size: var(--fs-small);
   font-weight: 600;
   cursor: pointer;
   text-align: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--color-primary) 30%, transparent);
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .pbk-package-btn:hover {
-  background: var(--color-primary);
-  color: #fff;
-  border-color: var(--color-primary);
-  box-shadow: 0 4px 16px color-mix(in srgb, var(--color-primary) 30%, transparent);
-  transform: translateX(-50%) translateY(-1px);
+  background: color-mix(in srgb, var(--color-primary) 85%, #000);
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--color-primary) 40%, transparent);
+  transform: translateX(-50%) translateY(-2px);
 }
 
 
