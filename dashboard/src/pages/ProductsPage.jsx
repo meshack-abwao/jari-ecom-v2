@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { productsAPI, settingsAPI } from '../api/client';
 import { Plus, Edit, Trash2, X, Eye, EyeOff, ExternalLink, Tag, ChevronDown, ChevronUp } from 'lucide-react';
+import ImageUploader from '../components/ImageUploader';
 
 // ===========================================
 // TEMPLATE DEFINITIONS
@@ -655,22 +656,24 @@ export default function ProductsPage() {
                   <SectionHeader section="gallery" title="Gallery Images" icon="🖼️" />
                   {expandedSections.gallery && (
                     <div style={styles.sectionContent}>
-                      <p style={styles.hint}>Add up to 6 product images (paste URLs)</p>
+                      <p style={styles.hint}>Add up to 6 product images (upload or paste URLs)</p>
                       <div style={styles.imageGrid}>
                         {formData.images.map((url, idx) => (
                           <div key={idx} style={styles.imageInput}>
-                            <input
-                              type="url"
+                            <label style={{ fontSize: '12px', color: '#666', marginBottom: '4px', display: 'block' }}>
+                              Image {idx + 1} {idx === 0 && '(Main)'}
+                            </label>
+                            <ImageUploader
                               value={url}
-                              onChange={e => {
+                              onChange={(newUrl) => {
                                 const newImages = [...formData.images];
-                                newImages[idx] = e.target.value;
+                                newImages[idx] = newUrl;
                                 updateField('images', newImages);
                               }}
+                              folder="products"
                               placeholder={`Image ${idx + 1} URL`}
-                              className="dashboard-input"
+                              allowUrl={true}
                             />
-                            {url && <img src={url} alt="" style={styles.imagePreview} />}
                           </div>
                         ))}
                       </div>
