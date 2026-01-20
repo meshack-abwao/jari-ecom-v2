@@ -177,6 +177,65 @@ async function runMigrations() {
     await runSafe('payment_type_col', `ALTER TABLE bookings ADD COLUMN IF NOT EXISTS payment_type VARCHAR(20) DEFAULT 'full'`);
     await runSafe('payment_type_idx', `CREATE INDEX IF NOT EXISTS idx_bookings_payment_type ON bookings(payment_type)`);
     
+    // ===========================================
+    // PLATFORM PAYMENTS (migration 006)
+    // ===========================================
+    
+    // Platform payments table
+    await runSafe('platform_payments', `
+      CREATE TABLE IF NOT EXISTS platform_payments (
+        id SERIAL PRIMARY KEY,
+        store_id INTEGER REFERENCES stores(id) ON DELETE CASCADE,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        amount DECIMAL(10,2) NOT NULL,
+        type VARCHAR(20) NOT NULL,
+        item_id VARCHAR(50),
+        item_name VARCHAR(100),
+        phone VARCHAR(15),
+        checkout_request_id VARCHAR(100),
+        merchant_request_id VARCHAR(100),
+        mpesa_receipt_number VARCHAR(50),
+        status VARCHAR(20) DEFAULT 'pending',
+        result_desc TEXT,
+        error_message TEXT,
+        created_at TIMESTAMP DEFAULT NOW(),
+        completed_at TIMESTAMP
+      )
+    `);
+    
+    // Store addons table
+    await runSafe('store_addons', `
+      CREATE TABLE IF NOT EXISTS store_addons (
+        id SERIAL PRIMARY KEY,
+        store_id INTEGER REFERENCES stores(id) ON DELETE CASCADE,
+        addon_type VARCHAR(50) NOT NULL,
+        activated_at TIMESTAMP DEFAULT NOW(),
+        expires_at TIMESTAMP,
+        UNIQUE(store_id, addon_type)
+      )
+    `);
+    
+    // Store themes table
+    await runSafe('store_themes', `
+      CREATE TABLE IF NOT EXISTS store_themes (
+        id SERIAL PRIMARY KEY,
+        store_id INTEGER REFERENCES stores(id) ON DELETE CASCADE,
+        theme_slug VARCHAR(50) NOT NULL,
+        unlocked_at TIMESTAMP DEFAULT NOW(),
+        UNIQUE(store_id, theme_slug)
+      )
+    `);
+    
+    // Add subscription columns to stores
+    await runSafe('subscription_status', `ALTER TABLE stores ADD COLUMN IF NOT EXISTS subscription_status VARCHAR(20) DEFAULT 'trial'`);
+    await runSafe('subscription_expires', `ALTER TABLE stores ADD COLUMN IF NOT EXISTS subscription_expires TIMESTAMP`);
+    await runSafe('product_card_limit', `ALTER TABLE stores ADD COLUMN IF NOT EXISTS product_card_limit INTEGER DEFAULT 3`);
+    await runSafe('trial_ends_at', `ALTER TABLE stores ADD COLUMN IF NOT EXISTS trial_ends_at TIMESTAMP`);
+    
+    // Platform payment indexes
+    await runSafe('pp_idx_1', `CREATE INDEX IF NOT EXISTS idx_platform_payments_store ON platform_payments(store_id)`);
+    await runSafe('pp_idx_2', `CREATE INDEX IF NOT EXISTS idx_platform_payments_checkout ON platform_payments(checkout_request_id)`);
+    
     console.log('✅ Migrations verified');
   } catch (err) {
     console.error('⚠️ Migration error:', err.message);

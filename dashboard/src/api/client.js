@@ -191,6 +191,41 @@ export const uploadAPI = {
 };
 
 // ===========================================
+// M-PESA PAYMENTS API
+// ===========================================
+export const mpesaAPI = {
+  // Initiate STK Push
+  stkPush: (phone, amount, type, itemId = null, itemName = null) => 
+    api.post('/mpesa/stk-push', { phone, amount, type, itemId, itemName }),
+  
+  // Check payment status
+  getStatus: (paymentId) => api.get(`/mpesa/status/${paymentId}`),
+  
+  // Get payment history
+  getHistory: () => api.get('/mpesa/history'),
+  
+  // Helper: Poll for payment completion
+  pollStatus: async (paymentId, maxAttempts = 30, intervalMs = 2000) => {
+    for (let i = 0; i < maxAttempts; i++) {
+      const response = await api.get(`/mpesa/status/${paymentId}`);
+      const { status, success } = response.data;
+      
+      if (status === 'completed') {
+        return { success: true, ...response.data };
+      }
+      if (status === 'failed') {
+        return { success: false, ...response.data };
+      }
+      
+      // Still pending, wait and retry
+      await new Promise(resolve => setTimeout(resolve, intervalMs));
+    }
+    
+    return { success: false, status: 'timeout', message: 'Payment verification timed out' };
+  }
+};
+
+// ===========================================
 // LEGACY API (for backwards compatibility)
 // ===========================================
 export const legacyApi = {
