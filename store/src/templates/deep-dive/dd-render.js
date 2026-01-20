@@ -75,20 +75,11 @@ export function renderDeepDive(product) {
       <!-- STEP 5: EVALUATE - Specifications (moved UP) -->
       ${renderDeepDiveSpecs(validSpecs)}
       
-      <!-- STEP 6: TRUST - Warranty -->
-      ${data.warranty ? `
-        <div class="deep-dive-warranty">
-          <span class="warranty-icon">✓</span>
-          <span class="warranty-text">${data.warranty}</span>
-        </div>
-      ` : ''}
+      <!-- STEP 6: TRUST - Trust Badges (horizontal) -->
+      ${renderTrustBadges(data)}
       
-      <!-- STEP 6b: TRUST - Stories (optional) -->
-      ${(media.stories || []).length > 0 ? `
-        <div class="deep-dive-stories">
-          ${renderStories(media.stories, data.storyTitle)}
-        </div>
-      ` : ''}
+      <!-- STEP 6b: Stories (no wrapper, inline with flow) -->
+      ${(media.stories || []).length > 0 ? renderStories(media.stories, data.storyTitle) : ''}
       
       <!-- STEP 7: VALIDATE - Testimonials -->
       ${testimonials.length > 0 ? `
@@ -188,6 +179,50 @@ function renderDeepDiveSpecs(specs) {
             </div>
           `).join('')}
         </div>
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * Render trust badges - horizontal row with icons
+ */
+function renderTrustBadges(data) {
+  const badges = [];
+  
+  // Warranty badge
+  if (data.warranty) {
+    badges.push({ icon: '✓', text: data.warranty });
+  }
+  
+  // Shipping badge (can be set in dashboard)
+  if (data.shipping) {
+    badges.push({ icon: '🚚', text: data.shipping });
+  } else {
+    badges.push({ icon: '🚚', text: 'Fast Delivery' });
+  }
+  
+  // Returns badge
+  if (data.returns) {
+    badges.push({ icon: '↩', text: data.returns });
+  } else {
+    badges.push({ icon: '↩', text: 'Easy Returns' });
+  }
+  
+  // Secure payment badge
+  badges.push({ icon: '🔒', text: 'Secure Payment' });
+  
+  if (badges.length === 0) return '';
+  
+  return `
+    <div class="deep-dive-trust">
+      <div class="trust-badges">
+        ${badges.map(b => `
+          <div class="trust-badge">
+            <span class="badge-icon">${b.icon}</span>
+            <span class="badge-text">${b.text}</span>
+          </div>
+        `).join('')}
       </div>
     </div>
   `;
