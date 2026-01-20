@@ -250,11 +250,11 @@
 /* Hero image card - Golden Ratio proportions (1:1.618) */
 .pbk-hero-image {
   position: relative;
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
   overflow: hidden;
   background: var(--bg-gray);
-  aspect-ratio: 1.618 / 1;  /* Golden ratio - harmonious proportions */
-  max-height: 400px;  /* Cap height on mobile */
+  aspect-ratio: 4 / 3;  /* Less wide, more balanced with text below */
+  max-height: 380px;  /* Cap height on mobile */
 }
 
 .pbk-hero-image img {
@@ -267,74 +267,84 @@
 
 @media (min-width: 768px) {
   .pbk-hero-image {
-    max-height: 480px;  /* Allow taller on tablet */
-    border-radius: 24px;
+    max-height: 420px;  /* Controlled on tablet */
+    aspect-ratio: 16 / 10;  /* Slightly wider but not too much */
+    border-radius: var(--radius-2xl);
   }
 }
 
 @media (min-width: 1024px) {
   .pbk-hero-image {
-    max-height: 560px;  /* Full height on desktop */
+    max-height: 480px;  /* Balanced on desktop */
   }
 }
 
-/* Hero Caption Overlay - Golden ratio positioning (61.8% from top) */
+/* Hero Caption Overlay - Bottom left with line separator like screenshot */
 .pbk-hero-overlay {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  /* Golden ratio: 61.8% from bottom = natural focal point */
-  padding: calc(38.2% + var(--space-xl)) var(--space-2xl) var(--space-2xl);
-  background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 60%, transparent 100%);
+  padding: var(--space-xl);
+  background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.3) 50%, transparent 100%);
   pointer-events: none;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
+  align-items: flex-start;
 }
 
 .pbk-hero-caption {
-  display: block;
-  font-size: clamp(var(--fs-body-lg), 4vw, var(--fs-heading-lg));
-  font-weight: 500;
+  display: flex;
+  flex-direction: column;
+  font-size: var(--fs-heading);
+  font-weight: 400;
   color: #fff;
-  text-shadow: 0 1px 8px rgba(0,0,0,0.4);
-  line-height: 1.3;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  line-height: 1.2;
   letter-spacing: -0.01em;
-  margin-bottom: var(--space-xs);
+  margin-bottom: var(--space-sm);
 }
 
-/* Hero description - smaller, below caption */
+/* Hero description - smaller, with line separator */
 .pbk-hero-description {
-  font-size: var(--fs-small);
-  color: rgba(255,255,255,0.8);
-  line-height: 1.5;
-  max-width: 85%;
+  font-size: var(--fs-tiny);
+  color: rgba(255,255,255,0.7);
+  line-height: 1.4;
+  max-width: 90%;
+  padding-top: var(--space-sm);
+  border-top: 1px solid rgba(255,255,255,0.3);
+  margin-top: var(--space-xs);
 }
 
-/* Intelligent text splitting - matches Deep Dive lightbox */
+/* Intelligent text splitting - light word on top, bold word below */
 .pbk-hero-caption .caption-light {
   font-weight: 300;
-  opacity: 0.9;
+  opacity: 0.85;
+  font-size: var(--fs-body-lg);
 }
 
 .pbk-hero-caption .caption-bold {
   font-weight: 700;
-  display: block;
-  font-size: 1.1em;
+  font-size: var(--fs-heading-lg);
+  letter-spacing: -0.02em;
 }
 
 @media (min-width: 768px) {
   .pbk-hero-overlay {
-    padding: var(--space-5xl) var(--space-3xl) var(--space-3xl);
+    padding: var(--space-2xl);
   }
   
-  .pbk-hero-caption {
-    font-size: clamp(var(--fs-heading-lg), 4vw, var(--fs-display-xl));
+  .pbk-hero-caption .caption-light {
+    font-size: var(--fs-heading);
+  }
+  
+  .pbk-hero-caption .caption-bold {
+    font-size: var(--fs-heading-xl);
   }
   
   .pbk-hero-description {
-    font-size: var(--fs-body-sm);
+    font-size: var(--fs-small);
     max-width: 70%;
   }
 }
@@ -408,7 +418,7 @@
 
 /* Intro - "Why should I care?" Value proposition */
 .pbk-intro {
-  margin-bottom: var(--space-4xl);
+  margin-bottom: var(--space-3xl);
   text-align: left;
 }
 
@@ -416,7 +426,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--space-md);
+  margin-bottom: var(--space-lg);
 }
 
 .pbk-price-from {
@@ -435,10 +445,11 @@
 
 .pbk-description {
   font-size: var(--fs-body);
-  line-height: 1.6;
+  line-height: 1.7;  /* More generous for readability */
   color: var(--text-secondary);
   margin: 0;
-  max-width: 65ch;  /* Line length limit for readability */
+  max-width: 60ch;  /* Optimal line length: 45-75 chars */
+  letter-spacing: 0.01em;  /* Slightly open for small text */
 }
 
 
@@ -887,25 +898,28 @@
 
 .pbk-package {
   position: relative;
-  background: #ffffff;
-  width: 320px;
-  border-radius: 28px;
-  border: none;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  background: var(--surface);
+  width: 280px;  /* Narrower than before */
+  min-height: 360px;  /* Taller - portrait orientation */
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
   overflow: visible;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
 }
 
 /* Hover: Lift effect */
 .pbk-package:hover {
   transform: translateY(-5px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
 }
 
 .pbk-package-featured {
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.07);
+  border-color: var(--color-primary);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--color-primary) 15%, transparent);
 }
 
 /* Package image - Golden ratio aspect, optional */
@@ -929,10 +943,10 @@
   transform: scale(1.03);
 }
 
-/* Package content - Exact spacing from reference */
+/* Package content - Theme-aware spacing */
 .pbk-package-content {
-  padding: 32px;
-  padding-bottom: 100px; /* Space for absolute CTA */
+  padding: var(--space-xl);
+  padding-bottom: calc(var(--space-xl) + 56px); /* Space for absolute CTA */
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -945,64 +959,66 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: var(--space-sm);
 }
 
-/* Badge - Inline with name, teal pill */
+/* Badge - Inline with name, uses theme color */
 .pbk-package-badge {
-  background: #e8f4f5;
-  color: #2a8d9c;
-  padding: 4px 12px;
-  border-radius: 100px;
-  font-size: 13px;
-  font-weight: 500;
+  background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+  color: var(--color-primary);
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-full);
+  font-size: var(--fs-tiny);
+  font-weight: 600;
   flex-shrink: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
-/* Package name - 20px semibold */
+/* Package name - Uses theme text color */
 .pbk-package-name {
-  font-size: 20px;
+  font-size: var(--fs-heading);
   font-weight: 600;
-  color: #1d1d1f;
+  color: var(--text-primary);
   letter-spacing: -0.02em;
   margin: 0;
   line-height: 1.2;
 }
 
-/* Price - 32px bold, own line */
+/* Price - Uses theme primary color */
 .pbk-package-price {
-  font-size: 32px;
+  font-size: var(--fs-heading-xl);
   font-weight: 700;
-  color: #1d1d1f;
+  color: var(--color-primary);
   letter-spacing: -0.03em;
-  margin-bottom: 16px;
+  margin-bottom: var(--space-md);
   line-height: 1;
 }
 
-/* Description - 14px gray */
+/* Description - Uses theme secondary text */
 .pbk-package-desc {
-  font-size: 14px;
-  line-height: 1.5;
-  color: #86868b;
+  font-size: var(--fs-body-sm);
+  line-height: 1.6;
+  color: var(--text-secondary);
   margin: 0;
   font-weight: 400;
 }
 
-/* CTA - Full width, teal filled */
+/* CTA - Full width, theme-aware */
 .pbk-package-btn {
   position: absolute;
-  bottom: 32px;
-  left: 32px;
-  right: 32px;
+  bottom: var(--space-xl);
+  left: var(--space-xl);
+  right: var(--space-xl);
   width: auto;
   transform: none;
   max-width: none;
-  padding: 14px 0;
-  background: #2a8d9c;
+  padding: var(--space-md) 0;
+  background: var(--color-primary);
   color: #fff;
   border: none;
-  border-radius: 100px;
-  font-size: 16px;
+  border-radius: var(--radius-full);
+  font-size: var(--fs-body);
   font-weight: 600;
   cursor: pointer;
   text-align: center;
@@ -1010,7 +1026,7 @@
 }
 
 .pbk-package-btn:hover {
-  background: #227380;
+  background: color-mix(in srgb, var(--color-primary) 85%, #000);
 }
 
 .pbk-package-btn:active {
