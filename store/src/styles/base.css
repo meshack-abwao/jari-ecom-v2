@@ -2638,34 +2638,49 @@ body {
 }
 
 /* ===========================================
-   FLOATING GLASS CTA - Premium Design
+   FLOATING GLASS CTA - Trust & Confidence Design
    =========================================== */
 .deep-dive-cta {
     position: fixed;
-    bottom: 20px;
+    bottom: 24px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 100;
     width: calc(100% - 32px);
-    max-width: 468px;
+    max-width: 480px;
     pointer-events: none;
 }
 
 .cta-glass {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 10px;
-    padding: 10px 12px;
-    background: rgba(255, 255, 255, 0.88);
+    justify-content: space-between;
+    gap: var(--space-md);
+    padding: 12px 16px;
+    /* Glassmorphism */
+    background: rgba(255, 255, 255, 0.92);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border-radius: 16px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08);
-    border: 1px solid rgba(255,255,255,0.6);
+    border-radius: 24px;
+    box-shadow: 
+        0 4px 16px rgba(0, 0, 0, 0.1),
+        0 12px 40px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.8);
     pointer-events: all;
 }
 
+@media (min-width: 768px) {
+    .deep-dive-cta {
+        bottom: 32px;
+    }
+    
+    .cta-glass {
+        padding: 14px 20px;
+        border-radius: 28px;
+    }
+}
+
+/* Quantity controls - Subtle, not distracting */
 .cta-qty-section {
     display: flex;
     align-items: center;
@@ -2674,21 +2689,21 @@ body {
 .cta-qty-controls {
     display: flex;
     align-items: center;
-    gap: 4px;
-    background: #f5f5f7;
-    border-radius: 10px;
-    padding: 3px;
+    gap: 2px;
+    background: var(--bg-gray);
+    border-radius: 12px;
+    padding: 4px;
 }
 
 .cta-qty-btn {
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     border: none;
-    background: white;
-    border-radius: 7px;
-    font-size: 16px;
+    background: var(--surface);
+    border-radius: 10px;
+    font-size: var(--fs-body-lg);
     font-weight: 500;
-    color: var(--color-primary);
+    color: var(--text-secondary);
     cursor: pointer;
     transition: all 0.2s ease;
     display: flex;
@@ -2701,59 +2716,67 @@ body {
     color: white;
 }
 
-.cta-qty-btn.minus {
-    color: #ff375f;
-}
-
-.cta-qty-btn.plus {
-    color: var(--color-primary);
+.cta-qty-btn:active {
+    transform: scale(0.95);
 }
 
 .cta-qty-value {
-    font-size: 15px;
+    font-size: var(--fs-body);
     font-weight: 600;
-    min-width: 20px;
+    min-width: 28px;
     text-align: center;
     color: var(--text-primary);
 }
 
+/* Price display */
 .cta-price-section {
     display: flex;
-    align-items: baseline;
-    gap: 4px;
-    padding: 0 8px;
-    border-left: 1px solid #e5e5e7;
-}
-
-.cta-price-value {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--color-primary);
-    letter-spacing: -0.02em;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0 var(--space-md);
 }
 
 .cta-price-currency {
-    font-size: 11px;
+    font-size: var(--fs-tiny);
     font-weight: 500;
-    color: #86868b;
+    color: var(--text-secondary);
+    line-height: 1;
 }
 
+.cta-price-value {
+    font-size: var(--fs-heading);
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+}
+
+/* Primary CTA button - Trust inducing */
 .cta-add-btn {
-    padding: 12px 20px;
-    background: var(--gradient-primary);
+    flex: 1;
+    max-width: 160px;
+    padding: 14px 24px;
+    background: var(--color-primary);
     border: none;
-    border-radius: 12px;
+    border-radius: 100px;
     color: white;
-    font-size: 14px;
+    font-size: var(--fs-body);
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     white-space: nowrap;
+    text-align: center;
 }
 
 .cta-add-btn:hover {
-    transform: scale(1.02);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    transform: scale(1.03);
+    box-shadow: 
+        0 4px 12px color-mix(in srgb, var(--color-primary) 30%, transparent),
+        0 8px 24px color-mix(in srgb, var(--color-primary) 20%, transparent);
+}
+
+.cta-add-btn:active {
+    transform: scale(0.98);
 }
 
 /* ===========================================
