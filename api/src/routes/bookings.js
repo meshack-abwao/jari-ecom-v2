@@ -454,11 +454,16 @@ router.get('/public/:storeSlug/availability', async (req, res, next) => {
       [storeId, dayOfWeek]
     );
     
-    if (hoursResult.rows.length === 0 || !hoursResult.rows[0].is_open) {
-      return res.json({ available: false, reason: 'Closed on this day', slots: [] });
+    // Use DB hours if exist, otherwise fall back to defaults
+    let workingHours = hoursResult.rows[0];
+    if (!workingHours) {
+      workingHours = DEFAULT_WORKING_HOURS.find(h => h.day_of_week === dayOfWeek);
     }
     
-    const workingHours = hoursResult.rows[0];
+    // Check if closed on this day
+    if (!workingHours || !workingHours.is_open) {
+      return res.json({ available: false, reason: 'Closed on this day', slots: [] });
+    }
     
     // Check if date is blocked
     const blockedResult = await db.query(
