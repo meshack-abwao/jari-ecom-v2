@@ -274,18 +274,17 @@ function renderPbkPackages(packages) {
                onclick="this.querySelector('.pbk-package-btn').click()" 
                role="button" 
                tabindex="0">
-            ${i === 0 ? '<span class="pbk-package-badge">Popular</span>' : ''}
             ${pkg.image ? `
               <div class="pbk-package-image">
                 <img src="${pkg.image}" alt="${pkg.name}" loading="lazy">
               </div>
             ` : ''}
             <div class="pbk-package-content">
-              <div class="pbk-package-name">${pkg.name}</div>
-              <div class="pbk-package-price-row">
-                <div class="pbk-package-price">KES ${parseInt(pkg.price || 0).toLocaleString()}</div>
-                ${pkg.duration ? `<div class="pbk-package-duration">${pkg.duration}</div>` : ''}
+              <div class="pbk-package-header">
+                <h2 class="pbk-package-name">${pkg.name}</h2>
+                ${pkg.duration ? `<span class="pbk-package-badge">${pkg.duration}</span>` : ''}
               </div>
+              <div class="pbk-package-price">KES ${parseInt(pkg.price || 0).toLocaleString()}</div>
               ${pkg.description ? `<p class="pbk-package-desc">${pkg.description}</p>` : ''}
               <button class="pbk-package-btn" data-pkg-index="${i}" data-pkg-name="${pkg.name}" data-pkg-price="${pkg.price}">
                 Select Package

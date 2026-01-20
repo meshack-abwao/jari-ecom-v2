@@ -881,44 +881,31 @@
 .pbk-packages-grid {
   display: flex;
   flex-direction: column;
-  gap: var(--space-lg);
+  align-items: center;
+  gap: var(--space-xl);
 }
 
 .pbk-package {
   position: relative;
-  background: #fff;
-  border-radius: 24px;
+  background: #ffffff;
+  width: 320px;
+  border-radius: 28px;
   border: none;
-  box-shadow: 
-    0 2px 4px rgba(0,0,0,0.02),
-    0 8px 24px rgba(0,0,0,0.06),
-    0 24px 48px rgba(0,0,0,0.04);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
   overflow: visible;
-  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: transform 0.3s ease;
   cursor: pointer;
 }
 
-/* No gradient overlay - clean Apple style */
-.pbk-package::before {
-  display: none;
-}
-
-/* Hover: Lift with enhanced shadow */
+/* Hover: Lift effect */
 .pbk-package:hover {
-  transform: translateY(-8px);
-  box-shadow: 
-    0 4px 8px rgba(0,0,0,0.04),
-    0 16px 40px rgba(0,0,0,0.1),
-    0 32px 64px rgba(0,0,0,0.06);
+  transform: translateY(-5px);
 }
 
 .pbk-package-featured {
-  box-shadow: 
-    0 2px 4px rgba(0,0,0,0.02),
-    0 12px 32px rgba(0,0,0,0.08),
-    0 24px 48px rgba(0,0,0,0.05);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.07);
 }
 
 /* Package image - Golden ratio aspect, optional */
@@ -942,110 +929,92 @@
   transform: scale(1.03);
 }
 
-/* Package content - Fixed height structure with absolute CTA */
+/* Package content - Exact spacing from reference */
 .pbk-package-content {
-  padding: var(--space-xl) var(--space-xl);
-  padding-bottom: calc(var(--space-2xl) + 48px + var(--space-lg));
+  padding: 32px;
+  padding-bottom: 100px; /* Space for absolute CTA */
   display: flex;
   flex-direction: column;
   flex: 1;
-  min-height: 200px;
   position: relative;
   z-index: 1;
 }
 
-/* Badge - Refined positioning */
-.pbk-package-badge {
-  position: absolute;
-  top: var(--space-lg);
-  right: var(--space-lg);
-  background: var(--color-primary);
-  color: #fff;
-  font-size: 10px;
-  font-weight: 700;
-  padding: 6px 12px;
-  border-radius: var(--radius-full);
-  z-index: 2;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  box-shadow: 0 2px 8px color-mix(in srgb, var(--color-primary) 40%, transparent);
+/* Header row - Name + Badge inline */
+.pbk-package-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
 }
 
-/* Package name - Clean, dark, prominent */
+/* Badge - Inline with name, teal pill */
+.pbk-package-badge {
+  background: #e8f4f5;
+  color: #2a8d9c;
+  padding: 4px 12px;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+/* Package name - 20px semibold */
 .pbk-package-name {
-  font-size: var(--fs-heading);
-  font-weight: 700;
-  color: #1a1a2e;
+  font-size: 20px;
+  font-weight: 600;
+  color: #1d1d1f;
   letter-spacing: -0.02em;
-  margin-bottom: var(--space-lg);
+  margin: 0;
   line-height: 1.2;
 }
 
-/* Price row - Price and duration inline */
-.pbk-package-price-row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-md);
-  margin-bottom: var(--space-md);
-}
-
-/* Price - Bold, dark like reference */
+/* Price - 32px bold, own line */
 .pbk-package-price {
-  font-size: var(--fs-heading-xl);
-  font-weight: 800;
-  color: #1a1a2e;
+  font-size: 32px;
+  font-weight: 700;
+  color: #1d1d1f;
   letter-spacing: -0.03em;
+  margin-bottom: 16px;
   line-height: 1;
 }
 
-/* Duration pill - Soft teal/sage like reference */
-.pbk-package-duration {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-xs);
-  font-size: var(--fs-small);
-  color: #3d8b8b;
-  font-weight: 600;
-  background: rgba(61, 139, 139, 0.12);
-  padding: 6px 14px;
-  border-radius: var(--radius-full);
-  width: fit-content;
-}
-
-/* Description - Subtle gray */
+/* Description - 14px gray */
 .pbk-package-desc {
-  font-size: var(--fs-body-sm);
-  color: #8e8e93;
+  font-size: 14px;
   line-height: 1.5;
+  color: #86868b;
   margin: 0;
   font-weight: 400;
 }
 
-/* CTA - Filled button like reference (teal/primary) */
+/* CTA - Full width, teal filled */
 .pbk-package-btn {
   position: absolute;
-  bottom: var(--space-xl);
-  left: 50%;
-  transform: translateX(-50%);
-  width: calc(100% - var(--space-xl) * 2);
-  max-width: 200px;
-  padding: 14px var(--space-xl);
-  background: var(--color-primary);
+  bottom: 32px;
+  left: 32px;
+  right: 32px;
+  width: auto;
+  transform: none;
+  max-width: none;
+  padding: 14px 0;
+  background: #2a8d9c;
   color: #fff;
   border: none;
-  border-radius: var(--radius-full);
-  font-size: var(--fs-small);
+  border-radius: 100px;
+  font-size: 16px;
   font-weight: 600;
   cursor: pointer;
   text-align: center;
-  box-shadow: 0 4px 12px color-mix(in srgb, var(--color-primary) 30%, transparent);
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: background 0.2s ease, transform 0.1s ease;
 }
 
 .pbk-package-btn:hover {
-  background: color-mix(in srgb, var(--color-primary) 85%, #000);
-  box-shadow: 0 6px 20px color-mix(in srgb, var(--color-primary) 40%, transparent);
-  transform: translateX(-50%) translateY(-2px);
+  background: #227380;
+}
+
+.pbk-package-btn:active {
+  transform: scale(0.98);
 }
 
 
@@ -1297,9 +1266,16 @@
   }
   
   .pbk-packages-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: var(--space-xl);
+  }
+  
+  .pbk-package {
+    width: 320px;
+    flex-shrink: 0;
   }
   
   /* Desktop CTA - Inline compact style, centered */
@@ -1458,8 +1434,8 @@
   }
   
   .pbk-packages-grid {
-    grid-template-columns: repeat(3, 1fr);
     gap: var(--space-2xl);
+  }
   }
   
   .pbk-why-content {
