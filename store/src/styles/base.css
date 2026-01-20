@@ -2513,9 +2513,9 @@ body {
 
 /* ===== Stories Section - Inline flow with breathing room ===== */
 .template-deep-dive .stories-section {
-    margin-top: var(--space-3xl);
+    margin-top: var(--space-4xl);
     margin-bottom: var(--space-3xl);
-    padding: 0;
+    padding: var(--space-2xl) 0;
     background: transparent;
 }
 
