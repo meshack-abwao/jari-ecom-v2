@@ -144,6 +144,34 @@ const bookingTime = String(b.booking_time).substring(0, 5); // Get HH:MM
 return bookingTime === timeStr;
 ```
 
+### Formula 11: CSS Must Use Theme Variables (No Hardcoded Colors)
+```css
+/* ❌ WRONG - Hardcoded colors don't respect store theme */
+.pbk-package-price { color: #1d1d1f; }
+.pbk-package-badge { background: #e8f4f5; color: #2a8d9c; }
+.pbk-package-btn { background: #2a8d9c; }
+
+/* ✅ CORRECT - Uses CSS variables from store theme */
+.pbk-package-price { color: var(--color-primary); }
+.pbk-package-badge { 
+  background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+  color: var(--color-primary);
+}
+.pbk-package-btn { background: var(--color-primary); }
+
+/* Theme variables to use:
+   --color-primary      (store's main accent color)
+   --text-primary       (main text color)
+   --text-secondary     (secondary/muted text)
+   --surface            (card backgrounds)
+   --bg-gray            (neutral backgrounds)
+   --border             (borders)
+   --radius-*           (border radius sizes)
+   --fs-*               (font sizes)
+   --space-*            (spacing scale)
+*/
+```
+
 ---
 
 ## 3. TEMPLATE SYSTEM
