@@ -68,12 +68,16 @@ export function renderDeepDive(product) {
           </div>
         </div>
         
-        <!-- STEP 4: CONFIRM - Description -->
-        ${data.description ? `<p class="product-description">${data.description}</p>` : ''}
+        <!-- STEP 4 & 5: Description + Specs (2-column on desktop) -->
+        <div class="dd-content-grid">
+          <div class="dd-content-left">
+            ${data.description ? `<p class="product-description">${data.description}</p>` : ''}
+          </div>
+          <div class="dd-content-right">
+            ${renderDeepDiveSpecs(validSpecs)}
+          </div>
+        </div>
       </div>
-      
-      <!-- STEP 5: EVALUATE - Specifications -->
-      ${renderDeepDiveSpecs(validSpecs)}
       
       <!-- STEP 6: Stories (between specs and trust) -->
       ${(media.stories || []).length > 0 ? renderStories(media.stories, data.storyTitle) : ''}
@@ -233,18 +237,33 @@ function renderTrustBadges(data) {
 
 /**
  * Render What's Included section
+ * Handles both array of items AND single comma-separated string
  */
 function renderWhatsIncluded(items) {
   if (!items || items.length === 0) return '';
-  const validItems = items.filter(item => item?.trim());
-  if (validItems.length === 0) return '';
+  
+  // Flatten and split: handle both arrays and comma-separated strings
+  let allItems = [];
+  items.forEach(item => {
+    if (item && item.trim()) {
+      // If item contains commas, split it into multiple items
+      if (item.includes(',')) {
+        const splitItems = item.split(',').map(i => i.trim()).filter(i => i);
+        allItems.push(...splitItems);
+      } else {
+        allItems.push(item.trim());
+      }
+    }
+  });
+  
+  if (allItems.length === 0) return '';
   
   return `
     <div class="deep-dive-included">
       <div class="included-card">
         <h3 class="included-title">What's Included</h3>
         <ul class="included-list">
-          ${validItems.map(item => `
+          ${allItems.map(item => `
             <li class="included-item">
               <span class="included-check">✓</span>
               <span class="included-text">${item}</span>

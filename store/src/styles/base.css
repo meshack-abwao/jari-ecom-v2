@@ -2465,9 +2465,54 @@ body {
     max-width: 60ch;
 }
 
+/* ===== Content Grid - Description + Specs side by side on desktop ===== */
+.dd-content-grid {
+    display: block;
+}
+
+.dd-content-left {
+    margin-bottom: var(--space-xl);
+}
+
+.dd-content-left .product-description {
+    max-width: none;
+}
+
+.dd-content-right .deep-dive-specs {
+    margin-top: 0;
+}
+
+@media (min-width: 1024px) {
+    .dd-content-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-2xl);
+        align-items: start;
+    }
+    
+    .dd-content-left {
+        margin-bottom: 0;
+    }
+    
+    .dd-content-left .product-description {
+        max-width: none;
+        font-size: 15px;
+        line-height: 1.8;
+    }
+    
+    .dd-content-right .deep-dive-specs {
+        max-width: none;
+        margin: 0 auto;
+    }
+    
+    .dd-content-right .specs-card {
+        max-width: none;
+    }
+}
+
 /* ===== Stories Section - Inline flow with breathing room ===== */
 .template-deep-dive .stories-section {
-    margin-top: var(--space-2xl);
+    margin-top: var(--space-3xl);
     margin-bottom: var(--space-3xl);
     padding: 0;
     background: transparent;
@@ -2643,7 +2688,8 @@ body {
 
 /* ===== Specifications - Title INSIDE Card ===== */
 .deep-dive-specs {
-    margin-top: var(--space-2xl);
+    margin-top: var(--space-3xl);
+    margin-bottom: var(--space-2xl);
 }
 
 /* Specs card container with title inside */
@@ -2714,7 +2760,8 @@ body {
 
 /* ===== Trust Badges - Horizontal Row ===== */
 .deep-dive-trust {
-    margin-top: var(--space-2xl);
+    margin-top: var(--space-3xl);
+    margin-bottom: var(--space-2xl);
 }
 
 .trust-badges {
