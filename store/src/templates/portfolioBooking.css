@@ -16,25 +16,35 @@
    Section gaps: --space-4xl (40px) or --space-5xl (48px)
    Element gaps: --space-xl (20px) or --space-2xl (24px)
    Tight groups: --space-md (12px) or --space-lg (16px)
+   
+   MOBILE-FIRST EDGE SPACING (Big Brand Standard):
+   ─────────────────────────────────────────────
+   Mobile (<768px):  16px edges - maximizes screen real estate
+   Tablet (768px+):  24px edges - comfortable spacing
+   Desktop (1024px+): 32px edges - breathable layout
    =========================================== */
 
-/* Container - Breathable width, not cramped */
+/* Container - Mobile-first with minimal edges */
 .pbk-container {
-  max-width: 680px;
+  max-width: 100%;
   margin: 0 auto;
-  padding: 0 var(--space-xl) 120px;
+  /* Mobile: 16px edges like Apple/Instagram */
+  padding: 0 16px 120px;
 }
 
 @media (min-width: 768px) {
   .pbk-container {
     max-width: 720px;
-    padding: 0 var(--space-2xl) 120px;
+    /* Tablet: 24px edges */
+    padding: 0 24px 120px;
   }
 }
 
 @media (min-width: 1024px) {
   .pbk-container {
     max-width: 1100px;
+    /* Desktop: 32px edges */
+    padding: 0 32px 120px;
   }
 }
 
@@ -199,22 +209,22 @@
   margin-bottom: var(--space-2xl);
   display: flex;
   justify-content: center;
+  /* On mobile, extend to edges (negative margin to counter container padding) */
+  margin-left: -16px;
+  margin-right: -16px;
 }
 
 /* Hero image card - Beautiful Apple-style with soft shadows */
 .pbk-hero-image {
   position: relative;
   width: 100%;
-  max-width: 900px;
-  /* Beautiful Apple-style rounded corners */
-  border-radius: 24px;
+  /* Mobile: Smaller corners for edge-to-edge feel */
+  border-radius: 16px;
   overflow: hidden;
   background: var(--bg-gray);
   aspect-ratio: 4 / 3;
-  /* Soft shadow like macOS windows */
-  box-shadow: 
-    0 4px 12px rgba(0, 0, 0, 0.08),
-    0 12px 32px rgba(0, 0, 0, 0.12);
+  /* Subtle shadow on mobile */
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
 .pbk-hero-image img {
@@ -226,7 +236,14 @@
 }
 
 @media (min-width: 768px) {
+  .pbk-hero {
+    /* Reset negative margins on tablet+ */
+    margin-left: 0;
+    margin-right: 0;
+  }
+  
   .pbk-hero-image {
+    max-width: 900px;
     aspect-ratio: 16 / 10;
     border-radius: 28px;
     box-shadow: 
@@ -328,10 +345,18 @@
   left: 0;
   right: 0;
   transform: translateY(-50%);
-  display: flex;
+  /* Hidden on mobile - use swipe + dots */
+  display: none;
   justify-content: space-between;
   padding: 0 var(--space-lg);
   pointer-events: none;
+}
+
+/* Show nav arrows on tablet+ */
+@media (min-width: 768px) {
+  .pbk-hero-nav {
+    display: flex;
+  }
 }
 
 /* Apple-style nav buttons with soft shadows */
@@ -735,13 +760,14 @@
 .pbk-gallery-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-md);
+  /* Mobile: Tighter gap */
+  gap: 8px;
 }
 
 .pbk-gallery-item {
   position: relative;
-  /* Beautiful Apple-style rounded corners */
-  border-radius: 20px;
+  /* Mobile: Smaller corners */
+  border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
   aspect-ratio: 1;
@@ -782,13 +808,13 @@
   bottom: 0;
   left: 0;
   right: 0;
-  padding: var(--space-4xl) var(--space-lg) var(--space-lg);
+  padding: var(--space-3xl) var(--space-md) var(--space-md);
   background: linear-gradient(transparent, rgba(0,0,0,0.7));
-  border-radius: 0 0 20px 20px;
+  border-radius: 0 0 12px 12px;
 }
 
 .pbk-gallery-caption {
-  font-size: var(--fs-body);
+  font-size: var(--fs-small);
   font-weight: 400;
   color: #fff;
   letter-spacing: -0.01em;
@@ -799,12 +825,35 @@
 @media (min-width: 768px) {
   .pbk-gallery-grid {
     grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-lg);
+    gap: 16px;
   }
   
   .pbk-gallery .pbk-section-title {
     font-size: var(--fs-display-xl);
     margin-bottom: var(--space-3xl);
+  }
+  
+  .pbk-gallery-item {
+    border-radius: 20px;
+  }
+  
+  .pbk-gallery-item.pbk-gallery-large {
+    border-radius: 24px;
+  }
+  
+  .pbk-gallery-overlay {
+    padding: var(--space-4xl) var(--space-lg) var(--space-lg);
+    border-radius: 0 0 20px 20px;
+  }
+  
+  .pbk-gallery-caption {
+    font-size: var(--fs-body);
+  }
+}
+
+@media (min-width: 1024px) {
+  .pbk-gallery-grid {
+    gap: 20px;
   }
   
   .pbk-gallery-item {
@@ -815,19 +864,8 @@
     border-radius: 28px;
   }
   
-  .pbk-gallery-caption {
-    font-size: var(--fs-body-lg);
-  }
-  
   .pbk-gallery-overlay {
-    padding: var(--space-5xl) var(--space-xl) var(--space-xl);
     border-radius: 0 0 24px 24px;
-  }
-}
-
-@media (min-width: 1024px) {
-  .pbk-gallery-grid {
-    gap: var(--space-xl);
   }
 }
 
@@ -946,17 +984,18 @@
 .pbk-packages-grid {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: var(--space-xl);
+  align-items: stretch;  /* Full width on mobile */
+  gap: var(--space-lg);
 }
 
 .pbk-package {
   position: relative;
   background: var(--surface);
-  width: 300px;
-  min-height: 280px;
+  /* Mobile: Full width of container */
+  width: 100%;
+  min-height: 260px;
   /* Beautiful Apple-style rounded corners */
-  border-radius: 28px;
+  border-radius: 24px;
   border: none;
   /* Soft, diffused shadow like macOS/iOS */
   box-shadow: 
@@ -1097,6 +1136,28 @@
 
 .pbk-package-btn:active {
   transform: scale(0.98);
+}
+
+/* Tablet+: Grid layout for packages */
+@media (min-width: 768px) {
+  .pbk-packages-grid {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-xl);
+  }
+  
+  .pbk-package {
+    width: 320px;
+    border-radius: 28px;
+  }
+}
+
+/* Desktop: Larger cards */
+@media (min-width: 1024px) {
+  .pbk-package {
+    width: 340px;
+  }
 }
 
 
