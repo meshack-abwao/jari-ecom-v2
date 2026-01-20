@@ -250,7 +250,7 @@
 /* Hero image card - Golden Ratio proportions (1:1.618) */
 .pbk-hero-image {
   position: relative;
-  border-radius: var(--radius-lg);
+  border-radius: 20px;
   overflow: hidden;
   background: var(--bg-gray);
   aspect-ratio: 1.618 / 1;  /* Golden ratio - harmonious proportions */
@@ -268,7 +268,7 @@
 @media (min-width: 768px) {
   .pbk-hero-image {
     max-height: 480px;  /* Allow taller on tablet */
-    border-radius: var(--radius-lg);
+    border-radius: 24px;
   }
 }
 
@@ -692,7 +692,7 @@
 
 .pbk-gallery-item {
   position: relative;
-  border-radius: var(--radius-lg);
+  border-radius: 16px;
   overflow: hidden;
   cursor: pointer;
   aspect-ratio: 1;
@@ -816,7 +816,7 @@
   max-width: 90vw;
   max-height: 80vh;
   object-fit: contain;
-  border-radius: var(--radius);
+  border-radius: 16px;
 }
 
 .pbk-lightbox-caption {
@@ -1114,7 +1114,7 @@
   max-width: 300px;
   padding: var(--space-2xl);
   background: var(--surface);
-  border-radius: var(--radius-lg);
+  border-radius: 20px;
   flex-shrink: 0;
   box-shadow: 0 4px 20px rgba(0,0,0,0.06);
   border: 1px solid rgba(0,0,0,0.04);
@@ -1197,7 +1197,7 @@
   color: var(--text-secondary);
   background: var(--bg-gray);
   padding: var(--space-md) var(--space-lg);
-  border-radius: var(--radius-sm);
+  border-radius: 12px;
   margin: 0 0 var(--space-xl);
   border-left: 3px solid var(--color-primary);
 }
@@ -1227,7 +1227,7 @@
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-radius: var(--radius-lg);  /* Rounded rectangle on mobile */
+  border-radius: 20px;  /* Apple-style rounded */
   box-shadow: 0 4px 20px rgba(0,0,0,0.1), 0 1px 4px rgba(0,0,0,0.06);
   border: 1px solid rgba(0,0,0,0.06);
   pointer-events: all;
