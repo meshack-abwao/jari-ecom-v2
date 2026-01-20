@@ -36,37 +36,46 @@ export function renderDeepDive(product) {
     ${showBackButton ? '<button class="back-btn" id="backBtn">← Back to All Products</button>' : ''}
     <div class="product-container template-deep-dive">
       
-      <!-- PRODUCT HEADER - Above Image -->
+      <!-- STEP 1: DEFINE - Product Header (Title + Rating) -->
       ${renderDeepDiveHeader(data)}
       
-      <!-- HERO GALLERY -->
+      <!-- STEP 2: LOCATE - Hero Gallery with Dock-style thumbnails -->
       <div class="deep-dive-hero">
         ${renderGallery(media.images || [])}
       </div>
       
-      <!-- PRICE + DESCRIPTION -->
+      <!-- STEP 3: PREPARE - Price Row (Inline KES + Share/Like) -->
       <div class="deep-dive-info">
         <div class="price-row">
-          <span class="price-currency">KES</span>
-          <span class="price-main">${formatPrice(data.price)}</span>
+          <div class="price-group">
+            <span class="price-label">From</span>
+            <span class="price-currency">KES</span>
+            <span class="price-main">${formatPrice(data.price)}</span>
+          </div>
+          <div class="social-actions">
+            <button class="social-btn share-btn" title="Share" onclick="shareProduct()">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                <polyline points="16 6 12 2 8 6"/>
+                <line x1="12" y1="2" x2="12" y2="15"/>
+              </svg>
+            </button>
+            <button class="social-btn heart-btn" title="Save" onclick="toggleLike(this)">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+              </svg>
+            </button>
+          </div>
         </div>
+        
+        <!-- STEP 4: CONFIRM - Description -->
         ${data.description ? `<p class="product-description">${data.description}</p>` : ''}
       </div>
       
-      <!-- STORIES (if present) -->
-      ${(media.stories || []).length > 0 ? `
-        <div class="deep-dive-stories">
-          ${renderStories(media.stories, data.storyTitle)}
-        </div>
-      ` : ''}
-      
-      <!-- SHOWCASE MASONRY GALLERY -->
-      ${renderDeepDiveShowcase(validShowcase, showcaseVideo, data.showcaseTitle)}
-      
-      <!-- SPECIFICATIONS -->
+      <!-- STEP 5: EVALUATE - Specifications (moved UP) -->
       ${renderDeepDiveSpecs(validSpecs)}
       
-      <!-- WARRANTY -->
+      <!-- STEP 6: TRUST - Warranty -->
       ${data.warranty ? `
         <div class="deep-dive-warranty">
           <span class="warranty-icon">✓</span>
@@ -74,17 +83,27 @@ export function renderDeepDive(product) {
         </div>
       ` : ''}
       
-      <!-- TESTIMONIALS -->
+      <!-- STEP 6b: TRUST - Stories (optional) -->
+      ${(media.stories || []).length > 0 ? `
+        <div class="deep-dive-stories">
+          ${renderStories(media.stories, data.storyTitle)}
+        </div>
+      ` : ''}
+      
+      <!-- STEP 7: VALIDATE - Testimonials -->
       ${testimonials.length > 0 ? `
         <div class="deep-dive-testimonials">
           ${renderTestimonials(testimonials)}
         </div>
       ` : ''}
       
+      <!-- STEP 7b: SHOWCASE - Gallery for deep divers -->
+      ${renderDeepDiveShowcase(validShowcase, showcaseVideo, data.showcaseTitle)}
+      
       ${renderProductPolicyLinks(policies)}
     </div>
     
-    <!-- FLOATING GLASS CTA -->
+    <!-- STEP 8: EXECUTE - Floating Glass CTA -->
     ${renderDeepDiveCTA(data.price)}
     
     ${renderStoryViewer(media.stories || [])}
@@ -94,34 +113,19 @@ export function renderDeepDive(product) {
 }
 
 /**
- * Render Deep Dive header with title, stars, and social actions
+ * Render Deep Dive header with title and rating (simplified - social moved to price row)
  */
 function renderDeepDiveHeader(data) {
   return `
     <div class="deep-dive-header">
       <h1 class="product-name">${data.name || 'Product'}</h1>
       <div class="header-meta-row">
-        <div class="meta-left">
-          <div class="rating-stars">
-            ${renderStarSVG(true)}${renderStarSVG(true)}${renderStarSVG(true)}${renderStarSVG(true)}${renderStarSVG(false)}
-            <span class="rating-count">4.8</span>
-          </div>
-          <span class="meta-dot">•</span>
-          <span class="stock-badge in-stock">In Stock</span>
+        <div class="rating-stars">
+          ${renderStarSVG(true)}${renderStarSVG(true)}${renderStarSVG(true)}${renderStarSVG(true)}${renderStarSVG(false)}
+          <span class="rating-count">4.8</span>
         </div>
-        <div class="social-actions">
-          <button class="social-btn share-btn" title="Share" onclick="shareProduct()">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <line x1="22" y1="2" x2="11" y2="13"/>
-              <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-            </svg>
-          </button>
-          <button class="social-btn heart-btn" title="Save" onclick="toggleLike(this)">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-            </svg>
-          </button>
-        </div>
+        <span class="meta-dot">•</span>
+        <span class="stock-badge in-stock">In Stock</span>
       </div>
     </div>
   `;
