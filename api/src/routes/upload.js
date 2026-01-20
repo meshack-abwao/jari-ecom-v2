@@ -50,6 +50,12 @@ router.post('/signature', auth, async (req, res, next) => {
       process.env.CLOUDINARY_API_SECRET
     );
     
+    // Debug logging (remove in production)
+    console.log('[Upload] Signature generated for folder:', uploadFolder);
+    console.log('[Upload] API Key present:', !!process.env.CLOUDINARY_API_KEY);
+    console.log('[Upload] API Secret present:', !!process.env.CLOUDINARY_API_SECRET);
+    console.log('[Upload] Cloud Name:', process.env.CLOUDINARY_CLOUD_NAME);
+    
     res.json({
       success: true,
       signature,
