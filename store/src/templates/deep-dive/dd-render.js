@@ -72,29 +72,29 @@ export function renderDeepDive(product) {
         ${data.description ? `<p class="product-description">${data.description}</p>` : ''}
       </div>
       
-      <!-- STEP 5: EVALUATE - Specifications (moved UP) -->
-      ${renderDeepDiveSpecs(validSpecs)}
-      
-      <!-- STEP 6: TRUST - Trust Badges (horizontal) -->
-      ${renderTrustBadges(data)}
-      
-      <!-- STEP 6b: Stories (no wrapper, inline with flow) -->
+      <!-- STEP 5: Stories (below description) -->
       ${(media.stories || []).length > 0 ? renderStories(media.stories, data.storyTitle) : ''}
       
-      <!-- STEP 7: VALIDATE - Testimonials -->
+      <!-- STEP 6: EVALUATE - Specifications -->
+      ${renderDeepDiveSpecs(validSpecs)}
+      
+      <!-- STEP 7: TRUST - Trust Badges (horizontal) -->
+      ${renderTrustBadges(data)}
+      
+      <!-- STEP 8: SHOWCASE - Gallery -->
+      ${renderDeepDiveShowcase(validShowcase, showcaseVideo, data.showcaseTitle)}
+      
+      <!-- STEP 9: VALIDATE - Testimonials (LAST) -->
       ${testimonials.length > 0 ? `
         <div class="deep-dive-testimonials">
           ${renderTestimonials(testimonials)}
         </div>
       ` : ''}
       
-      <!-- STEP 7b: SHOWCASE - Gallery for deep divers -->
-      ${renderDeepDiveShowcase(validShowcase, showcaseVideo, data.showcaseTitle)}
-      
       ${renderProductPolicyLinks(policies)}
     </div>
     
-    <!-- STEP 8: EXECUTE - Floating Glass CTA -->
+    <!-- FLOATING CTA -->
     ${renderDeepDiveCTA(data.price)}
     
     ${renderStoryViewer(media.stories || [])}

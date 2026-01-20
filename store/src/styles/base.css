@@ -2701,6 +2701,13 @@ body {
     .specs-card {
         padding: var(--space-2xl);
         border-radius: 28px;
+        max-width: 560px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .specs-card {
+        max-width: 620px;
     }
 }
 
