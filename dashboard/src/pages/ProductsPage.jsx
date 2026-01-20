@@ -33,7 +33,7 @@ const TEMPLATES = {
     price: 800,
     description: 'For high-ticket items needing specs',
     icon: '🔍',
-    fields: ['basic', 'gallery', 'stories', 'specifications', 'warranty', 'testimonials']
+    fields: ['basic', 'gallery', 'stories', 'specifications', 'showcase', 'warranty', 'testimonials']
   },
   'event-landing': {
     name: 'Event Landing',
@@ -708,6 +708,18 @@ export default function ProductsPage() {
                               }}
                               placeholder={`Story ${idx + 1} URL`}
                               className="dashboard-input"
+                            />
+                            <input
+                              type="text"
+                              value={story.caption || ''}
+                              onChange={e => {
+                                const newStories = [...formData.stories];
+                                newStories[idx] = { ...newStories[idx], caption: e.target.value };
+                                updateField('stories', newStories);
+                              }}
+                              placeholder="Label (e.g. Living Room)"
+                              className="dashboard-input"
+                              style={{ marginTop: '4px' }}
                             />
                             <select
                               value={story.type}

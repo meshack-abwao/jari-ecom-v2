@@ -181,6 +181,7 @@ export function initStoryHandlers(stories) {
   if (!viewer || !storyImage) return;
   
   function showStory(index) {
+    if (!stories[index] || !stories[index].url) return;
     currentStoryIndex = index;
     storyImage.src = stories[index].url;
     viewer.classList.add('active');
