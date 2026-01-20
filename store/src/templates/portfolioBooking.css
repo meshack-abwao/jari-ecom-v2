@@ -194,54 +194,6 @@
   margin-left: var(--space-sm);
 }
 
-.pbk-actions {
-  display: flex;
-  gap: var(--space-sm);
-  flex-shrink: 0;
-}
-
-/* Action buttons - Larger, more visible */
-.pbk-action-btn {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: var(--text-secondary);
-  transition: all 0.2s ease;
-}
-
-.pbk-action-btn svg {
-  width: 22px;
-  height: 22px;
-}
-
-.pbk-action-btn:hover {
-  transform: scale(1.08);
-  background: rgba(0, 0, 0, 0.1);
-  color: var(--text-primary);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.pbk-action-btn:active {
-  transform: scale(0.95);
-}
-
-.pbk-action-btn.liked {
-  background: rgba(255, 59, 48, 0.12);
-  border-color: rgba(255, 59, 48, 0.2);
-  color: #ff3b30;
-}
-
-.pbk-action-btn.liked svg {
-  fill: #ff3b30;
-}
-
-
 /* Hero */
 .pbk-hero {
   margin-bottom: var(--space-2xl);
@@ -416,7 +368,7 @@
   background: var(--surface);
 }
 
-/* Intro - "Why should I care?" Value proposition */
+/* Intro - Apple-style info section */
 .pbk-intro {
   margin-bottom: var(--space-3xl);
   text-align: left;
@@ -430,7 +382,7 @@
 }
 
 .pbk-price-from {
-  font-size: var(--fs-body-lg);
+  font-size: var(--fs-body);
   color: var(--text-secondary);
   display: flex;
   align-items: baseline;
@@ -439,17 +391,69 @@
 
 .pbk-price-from strong {
   color: var(--color-primary);
-  font-size: var(--fs-heading-lg);
+  font-size: var(--fs-heading-xl);
   font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* Action buttons - Apple-style soft circles */
+.pbk-actions {
+  display: flex;
+  gap: var(--space-sm);
+  flex-shrink: 0;
+}
+
+.pbk-action-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  /* Apple-style soft background */
+  background: var(--surface);
+  border: none;
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.06),
+    0 4px 16px rgba(0, 0, 0, 0.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.pbk-action-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.pbk-action-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.1),
+    0 8px 24px rgba(0, 0, 0, 0.08);
+  color: var(--text-primary);
+}
+
+.pbk-action-btn:active {
+  transform: scale(0.95);
+}
+
+.pbk-action-btn.liked {
+  background: rgba(255, 59, 48, 0.1);
+  color: #ff3b30;
+}
+
+.pbk-action-btn.liked svg {
+  fill: #ff3b30;
 }
 
 .pbk-description {
   font-size: var(--fs-body);
-  line-height: 1.7;  /* More generous for readability */
+  line-height: 1.7;
   color: var(--text-secondary);
   margin: 0;
-  max-width: 60ch;  /* Optimal line length: 45-75 chars */
-  letter-spacing: 0.01em;  /* Slightly open for small text */
+  max-width: 60ch;
+  letter-spacing: 0.01em;
 }
 
 
