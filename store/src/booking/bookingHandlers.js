@@ -481,6 +481,13 @@ async function handleConfirm() {
   }
   
   try {
+    console.log('[Booking] Creating booking with data:', {
+      storeSlug,
+      product_id: product?.id,
+      booking_date: selectedDate,
+      booking_time: selectedTime
+    });
+    
     const booking = await bookingApi.createBooking(storeSlug, {
       product_id: product?.id,
       package_name: selectedPackage?.name || product?.data?.name,

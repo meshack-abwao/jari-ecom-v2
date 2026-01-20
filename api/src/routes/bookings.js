@@ -482,6 +482,10 @@ router.get('/public/:storeSlug/availability', async (req, res, next) => {
       [storeId, date]
     );
     
+    console.log('[Availability] Store:', storeSlug, '| Date:', date, '| Found bookings:', bookingsResult.rows.length);
+    if (bookingsResult.rows.length > 0) {
+      console.log('[Availability] Existing bookings:', bookingsResult.rows.map(b => b.booking_time));
+    
     // Generate available slots
     const slotDuration = settings.slot_duration_minutes || 60;
     const maxPerSlot = settings.max_bookings_per_slot || 1;
@@ -545,6 +549,9 @@ router.get('/public/:storeSlug/availability', async (req, res, next) => {
 router.post('/public/:storeSlug/bookings', async (req, res, next) => {
   try {
     const { storeSlug } = req.params;
+    console.log('[Booking] Create request for store:', storeSlug);
+    console.log('[Booking] Body:', JSON.stringify(req.body, null, 2));
+    
     const {
       service_id,
       product_id, // Accept both service_id and product_id
@@ -636,6 +643,13 @@ router.post('/public/:storeSlug/bookings', async (req, res, next) => {
       totalAmount, depositAmount, jumped_line || false, jumpFeePaid,
       customerNotes, payment_type || 'full', mpesa_code || null, payment_confirmed || false
     ]);
+    
+    console.log('[Booking] Created successfully:', {
+      id: result.rows[0].id,
+      store_id: storeId,
+      booking_date,
+      booking_time
+    });
     
     // TODO: Send notification to provider (SMS/WhatsApp)
     // TODO: Send confirmation to customer
