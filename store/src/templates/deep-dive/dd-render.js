@@ -171,21 +171,23 @@ function renderDeepDiveShowcase(showcaseImages, showcaseVideo, title) {
 }
 
 /**
- * Render specifications section
+ * Render specifications section - Title INSIDE card for unified look
  */
 function renderDeepDiveSpecs(specs) {
   if (!specs || specs.length === 0) return '';
   
   return `
     <div class="deep-dive-specs">
-      <h3 class="specs-title">Specifications</h3>
-      <div class="specs-list">
-        ${specs.map(spec => `
-          <div class="spec-row">
-            <span class="spec-label">${spec.label}</span>
-            <span class="spec-value">${spec.value}</span>
-          </div>
-        `).join('')}
+      <div class="specs-card">
+        <h3 class="specs-title">Specifications</h3>
+        <div class="specs-list">
+          ${specs.map(spec => `
+            <div class="spec-row">
+              <span class="spec-label">${spec.label}</span>
+              <span class="spec-value">${spec.value}</span>
+            </div>
+          `).join('')}
+        </div>
       </div>
     </div>
   `;
