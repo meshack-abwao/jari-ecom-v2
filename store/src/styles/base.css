@@ -2465,18 +2465,18 @@ body {
     max-width: 60ch;
 }
 
-/* ===== Stories Section - Centered ===== */
-.deep-dive-stories {
+/* ===== Stories Section - Inline flow (no wrapper needed) ===== */
+.template-deep-dive .stories-section {
     margin-top: var(--space-2xl);
-    padding-top: var(--space-2xl);
-    border-top: 1px solid var(--border);
+    padding: 0;
+    background: transparent;
 }
 
-.deep-dive-stories .stories-container {
+.template-deep-dive .stories-container {
     justify-content: center;
 }
 
-.deep-dive-stories .story-title {
+.template-deep-dive .story-title {
     text-align: center;
 }
 
