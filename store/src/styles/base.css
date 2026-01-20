@@ -2712,7 +2712,7 @@ body {
     margin-left: 4px;
 }
 
-/* ===== Specifications - Title INSIDE Card ===== */
+/* ===== Specifications - Unified Card Style (matches PBK) ===== */
 .deep-dive-specs {
     margin-top: var(--space-3xl);
     margin-bottom: var(--space-2xl);
@@ -2721,22 +2721,22 @@ body {
 /* Specs card container with title inside */
 .specs-card {
     background: var(--surface);
-    border-radius: 24px;
-    padding: var(--space-xl);
+    border-radius: 20px;
+    padding: var(--space-lg) var(--space-xl);
     box-shadow: 
         0 2px 8px rgba(0, 0, 0, 0.04),
         0 8px 24px rgba(0, 0, 0, 0.06);
-    max-width: 500px;
-    margin: 0 auto;
+    max-width: 100%;
+    margin: 0;
 }
 
 .specs-card .specs-title {
-    font-size: var(--fs-heading);
+    font-size: var(--fs-body-lg);
     font-weight: 600;
     color: var(--text-primary);
-    margin-bottom: var(--space-lg);
-    letter-spacing: -0.02em;
-    padding-bottom: var(--space-md);
+    margin-bottom: var(--space-md);
+    letter-spacing: -0.01em;
+    padding-bottom: var(--space-sm);
     border-bottom: 1px solid var(--border);
     text-align: center;
 }
@@ -2749,7 +2749,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: var(--space-md) 0;
+    padding: var(--space-sm) 0;
     border-bottom: 1px solid var(--border);
 }
 
@@ -2758,13 +2758,17 @@ body {
     padding-bottom: 0;
 }
 
+.spec-row:first-child {
+    padding-top: var(--space-xs);
+}
+
 .spec-row .spec-label {
-    font-size: var(--fs-body);
+    font-size: var(--fs-small);
     color: var(--text-secondary);
 }
 
 .spec-row .spec-value {
-    font-size: var(--fs-body);
+    font-size: var(--fs-small);
     font-weight: 600;
     color: var(--text-primary);
     text-align: right;
@@ -2772,15 +2776,14 @@ body {
 
 @media (min-width: 768px) {
     .specs-card {
-        padding: var(--space-2xl);
-        border-radius: 28px;
-        max-width: 560px;
+        padding: var(--space-xl) var(--space-2xl);
+        border-radius: 24px;
     }
 }
 
 @media (min-width: 1024px) {
     .specs-card {
-        max-width: 620px;
+        max-width: none;
     }
 }
 
