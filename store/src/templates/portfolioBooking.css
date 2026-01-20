@@ -194,40 +194,50 @@
   margin-left: var(--space-sm);
 }
 
-/* Hero */
+/* Hero - Apple-style centered container */
 .pbk-hero {
   margin-bottom: var(--space-2xl);
+  display: flex;
+  justify-content: center;
 }
 
-/* Hero image card - Golden Ratio proportions (1:1.618) */
+/* Hero image card - Beautiful Apple-style with soft shadows */
 .pbk-hero-image {
   position: relative;
-  border-radius: var(--radius-xl);
+  width: 100%;
+  max-width: 900px;
+  /* Beautiful Apple-style rounded corners */
+  border-radius: 24px;
   overflow: hidden;
   background: var(--bg-gray);
-  aspect-ratio: 4 / 3;  /* Less wide, more balanced with text below */
-  max-height: 380px;  /* Cap height on mobile */
+  aspect-ratio: 4 / 3;
+  /* Soft shadow like macOS windows */
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.08),
+    0 12px 32px rgba(0, 0, 0, 0.12);
 }
 
 .pbk-hero-image img {
   width: 100%;
   height: 100%;
-  object-fit: cover;  /* Fill container, crop if needed */
+  object-fit: cover;
   object-position: center;
   display: block;
 }
 
 @media (min-width: 768px) {
   .pbk-hero-image {
-    max-height: 420px;  /* Controlled on tablet */
-    aspect-ratio: 16 / 10;  /* Slightly wider but not too much */
-    border-radius: var(--radius-2xl);
+    aspect-ratio: 16 / 10;
+    border-radius: 28px;
+    box-shadow: 
+      0 8px 24px rgba(0, 0, 0, 0.1),
+      0 24px 48px rgba(0, 0, 0, 0.1);
   }
 }
 
 @media (min-width: 1024px) {
   .pbk-hero-image {
-    max-height: 480px;  /* Balanced on desktop */
+    border-radius: 32px;
   }
 }
 
@@ -318,54 +328,77 @@
   left: 0;
   right: 0;
   transform: translateY(-50%);
-  display: none;  /* Hidden on mobile - use swipe */
+  display: flex;
   justify-content: space-between;
-  padding: 0 var(--space-md);
+  padding: 0 var(--space-lg);
   pointer-events: none;
 }
 
-@media (min-width: 768px) {
-  .pbk-hero-nav {
-    display: flex;  /* Show arrows on tablet+ */
-  }
-}
-
+/* Apple-style nav buttons with soft shadows */
 .pbk-nav-btn {
-  width: var(--size-icon-sm);
-  height: var(--size-icon-sm);
+  width: 44px;
+  height: 44px;
   border: none;
   border-radius: 50%;
-  background: rgba(255,255,255,0.9);
-  font-size: var(--fs-heading);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font-size: var(--fs-body-lg);
+  color: var(--text-primary);
   cursor: pointer;
   pointer-events: auto;
-  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.1),
+    0 8px 24px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .pbk-nav-btn:hover {
-  background: var(--surface);
-  transform: scale(1.05);
+  background: #fff;
+  transform: scale(1.1);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.15),
+    0 12px 32px rgba(0, 0, 0, 0.12);
 }
 
+.pbk-nav-btn:active {
+  transform: scale(0.95);
+}
+
+/* Apple-style indicator dots */
 .pbk-hero-dots {
   position: absolute;
-  bottom: var(--space-md);
+  bottom: var(--space-lg);
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  gap: var(--space-sm);
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 100px;
 }
 
 .pbk-dot {
-  width: var(--space-sm);
-  height: var(--space-sm);
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.5);
+  background: rgba(255, 255, 255, 0.5);
   cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.pbk-dot:hover {
+  background: rgba(255, 255, 255, 0.8);
 }
 
 .pbk-dot.active {
-  background: var(--surface);
+  background: #fff;
+  transform: scale(1.2);
 }
 
 /* Intro - Apple-style info section */
