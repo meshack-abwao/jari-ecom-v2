@@ -1897,12 +1897,12 @@ body {
 }
 
 .stories-title {
-    font-size: var(--fs-label);
+    font-size: var(--fs-small);
     font-weight: 600;
     color: var(--text-secondary);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 12px;
+    letter-spacing: 0.08em;
+    margin-bottom: var(--space-md);
     text-align: center;
 }
 
