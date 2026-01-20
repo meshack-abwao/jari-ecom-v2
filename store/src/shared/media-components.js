@@ -60,22 +60,25 @@ export function renderGallery(images, options = {}) {
 }
 
 /**
- * Render stories section (Instagram-style circles)
- * @param {object[]} stories - Array of story objects { url, type }
- * @param {string} title - Section title
+ * Render stories section (Instagram-style circles with optional titles)
+ * @param {object[]} stories - Array of story objects { url, type, title }
+ * @param {string} sectionTitle - Section title
  * @returns {string} HTML string
  */
-export function renderStories(stories, title = 'See it in Action') {
+export function renderStories(stories, sectionTitle = 'See it in Action') {
   if (!stories || stories.length === 0) return '';
   
   return `
     <div class="stories-section">
-      <h3 class="stories-title">${title}</h3>
+      <h3 class="stories-title">${sectionTitle}</h3>
       <div class="stories-row">
         ${stories.map((story, i) => `
-          <div class="story-bubble" data-story-index="${i}">
-            <img src="${story.url}" alt="Story ${i + 1}">
-            ${story.type === 'video' ? '<span class="story-play">▶</span>' : ''}
+          <div class="story-item" data-story-index="${i}">
+            <div class="story-bubble">
+              <img src="${story.url}" alt="Story ${i + 1}">
+              ${story.type === 'video' ? '<span class="story-play">▶</span>' : ''}
+            </div>
+            ${story.title ? `<span class="story-label">${story.title}</span>` : ''}
           </div>
         `).join('')}
       </div>
