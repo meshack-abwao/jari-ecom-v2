@@ -2903,9 +2903,9 @@ body {
 }
 
 .included-text {
-    font-size: var(--fs-small);
+    font-size: var(--fs-body);
     color: var(--text-primary);
-    line-height: 1.4;
+    line-height: 1.5;
 }
 
 @media (min-width: 768px) {
