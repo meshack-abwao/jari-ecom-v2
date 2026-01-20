@@ -33,7 +33,7 @@ const TEMPLATES = {
     price: 800,
     description: 'For high-ticket items needing specs',
     icon: '🔍',
-    fields: ['basic', 'gallery', 'stories', 'specifications', 'showcase', 'warranty', 'testimonials']
+    fields: ['basic', 'gallery', 'stories', 'specifications', 'whatsIncluded', 'showcase', 'warranty', 'testimonials']
   },
   'event-landing': {
     name: 'Event Landing',
@@ -128,7 +128,7 @@ export default function ProductsPage() {
   const [formData, setFormData] = useState(getInitialFormData());
   const [expandedSections, setExpandedSections] = useState({
     basic: true, gallery: false, stories: false, testimonials: false,
-    packages: false, dietary: false, specifications: false, showcase: false, warranty: false, eventDetails: false, tickets: false, policies: false
+    packages: false, dietary: false, specifications: false, whatsIncluded: false, showcase: false, warranty: false, eventDetails: false, tickets: false, policies: false
   });
 
   useEffect(() => { loadProducts(); loadStoreInfo(); loadCategories(); }, []);
@@ -257,6 +257,7 @@ export default function ProductsPage() {
           ...(selectedTemplate === 'deep-dive' && {
             specifications: formData.specifications.filter(s => s.label?.trim()),
             warranty: formData.warranty,
+            whatsIncluded: formData.whatsIncluded.filter(item => item?.trim()),
             showcaseTitle: formData.showcaseTitle || 'Gallery',
           }),
           
@@ -394,7 +395,7 @@ export default function ProductsPage() {
     setSelectedTemplate('quick-decision');
     setShowModal(false);
     setExpandedSections({ basic: true, gallery: false, stories: false, testimonials: false,
-      packages: false, dietary: false, specifications: false, eventDetails: false, tickets: false, policies: false });
+      packages: false, dietary: false, specifications: false, whatsIncluded: false, showcase: false, warranty: false, eventDetails: false, tickets: false, policies: false });
   };
 
   const toggleSection = (section) => {
@@ -1123,6 +1124,33 @@ export default function ProductsPage() {
                           className="dashboard-input"
                         />
                       </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* WHAT'S INCLUDED (deep-dive) */}
+              {showField('whatsIncluded') && (
+                <div style={styles.section}>
+                  <SectionHeader section="whatsIncluded" title="What's Included" icon="📦" />
+                  {expandedSections.whatsIncluded && (
+                    <div style={styles.sectionContent}>
+                      <p style={styles.hint}>List what comes with the product (4 items max)</p>
+                      {formData.whatsIncluded.map((item, idx) => (
+                        <input
+                          key={idx}
+                          type="text"
+                          value={item}
+                          onChange={e => {
+                            const newItems = [...formData.whatsIncluded];
+                            newItems[idx] = e.target.value;
+                            updateField('whatsIncluded', newItems);
+                          }}
+                          placeholder={`Item ${idx + 1} (e.g. Remote Control, Cables, Manual)`}
+                          className="dashboard-input"
+                          style={{ marginBottom: '8px' }}
+                        />
+                      ))}
                     </div>
                   )}
                 </div>

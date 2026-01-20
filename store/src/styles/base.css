@@ -2759,6 +2759,82 @@ body {
     color: var(--text-primary);
 }
 
+/* ===== What's Included - Card with checklist ===== */
+.deep-dive-included {
+    margin-top: var(--space-2xl);
+}
+
+.included-card {
+    background: var(--surface);
+    border-radius: 24px;
+    padding: var(--space-xl);
+    box-shadow: 
+        0 2px 8px rgba(0, 0, 0, 0.04),
+        0 8px 24px rgba(0, 0, 0, 0.06);
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.included-title {
+    font-size: var(--fs-heading);
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--space-lg);
+    letter-spacing: -0.02em;
+    padding-bottom: var(--space-md);
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+}
+
+.included-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.included-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-md);
+}
+
+.included-check {
+    width: 24px;
+    height: 24px;
+    background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+    color: var(--color-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--fs-small);
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.included-text {
+    font-size: var(--fs-body);
+    color: var(--text-primary);
+    line-height: 1.5;
+}
+
+@media (min-width: 768px) {
+    .included-card {
+        padding: var(--space-2xl);
+        border-radius: 28px;
+        max-width: 560px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .included-card {
+        max-width: 620px;
+    }
+}
+
 /* ===== Testimonials ===== */
 .deep-dive-testimonials {
     margin-top: var(--space-3xl);

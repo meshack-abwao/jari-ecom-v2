@@ -72,19 +72,22 @@ export function renderDeepDive(product) {
         ${data.description ? `<p class="product-description">${data.description}</p>` : ''}
       </div>
       
-      <!-- STEP 5: Stories (below description) -->
-      ${(media.stories || []).length > 0 ? renderStories(media.stories, data.storyTitle) : ''}
-      
-      <!-- STEP 6: EVALUATE - Specifications -->
+      <!-- STEP 5: EVALUATE - Specifications -->
       ${renderDeepDiveSpecs(validSpecs)}
+      
+      <!-- STEP 6: Stories (between specs and trust) -->
+      ${(media.stories || []).length > 0 ? renderStories(media.stories, data.storyTitle) : ''}
       
       <!-- STEP 7: TRUST - Trust Badges (horizontal) -->
       ${renderTrustBadges(data)}
       
-      <!-- STEP 8: SHOWCASE - Gallery -->
+      <!-- STEP 8: What's Included -->
+      ${renderWhatsIncluded(data.whatsIncluded)}
+      
+      <!-- STEP 9: SHOWCASE - Gallery -->
       ${renderDeepDiveShowcase(validShowcase, showcaseVideo, data.showcaseTitle)}
       
-      <!-- STEP 9: VALIDATE - Testimonials (LAST) -->
+      <!-- STEP 10: VALIDATE - Testimonials (LAST) -->
       ${testimonials.length > 0 ? `
         <div class="deep-dive-testimonials">
           ${renderTestimonials(testimonials)}
@@ -223,6 +226,31 @@ function renderTrustBadges(data) {
             <span class="badge-text">${b.text}</span>
           </div>
         `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * Render What's Included section
+ */
+function renderWhatsIncluded(items) {
+  if (!items || items.length === 0) return '';
+  const validItems = items.filter(item => item?.trim());
+  if (validItems.length === 0) return '';
+  
+  return `
+    <div class="deep-dive-included">
+      <div class="included-card">
+        <h3 class="included-title">What's Included</h3>
+        <ul class="included-list">
+          ${validItems.map(item => `
+            <li class="included-item">
+              <span class="included-check">✓</span>
+              <span class="included-text">${item}</span>
+            </li>
+          `).join('')}
+        </ul>
       </div>
     </div>
   `;
