@@ -2492,6 +2492,7 @@ body {
     
     .dd-content-left {
         margin-bottom: 0;
+        padding-top: var(--space-sm);
     }
     
     .dd-content-left .product-description {
@@ -2502,7 +2503,7 @@ body {
     
     .dd-content-right .deep-dive-specs {
         max-width: none;
-        margin: 0 auto;
+        margin: 0;
     }
     
     .dd-content-right .specs-card {
