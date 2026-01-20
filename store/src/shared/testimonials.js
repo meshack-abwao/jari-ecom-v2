@@ -18,12 +18,16 @@ export function renderTestimonials(testimonials) {
   const filtered = testimonials.filter(t => t.text?.trim());
   if (filtered.length === 0) return '';
   
+  // Render cards and duplicate for seamless infinite scroll
+  const testimonialCards = filtered.map(t => renderTestimonialCard(t)).join('');
+  
   return `
     <div class="testimonials-section">
       <div class="testimonials-card">
         <h3 class="testimonials-title">What Customers Say</h3>
-        <div class="testimonials-scroll">
-          ${filtered.map(t => renderTestimonialCard(t)).join('')}
+        <div class="testimonials-track">
+          ${testimonialCards}
+          ${testimonialCards}
         </div>
       </div>
     </div>
