@@ -71,6 +71,28 @@ export function renderPortfolioBookingTemplate(product) {
             ${data.whatsIncluded ? renderPbkWhatsIncluded(data.whatsIncluded) : ''}
           </div>
         </div>
+
+        <!-- 3.5 TRUST BADGES - "Can I trust this provider?" (JTBD: Build confidence) -->
+        <div class="pbk-trust-section">
+          <div class="pbk-trust-badges">
+            <div class="pbk-trust-badge">
+              <span class="pbk-badge-icon">✓</span>
+              <span class="pbk-badge-text">Verified Pro</span>
+            </div>
+            <div class="pbk-trust-badge">
+              <span class="pbk-badge-icon">🛡️</span>
+              <span class="pbk-badge-text">Secure Booking</span>
+            </div>
+            <div class="pbk-trust-badge">
+              <span class="pbk-badge-icon">💬</span>
+              <span class="pbk-badge-text">Quick Response</span>
+            </div>
+            <div class="pbk-trust-badge">
+              <span class="pbk-badge-icon">⭐</span>
+              <span class="pbk-badge-text">Satisfaction Guaranteed</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- 4. PACKAGES - "What do I get?" (Decision framework - EARLY!) -->

@@ -549,6 +549,83 @@
   }
 }
 
+/* ===========================================
+   TRUST BADGES - JTBD: Build confidence before decision
+   Apple-style pill design, horizontal scroll on mobile
+   =========================================== */
+.pbk-trust-section {
+  margin-top: var(--space-3xl);
+  margin-bottom: var(--space-2xl);
+}
+
+.pbk-trust-badges {
+  display: flex;
+  gap: var(--space-sm);
+  overflow-x: auto;
+  padding: var(--space-xs) 0;
+  -webkit-overflow-scrolling: touch;
+  justify-content: flex-start;
+  scrollbar-width: none;
+}
+
+.pbk-trust-badges::-webkit-scrollbar {
+  display: none;
+}
+
+.pbk-trust-badge {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--surface);
+  border-radius: 100px;
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.04),
+    0 4px 12px rgba(0, 0, 0, 0.06);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.pbk-badge-icon {
+  width: 24px;
+  height: 24px;
+  background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+  color: var(--color-primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.pbk-badge-text {
+  font-size: var(--fs-small);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+@media (min-width: 768px) {
+  .pbk-trust-badges {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+  }
+  
+  .pbk-trust-badge {
+    padding: var(--space-sm) var(--space-lg);
+  }
+  
+  .pbk-badge-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
+  }
+  
+  .pbk-badge-text {
+    font-size: var(--fs-body-sm);
+  }
+}
+
 
 /* Section Title (Level 3 in hierarchy) - Clear wayfinding, centered */
 .pbk-section-title {
