@@ -522,8 +522,8 @@
 }
 
 .pbk-content-left {
-  margin-bottom: var(--space-2xl);
-  padding-top: var(--space-lg);  /* Visual balance with What's Included card */
+  margin-bottom: var(--space-3xl);  /* More breathing room on mobile */
+  padding-top: var(--space-xl);  /* Visual balance with What's Included card */
 }
 
 .pbk-content-right .pbk-whats-included {
