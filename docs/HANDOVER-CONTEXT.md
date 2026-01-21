@@ -1,40 +1,69 @@
 # Jari.Ecom V2 - Handover Context
-## Session: January 22, 2026 (Evening)
-## Status: PBK TEMPLATE REFINEMENTS COMPLETE ✅
+## Session: January 22, 2026 (Late Night)
+## Status: PBK + BOOKING MODAL COMPLETE ✅ | VISUAL MENU NEXT
 
 ---
 
-## 🎯 TODAY'S PROGRESS (January 22, Evening)
+## 🎯 TODAY'S PROGRESS (January 22, Late Night)
 
-### PBK Template - What's Included Section
-| Fix | Description |
-|-----|-------------|
-| **2-col grid layout** | Description + What's Included side-by-side on desktop |
-| **Title inside card** | Matches Deep Dive Specs card pattern |
-| **Single column list** | Removed 2-col grid inside card |
-| **Breathing room** | Added spacing from hero and between sections |
-| **Typography legibility** | Font sizes updated to match DD specs (fs-body = 15px) |
-| **CTA icon position** | Calendar icon now AFTER "Check Availability" text |
+### PBK Template - Trust Elements & JTBD Flow
+| Feature | Description |
+|---------|-------------|
+| **Trust Badges** | 4 pill badges (Verified Pro, Secure Booking, Quick Response, Satisfaction Guaranteed) |
+| **Animation stagger** | Trust section animates at 0.18s delay in sequence |
+| **Stories fix** | Now uses `data.storyTitle` from dashboard + `story.caption` for labels |
 
-### Design Principles Applied
-- **JTBD/ODI:** Trust-building before purchase decision
-- **Typography Psychology:** Processing fluency = easier to read = more trust
-- **Grid System:** 2-column balanced layout on desktop, stacked on mobile
+### Booking Modal - Payment Step Redesign
+| Feature | Description |
+|---------|-------------|
+| **Unified M-Pesa card** | Premium design with green border |
+| **Payment pills** | Paybill/Account in subtle gray boxes |
+| **Amount display** | Horizontal layout, soft green background |
+| **Step instructions** | Inline text with highlighted final step |
 
-### Commits This Session
+### Commits This Session (Latest)
 ```
-361775e checkout-trust-pills-step4-no-hidden-fees-CSS-styling
-a97fd8e checkout-trust-pills-step2-realtime-step3-secure
-7f0a311 checkout-trust-pills-step1-transparent-pricing
-db66912 docs-handover-PBK-template-refinements-complete
-d2b4447 PBK-mobile-breathing-room-CTA-icon-after-text
-5ffad26 PBK-description-top-padding-content-grid-breathing-room
-b8096ca docs-update-formula4-commit-as-you-go-phases
-f09cabe PBK-typography-legibility-match-DD-specs-card-style
-438758f PBK-WhatsIncluded-single-col-compact-remove-grid-override
-0823be0 PBK-WhatsIncluded-title-inside-card-single-col-breathing-room
-cb39ce3 PBK-2col-grid-Description-WhatsIncluded-side-by-side-desktop
+c22cb89 BKM-mpesa-card-green-border
+e45d9b1 BKM-mpesa-card-subtle-premium-less-shouting
+7f2e73a BKM-payment-unified-mpesa-card-premium-pills-design
+de8c446 BKM-payment-step-trust-pills-verified-encrypted-support
+a1344ed PBK-stories-use-dashboard-title-and-caption-fields
+eb8500c PBK-trust-section-animation-stagger-accessibility
+8c80a60 PBK-trust-badges-JTBD-build-confidence-pills
 ```
+
+### Trust Architecture Complete
+```
+PBK STOREFRONT                    BOOKING MODAL
+──────────────────────────────    ──────────────────────────────
+1. Trust Badges (pills) ✅        Step 1: SELECT - Date/Time
+2. What's Included (card) ✅      Step 2: DETAILS - Your Info  
+3. Why Choose Us (cards) ✅       Step 3: PAY - M-Pesa Card ✅
+4. Testimonials ✅                Step 4: SUCCESS - Confirmation
+```
+
+---
+
+## 🔜 NEXT: VISUAL MENU TEMPLATE
+
+### Target Audience
+- Restaurants, cafes, food vendors
+- Menu-based businesses
+- Quick service establishments
+
+### JTBD Analysis Needed
+1. "Help me see what food is available"
+2. "Help me understand prices quickly"  
+3. "Help me order easily"
+4. "Help me trust the food quality"
+
+### Template Features to Build
+- [ ] Category-based menu navigation
+- [ ] Food item cards with images
+- [ ] Price display (KES formatting)
+- [ ] Dietary tags (vegetarian, spicy, etc.)
+- [ ] Quick add to cart
+- [ ] WhatsApp ordering integration
 
 ---
 
