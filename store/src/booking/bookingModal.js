@@ -390,6 +390,9 @@ function renderStep4() {
   
   return `
     <div class="bkm-step-content">
+      <div class="bkm-step-trust">
+        ${renderTrustPill('✅', 'No Hidden Fees', 'success')}
+      </div>
       <h3 class="bkm-title">Review & Confirm</h3>
       
       <!-- Booking Summary - Clean Card Layout -->

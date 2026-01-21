@@ -1394,6 +1394,38 @@
 }
 
 /* ===========================================
+   TRUST PILLS - All Steps
+   JTBD: Build confidence throughout checkout
+   Typography: fs-body-sm (13px), 600 weight
+   =========================================== */
+.bkm-step-trust {
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.bkm-trust-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 100px;
+  background: color-mix(in srgb, var(--color-primary, #11998e) 12%, transparent);
+  color: var(--color-primary, #11998e);
+}
+
+.bkm-trust-pill.bkm-pill-secure {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.bkm-trust-pill.bkm-pill-success {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+/* ===========================================
    TRUST ELEMENTS (Step 5 - Payment)
    =========================================== */
 .bkm-trust-header {
