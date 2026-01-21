@@ -108,7 +108,7 @@ export function renderPortfolioBookingTemplate(product) {
       ${testimonials.length > 0 ? renderPbkTestimonials(testimonials) : ''}
 
       <!-- 9. STORIES - "See more examples" (Bonus content - last) -->
-      ${media.stories?.length > 0 ? renderPbkStories(media.stories) : ''}
+      ${media.stories?.length > 0 ? renderPbkStories(media.stories, data.storyTitle) : ''}
 
       <!-- 10. BOOKING NOTE - Final reassurance -->
       ${data.bookingNote ? `<p class="pbk-note">ℹ️ ${data.bookingNote}</p>` : ''}
@@ -210,20 +210,22 @@ function renderPbkHero(media) {
   `;
 }
 
-function renderPbkStories(stories) {
+function renderPbkStories(stories, storyTitle) {
   const valid = stories.filter(s => s.thumbnail || s.url);
   if (valid.length === 0) return '';
   
+  const title = storyTitle || 'See it in Action';
+  
   return `
     <div class="pbk-stories">
-      <h3 class="pbk-section-title">More From Our Portfolio</h3>
+      <h3 class="pbk-section-title">${title}</h3>
       <div class="pbk-stories-row">
         ${valid.map((story, i) => `
           <div class="pbk-story" data-index="${i}">
             <div class="pbk-story-ring">
-              <img src="${story.thumbnail || story.url}" alt="${story.label || ''}">
+              <img src="${story.thumbnail || story.url}" alt="${story.caption || story.label || ''}">
             </div>
-            ${story.label ? `<span class="pbk-story-label">${story.label}</span>` : ''}
+            ${(story.caption || story.label) ? `<span class="pbk-story-label">${story.caption || story.label}</span>` : ''}
           </div>
         `).join('')}
       </div>
