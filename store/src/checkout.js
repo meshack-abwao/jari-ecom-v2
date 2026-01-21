@@ -7,121 +7,248 @@ let mpesaCode = '';
 let paymentConfirmed = false;
 
 // ===========================================
-// CHECKOUT MODAL HTML
+// CHECKOUT MODAL HTML - JTBD Optimized (3 Steps)
+// Apple Design System + Trust Architecture
 // ===========================================
 export function renderCheckoutModal() {
   return `
     <div class="modal-overlay" id="checkoutModal">
-      <div class="modal-content">
-        <button class="modal-close" id="checkoutClose">×</button>
+      <div class="modal-content checkout-modal">
+        <button class="modal-close" id="checkoutClose">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6L6 18M6 6l12 12"/>
+          </svg>
+        </button>
         
-        <!-- Step 1: Order Summary -->
-        <div class="checkout-step active" id="step1">
-          <h2 class="step-title">Confirm Order</h2>
-          <div class="order-summary">
-            <div class="summary-row">
-              <span>Product</span>
-              <span id="summaryProduct">-</span>
-            </div>
-            <div class="summary-row">
-              <span>Quantity</span>
-              <span id="summaryQty">1</span>
-            </div>
-            <div class="summary-row">
-              <span>Unit Price</span>
-              <span>KES <span id="summaryPrice">0</span></span>
-            </div>
-            <div class="summary-total">
-              <span>Total</span>
-              <span>KES <span id="summaryTotal">0</span></span>
-            </div>
+        <!-- Progress Bar -->
+        <div class="checkout-progress">
+          <div class="progress-track">
+            <div class="progress-fill" id="progressFill"></div>
           </div>
-          <button class="btn btn-primary" id="toStep2">Continue to Delivery</button>
+          <div class="progress-steps">
+            <span class="progress-step active" data-step="1">Review</span>
+            <span class="progress-step" data-step="2">Delivery</span>
+            <span class="progress-step" data-step="3">Payment</span>
+          </div>
         </div>
         
-        <!-- Step 2: Customer Info -->
+        <!-- Step 1: Review Order (JTBD: Define & Confirm) -->
+        <div class="checkout-step active" id="step1">
+          <h2 class="step-title">Review Your Order</h2>
+          
+          <div class="order-product-card">
+            <div class="product-thumb" id="checkoutProductThumb">
+              <div class="thumb-placeholder">📦</div>
+            </div>
+            <div class="product-details">
+              <h3 class="product-name" id="checkoutProductName">Product</h3>
+              <div class="product-meta">
+                <span class="product-qty">Qty: <span id="checkoutQty">1</span></span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="order-breakdown">
+            <div class="breakdown-row">
+              <span>Subtotal</span>
+              <span>KES <span id="checkoutSubtotal">0</span></span>
+            </div>
+            <div class="breakdown-row">
+              <span>Delivery</span>
+              <span class="delivery-free">FREE</span>
+            </div>
+            <div class="breakdown-divider"></div>
+            <div class="breakdown-row total">
+              <span>Total</span>
+              <span>KES <span id="checkoutTotal">0</span></span>
+            </div>
+          </div>
+          
+          <div class="trust-badges-row">
+            <div class="trust-badge-mini">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+              <span>Secure</span>
+            </div>
+            <div class="trust-badge-mini">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 12l2 2 4-4"/>
+                <circle cx="12" cy="12" r="10"/>
+              </svg>
+              <span>Warranty</span>
+            </div>
+            <div class="trust-badge-mini">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+              </svg>
+              <span>Returns</span>
+            </div>
+          </div>
+          
+          <button class="btn-primary-checkout" id="toStep2">
+            Continue to Delivery
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </button>
+        </div>
+        
+        <!-- Step 2: Delivery Details (JTBD: Locate) -->
         <div class="checkout-step" id="step2">
           <h2 class="step-title">Delivery Details</h2>
-          <form class="customer-form" id="customerForm">
-            <div class="form-group">
-              <label>Full Name</label>
-              <input type="text" id="customerName" placeholder="John Doe" required>
+          
+          <form class="checkout-form" id="customerForm">
+            <div class="form-field">
+              <label for="customerName">Full Name</label>
+              <input type="text" id="customerName" placeholder="John Doe" required autocomplete="name">
             </div>
-            <div class="form-group">
-              <label>Phone Number</label>
-              <input type="tel" id="customerPhone" placeholder="0712345678" required>
+            <div class="form-field">
+              <label for="customerPhone">Phone Number (M-Pesa)</label>
+              <input type="tel" id="customerPhone" placeholder="0712 345 678" required autocomplete="tel">
             </div>
-            <div class="form-group">
-              <label>Delivery Location</label>
+            <div class="form-field">
+              <label for="customerLocation">Delivery Location</label>
               <input type="text" id="customerLocation" placeholder="Westlands, Nairobi" required>
             </div>
-            <button type="button" class="btn btn-primary" id="toStep3">Continue to Payment</button>
-            <button type="button" class="btn btn-secondary" id="backToStep1">Back</button>
           </form>
+          
+          <div class="delivery-info">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="10" r="3"/>
+              <path d="M12 21.7C17.3 17 20 13 20 10a8 8 0 10-16 0c0 3 2.7 7 8 11.7z"/>
+            </svg>
+            <span>Delivery within 2-5 business days</span>
+          </div>
+          
+          <div class="step-buttons">
+            <button class="btn-secondary-checkout" id="backToStep1">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+              </svg>
+              Back
+            </button>
+            <button class="btn-primary-checkout" id="toStep3">
+              Continue to Payment
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </button>
+          </div>
         </div>
         
-        <!-- Step 3: Payment -->
+        <!-- Step 3: Payment (JTBD: Execute) -->
         <div class="checkout-step" id="step3">
-          <h2 class="step-title">Choose Payment</h2>
+          <h2 class="step-title">Payment Method</h2>
+          
           <div class="payment-options">
-            <div class="payment-option mpesa" id="mpesaOption" data-method="mpesa">
-              <div class="payment-icon">💚</div>
-              <div class="payment-text-container">
-                <div class="payment-text">M-Pesa Payment</div>
-                <div class="payment-subtext">Instant & Secure</div>
+            <div class="payment-card mpesa" id="mpesaOption" data-method="mpesa">
+              <div class="payment-radio">
+                <div class="radio-dot"></div>
               </div>
-              <div class="payment-checkmark">✓</div>
+              <div class="payment-icon-wrap mpesa-icon">
+                <span>M</span>
+              </div>
+              <div class="payment-info">
+                <span class="payment-title">M-Pesa</span>
+                <span class="payment-desc">Instant & Secure</span>
+              </div>
             </div>
-            <div class="payment-option" id="codOption" data-method="cod">
-              <div class="payment-icon">💵</div>
-              <div class="payment-text-container">
-                <div class="payment-text">Cash on Delivery</div>
-                <div class="payment-subtext">Pay when you receive</div>
+            
+            <div class="payment-card" id="codOption" data-method="cod">
+              <div class="payment-radio">
+                <div class="radio-dot"></div>
               </div>
-              <div class="payment-checkmark">✓</div>
+              <div class="payment-icon-wrap cod-icon">
+                <span>💵</span>
+              </div>
+              <div class="payment-info">
+                <span class="payment-title">Cash on Delivery</span>
+                <span class="payment-desc">Pay when you receive</span>
+              </div>
             </div>
           </div>
-          <div class="cta-helper-text" id="ctaHelper">
-            <span id="paymentMethodText"></span>
+          
+          <!-- M-Pesa Instructions (shown when M-Pesa selected) -->
+          <div class="mpesa-instructions" id="mpesaInstructions">
+            <div class="mpesa-box" id="mpesaPaymentBox">
+              <!-- Populated dynamically -->
+            </div>
+            <div class="mpesa-confirm">
+              <label class="confirm-checkbox" id="mpesaConfirmCheckbox">
+                <div class="checkbox-box" id="confirmIcon"></div>
+                <span>I've completed the payment</span>
+              </label>
+              <input type="text" id="mpesaCodeInput" class="mpesa-code-input" placeholder="M-Pesa Code (optional)" maxlength="20">
+            </div>
           </div>
-          <button class="complete-order-btn" id="completeOrderBtn">
-            <span id="ctaButtonText">Complete Order</span>
+          
+          <div class="order-total-final">
+            <span>Total</span>
+            <span class="total-amount">KES <span id="finalTotal">0</span></span>
+          </div>
+          
+          <button class="btn-complete-order" id="completeOrderBtn" disabled>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+            <span id="completeButtonText">Select Payment Method</span>
           </button>
-          <button class="btn btn-secondary" id="backToStep2">Back</button>
+          
+          <button class="btn-secondary-checkout" id="backToStep2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            Back
+          </button>
+          
+          <div class="secure-notice">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0110 0v4"/>
+            </svg>
+            <span>Your payment is secure and encrypted</span>
+          </div>
         </div>
         
-        <!-- Step 4: M-Pesa Payment Instructions (COMPACT) -->
-        <div class="checkout-step" id="step4Mpesa">
-          <h2 class="step-title">Pay via M-Pesa</h2>
-          <div class="mpesa-payment-box compact" id="mpesaPaymentBox">
-            <!-- Populated dynamically -->
-          </div>
-          <div class="mpesa-confirm-row">
-            <label class="mpesa-confirm-checkbox" id="mpesaConfirmCheckbox">
-              <span class="checkbox-icon" id="confirmIcon"></span>
-              <span>I've paid</span>
-            </label>
-            <input type="text" id="mpesaCodeInput" class="mpesa-code-inline" placeholder="M-Pesa code" maxlength="20">
-          </div>
-          <button class="complete-order-btn show" id="completeMpesaOrder" disabled>
-            <span>Complete Order</span>
-          </button>
-          <button class="btn btn-secondary" id="backToStep3">Back</button>
-        </div>
-        
-        <!-- Step 5: Loading -->
+        <!-- Loading State -->
         <div class="checkout-step" id="stepLoading">
-          <div class="loading-spinner"></div>
-          <p class="loading-text">Processing your order...</p>
+          <div class="loading-state">
+            <div class="loading-spinner-checkout"></div>
+            <p>Processing your order...</p>
+          </div>
         </div>
         
-        <!-- Step 5: Success -->
+        <!-- Success State (JTBD: Monitor & Conclude) -->
         <div class="checkout-step" id="stepSuccess">
-          <div class="success-icon">✓</div>
-          <h2 class="success-title">Order Confirmed!</h2>
-          <p class="success-order">Order #<span id="orderNumber">-</span></p>
-          <div class="success-message" id="successMessage">Your order has been confirmed.</div>
-          <button class="btn btn-primary" id="successClose">Done</button>
+          <div class="success-state">
+            <div class="success-icon-big">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/>
+                <polyline points="22 4 12 14.01 9 11.01"/>
+              </svg>
+            </div>
+            <h2 class="success-title">Order Confirmed!</h2>
+            <p class="order-number">Order #<span id="orderNumber">-</span></p>
+            <div class="success-message" id="successMessage"></div>
+            <div class="success-next-steps">
+              <div class="next-step-item">
+                <span class="step-num">1</span>
+                <span>Confirmation SMS sent</span>
+              </div>
+              <div class="next-step-item">
+                <span class="step-num">2</span>
+                <span>Seller will contact you</span>
+              </div>
+              <div class="next-step-item">
+                <span class="step-num">3</span>
+                <span>Track via WhatsApp</span>
+              </div>
+            </div>
+            <button class="btn-primary-checkout" id="successClose">
+              Done
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -135,129 +262,58 @@ export function initCheckout() {
   const modal = document.getElementById('checkoutModal');
   if (!modal) return;
   
-  // Close button
+  // Close handlers
   document.getElementById('checkoutClose')?.addEventListener('click', closeCheckout);
   document.getElementById('successClose')?.addEventListener('click', closeCheckout);
-  
-  // Close on overlay click
   modal.addEventListener('click', (e) => {
     if (e.target === modal) closeCheckout();
   });
   
   // Step navigation
-  document.getElementById('toStep2')?.addEventListener('click', () => goToStep('step2'));
-  document.getElementById('backToStep1')?.addEventListener('click', () => goToStep('step1'));
+  document.getElementById('toStep2')?.addEventListener('click', () => {
+    goToStep('step2');
+    updateProgress(2);
+  });
+  document.getElementById('backToStep1')?.addEventListener('click', () => {
+    goToStep('step1');
+    updateProgress(1);
+  });
   document.getElementById('toStep3')?.addEventListener('click', validateAndGoToStep3);
-  document.getElementById('backToStep2')?.addEventListener('click', () => goToStep('step2'));
-  document.getElementById('backToStep3')?.addEventListener('click', () => goToStep('step3'));
-  
-  // Payment options
-  document.querySelectorAll('.payment-option').forEach(option => {
-    option.addEventListener('click', () => selectPayment(option.dataset.method));
+  document.getElementById('backToStep2')?.addEventListener('click', () => {
+    goToStep('step2');
+    updateProgress(2);
   });
   
-  // M-Pesa confirmation checkbox
-  document.getElementById('mpesaConfirmCheckbox')?.addEventListener('click', togglePaymentConfirmed);
+  // Payment selection
+  document.querySelectorAll('.payment-card').forEach(card => {
+    card.addEventListener('click', () => selectPayment(card.dataset.method));
+  });
   
-  // M-Pesa code input
+  // M-Pesa confirmation
+  document.getElementById('mpesaConfirmCheckbox')?.addEventListener('click', togglePaymentConfirmed);
   document.getElementById('mpesaCodeInput')?.addEventListener('input', (e) => {
     mpesaCode = e.target.value.toUpperCase();
   });
   
-  // Complete M-Pesa order
-  document.getElementById('completeMpesaOrder')?.addEventListener('click', completeOrder);
-  
-  // Complete order (or go to M-Pesa step if M-Pesa selected)
-  document.getElementById('completeOrderBtn')?.addEventListener('click', handleCompleteClick);
+  // Complete order
+  document.getElementById('completeOrderBtn')?.addEventListener('click', handleCompleteOrder);
 }
 
-// Handle complete button click - go to M-Pesa step or complete order
-function handleCompleteClick() {
-  if (!selectedPaymentMethod) {
-    alert('Please select a payment method');
-    return;
+// ===========================================
+// PROGRESS BAR
+// ===========================================
+function updateProgress(step) {
+  const fill = document.getElementById('progressFill');
+  const steps = document.querySelectorAll('.progress-step');
+  
+  if (fill) {
+    fill.style.width = `${((step - 1) / 2) * 100}%`;
   }
   
-  // Check if store has M-Pesa config
-  const storeConfig = window.JARI_STORE_CONFIG || {};
-  const payment = storeConfig.payment || {};
-  const hasPaymentConfig = payment.type && (payment.paybill_number || payment.till_number);
-  
-  if (selectedPaymentMethod === 'mpesa' && hasPaymentConfig) {
-    // Show M-Pesa payment instructions
-    showMpesaStep();
-  } else {
-    // Complete order directly
-    completeOrder();
-  }
-}
-
-// Show M-Pesa payment step with instructions (COMPACT)
-function showMpesaStep() {
-  const storeConfig = window.JARI_STORE_CONFIG || {};
-  const payment = storeConfig.payment || {};
-  const { currentProduct, quantity, selectedPrice } = state;
-  const data = currentProduct?.data || {};
-  const price = selectedPrice || Number(data.price || 0);
-  const total = price * quantity;
-  const acct = payment.paybill_account || document.getElementById('customerPhone')?.value || 'Your Phone';
-  
-  const mpesaBox = document.getElementById('mpesaPaymentBox');
-  if (mpesaBox) {
-    mpesaBox.innerHTML = `
-      ${payment.type === 'paybill' ? `
-        <div class="mpesa-grid">
-          <div class="mpesa-grid-row">
-            <div class="mpesa-item"><span>Paybill</span><strong>${payment.paybill_number}</strong></div>
-            <div class="mpesa-item"><span>Account</span><strong>${acct}</strong></div>
-          </div>
-          <div class="mpesa-item mpesa-highlight"><span>Amount</span><strong>KES ${total.toLocaleString()}</strong></div>
-        </div>
-        <p class="mpesa-hint">M-Pesa → Lipa na M-Pesa → Paybill → ${payment.paybill_number}</p>
-      ` : `
-        <div class="mpesa-grid">
-          <div class="mpesa-grid-row">
-            <div class="mpesa-item"><span>Till No</span><strong>${payment.till_number}</strong></div>
-          </div>
-          <div class="mpesa-item mpesa-highlight"><span>Amount</span><strong>KES ${total.toLocaleString()}</strong></div>
-        </div>
-        <p class="mpesa-hint">M-Pesa → Lipa na M-Pesa → Buy Goods → ${payment.till_number}</p>
-      `}
-      ${payment.business_name ? `<p class="mpesa-to">To: <strong>${payment.business_name}</strong></p>` : ''}
-    `;
-  }
-  
-  // Reset confirmation state
-  paymentConfirmed = false;
-  mpesaCode = '';
-  updateConfirmCheckbox();
-  updateMpesaButton();
-  document.getElementById('mpesaCodeInput').value = '';
-  
-  goToStep('step4Mpesa');
-}
-
-// Toggle payment confirmed checkbox
-function togglePaymentConfirmed() {
-  paymentConfirmed = !paymentConfirmed;
-  updateConfirmCheckbox();
-  updateMpesaButton();
-}
-
-function updateConfirmCheckbox() {
-  const checkbox = document.getElementById('mpesaConfirmCheckbox');
-  const icon = document.getElementById('confirmIcon');
-  if (checkbox && icon) {
-    checkbox.classList.toggle('checked', paymentConfirmed);
-    icon.textContent = paymentConfirmed ? '✓' : '';
-  }
-}
-
-function updateMpesaButton() {
-  const btn = document.getElementById('completeMpesaOrder');
-  if (btn) {
-    btn.disabled = !paymentConfirmed;
-  }
+  steps.forEach((s, i) => {
+    s.classList.toggle('active', i < step);
+    s.classList.toggle('current', i === step - 1);
+  });
 }
 
 // ===========================================
@@ -268,27 +324,38 @@ export function openCheckout() {
   if (!currentProduct) return;
   
   const data = currentProduct.data || {};
-  // Use selectedPrice if set (from package/ticket selection), otherwise use base price
+  const media = currentProduct.media || {};
   const price = selectedPrice || Number(data.price || 0);
   const total = price * quantity;
   
   // Track checkout start
   pixel.checkoutStart(total);
   
-  // Update summary
-  document.getElementById('summaryProduct').textContent = data.name || 'Product';
-  document.getElementById('summaryQty').textContent = quantity;
-  document.getElementById('summaryPrice').textContent = price.toLocaleString();
-  document.getElementById('summaryTotal').textContent = total.toLocaleString();
+  // Update Step 1 - Product card with image
+  const thumbEl = document.getElementById('checkoutProductThumb');
+  if (thumbEl && media.images?.[0]) {
+    thumbEl.innerHTML = `<img src="${media.images[0]}" alt="${data.name || 'Product'}">`;
+  }
+  document.getElementById('checkoutProductName').textContent = data.name || 'Product';
+  document.getElementById('checkoutQty').textContent = quantity;
+  document.getElementById('checkoutSubtotal').textContent = total.toLocaleString();
+  document.getElementById('checkoutTotal').textContent = total.toLocaleString();
+  document.getElementById('finalTotal').textContent = total.toLocaleString();
   
   // Reset state
   selectedPaymentMethod = null;
-  document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
-  document.getElementById('completeOrderBtn')?.classList.remove('show');
-  document.getElementById('ctaHelper')?.classList.remove('show');
+  paymentConfirmed = false;
+  mpesaCode = '';
+  document.querySelectorAll('.payment-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('mpesaInstructions')?.classList.remove('show');
+  document.getElementById('completeOrderBtn').disabled = true;
+  document.getElementById('completeButtonText').textContent = 'Select Payment Method';
+  document.getElementById('mpesaCodeInput').value = '';
+  updateConfirmCheckbox();
   
   // Show modal
   goToStep('step1');
+  updateProgress(1);
   document.getElementById('checkoutModal')?.classList.add('active');
   document.body.style.overflow = 'hidden';
 }
@@ -300,10 +367,10 @@ function closeCheckout() {
   document.getElementById('checkoutModal')?.classList.remove('active');
   document.body.style.overflow = '';
   
-  // Reset form after animation
   setTimeout(() => {
     document.getElementById('customerForm')?.reset();
     goToStep('step1');
+    updateProgress(1);
   }, 300);
 }
 
@@ -323,16 +390,26 @@ function validateAndGoToStep3() {
   const location = document.getElementById('customerLocation')?.value.trim();
   
   if (!name || !phone || !location) {
-    alert('Please fill in all fields');
+    // Highlight empty fields
+    if (!name) document.getElementById('customerName')?.classList.add('error');
+    if (!phone) document.getElementById('customerPhone')?.classList.add('error');
+    if (!location) document.getElementById('customerLocation')?.classList.add('error');
     return;
   }
+  
+  // Remove error states
+  document.querySelectorAll('.checkout-form input').forEach(i => i.classList.remove('error'));
   
   if (phone.length < 10) {
-    alert('Please enter a valid phone number');
+    document.getElementById('customerPhone')?.classList.add('error');
     return;
   }
   
+  // Populate M-Pesa instructions
+  populateMpesaInstructions();
+  
   goToStep('step3');
+  updateProgress(3);
 }
 
 // ===========================================
@@ -342,58 +419,157 @@ function selectPayment(method) {
   selectedPaymentMethod = method;
   
   // Update UI
-  document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
+  document.querySelectorAll('.payment-card').forEach(c => c.classList.remove('selected'));
   
-  const ctaButton = document.getElementById('ctaButtonText');
-  const helperText = document.getElementById('paymentMethodText');
-  const ctaHelper = document.getElementById('ctaHelper');
-  const completeBtn = document.getElementById('completeOrderBtn');
+  const btn = document.getElementById('completeOrderBtn');
+  const btnText = document.getElementById('completeButtonText');
+  const mpesaInstructions = document.getElementById('mpesaInstructions');
+  const { selectedPrice, currentProduct, quantity } = state;
+  const price = selectedPrice || Number(currentProduct?.data?.price || 0);
+  const total = price * quantity;
   
   if (method === 'mpesa') {
     document.getElementById('mpesaOption')?.classList.add('selected');
-    if (ctaButton) ctaButton.textContent = '✓ Complete Order with M-Pesa';
-    if (helperText) helperText.textContent = 'Check your phone for M-Pesa prompt';
+    mpesaInstructions?.classList.add('show');
+    
+    // Check if store has M-Pesa config
+    const storeConfig = window.JARI_STORE_CONFIG || {};
+    const payment = storeConfig.payment || {};
+    const hasPaymentConfig = payment.type && (payment.paybill_number || payment.till_number);
+    
+    if (hasPaymentConfig) {
+      btnText.textContent = `Pay KES ${total.toLocaleString()} with M-Pesa`;
+      btn.disabled = !paymentConfirmed;
+    } else {
+      btnText.textContent = `Complete Order - KES ${total.toLocaleString()}`;
+      btn.disabled = false;
+    }
   } else {
     document.getElementById('codOption')?.classList.add('selected');
-    if (ctaButton) ctaButton.textContent = '✓ Complete Order - Pay on Delivery';
-    if (helperText) helperText.textContent = 'Prepare exact cash for delivery';
+    mpesaInstructions?.classList.remove('show');
+    btnText.textContent = `Pay on Delivery - KES ${total.toLocaleString()}`;
+    btn.disabled = false;
+  }
+}
+
+// ===========================================
+// M-PESA INSTRUCTIONS
+// ===========================================
+function populateMpesaInstructions() {
+  const storeConfig = window.JARI_STORE_CONFIG || {};
+  const payment = storeConfig.payment || {};
+  const { currentProduct, quantity, selectedPrice } = state;
+  const price = selectedPrice || Number(currentProduct?.data?.price || 0);
+  const total = price * quantity;
+  const phone = document.getElementById('customerPhone')?.value || '';
+  const acct = payment.paybill_account || phone || 'Your Phone';
+  
+  const mpesaBox = document.getElementById('mpesaPaymentBox');
+  if (!mpesaBox) return;
+  
+  const hasConfig = payment.type && (payment.paybill_number || payment.till_number);
+  
+  if (!hasConfig) {
+    mpesaBox.innerHTML = `
+      <p class="mpesa-no-config">M-Pesa details will be sent via SMS after order.</p>
+    `;
+    return;
   }
   
-  completeBtn?.classList.add('show');
-  ctaHelper?.classList.add('show');
+  if (payment.type === 'paybill') {
+    mpesaBox.innerHTML = `
+      <div class="mpesa-steps">
+        <div class="mpesa-step">
+          <span class="mpesa-step-num">1</span>
+          <span>Go to M-Pesa → Lipa na M-Pesa → Paybill</span>
+        </div>
+        <div class="mpesa-step">
+          <span class="mpesa-step-num">2</span>
+          <span>Business No: <strong>${payment.paybill_number}</strong></span>
+        </div>
+        <div class="mpesa-step">
+          <span class="mpesa-step-num">3</span>
+          <span>Account: <strong>${acct}</strong></span>
+        </div>
+        <div class="mpesa-step">
+          <span class="mpesa-step-num">4</span>
+          <span>Amount: <strong>KES ${total.toLocaleString()}</strong></span>
+        </div>
+      </div>
+      ${payment.business_name ? `<p class="mpesa-to">Pay to: ${payment.business_name}</p>` : ''}
+    `;
+  } else {
+    mpesaBox.innerHTML = `
+      <div class="mpesa-steps">
+        <div class="mpesa-step">
+          <span class="mpesa-step-num">1</span>
+          <span>Go to M-Pesa → Lipa na M-Pesa → Buy Goods</span>
+        </div>
+        <div class="mpesa-step">
+          <span class="mpesa-step-num">2</span>
+          <span>Till Number: <strong>${payment.till_number}</strong></span>
+        </div>
+        <div class="mpesa-step">
+          <span class="mpesa-step-num">3</span>
+          <span>Amount: <strong>KES ${total.toLocaleString()}</strong></span>
+        </div>
+      </div>
+      ${payment.business_name ? `<p class="mpesa-to">Pay to: ${payment.business_name}</p>` : ''}
+    `;
+  }
+}
+
+// ===========================================
+// M-PESA CONFIRMATION
+// ===========================================
+function togglePaymentConfirmed() {
+  paymentConfirmed = !paymentConfirmed;
+  updateConfirmCheckbox();
+  
+  // Update button state
+  if (selectedPaymentMethod === 'mpesa') {
+    const storeConfig = window.JARI_STORE_CONFIG || {};
+    const payment = storeConfig.payment || {};
+    const hasPaymentConfig = payment.type && (payment.paybill_number || payment.till_number);
+    
+    if (hasPaymentConfig) {
+      document.getElementById('completeOrderBtn').disabled = !paymentConfirmed;
+    }
+  }
+}
+
+function updateConfirmCheckbox() {
+  const checkbox = document.getElementById('mpesaConfirmCheckbox');
+  const icon = document.getElementById('confirmIcon');
+  if (checkbox) {
+    checkbox.classList.toggle('checked', paymentConfirmed);
+  }
+  if (icon) {
+    icon.innerHTML = paymentConfirmed ? `
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+    ` : '';
+  }
 }
 
 // ===========================================
 // COMPLETE ORDER
 // ===========================================
-async function completeOrder() {
-  if (!selectedPaymentMethod) {
-    alert('Please select a payment method');
-    return;
-  }
+async function handleCompleteOrder() {
+  if (!selectedPaymentMethod) return;
   
   goToStep('stepLoading');
   
   const { store, currentProduct, quantity, selectedPrice } = state;
   
-  console.log('Checkout state:', { store, currentProduct, quantity, selectedPrice });
-  
-  if (!store || !store.slug) {
-    console.error('Store or slug is missing!', store);
-    alert('Store information missing. Please refresh the page.');
-    goToStep('step3');
-    return;
-  }
-  
-  if (!currentProduct || !currentProduct.id) {
-    console.error('Product or product ID is missing!', currentProduct);
-    alert('Product information missing. Please refresh the page.');
+  if (!store?.slug || !currentProduct?.id) {
+    alert('Missing information. Please refresh and try again.');
     goToStep('step3');
     return;
   }
   
   const data = currentProduct.data || {};
-  // Use selectedPrice if set (from package/ticket selection), otherwise use base price
   const price = selectedPrice || Number(data.price || 0);
   const total = price * quantity;
   
@@ -423,15 +599,13 @@ async function completeOrder() {
     const result = await createOrder(store.slug, orderData);
     
     if (result.success) {
-      // Track successful purchase
       pixel.purchase(result.order_number, total, currentProduct.id);
       
-      // Show success
       document.getElementById('orderNumber').textContent = result.order_number;
       
       const message = selectedPaymentMethod === 'mpesa'
-        ? `🎉 Order confirmed!\n\n📱 Check ${orderData.customer.phone} for M-Pesa prompt to pay KES ${total.toLocaleString()}.\n\n💬 WhatsApp confirmation coming soon.`
-        : `🎉 Order confirmed!\n\n💵 Prepare KES ${total.toLocaleString()} for payment on delivery.\n\n💬 WhatsApp confirmation coming soon.`;
+        ? `Payment of KES ${total.toLocaleString()} received. Your order is being prepared!`
+        : `Prepare KES ${total.toLocaleString()} for payment on delivery.`;
       
       document.getElementById('successMessage').textContent = message;
       goToStep('stepSuccess');

@@ -1820,6 +1820,681 @@ body {
 }
 
 /* ===========================================
+   CHECKOUT REDESIGN - JTBD Optimized (3 Steps)
+   Apple Design System + Trust Architecture
+   =========================================== */
+
+/* Modal Specific */
+.checkout-modal {
+    max-width: 420px;
+    padding: var(--space-xl);
+}
+
+/* Progress Bar */
+.checkout-progress {
+    margin-bottom: var(--space-xl);
+}
+
+.progress-track {
+    height: 3px;
+    background: var(--bg-gray);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: var(--space-sm);
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--color-primary);
+    border-radius: 2px;
+    transition: width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    width: 0%;
+}
+
+.progress-steps {
+    display: flex;
+    justify-content: space-between;
+}
+
+.progress-step {
+    font-size: var(--fs-tiny);
+    color: var(--text-tertiary);
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.progress-step.active {
+    color: var(--color-primary);
+}
+
+.progress-step.current {
+    font-weight: 600;
+}
+
+/* Order Product Card */
+.order-product-card {
+    display: flex;
+    gap: var(--space-md);
+    padding: var(--space-md);
+    background: var(--bg-gray);
+    border-radius: 16px;
+    margin-bottom: var(--space-lg);
+}
+
+.product-thumb {
+    width: 72px;
+    height: 72px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--surface);
+    flex-shrink: 0;
+}
+
+.product-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.thumb-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    background: var(--bg-gray);
+}
+
+.product-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.order-product-card .product-name {
+    font-size: var(--fs-body);
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 4px 0;
+    line-height: 1.3;
+}
+
+.product-meta {
+    font-size: var(--fs-small);
+    color: var(--text-secondary);
+}
+
+/* Order Breakdown */
+.order-breakdown {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: var(--space-md);
+    margin-bottom: var(--space-lg);
+}
+
+.breakdown-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: var(--fs-small);
+    color: var(--text-secondary);
+    padding: var(--space-xs) 0;
+}
+
+.breakdown-row.total {
+    font-size: var(--fs-body);
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.breakdown-divider {
+    height: 1px;
+    background: var(--border);
+    margin: var(--space-sm) 0;
+}
+
+.delivery-free {
+    color: var(--success-green);
+    font-weight: 500;
+}
+
+/* Trust Badges Row */
+.trust-badges-row {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-lg);
+    margin-bottom: var(--space-xl);
+}
+
+.trust-badge-mini {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: var(--fs-tiny);
+    color: var(--text-secondary);
+}
+
+.trust-badge-mini svg {
+    color: var(--color-primary);
+}
+
+/* Checkout Buttons */
+.btn-primary-checkout {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    width: 100%;
+    padding: 16px 24px;
+    background: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 100px;
+    font-size: var(--fs-body);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.btn-primary-checkout:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px color-mix(in srgb, var(--color-primary) 30%, transparent);
+}
+
+.btn-primary-checkout:active {
+    transform: translateY(0);
+}
+
+.btn-secondary-checkout {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs);
+    padding: 12px 20px;
+    background: transparent;
+    color: var(--text-secondary);
+    border: none;
+    font-size: var(--fs-small);
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.btn-secondary-checkout:hover {
+    color: var(--text-primary);
+}
+
+.step-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    margin-top: var(--space-lg);
+}
+
+/* Checkout Form */
+.checkout-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-field label {
+    font-size: var(--fs-tiny);
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.form-field input {
+    padding: 14px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    font-size: var(--fs-body);
+    font-family: inherit;
+    transition: all 0.2s;
+    background: var(--surface);
+}
+
+.form-field input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-primary) 10%, transparent);
+}
+
+.form-field input.error {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
+}
+
+.delivery-info {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-md);
+    background: var(--bg-gray);
+    border-radius: 12px;
+    margin-top: var(--space-md);
+    font-size: var(--fs-small);
+    color: var(--text-secondary);
+}
+
+.delivery-info svg {
+    color: var(--color-primary);
+    flex-shrink: 0;
+}
+
+/* Payment Cards */
+.payment-options {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-lg);
+}
+
+.payment-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-md);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--surface);
+}
+
+.payment-card:hover {
+    border-color: var(--color-primary);
+}
+
+.payment-card.selected {
+    border-color: var(--color-primary);
+    background: color-mix(in srgb, var(--color-primary) 5%, transparent);
+}
+
+.payment-card.mpesa.selected {
+    border-color: var(--success-green);
+    background: rgba(0, 168, 107, 0.05);
+}
+
+.payment-radio {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.payment-card.selected .payment-radio {
+    border-color: var(--color-primary);
+}
+
+.payment-card.mpesa.selected .payment-radio {
+    border-color: var(--success-green);
+}
+
+.radio-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: transparent;
+    transition: all 0.2s;
+}
+
+.payment-card.selected .radio-dot {
+    background: var(--color-primary);
+}
+
+.payment-card.mpesa.selected .radio-dot {
+    background: var(--success-green);
+}
+
+.payment-icon-wrap {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+.mpesa-icon {
+    background: linear-gradient(135deg, #00a86b 0%, #00c779 100%);
+    color: white;
+    font-weight: 700;
+    font-size: 18px;
+}
+
+.cod-icon {
+    background: var(--bg-gray);
+}
+
+.payment-info {
+    flex: 1;
+}
+
+.payment-title {
+    display: block;
+    font-size: var(--fs-body);
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.payment-desc {
+    font-size: var(--fs-tiny);
+    color: var(--text-secondary);
+}
+
+/* M-Pesa Instructions */
+.mpesa-instructions {
+    display: none;
+    margin-bottom: var(--space-lg);
+}
+
+.mpesa-instructions.show {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+.mpesa-box {
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    border-radius: 16px;
+    padding: var(--space-md);
+    margin-bottom: var(--space-md);
+}
+
+.mpesa-steps {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.mpesa-step {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: var(--fs-small);
+    color: #1b5e20;
+}
+
+.mpesa-step-num {
+    width: 20px;
+    height: 20px;
+    background: #1b5e20;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.mpesa-step strong {
+    font-family: monospace;
+}
+
+.mpesa-to {
+    text-align: center;
+    font-size: var(--fs-small);
+    color: #2e7d32;
+    margin-top: var(--space-sm);
+}
+
+.mpesa-no-config {
+    text-align: center;
+    color: #2e7d32;
+    font-size: var(--fs-small);
+    margin: 0;
+}
+
+.mpesa-confirm {
+    display: flex;
+    gap: var(--space-sm);
+    align-items: stretch;
+}
+
+.confirm-checkbox {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    background: var(--bg-gray);
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: var(--fs-small);
+    transition: all 0.2s;
+}
+
+.confirm-checkbox:hover {
+    background: var(--border);
+}
+
+.confirm-checkbox.checked {
+    background: color-mix(in srgb, var(--success-green) 15%, transparent);
+}
+
+.checkbox-box {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.confirm-checkbox.checked .checkbox-box {
+    background: var(--success-green);
+    border-color: var(--success-green);
+}
+
+.checkbox-box svg {
+    color: white;
+}
+
+.mpesa-code-input {
+    flex: 0 0 120px;
+    padding: var(--space-sm) var(--space-md);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-size: var(--fs-small);
+    font-family: monospace;
+    text-transform: uppercase;
+}
+
+.mpesa-code-input:focus {
+    outline: none;
+    border-color: var(--success-green);
+}
+
+/* Order Total Final */
+.order-total-final {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-md) 0;
+    margin-bottom: var(--space-md);
+    border-top: 1px solid var(--border);
+}
+
+.order-total-final span:first-child {
+    font-size: var(--fs-body);
+    color: var(--text-secondary);
+}
+
+.total-amount {
+    font-size: var(--fs-heading);
+    font-weight: 700;
+    color: var(--color-primary);
+}
+
+/* Complete Button */
+.btn-complete-order {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    width: 100%;
+    padding: 18px 24px;
+    background: linear-gradient(135deg, var(--color-primary) 0%, color-mix(in srgb, var(--color-primary) 80%, #000) 100%);
+    color: white;
+    border: none;
+    border-radius: 100px;
+    font-size: var(--fs-body);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    margin-bottom: var(--space-md);
+}
+
+.btn-complete-order:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px color-mix(in srgb, var(--color-primary) 40%, transparent);
+}
+
+.btn-complete-order:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.secure-notice {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: var(--fs-tiny);
+    color: var(--text-tertiary);
+    margin-top: var(--space-md);
+}
+
+/* Loading State */
+.loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-3xl) 0;
+}
+
+.loading-spinner-checkout {
+    width: 48px;
+    height: 48px;
+    border: 3px solid var(--bg-gray);
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-bottom: var(--space-lg);
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.loading-state p {
+    color: var(--text-secondary);
+    font-size: var(--fs-body);
+}
+
+/* Success State */
+.success-state {
+    text-align: center;
+    padding: var(--space-xl) 0;
+}
+
+.success-icon-big {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, var(--success-green) 0%, #00c779 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto var(--space-lg);
+    animation: successPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes successPop {
+    0% { transform: scale(0); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.success-icon-big svg {
+    color: white;
+}
+
+.success-title {
+    font-size: var(--fs-heading-lg);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--space-sm);
+}
+
+.order-number {
+    font-size: var(--fs-body);
+    color: var(--text-secondary);
+    margin-bottom: var(--space-lg);
+}
+
+.success-message {
+    font-size: var(--fs-small);
+    color: var(--text-secondary);
+    margin-bottom: var(--space-xl);
+    line-height: 1.6;
+}
+
+.success-next-steps {
+    background: var(--bg-gray);
+    border-radius: 16px;
+    padding: var(--space-md);
+    margin-bottom: var(--space-xl);
+}
+
+.next-step-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) 0;
+    font-size: var(--fs-small);
+    color: var(--text-secondary);
+}
+
+.next-step-item:not(:last-child) {
+    border-bottom: 1px solid var(--border);
+}
+
+.step-num {
+    width: 24px;
+    height: 24px;
+    background: var(--color-primary);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+/* ===========================================
    EMPTY STATE
    =========================================== */
 .empty-state {
