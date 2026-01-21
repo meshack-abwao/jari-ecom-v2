@@ -546,6 +546,13 @@ function renderStep5() {
         <p class="bkm-paying-to">Paying to: <strong>${businessName}</strong></p>
       </div>
       
+      <!-- Trust Pills Row - JTBD: Build payment confidence -->
+      <div class="bkm-trust-pills">
+        <span class="bkm-trust-pill">✓ Verified Business</span>
+        <span class="bkm-trust-pill">🔒 Encrypted</span>
+        <span class="bkm-trust-pill">💬 Support</span>
+      </div>
+      
       <!-- Compact M-Pesa Details - Golden Ratio Layout -->
       <div class="bkm-mpesa-compact">
         ${payment.type === 'paybill' ? `
