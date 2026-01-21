@@ -67,6 +67,7 @@
 .pbk-hero,
 .pbk-intro,
 .pbk-stories-section,
+.pbk-trust-section,
 .pbk-packages,
 .pbk-gallery,
 .pbk-why-choose,
@@ -80,6 +81,7 @@
 .pbk-hero { animation-delay: 0s; }
 .pbk-intro { animation-delay: 0.1s; }
 .pbk-stories-section { animation-delay: 0.15s; }
+.pbk-trust-section { animation-delay: 0.18s; }
 .pbk-packages { animation-delay: 0.2s; }
 .pbk-gallery { animation-delay: 0.25s; }
 .pbk-why-choose { animation-delay: 0.3s; }
@@ -133,6 +135,7 @@
   .pbk-hero,
   .pbk-intro,
   .pbk-stories-section,
+  .pbk-trust-section,
   .pbk-packages,
   .pbk-gallery,
   .pbk-why-choose,
