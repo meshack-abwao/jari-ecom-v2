@@ -1,6 +1,6 @@
 # Jari.Ecom V2 - Handover Context
-## Session: January 21, 2026 (Night)
-## Status: MOBILE APP PHASE 1 COMPLETE ✅
+## Session: January 22, 2026 (Morning)
+## Status: DEEP DIVE TEMPLATE REFINEMENTS ✅
 
 ---
 
@@ -161,6 +161,27 @@ cd android && ./gradlew assembleDebug
 sdk.dir=C:\\Users\\ADMIN\\AppData\\Local\\Android\\Sdk
 ```
 
+### Formula 9: Mobile Elements - Responsive Shrink with clamp()
+```css
+/* ❌ PROBLEM: Fixed-size elements get cut off at screen edges on narrow mobiles */
+.story-bubble {
+    width: 54px;
+    min-width: 54px;  /* Forces cutoff */
+}
+
+/* ✅ FIX: Use clamp() for responsive shrinking */
+.story-bubble {
+    width: clamp(44px, 12vw, 54px);  /* min, preferred, max */
+    height: clamp(44px, 12vw, 54px);
+    min-width: 44px;  /* Smaller min allows shrink */
+}
+
+/* Also add horizontal padding to container */
+.stories-row {
+    padding: 0 var(--space-lg);  /* Breathing room from edges */
+}
+```
+
 ---
 
 ## 4. TEMPLATE SYSTEM
@@ -247,16 +268,16 @@ Both support M-Pesa payment instructions!
 
 ---
 
-## 8. RECENT COMMITS (January 21, 2026)
+## 8. RECENT COMMITS (January 22, 2026)
 
 ```
+edbbda3 DD-stories-responsive-shrink-clamp-prevent-edge-cutoff
+2d16511 docs-complete-handover-mobile-phase1-complete
 6a9bd11 mobile-add-resources-folder-for-app-icons
 8e31203 mobile-add-npm-scripts-for-capacitor
 5c2e78a mobile-add-android-platform
 5c01820 mobile: Initialize Capacitor with config
 18ee11e mobile: Install Capacitor Android platform
-2fb794e mobile: Install Capacitor core and CLI
-18a5bfe docs: Mobile-app-guide-Capacitor-strategy
 ```
 
 ---
@@ -276,10 +297,16 @@ Both support M-Pesa payment instructions!
 
 ## 10. NEXT SESSION PRIORITIES
 
-1. **Test APK on physical phone** - Connect via USB, enable USB debugging
-2. **Fix emulator** - Enable Hyper-V in Windows Features
-3. **App icon** - Create 1024x1024 Jari logo PNG
-4. **Splash screen** - Create 2732x2732 splash PNG
+### Deep Dive Template (Current Focus)
+- [x] Stories responsive shrink (clamp) - prevent edge cutoff
+- [ ] Test on various mobile screen sizes
+- [ ] User feedback and refinements
+
+### Mobile App
+- [ ] Test APK on physical phone - Connect via USB, enable USB debugging
+- [ ] Fix emulator - Enable Hyper-V in Windows Features
+- [ ] App icon - Create 1024x1024 Jari logo PNG
+- [ ] Splash screen - Create 2732x2732 splash PNG
 
 ---
 
