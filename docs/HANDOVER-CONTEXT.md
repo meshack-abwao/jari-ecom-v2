@@ -1,6 +1,6 @@
 # Jari.Ecom V2 - Handover Context
-## Session: January 19, 2026 (Evening)
-## Status: M-Pesa Phase 1 COMPLETE
+## Session: January 21, 2026 (Night)
+## Status: MOBILE APP PHASE 1 COMPLETE ✅
 
 ---
 
@@ -11,29 +11,92 @@ E-commerce platform for solo entrepreneurs and small teams in Kenya/East Africa.
 - Instagram/WhatsApp-focused sellers
 - M-Pesa integration for payments
 - Multiple store templates for different business types
+- **NEW: Native Android app via Capacitor**
 
 ### Tech Stack
 | Layer | Technology |
 |-------|------------|
-| Dashboard | React + Vite |
+| Dashboard | React + Vite + **Capacitor** |
 | Storefront | Vanilla JS + CSS |
 | API | Node.js + Express |
 | Database | PostgreSQL (Railway) |
 | Hosting | Netlify (frontend), Railway (API + DB) |
+| Mobile | **Capacitor (Android ready, iOS pending)** |
 
-### Repository
+### Repository Structure
 ```
 C:\Users\ADMIN\Desktop\jari-ecom-v2\
-├── api/           # Express backend
-├── dashboard/     # React admin
-├── store/         # Public storefront
-├── shared/        # Utilities
-└── docs/          # Documentation
+├── api/                    # Express backend
+├── dashboard/              # React admin + Capacitor
+│   ├── src/                # React source
+│   ├── dist/               # Web build (Netlify)
+│   ├── android/            # NEW: Android native project
+│   ├── resources/          # NEW: App icon/splash sources
+│   └── capacitor.config.json
+├── store/                  # Public storefront (web only)
+├── shared/                 # Utilities
+└── docs/                   # Documentation
+    ├── HANDOVER-CONTEXT.md
+    ├── MOBILE-APP-GUIDE.md # NEW: Complete mobile guide
+    └── PROJECT-INSTRUCTIONS.md
 ```
 
 ---
 
-## 2. DEBUG FORMULAS (CRITICAL)
+## 2. MOBILE APP STATUS (NEW!)
+
+### ✅ COMPLETED - January 21, 2026
+| Task | Status | Notes |
+|------|--------|-------|
+| Capacitor core installed | ✅ | @capacitor/core, @capacitor/cli |
+| Android platform added | ✅ | 53 files in dashboard/android/ |
+| SDK path configured | ✅ | local.properties created |
+| Debug APK built | ✅ | 4.2MB, ready to install |
+| npm scripts added | ✅ | build:android, cap:sync, etc. |
+| Documentation | ✅ | MOBILE-APP-GUIDE.md |
+
+### APK Location
+```
+C:\Users\ADMIN\Desktop\jari-ecom-v2\dashboard\android\app\build\outputs\apk\debug\app-debug.apk
+```
+
+### New npm Scripts
+```bash
+npm run build:android    # Build web + sync to Android
+npm run cap:sync         # Sync web changes to native
+npm run cap:android      # Open in Android Studio
+npm run apk:debug        # Build debug APK (run from android folder)
+npm run apk:release      # Build release APK
+```
+
+### Build Commands (Git Bash)
+```bash
+# Full rebuild
+cd /c/Users/ADMIN/Desktop/jari-ecom-v2/dashboard
+npm run build
+npx cap sync android
+
+# Build APK
+cd android
+./gradlew assembleDebug
+```
+
+### Known Issue: Emulator Hypervisor
+- Android Studio shows "Install Android Emulator hypervisor driver"
+- **Workaround:** Use physical Android phone via USB debugging
+- **Fix:** Enable Hyper-V in Windows Features, restart PC
+
+### Pending for Mobile
+- [ ] Test APK on physical phone
+- [ ] Fix emulator hypervisor issue
+- [ ] Custom app icon (1024x1024 PNG)
+- [ ] Custom splash screen
+- [ ] DUNS number approval (in progress)
+- [ ] Play Store submission
+
+---
+
+## 3. DEBUG FORMULAS (CRITICAL)
 
 ### Formula 1: API Response Pattern
 ```javascript
@@ -52,13 +115,15 @@ const store = response.data.settings;
 - Use CSS vars: `--fs-*`, `--space-*`
 - Never use generic class names that could conflict
 
-### Formula 3: Git on Windows (PowerShell)
-```powershell
-# Use cmd /c wrapper for complex commands
-cmd /c "cd /d C:\Users\ADMIN\Desktop\jari-ecom-v2 && git add -A && git commit -m 'message' && git push origin main"
+### Formula 3: Git on Windows
+```bash
+# Git Bash (PREFERRED - set as default shell)
+cd /c/Users/ADMIN/Desktop/jari-ecom-v2
+git add -A && git commit -m "message" && git push origin main
 
-# Simple status check
-cd C:\Users\ADMIN\Desktop\jari-ecom-v2; git status; git log --oneline -5
+# CMD (use hyphens in commit messages, no spaces)
+cd /d C:\Users\ADMIN\Desktop\jari-ecom-v2
+git add -A && git commit -m "message-no-spaces"
 ```
 
 ### Formula 4: Surgical Edits
@@ -69,158 +134,36 @@ cd C:\Users\ADMIN\Desktop\jari-ecom-v2; git status; git log --oneline -5
 
 ### Formula 5: Store Config Access (Storefront)
 ```javascript
-// Store config is set on page load
 window.JARI_STORE_CONFIG = data.store;
-
-// Access payment config
 const payment = window.JARI_STORE_CONFIG?.payment || {};
-const hasPaymentConfig = payment.type && (payment.paybill_number || payment.till_number);
 ```
 
-### Formula 6: Database Column Must Exist Before INSERT
+### Formula 6: Database Migrations - Keep Both in Sync!
 ```javascript
-// ❌ WRONG - Column doesn't exist, INSERT fails silently
-INSERT INTO bookings (..., payment_type, ...) VALUES (...)
-// Error: column "payment_type" does not exist
-
-// ✅ FIX - Create migration first
-// api/migrations/005_payment_type.sql
-ALTER TABLE bookings ADD COLUMN IF NOT EXISTS payment_type VARCHAR(20) DEFAULT 'full';
-
-// Then deploy to run migration before API uses the column
+// Update BOTH when adding columns:
+// 1. api/migrations/00X_name.sql
+// 2. api/src/index.js runMigrations()
 ```
 
-### Formula 7: Progress Bar Must Update on Step Change
-```javascript
-// When using perceived steps (3 visible) but internal steps (5 actual):
-function getPerceivedStep(internalStep) {
-  if (internalStep <= 2) return 1;  // Package + Date/Time = SELECT
-  if (internalStep <= 4) return 2;  // Details + Review = DETAILS
-  return 3;                          // Payment = PAY
-}
-
-// updateContent() must call updateProgressBar()
-// updateProgressBar() must target correct selectors (.bkm-step-group not .bkm-step)
-```
-
-### Formula 8: Two Migration Systems - Keep Both in Sync!
-```javascript
-// ❌ PROBLEM: migrations/*.sql files exist BUT index.js has inline migrations
-// The SQL files run via package.json "start" script
-// The inline migrations run on every server startup
-// If they're out of sync, columns are missing!
-
-// ✅ FIX: When adding columns, update BOTH:
-// 1. api/migrations/00X_name.sql  (for full migration runs)
-// 2. api/src/index.js runMigrations() (for inline startup)
-
-// Example - adding payment_type column:
-// In migrations/005_payment_type.sql:
-ALTER TABLE bookings ADD COLUMN IF NOT EXISTS payment_type VARCHAR(20) DEFAULT 'full';
-
-// In index.js runMigrations():
-await runSafe('payment_type_col', `ALTER TABLE bookings ADD COLUMN IF NOT EXISTS payment_type VARCHAR(20) DEFAULT 'full'`);
-```
-
-### Formula 9: API Must Use Defaults When No DB Records Exist
-```javascript
-// ❌ PROBLEM: Availability endpoint returns "Closed" when no working_hours in DB
-// New stores have no working_hours records yet!
-
-// ✅ FIX: Fall back to DEFAULT_WORKING_HOURS when no DB records
-let workingHours = hoursResult.rows[0];
-if (!workingHours) {
-  workingHours = DEFAULT_WORKING_HOURS.find(h => h.day_of_week === dayOfWeek);
-}
-```
-
-### Formula 10: PostgreSQL TIME Format Comparison
-```javascript
-// ❌ PROBLEM: PostgreSQL TIME returns 'HH:MM:SS' but we compare with 'HH:MM'
-// b.booking_time === '09:00' fails when DB has '09:00:00'
-
-// ✅ FIX: Normalize to HH:MM before comparing
-const bookingTime = String(b.booking_time).substring(0, 5); // Get HH:MM
-return bookingTime === timeStr;
-```
-
-### Formula 11: CSS Must Use Theme Variables (No Hardcoded Colors)
-```css
-/* ❌ WRONG - Hardcoded colors don't respect store theme */
-.pbk-package-price { color: #1d1d1f; }
-.pbk-package-badge { background: #e8f4f5; color: #2a8d9c; }
-.pbk-package-btn { background: #2a8d9c; }
-
-/* ✅ CORRECT - Uses CSS variables from store theme */
-.pbk-package-price { color: var(--color-primary); }
-.pbk-package-badge { 
-  background: color-mix(in srgb, var(--color-primary) 12%, transparent);
-  color: var(--color-primary);
-}
-.pbk-package-btn { background: var(--color-primary); }
-
-/* Theme variables to use:
-   --color-primary      (store's main accent color)
-   --text-primary       (main text color)
-   --text-secondary     (secondary/muted text)
-   --surface            (card backgrounds)
-   --bg-gray            (neutral backgrounds)
-   --border             (borders)
-   --radius-*           (border radius sizes)
-   --fs-*               (font sizes)
-   --space-*            (spacing scale)
-*/
-```
-
-### Formula 12: Commit Frequently to Prevent Memory Loss
+### Formula 7: Capacitor Workflow
 ```bash
-# ❌ PROBLEM: Making many edits before committing
-# Context window fills up, AI loses progress, work is lost
+# After ANY React code change:
+npm run build          # Build web
+npx cap sync android   # Sync to Android
 
-# ✅ FIX: Commit after EACH successful change
-# Pattern: Edit → Test → Commit → Next Edit
-cd C:\Users\ADMIN\Desktop\jari-ecom-v2
-git add -A
-git commit -m "PREFIX: Short description of single change"
-
-# Push every 2-3 commits to prevent total loss
-git push origin main
-
-# Prefixes: DD: (Deep Dive), PBK: (Portfolio Booking), Fix:, docs:
+# Then rebuild APK:
+cd android && ./gradlew assembleDebug
 ```
 
-### Formula 13: What's Included Comma Split
-```javascript
-// ❌ PROBLEM: User enters all items in ONE field with commas
-// "Remote, TV stand, Cable" should become 3 separate items
-
-// ✅ FIX: Auto-split comma-separated items in render function
-items.forEach(item => {
-  if (item && item.includes(',')) {
-    const splitItems = item.split(',').map(i => i.trim()).filter(i => i);
-    allItems.push(...splitItems);
-  } else if (item && item.trim()) {
-    allItems.push(item.trim());
-  }
-});
-```
-
-### Formula 14: Apple Dynamic Spacing with clamp()
-```css
-/* ❌ PROBLEM: Fixed gap values don't scale with screen size */
-gap: 24px;
-
-/* ✅ FIX: Use clamp() for responsive scaling */
-gap: clamp(var(--space-lg), 4vw, var(--space-2xl));
-/* Minimum: 24px, Preferred: 4% viewport, Maximum: 48px */
-
-/* Same pattern for margins, padding, font-sizes */
-margin: clamp(32px, 5vw, 64px);
+### Formula 8: Android SDK Path
+```properties
+# dashboard/android/local.properties
+sdk.dir=C:\\Users\\ADMIN\\AppData\\Local\\Android\\Sdk
 ```
 
 ---
 
-## 3. TEMPLATE SYSTEM
+## 4. TEMPLATE SYSTEM
 
 ### Available Templates
 | Template | Purpose | Status |
@@ -232,80 +175,23 @@ margin: clamp(32px, 5vw, 64px);
 | Portfolio/Booking | Services, photographers | ✅ Complete |
 
 ### Two Checkout Flows
-1. **Product Checkout** (`store/src/checkout.js`)
-   - Used by: Quick Decision, Deep Dive, Visual Menu, Event Landing
-   - Flow: Summary → Delivery → Payment → M-Pesa → Success
+1. **Product Checkout** (`store/src/checkout.js`) - Products
+2. **Booking Modal** (`store/src/booking/`) - Services
 
-2. **Booking Modal** (`store/src/booking/`)
-   - Used by: Portfolio/Booking template
-   - Flow: Package → Date/Time → Details → Review → Payment → Success
-
-Both now support M-Pesa payment instructions!
+Both support M-Pesa payment instructions!
 
 ---
 
-## 4. M-PESA PHASE 1 (COMPLETE)
+## 5. M-PESA STATUS
 
-### What Was Built
+### Phase 1: Manual Instructions ✅ COMPLETE
+- Dashboard: Payment settings (Paybill/Till)
+- Storefront: Shows payment instructions
+- Tracks M-Pesa codes in database
 
-#### Dashboard (Settings Page)
-- Payment Settings section with Wallet icon
-- Radio: Paybill vs Till Number
-- Fields: Paybill/Till number, Account number (Paybill only), Business name
-- Saves to store config
-
-#### API
-- `GET/PUT /settings` includes payment fields
-- `GET /public/:slug` returns payment object
-- `POST /bookings` accepts mpesa_code, payment_confirmed
-- Migration 004: Adds mpesa_code, payment_confirmed to bookings table
-
-#### Storefront - Booking Modal (5-step flow)
-```
-Step 1: Select Package
-Step 2: Pick Date & Time  
-Step 3: Your Details
-Step 4: Review & Price → "Continue to Payment"
-Step 5: M-Pesa Instructions + "I've paid" + Code input → "Complete Booking"
-```
-
-#### Storefront - Product Checkout (4-step flow)
-```
-Step 1: Order Summary
-Step 2: Delivery Details
-Step 3: Choose Payment (M-Pesa / COD)
-Step 4: M-Pesa Instructions + Confirmation → "Complete Order"
-```
-
-### Key Files Modified
-| File | Changes |
-|------|---------|
-| `api/package.json` | Auto-migrate on deploy |
-| `api/migrations/004_mpesa_tracking.sql` | New columns |
-| `api/src/routes/bookings.js` | Accept M-Pesa fields |
-| `api/src/routes/public.js` | Return payment config |
-| `dashboard/src/pages/SettingsPage.jsx` | Payment settings UI |
-| `store/src/checkout.js` | M-Pesa step for products |
-| `store/src/styles/base.css` | M-Pesa CSS |
-| `store/src/booking/bookingModal.js` | Step 5 for M-Pesa |
-| `store/src/booking/bookingModal.css` | Payment confirmation CSS |
-| `store/src/booking/bookingState.js` | mpesaCode, paymentConfirmed |
-| `store/src/booking/bookingHandlers.js` | Step 5 handlers |
-| `store/src/main.js` | window.JARI_STORE_CONFIG |
-
----
-
-## 5. RECENT COMMITS
-
-```
-6fa3de1 M-Pesa Phase 1: Add payment instructions to product checkout
-00889d4 Booking flow: Add Step 5 for M-Pesa payment confirmation, auto-migrate on deploy
-38cbfc3 M-Pesa Phase 1: Add payment confirmation, M-Pesa code tracking, proper icon
-330c1a4 M-Pesa Phase 1: Add payment instructions UI to booking checkout
-cacd949 M-Pesa Phase 1: Add payment fields to dashboard, API, and booking state
-27faabd docs: Update handover with shelved ideas section and current status
-97285c7 CTA polish: centered hero CTAs, calendar+WhatsApp icons in PBK
-```
+### Phase 2: STK Push (SHELVED)
+- Partner: IntaSend WaaS
+- Status: Awaiting partnership confirmation
 
 ---
 
@@ -313,84 +199,46 @@ cacd949 M-Pesa Phase 1: Add payment fields to dashboard, API, and booking state
 
 ### 🔴 HIGH PRIORITY
 
+#### Mobile App Polish
+- Custom app icon and splash screen
+- Push notifications for new orders/bookings
+- Camera integration for product photos
+- Play Store submission (when DUNS ready)
+
 #### M-Pesa WaaS Integration (Phase 2)
-**Partner:** IntaSend
-**Job:** Automatic STK Push, no manual payment
-**Status:** Email drafted, awaiting partnership confirmation
-
-Key Architecture:
-```
-Phase 1: Manual Paybill/Till display ✅ DONE
-Phase 2: IntaSend WaaS (STK Push via their shortcode)
-Phase 3: Direct Daraja BYOC (merchants with own Paybill)
-Phase 4: Jari as Aggregator (requires CBK PSP license)
-```
-
-Database schema planned:
-- `store_wallets` - Link stores to IntaSend wallets
-- `wallet_transactions` - Track money movement
+- IntaSend partnership
+- Automatic STK Push
 
 #### User Accounts & Authentication
 - Customer registration/login
 - Order history, saved addresses
-- Repeat purchase flow
 
 ### 🟡 MEDIUM PRIORITY
 
 #### SMS/WhatsApp Reminders
 - 5hr, 2hr, 30min before booking
 - Africa's Talking or Twilio
-- Toggle exists in booking_settings table
 
 #### Real Discount Codes
 - Dashboard UI to create codes
 - Validation on checkout
-- Currently just shows input, no backend
 
 #### Multi-Select Categories
-- Allow services in multiple categories
-- "Wedding Photography" in both "Weddings" AND "Outdoor"
+- Services in multiple categories
 
 ### 🟢 LOW PRIORITY
-- Dashboard debouncing (prevent double-saves)
+- iOS app (requires Mac)
+- Dashboard debouncing
 - Confirmation emails
-- Image CDN optimization
-- CSS file splitting
+- PWA for storefronts
 
 ---
 
-## 7. TESTING CHECKLIST
-
-### Dashboard
-- [ ] Settings → Payment Settings shows Wallet icon
-- [ ] Can select Paybill or Till
-- [ ] Conditional fields work (Account # only for Paybill)
-- [ ] Save persists, reload shows saved values
-
-### Storefront - Product Checkout
-- [ ] Add to cart, proceed to checkout
-- [ ] Fill delivery details
-- [ ] Select M-Pesa → See "Continue" or go to Step 4
-- [ ] Step 4 shows M-Pesa instructions (if configured)
-- [ ] Can check "I've paid" and enter code
-- [ ] Complete order works
-
-### Storefront - Booking Modal
-- [ ] Open booking, select package
-- [ ] Pick date/time, enter details
-- [ ] Step 4 shows Review with price breakdown
-- [ ] "Continue to Payment" goes to Step 5
-- [ ] Step 5 shows M-Pesa instructions
-- [ ] Confirm checkbox + code input work
-- [ ] Complete booking saves M-Pesa code
-
----
-
-## 8. ENVIRONMENT URLS
+## 7. ENVIRONMENT URLS
 
 | Service | URL |
 |---------|-----|
-| Dashboard | https://jari-dashboard.netlify.app |
+| Dashboard (Web) | https://jari-dashboard.netlify.app |
 | Store | https://jariecommstore.netlify.app |
 | API | https://jari-api-production.up.railway.app |
 | GitHub | github.com/meshack-abwao/jari-ecom-v2 |
@@ -399,82 +247,107 @@ Database schema planned:
 
 ---
 
-## 9. QUICK COMMANDS
+## 8. RECENT COMMITS (January 21, 2026)
 
-### Check Status
-```powershell
-cd C:\Users\ADMIN\Desktop\jari-ecom-v2; git status; git log --oneline -5
 ```
-
-### Read File with Offset
-```javascript
-read_file(path, { offset: 100, length: 50 })
-```
-
-### Surgical Edit
-```javascript
-edit_block(path, { old_string: "exact match", new_string: "replacement" })
-```
-
-### Commit & Push
-```powershell
-cmd /c "cd /d C:\Users\ADMIN\Desktop\jari-ecom-v2 && git add -A && git commit -m 'message' && git push origin main"
+6a9bd11 mobile-add-resources-folder-for-app-icons
+8e31203 mobile-add-npm-scripts-for-capacitor
+5c2e78a mobile-add-android-platform
+5c01820 mobile: Initialize Capacitor with config
+18ee11e mobile: Install Capacitor Android platform
+2fb794e mobile: Install Capacitor core and CLI
+18a5bfe docs: Mobile-app-guide-Capacitor-strategy
 ```
 
 ---
 
-## 10. MOBILE APP STRATEGY (NEW)
+## 9. KEY FILES FOR MOBILE
 
-### Architecture Decision
-- **Dashboard** → Native app via Capacitor (Android + iOS)
-- **Storefronts** → Web only (PWA-enhanced)
-- **Single codebase** → Two outputs (web + native)
+| File | Purpose |
+|------|---------|
+| `dashboard/capacitor.config.json` | Capacitor settings |
+| `dashboard/android/` | Android native project |
+| `dashboard/android/local.properties` | SDK path |
+| `dashboard/android/app/build/outputs/apk/debug/` | APK output |
+| `dashboard/resources/` | Icon/splash sources |
+| `docs/MOBILE-APP-GUIDE.md` | Complete mobile guide |
 
-### Status: Planning Phase
-- DUNS number application submitted (required for Play Store org account)
-- Estimated 3-4 weeks for DUNS approval
-- Using wait time to prepare submission-ready app
+---
 
-### Workflow (Web + Native Coexist)
+## 10. NEXT SESSION PRIORITIES
+
+1. **Test APK on physical phone** - Connect via USB, enable USB debugging
+2. **Fix emulator** - Enable Hyper-V in Windows Features
+3. **App icon** - Create 1024x1024 Jari logo PNG
+4. **Splash screen** - Create 2732x2732 splash PNG
+
+---
+
+## 11. ARCHITECTURE DIAGRAM
+
 ```
-Code changes → npm run build → dist/
-                                  ↓
-                    ┌─────────────┴─────────────┐
-                    ↓                           ↓
-                Netlify                   npx cap sync
-                (Web)                     (Native APK)
+┌─────────────────────────────────────────────────────────────────┐
+│                     SINGLE REACT CODEBASE                       │
+│                      dashboard/src/                             │
+├─────────────────────────────────────────────────────────────────┤
+│                             │                                   │
+│              ┌──────────────┴──────────────┐                   │
+│              ▼                             ▼                    │
+│    ┌─────────────────┐           ┌─────────────────┐          │
+│    │   WEB BUILD     │           │  NATIVE BUILD   │          │
+│    │  npm run build  │           │  npx cap sync   │          │
+│    │       ↓         │           │       ↓         │          │
+│    │    dist/        │           │   android/      │          │
+│    │       ↓         │           │       ↓         │          │
+│    │   Netlify       │           │  APK / Play     │          │
+│    └─────────────────┘           └─────────────────┘          │
+│                                                                │
+│    STOREFRONTS (Web Only)                                      │
+│    ┌─────────────────────────────────────────────┐            │
+│    │  store/ → Netlify → yourstore.jari.eco      │            │
+│    └─────────────────────────────────────────────┘            │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-### Distribution Options
-1. **APK Sideloading** - Direct install (testing, beta users)
-2. **Play Store** - Once DUNS approved ($25 one-time)
-3. **App Store** - Requires Mac + $99/year
+---
 
-### See Also
-- Full guide: `docs/MOBILE-APP-GUIDE.md`
-- Capacitor config: `dashboard/capacitor.config.ts` (to be created)
+## 12. QUICK REFERENCE
+
+### Start Development
+```bash
+# Dashboard (web)
+cd /c/Users/ADMIN/Desktop/jari-ecom-v2/dashboard
+npm run dev
+
+# API
+cd /c/Users/ADMIN/Desktop/jari-ecom-v2/api
+npm run dev
+
+# Store
+cd /c/Users/ADMIN/Desktop/jari-ecom-v2/store
+npm run dev
+```
+
+### Build & Deploy Mobile
+```bash
+cd /c/Users/ADMIN/Desktop/jari-ecom-v2/dashboard
+npm run build
+npx cap sync android
+cd android
+./gradlew assembleDebug
+# APK at: app/build/outputs/apk/debug/app-debug.apk
+```
+
+### Git Workflow
+```bash
+cd /c/Users/ADMIN/Desktop/jari-ecom-v2
+git add -A
+git commit -m "prefix: description"
+git push origin main
+```
 
 ---
 
-## 11. NEXT SESSION PRIORITIES
-
-1. **Capacitor Setup** - Add to dashboard, generate Android project
-2. **First APK Build** - Get app running on physical device
-3. **App Assets** - Icon, splash screen, store listing
-4. **Native Features** - Push notifications, camera, share
-
----
-
-## 12. KEY LEARNINGS FROM THIS SESSION
-
-1. **Separate checkout flows** need separate M-Pesa implementations
-2. **window.JARI_STORE_CONFIG** is the bridge for store config to storefront
-3. **Auto-migrate on deploy** prevents forgotten migrations
-4. **5-step vs 4-step** booking flow depends on payment config
-5. **CSS in base.css** for product checkout, **bookingModal.css** for booking modal
-
----
-
-*Last updated: January 21, 2026*
+*Last updated: January 21, 2026 ~22:30 EAT*
 *Author: Claude (AI Assistant)*
-*Session: Mobile App Planning*
+*Session: Mobile App Phase 1 Complete*

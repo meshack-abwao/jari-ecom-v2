@@ -273,17 +273,51 @@ dfc032a 📝 Add comprehensive Template Isolation handover document
 
 ---
 
-## 10. NEXT SESSION CHECKLIST
+## 10. MOBILE APP (NEW - January 21, 2026)
+
+### Status: Phase 1 Complete ✅
+- Capacitor installed and configured
+- Android platform added
+- Debug APK built (4.2MB)
+- Ready for testing
+
+### APK Location
+```
+dashboard/android/app/build/outputs/apk/debug/app-debug.apk
+```
+
+### Mobile Commands
+```bash
+# Build for Android
+npm run build:android    # Build web + sync
+cd android && ./gradlew assembleDebug
+
+# Open in Android Studio
+npx cap open android
+```
+
+### Pending
+- [ ] Test APK on physical phone
+- [ ] Fix emulator hypervisor
+- [ ] Custom app icon (1024x1024)
+- [ ] DUNS approval → Play Store
+
+### See Also
+- `docs/MOBILE-APP-GUIDE.md` - Complete mobile documentation
+
+---
+
+## 11. NEXT SESSION CHECKLIST
 
 When starting a new chat:
 1. ✅ Run `git status` and `git log --oneline -5`
-2. ✅ Read `docs/TEMPLATE-ISOLATION-HANDOVER.md` if doing template work
-3. ✅ Check which phase of isolation is next
-4. ✅ Work on feature branch for risky changes
+2. ✅ Check `docs/HANDOVER-CONTEXT.md` for current status
+3. ✅ Read `docs/MOBILE-APP-GUIDE.md` if doing mobile work
+4. ✅ Read `docs/TEMPLATE-ISOLATION-HANDOVER.md` if doing template work
 5. ✅ Commit after each successful change
-6. ✅ Test in browser before proceeding
+6. ✅ Test before proceeding
 
 ---
 
 **End of Project Instructions**
-*Last Updated: January 19, 2026*
+*Last Updated: January 21, 2026*
