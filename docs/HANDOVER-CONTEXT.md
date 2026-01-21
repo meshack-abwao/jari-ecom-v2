@@ -423,16 +423,49 @@ cmd /c "cd /d C:\Users\ADMIN\Desktop\jari-ecom-v2 && git add -A && git commit -m
 
 ---
 
-## 10. NEXT SESSION PRIORITIES
+## 10. MOBILE APP STRATEGY (NEW)
 
-1. **Test M-Pesa flow** on live site
-2. **Fix any bugs** discovered in testing
-3. **Template polish** - any remaining UI issues
-4. **Consider Phase 2** - IntaSend partnership if ready
+### Architecture Decision
+- **Dashboard** → Native app via Capacitor (Android + iOS)
+- **Storefronts** → Web only (PWA-enhanced)
+- **Single codebase** → Two outputs (web + native)
+
+### Status: Planning Phase
+- DUNS number application submitted (required for Play Store org account)
+- Estimated 3-4 weeks for DUNS approval
+- Using wait time to prepare submission-ready app
+
+### Workflow (Web + Native Coexist)
+```
+Code changes → npm run build → dist/
+                                  ↓
+                    ┌─────────────┴─────────────┐
+                    ↓                           ↓
+                Netlify                   npx cap sync
+                (Web)                     (Native APK)
+```
+
+### Distribution Options
+1. **APK Sideloading** - Direct install (testing, beta users)
+2. **Play Store** - Once DUNS approved ($25 one-time)
+3. **App Store** - Requires Mac + $99/year
+
+### See Also
+- Full guide: `docs/MOBILE-APP-GUIDE.md`
+- Capacitor config: `dashboard/capacitor.config.ts` (to be created)
 
 ---
 
-## 11. KEY LEARNINGS FROM THIS SESSION
+## 11. NEXT SESSION PRIORITIES
+
+1. **Capacitor Setup** - Add to dashboard, generate Android project
+2. **First APK Build** - Get app running on physical device
+3. **App Assets** - Icon, splash screen, store listing
+4. **Native Features** - Push notifications, camera, share
+
+---
+
+## 12. KEY LEARNINGS FROM THIS SESSION
 
 1. **Separate checkout flows** need separate M-Pesa implementations
 2. **window.JARI_STORE_CONFIG** is the bridge for store config to storefront
@@ -442,5 +475,6 @@ cmd /c "cd /d C:\Users\ADMIN\Desktop\jari-ecom-v2 && git add -A && git commit -m
 
 ---
 
-*Last updated: January 19, 2026 ~23:30 EAT*
+*Last updated: January 21, 2026*
 *Author: Claude (AI Assistant)*
+*Session: Mobile App Planning*
