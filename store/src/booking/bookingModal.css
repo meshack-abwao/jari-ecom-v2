@@ -1482,27 +1482,111 @@
   color: #1b5e20;
 }
 
-/* Trust Pills Row - Payment Confidence */
-.bkm-trust-pills {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  flex-wrap: wrap;
+/* ===========================================
+   UNIFIED M-PESA PAYMENT CARD
+   Trust-focused, premium design
+   =========================================== */
+.bkm-mpesa-card {
+  background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
+  border-radius: 16px;
+  padding: 20px;
   margin-bottom: 16px;
 }
 
-.bkm-trust-pill {
-  display: inline-flex;
+/* Payment Details as Pills */
+.bkm-payment-pills {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.bkm-payment-pills-single {
+  justify-content: center;
+}
+
+.bkm-payment-pill {
+  display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 4px;
-  padding: 6px 12px;
-  background: var(--surface, #fff);
-  border: 1px solid rgba(0,0,0,0.08);
+  padding: 12px 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  min-width: 100px;
+}
+
+.bkm-pill-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-secondary, #666);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.bkm-pill-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary, #1a1a1a);
+  font-family: 'SF Mono', 'Monaco', monospace;
+}
+
+/* Amount Hero */
+.bkm-amount-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 16px 24px;
+  background: #1b5e20;
   border-radius: 100px;
+  margin-bottom: 16px;
+}
+
+.bkm-amount-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.8);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.bkm-amount-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: white;
+  letter-spacing: -0.5px;
+}
+
+/* M-Pesa Steps */
+.bkm-mpesa-steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.bkm-step-item {
   font-size: 11px;
   font-weight: 500;
   color: var(--text-secondary, #666);
-  white-space: nowrap;
+  padding: 4px 8px;
+  background: white;
+  border-radius: 6px;
+}
+
+.bkm-step-arrow {
+  font-size: 10px;
+  color: #1b5e20;
+  font-weight: 600;
+}
+
+.bkm-step-highlight {
+  background: #1b5e20;
+  color: white;
+  font-weight: 700;
 }
 
 

@@ -546,47 +546,62 @@ function renderStep5() {
         <p class="bkm-paying-to">Paying to: <strong>${businessName}</strong></p>
       </div>
       
-      <!-- Trust Pills Row - JTBD: Build payment confidence -->
-      <div class="bkm-trust-pills">
-        <span class="bkm-trust-pill">✓ Verified Business</span>
-        <span class="bkm-trust-pill">🔒 Encrypted</span>
-        <span class="bkm-trust-pill">💬 Support</span>
-      </div>
-      
-      <!-- Compact M-Pesa Details - Golden Ratio Layout -->
-      <div class="bkm-mpesa-compact">
+      <!-- Unified M-Pesa Payment Card - Trust-focused design -->
+      <div class="bkm-mpesa-card">
         ${payment.type === 'paybill' ? `
-          <div class="bkm-mpesa-grid">
-            <div class="bkm-mpesa-grid-row">
-              <div class="bkm-mpesa-item">
-                <span class="bkm-label">Paybill</span>
-                <strong>${payment.paybill_number}</strong>
-              </div>
-              <div class="bkm-mpesa-item">
-                <span class="bkm-label">Account</span>
-                <strong>${acct}</strong>
-              </div>
+          <!-- Payment Details as Pills -->
+          <div class="bkm-payment-pills">
+            <div class="bkm-payment-pill">
+              <span class="bkm-pill-label">Paybill</span>
+              <span class="bkm-pill-value">${payment.paybill_number}</span>
             </div>
-            <div class="bkm-mpesa-item bkm-mpesa-highlight">
-              <span class="bkm-label">Amount</span>
-              <strong>KES ${Number(payNow).toLocaleString()}</strong>
+            <div class="bkm-payment-pill">
+              <span class="bkm-pill-label">Account</span>
+              <span class="bkm-pill-value">${acct}</span>
             </div>
           </div>
-          <p class="bkm-mpesa-hint">M-Pesa → Lipa na M-Pesa → Paybill → ${payment.paybill_number}</p>
+          
+          <!-- Amount - Hero element -->
+          <div class="bkm-amount-hero">
+            <span class="bkm-amount-label">Amount to Pay</span>
+            <span class="bkm-amount-value">KES ${Number(payNow).toLocaleString()}</span>
+          </div>
+          
+          <!-- Instructions -->
+          <div class="bkm-mpesa-steps">
+            <span class="bkm-step-item">M-Pesa</span>
+            <span class="bkm-step-arrow">→</span>
+            <span class="bkm-step-item">Lipa na M-Pesa</span>
+            <span class="bkm-step-arrow">→</span>
+            <span class="bkm-step-item">Paybill</span>
+            <span class="bkm-step-arrow">→</span>
+            <span class="bkm-step-item bkm-step-highlight">${payment.paybill_number}</span>
+          </div>
         ` : `
-          <div class="bkm-mpesa-grid">
-            <div class="bkm-mpesa-grid-row">
-              <div class="bkm-mpesa-item">
-                <span class="bkm-label">Till No</span>
-                <strong>${payment.till_number}</strong>
-              </div>
-            </div>
-            <div class="bkm-mpesa-item bkm-mpesa-highlight">
-              <span class="bkm-label">Amount</span>
-              <strong>KES ${Number(payNow).toLocaleString()}</strong>
+          <!-- Till Number as Pill -->
+          <div class="bkm-payment-pills bkm-payment-pills-single">
+            <div class="bkm-payment-pill">
+              <span class="bkm-pill-label">Till Number</span>
+              <span class="bkm-pill-value">${payment.till_number}</span>
             </div>
           </div>
-          <p class="bkm-mpesa-hint">M-Pesa → Lipa na M-Pesa → Buy Goods → ${payment.till_number}</p>
+          
+          <!-- Amount - Hero element -->
+          <div class="bkm-amount-hero">
+            <span class="bkm-amount-label">Amount to Pay</span>
+            <span class="bkm-amount-value">KES ${Number(payNow).toLocaleString()}</span>
+          </div>
+          
+          <!-- Instructions -->
+          <div class="bkm-mpesa-steps">
+            <span class="bkm-step-item">M-Pesa</span>
+            <span class="bkm-step-arrow">→</span>
+            <span class="bkm-step-item">Lipa na M-Pesa</span>
+            <span class="bkm-step-arrow">→</span>
+            <span class="bkm-step-item">Buy Goods</span>
+            <span class="bkm-step-arrow">→</span>
+            <span class="bkm-step-item bkm-step-highlight">${payment.till_number}</span>
+          </div>
         `}
       </div>
       
