@@ -517,11 +517,13 @@
 /* ===== Content Grid - Description + What's Included side by side on desktop ===== */
 .pbk-content-grid {
   display: block;
-  margin-top: var(--space-3xl);  /* Breathing room from hero */
+  margin-top: var(--space-4xl);  /* More breathing room from hero */
+  margin-bottom: var(--space-3xl);  /* Space before packages */
 }
 
 .pbk-content-left {
   margin-bottom: var(--space-2xl);
+  padding-top: var(--space-lg);  /* Visual balance with What's Included card */
 }
 
 .pbk-content-right .pbk-whats-included {
