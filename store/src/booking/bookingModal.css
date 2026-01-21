@@ -1488,7 +1488,7 @@
    =========================================== */
 .bkm-mpesa-card {
   background: var(--surface, #fff);
-  border: 1px solid rgba(0,0,0,0.08);
+  border: 1px solid #c8e6c9;
   border-radius: 16px;
   padding: 16px;
   margin-bottom: 16px;
