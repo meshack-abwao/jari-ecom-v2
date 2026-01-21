@@ -308,14 +308,15 @@
 }
 
 .bkm-slot {
-  padding: 10px;
+  padding: 10px 14px;
   border: 2px solid var(--border, #e0e0e0);
-  border-radius: 8px;
+  border-radius: 100px; /* PILL shape for trust */
   background: var(--surface, #fff);
   font-size: 13px;
   cursor: pointer;
   text-align: center;
   color: var(--text-primary, #000);
+  transition: all 0.2s ease;
 }
 
 .bkm-slot:hover:not(.disabled) {
@@ -437,7 +438,7 @@
   margin: 8px 0 0;
 }
 
-/* Actions */
+/* Actions - PILL CTAs for trust (rounded = safe, no amygdala threat) */
 .bkm-actions {
   display: flex;
   gap: 10px;
@@ -445,26 +446,35 @@
 
 .bkm-btn {
   flex: 1;
-  padding: 14px;
+  padding: 14px 20px;
   border: none;
-  border-radius: 12px;
+  border-radius: 100px; /* PILL shape = TRUST */
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .bkm-btn-primary {
-  background: var(--color-primary, #007AFF);
+  background: linear-gradient(135deg, var(--color-primary, #007AFF) 0%, color-mix(in srgb, var(--color-primary, #007AFF) 80%, #000) 100%);
   color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.25);
 }
 
 .bkm-btn-primary:hover:not(:disabled) {
   filter: brightness(1.1);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
 }
 
 .bkm-btn-primary:disabled {
   background: var(--text-muted, #999);
   cursor: not-allowed;
+  box-shadow: none;
 }
 
 .bkm-btn-secondary {
@@ -474,6 +484,20 @@
 
 .bkm-btn-secondary:hover {
   background: var(--border, #e0e0e0);
+  transform: translateY(-1px);
+}
+
+/* Confirm button - Green for final action */
+.bkm-btn-confirm {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.25);
+}
+
+.bkm-btn-confirm:hover:not(:disabled) {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
 }
 
 /* Success */
