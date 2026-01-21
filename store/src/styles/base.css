@@ -1876,11 +1876,20 @@ body {
         font-size: var(--fs-body);
     }
     
-    /* V1 mobile story sizes */
+    /* V1 mobile story sizes - responsive shrink to fit */
     .story-bubble {
-        width: var(--size-story-mobile);
-        height: var(--size-story-mobile);
-        min-width: var(--size-story-mobile);
+        width: clamp(44px, 12vw, var(--size-story-mobile));
+        height: clamp(44px, 12vw, var(--size-story-mobile));
+        min-width: 44px;
+    }
+    
+    .story-item {
+        max-width: clamp(50px, 14vw, 70px);
+    }
+    
+    .story-label {
+        font-size: clamp(9px, 2.5vw, var(--fs-small));
+        max-width: clamp(50px, 14vw, 70px);
     }
     
     .stories-strip {
@@ -1931,13 +1940,15 @@ body {
 .stories-row {
     display: flex;
     justify-content: center;
-    gap: clamp(var(--space-lg), 4vw, var(--space-2xl));
+    gap: clamp(var(--space-md), 3vw, var(--space-2xl));
     overflow-x: auto;
+    padding: 0 var(--space-lg);
     padding-bottom: var(--space-sm);
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     -ms-overflow-style: none;
     max-width: 100%;
+    box-sizing: border-box;
 }
 
 .stories-row::-webkit-scrollbar {
