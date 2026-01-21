@@ -70,6 +70,13 @@ export function renderStep(step) {
   }
 }
 
+// Trust Pill Component - JTBD: Build confidence at each step
+function renderTrustPill(icon, text, variant = 'default') {
+  const variantClass = variant === 'success' ? 'bkm-pill-success' : 
+                       variant === 'secure' ? 'bkm-pill-secure' : '';
+  return `<span class="bkm-trust-pill ${variantClass}">${icon} ${text}</span>`;
+}
+
 // Step 1: Select Package
 function renderStep1() {
   const { product, selectedPackage } = bookingState;
@@ -80,6 +87,9 @@ function renderStep1() {
     // No packages, just show service
     return `
       <div class="bkm-step-content">
+        <div class="bkm-step-trust">
+          ${renderTrustPill('✨', 'Transparent Pricing')}
+        </div>
         <h3 class="bkm-title">Select Service</h3>
         <div class="bkm-service selected" data-price="${data.price || 0}" data-name="${data.name}">
           <div class="bkm-service-info">
@@ -97,6 +107,9 @@ function renderStep1() {
   
   return `
     <div class="bkm-step-content">
+      <div class="bkm-step-trust">
+        ${renderTrustPill('✨', 'Transparent Pricing')}
+      </div>
       <h3 class="bkm-title">Select Package</h3>
       <div class="bkm-packages">
         ${packages.map((pkg, i) => `
