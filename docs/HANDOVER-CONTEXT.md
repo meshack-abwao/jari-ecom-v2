@@ -126,11 +126,12 @@ cd /d C:\Users\ADMIN\Desktop\jari-ecom-v2
 git add -A && git commit -m "message-no-spaces"
 ```
 
-### Formula 4: Surgical Edits
+### Formula 4: Surgical Edits + Commit As You Go
 1. `read_file` with offset/length to see current state
 2. `edit_block` with exact old_string match
-3. Commit immediately after each fix
-4. Small, focused changes prevent cascading bugs
+3. **COMMIT IMMEDIATELY after each logical change** - prevents memory loss!
+4. Build in phases - don't make 10 changes before committing
+5. Small, focused commits = easy rollback + context preservation
 
 ### Formula 5: Store Config Access (Storefront)
 ```javascript
