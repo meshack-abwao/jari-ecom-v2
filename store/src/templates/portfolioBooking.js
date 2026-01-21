@@ -384,7 +384,7 @@ function renderPbkWhyChooseUs(content) {
   `;
 }
 
-// What's Included section
+// What's Included section - Apple-style card with title inside (like DD Specs)
 function renderPbkWhatsIncluded(content) {
   if (!content) return '';
   
@@ -393,15 +393,17 @@ function renderPbkWhatsIncluded(content) {
   
   return `
     <div class="pbk-whats-included">
-      <h3 class="pbk-section-title">What's Included</h3>
-      <ul class="pbk-included-list">
-        ${items.map(item => `
-          <li class="pbk-included-item">
-            <span class="pbk-included-check">✓</span>
-            <span class="pbk-included-text">${typeof item === 'string' ? item : item.text || item}</span>
-          </li>
-        `).join('')}
-      </ul>
+      <div class="pbk-included-card">
+        <h3 class="pbk-included-title">What's Included</h3>
+        <ul class="pbk-included-list">
+          ${items.map(item => `
+            <li class="pbk-included-item">
+              <span class="pbk-included-check">✓</span>
+              <span class="pbk-included-text">${typeof item === 'string' ? item : item.text || item}</span>
+            </li>
+          `).join('')}
+        </ul>
+      </div>
     </div>
   `;
 }

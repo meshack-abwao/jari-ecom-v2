@@ -517,32 +517,33 @@
 /* ===== Content Grid - Description + What's Included side by side on desktop ===== */
 .pbk-content-grid {
   display: block;
+  margin-top: var(--space-3xl);  /* Breathing room from hero */
 }
 
 .pbk-content-left {
-  margin-bottom: var(--space-xl);
+  margin-bottom: var(--space-2xl);
 }
 
 .pbk-content-right .pbk-whats-included {
   margin-top: 0;
 }
 
-/* Remove auto-margin from included list when in grid */
-.pbk-content-right .pbk-included-list {
-  margin: 0;
-  max-width: none;
-}
-
 @media (min-width: 1024px) {
   .pbk-content-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: var(--space-2xl);
+    gap: var(--space-3xl);
     align-items: start;
+    margin-top: var(--space-4xl);  /* More breathing room on desktop */
   }
   
   .pbk-content-left {
     margin-bottom: 0;
+  }
+  
+  .pbk-included-card {
+    padding: var(--space-2xl);
+    border-radius: 28px;
   }
 }
 
@@ -1579,26 +1580,39 @@
 }
 
 /* ===========================================
-   WHAT'S INCLUDED - Apple-style list
-   Reassurance before booking decision
+   WHAT'S INCLUDED - Apple-style card (like DD Specs)
+   Title INSIDE card, single column, centered
    =========================================== */
 .pbk-whats-included {
-  /* No margin/padding when in content-grid - grid handles spacing */
+  /* Grid handles spacing */
+}
+
+.pbk-included-card {
+  background: var(--surface);
+  border-radius: 24px;
+  padding: var(--space-xl);
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.04),
+    0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+.pbk-included-title {
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: center;
+  margin: 0 0 var(--space-lg);
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--border);
 }
 
 .pbk-included-list {
   list-style: none;
   margin: 0;
-  padding: var(--space-xl);
+  padding: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-lg);
-  /* Apple-style card container */
-  background: var(--surface);
-  border-radius: 24px;
-  box-shadow: 
-    0 2px 8px rgba(0, 0, 0, 0.04),
-    0 8px 24px rgba(0, 0, 0, 0.06);
+  gap: 0;
 }
 
 .pbk-included-item {
@@ -1611,6 +1625,11 @@
 
 .pbk-included-item:last-child {
   border-bottom: none;
+  padding-bottom: 0;
+}
+
+.pbk-included-item:first-child {
+  padding-top: var(--space-xs);
 }
 
 .pbk-included-icon {
