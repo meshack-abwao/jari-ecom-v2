@@ -514,6 +514,38 @@
   letter-spacing: 0.01em;
 }
 
+/* ===== Content Grid - Description + What's Included side by side on desktop ===== */
+.pbk-content-grid {
+  display: block;
+}
+
+.pbk-content-left {
+  margin-bottom: var(--space-xl);
+}
+
+.pbk-content-right .pbk-whats-included {
+  margin-top: 0;
+}
+
+/* Remove auto-margin from included list when in grid */
+.pbk-content-right .pbk-included-list {
+  margin: 0;
+  max-width: none;
+}
+
+@media (min-width: 1024px) {
+  .pbk-content-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-2xl);
+    align-items: start;
+  }
+  
+  .pbk-content-left {
+    margin-bottom: 0;
+  }
+}
+
 
 /* Section Title (Level 3 in hierarchy) - Clear wayfinding, centered */
 .pbk-section-title {
@@ -1551,19 +1583,16 @@
    Reassurance before booking decision
    =========================================== */
 .pbk-whats-included {
-  margin-bottom: var(--space-5xl);
-  padding-top: var(--space-4xl);
-  border-top: 1px solid var(--border);
+  /* No margin/padding when in content-grid - grid handles spacing */
 }
 
 .pbk-included-list {
   list-style: none;
-  margin: 0 auto;
+  margin: 0;
   padding: var(--space-xl);
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--space-md);
-  max-width: 700px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
   /* Apple-style card container */
   background: var(--surface);
   border-radius: 24px;
@@ -1576,9 +1605,8 @@
   display: flex;
   align-items: center;
   gap: var(--space-md);
-  padding: var(--space-sm) var(--space-md);
-  background: var(--background);
-  border-radius: 12px;
+  padding: var(--space-sm) 0;
+  border-bottom: 1px solid var(--border);
 }
 
 .pbk-included-item:last-child {
@@ -1613,15 +1641,8 @@
 
 @media (min-width: 768px) {
   .pbk-included-list {
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-lg);
     padding: var(--space-2xl);
     border-radius: 28px;
-    max-width: 800px;
-  }
-  
-  .pbk-included-item {
-    padding: var(--space-md);
   }
 }
 

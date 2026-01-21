@@ -61,14 +61,20 @@ export function renderPortfolioBookingTemplate(product) {
             </button>
           </div>
         </div>
-        ${data.description ? `<p class="pbk-description">${data.description}</p>` : ''}
+        
+        <!-- Description + What's Included (2-column on desktop, like Deep Dive) -->
+        <div class="pbk-content-grid">
+          <div class="pbk-content-left">
+            ${data.description ? `<p class="pbk-description">${data.description}</p>` : ''}
+          </div>
+          <div class="pbk-content-right">
+            ${data.whatsIncluded ? renderPbkWhatsIncluded(data.whatsIncluded) : ''}
+          </div>
+        </div>
       </div>
 
       <!-- 4. PACKAGES - "What do I get?" (Decision framework - EARLY!) -->
       ${packages.length > 0 ? renderPbkPackages(packages) : ''}
-
-      <!-- 5. WHAT'S INCLUDED - "What exactly is in my package?" (Details - right after packages!) -->
-      ${data.whatsIncluded ? renderPbkWhatsIncluded(data.whatsIncluded) : ''}
 
       <!-- 6. GALLERY - "Is the work good?" (Proof of quality) -->
       ${renderPbkGallerySection(media, data.galleryTitle)}
