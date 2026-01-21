@@ -2379,15 +2379,16 @@ body {
 /* ===== macOS Dock-style Thumbnails ===== */
 .deep-dive-hero .thumbnails {
     background: var(--surface);
-    padding: var(--space-lg) var(--space-md);
+    padding: var(--space-lg) var(--space-xl);
     display: flex;
     justify-content: center;
     align-items: flex-end;
-    gap: var(--space-sm);
+    gap: clamp(6px, 2vw, var(--space-sm));
     border-top: 1px solid var(--border);
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
+    box-sizing: border-box;
 }
 
 .deep-dive-hero .thumbnails::-webkit-scrollbar {
@@ -2395,13 +2396,14 @@ body {
 }
 
 .deep-dive-hero .thumbnail {
-    width: 56px;
-    height: 56px;
-    min-width: 56px;
-    border-radius: 14px;
+    width: clamp(44px, 12vw, 56px);
+    height: clamp(44px, 12vw, 56px);
+    min-width: 44px;
+    border-radius: clamp(10px, 3vw, 14px);
     transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     cursor: pointer;
     object-fit: cover;
+    flex-shrink: 0;
 }
 
 /* Dock magnification effect on hover */
@@ -2430,6 +2432,11 @@ body {
         height: 64px;
         min-width: 64px;
         border-radius: 16px;
+    }
+    
+    .deep-dive-hero .thumbnails {
+        padding: var(--space-xl) var(--space-2xl);
+        gap: var(--space-sm);
     }
     
     .deep-dive-hero .thumbnail:hover {
