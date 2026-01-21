@@ -138,6 +138,9 @@ function renderStep2() {
   
   return `
     <div class="bkm-step-content">
+      <div class="bkm-step-trust">
+        ${renderTrustPill('📅', 'Real-Time Availability')}
+      </div>
       <h3 class="bkm-title">Pick Date & Time</h3>
       
       <div class="bkm-calendar">
@@ -286,6 +289,9 @@ function renderStep3() {
   
   return `
     <div class="bkm-step-content">
+      <div class="bkm-step-trust">
+        ${renderTrustPill('🔒', 'Your Info is Secure', 'secure')}
+      </div>
       <h3 class="bkm-title">Your Details</h3>
       
       <!-- Inline Booking Summary -->
