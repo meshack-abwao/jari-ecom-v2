@@ -3426,13 +3426,13 @@ body {
     
     .cta-glass {
         padding: 14px 24px;
-        border-radius: 20px;
+        border-radius: 100px;
         justify-content: center;
         gap: 20px;
     }
     
     .cta-add-btn {
-        padding: 16px 36px;
+        padding: 14px 32px;
         font-size: 16px;
     }
 }
