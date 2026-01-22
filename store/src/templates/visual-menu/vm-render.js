@@ -8,7 +8,6 @@ import { state } from '../../state.js';
 import { formatPrice } from '../../shared/utils.js';
 import { renderStories, renderStoryViewer } from '../../shared/media-components.js';
 import { renderProductPolicyLinks, renderProductPolicyModals } from '../../shared/policy-modals.js';
-import { renderQuantitySection } from '../../shared/quantity-controls.js';
 
 // Dietary tag icons mapping
 const DIETARY_ICONS = {
@@ -37,6 +36,7 @@ export function renderVisualMenu(product) {
   const policies = data.policies || {};
   const dietaryTags = data.dietaryTags || [];
   const stories = media.stories || [];
+  const addOns = data.addOns || [];
   const showBackButton = products.length > 1;
   
   return `
@@ -59,7 +59,6 @@ export function renderVisualMenu(product) {
           </div>
           
           <div class="price-meta-row">
-            <div class="price"><span class="currency">KES</span> <span id="displayPrice">${formatPrice(data.price)}</span></div>
             <div class="menu-meta-inline">
               ${data.prepTime ? `<span class="meta-item">⏱️ ${data.prepTime}</span>` : ''}
               ${data.calories ? `<span class="meta-item">🔥 ${data.calories}</span>` : ''}
@@ -72,18 +71,32 @@ export function renderVisualMenu(product) {
           
           <p class="product-description">${data.description || ''}</p>
           
+          ${renderAddOnsSection(addOns)}
+          
           ${renderIngredientsSection(data.ingredients)}
           
           ${data.allergens ? `<p class="allergens-notice">⚠️ Allergens: ${data.allergens}</p>` : ''}
           
-          ${renderQuantitySection(data.price || 0, data.stock || 999)}
-          
-          <button class="buy-btn" id="buyBtn"><span class="btn-text">Add to Order</span><span class="btn-arrow">→</span></button>
           ${renderProductPolicyLinks(policies)}
         </div>
       </div>
       
       ${renderMenuTestimonials(testimonials)}
+      
+      <!-- Sticky CTA - PBK Glass Style -->
+      <div class="vm-sticky-cta">
+        <div class="vm-cta-glass">
+          <div class="vm-cta-qty">
+            <button class="vm-qty-btn" id="decreaseQty">−</button>
+            <span class="vm-qty-value" id="quantity">1</span>
+            <button class="vm-qty-btn" id="increaseQty">+</button>
+          </div>
+          <button class="vm-cta-order" id="buyBtn">
+            Add to Order
+            <span class="vm-cta-price">KES <span id="displayPrice">${formatPrice(data.price)}</span></span>
+          </button>
+        </div>
+      </div>
     </div>
     ${renderStoryViewer(stories)}
     ${renderProductPolicyModals(policies)}
@@ -142,6 +155,33 @@ function renderDietaryTags(tags) {
         const icon = DIETARY_ICONS[tag.toLowerCase()] || '•';
         return `<span class="dietary-tag">${icon} ${tag}</span>`;
       }).join('')}
+    </div>
+  `;
+}
+
+/**
+ * Render add-ons/extras section with optional image thumbnails
+ */
+function renderAddOnsSection(addOns) {
+  if (!addOns || addOns.length === 0) return '';
+  const validAddOns = addOns.filter(a => a.name?.trim());
+  if (validAddOns.length === 0) return '';
+  
+  return `
+    <div class="vm-addons-section">
+      <h4 class="vm-addons-title">Add Extras</h4>
+      <div class="vm-addons-list">
+        ${validAddOns.map((addon, i) => `
+          <label class="vm-addon-item ${addon.image ? 'has-image' : ''}" data-addon-index="${i}" data-addon-price="${addon.price || 0}">
+            <input type="checkbox" class="vm-addon-checkbox" />
+            ${addon.image ? `<img src="${addon.image}" alt="${addon.name}" class="vm-addon-thumb" />` : ''}
+            <span class="vm-addon-info">
+              <span class="vm-addon-name">${addon.name}</span>
+              ${addon.price ? `<span class="vm-addon-price">+KES ${formatPrice(addon.price)}</span>` : ''}
+            </span>
+          </label>
+        `).join('')}
+      </div>
     </div>
   `;
 }
