@@ -185,7 +185,7 @@ function initStickyCTAHandlers(basePrice, maxStock, addOns) {
       
       const addonData = {
         name: item.querySelector('.vm-addon-name')?.textContent || '',
-        price: parseFloat(item.dataset.price || 0),
+        price: parseFloat(item.dataset.addonPrice || 0),
         index: index
       };
       
