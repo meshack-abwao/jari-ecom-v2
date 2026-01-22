@@ -2,9 +2,8 @@
 // VISUAL MENU TEMPLATE - EVENT HANDLERS
 // ===========================================
 
-import { initGalleryHandlers, initStoryHandlers } from '../../shared/media-components.js';
+import { initStoryHandlers } from '../../shared/media-components.js';
 import { initPolicyModalHandlers } from '../../shared/policy-modals.js';
-import { initQuantityHandlers } from '../../shared/quantity-controls.js';
 
 /**
  * Initialize all Visual Menu template handlers
@@ -23,8 +22,8 @@ export function initVisualMenuHandlers(product) {
   // Policy modal handlers
   initPolicyModalHandlers();
   
-  // Quantity handlers
-  initQuantityHandlers(data.price || 0, data.stock || 999);
+  // Sticky CTA quantity + add-ons handlers
+  initStickyCTAHandlers(data.price || 0, data.stock || 999, data.addOns || []);
   
   // Social actions
   initMenuSocialActions(product);
@@ -130,6 +129,74 @@ function initBackButton() {
       urlParts.pop();
       window.location.href = urlParts.join('/') || '/';
     }
+  });
+}
+
+/**
+ * Initialize sticky CTA handlers (quantity + add-ons)
+ */
+function initStickyCTAHandlers(basePrice, maxStock, addOns) {
+  const decreaseBtn = document.getElementById('decreaseQty');
+  const increaseBtn = document.getElementById('increaseQty');
+  const qtyDisplay = document.getElementById('quantity');
+  const priceDisplay = document.getElementById('displayPrice');
+  const addonItems = document.querySelectorAll('.vm-addon-item');
+  
+  let quantity = 1;
+  let selectedAddOns = [];
+  
+  function updateDisplay() {
+    // Calculate total with add-ons
+    const addOnsTotal = selectedAddOns.reduce((sum, addon) => sum + (addon.price || 0), 0);
+    const unitPrice = basePrice + addOnsTotal;
+    const total = unitPrice * quantity;
+    
+    if (qtyDisplay) qtyDisplay.textContent = quantity;
+    if (priceDisplay) priceDisplay.textContent = total.toLocaleString();
+    
+    // Store for checkout
+    window.JARI_SELECTED_ADDONS = selectedAddOns;
+    window.JARI_VM_QUANTITY = quantity;
+  }
+  
+  // Quantity buttons
+  if (decreaseBtn) {
+    decreaseBtn.addEventListener('click', () => {
+      if (quantity > 1) {
+        quantity--;
+        updateDisplay();
+      }
+    });
+  }
+  
+  if (increaseBtn) {
+    increaseBtn.addEventListener('click', () => {
+      if (quantity < maxStock) {
+        quantity++;
+        updateDisplay();
+      }
+    });
+  }
+  
+  // Add-on selection
+  addonItems.forEach((item, index) => {
+    item.addEventListener('click', () => {
+      item.classList.toggle('selected');
+      
+      const addonData = {
+        name: item.querySelector('.vm-addon-name')?.textContent || '',
+        price: parseFloat(item.dataset.price || 0),
+        index: index
+      };
+      
+      if (item.classList.contains('selected')) {
+        selectedAddOns.push(addonData);
+      } else {
+        selectedAddOns = selectedAddOns.filter(a => a.index !== index);
+      }
+      
+      updateDisplay();
+    });
   });
 }
 
