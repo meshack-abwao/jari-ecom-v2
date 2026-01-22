@@ -191,6 +191,28 @@ export const uploadAPI = {
 };
 
 // ===========================================
+// FOOD ORDERS API (Visual Menu Template)
+// ===========================================
+export const foodOrdersAPI = {
+  // Get all food orders
+  getAll: (status = 'all') => api.get(`/food-orders${status !== 'all' ? `?status=${status}` : ''}`),
+  
+  // Get order statistics
+  getStats: () => api.get('/food-orders/stats'),
+  
+  // Get single order
+  getById: (id) => api.get(`/food-orders/${id}`),
+  
+  // Update order status
+  updateStatus: (id, status, note = null) => 
+    api.put(`/food-orders/${id}/status`, { status, note }),
+  
+  // Update payment status
+  updatePayment: (id, paymentStatus, mpesaReceipt = null) => 
+    api.put(`/food-orders/${id}/payment`, { paymentStatus, mpesaReceipt })
+};
+
+// ===========================================
 // M-PESA PAYMENTS API
 // ===========================================
 export const mpesaAPI = {
