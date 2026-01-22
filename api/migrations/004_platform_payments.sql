@@ -4,8 +4,8 @@
 -- Platform payments table (tracks all M-Pesa payments to Jari)
 CREATE TABLE IF NOT EXISTS platform_payments (
   id SERIAL PRIMARY KEY,
-  store_id INTEGER REFERENCES stores(id) ON DELETE CASCADE,
-  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  store_id UUID REFERENCES stores(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
   
   -- Payment details
   amount DECIMAL(10,2) NOT NULL,
@@ -38,7 +38,7 @@ CREATE INDEX IF NOT EXISTS idx_platform_payments_status ON platform_payments(sta
 -- Store add-ons table (tracks activated add-ons per store)
 CREATE TABLE IF NOT EXISTS store_addons (
   id SERIAL PRIMARY KEY,
-  store_id INTEGER REFERENCES stores(id) ON DELETE CASCADE,
+  store_id UUID REFERENCES stores(id) ON DELETE CASCADE,
   addon_type VARCHAR(50) NOT NULL, -- 'mpesa-stk', 'whatsapp-auto', 'analytics', 'priority-support'
   activated_at TIMESTAMP DEFAULT NOW(),
   expires_at TIMESTAMP,
@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS store_addons (
 -- Store themes table (tracks unlocked themes per store)
 CREATE TABLE IF NOT EXISTS store_themes (
   id SERIAL PRIMARY KEY,
-  store_id INTEGER REFERENCES stores(id) ON DELETE CASCADE,
+  store_id UUID REFERENCES stores(id) ON DELETE CASCADE,
   theme_slug VARCHAR(50) NOT NULL, -- 'quick-decision', 'visual-menu', 'deep-dive', etc.
   unlocked_at TIMESTAMP DEFAULT NOW(),
   UNIQUE(store_id, theme_slug)
