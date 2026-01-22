@@ -83,18 +83,19 @@ export function renderVisualMenu(product) {
       
       ${renderMenuTestimonials(testimonials)}
       
-      <!-- Sticky CTA - PBK Glass Style -->
+      <!-- Sticky CTA - PBK Style (Stacked mobile, inline desktop) -->
       <div class="vm-sticky-cta">
         <div class="vm-cta-glass">
+          <div class="vm-cta-price-row">
+            <span class="vm-cta-label">Total</span>
+            <span class="vm-cta-amount">KES <span id="displayPrice">${formatPrice(data.price)}</span></span>
+          </div>
           <div class="vm-cta-qty">
             <button class="vm-qty-btn" id="decreaseQty">−</button>
             <span class="vm-qty-value" id="quantity">1</span>
             <button class="vm-qty-btn" id="increaseQty">+</button>
           </div>
-          <button class="vm-cta-order" id="buyBtn">
-            Add to Order
-            <span class="vm-cta-price">KES <span id="displayPrice">${formatPrice(data.price)}</span></span>
-          </button>
+          <button class="vm-cta-order" id="buyBtn">Add to Order</button>
         </div>
       </div>
     </div>
