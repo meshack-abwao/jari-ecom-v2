@@ -310,8 +310,8 @@ npx cap open android
 ## 11. NEXT SESSION CHECKLIST
 
 When starting a new chat:
-1. ✅ Run `git status` and `git log --oneline -5`
-2. ✅ Check `docs/HANDOVER-CONTEXT.md` for current status
+1. ✅ Run `git status` and `git log --oneline -10`
+2. ✅ Check `docs/HANDOVER-VM-SESSION.md` for latest session context
 3. ✅ Read `docs/MOBILE-APP-GUIDE.md` if doing mobile work
 4. ✅ Read `docs/TEMPLATE-ISOLATION-HANDOVER.md` if doing template work
 5. ✅ Commit after each successful change
@@ -319,5 +319,30 @@ When starting a new chat:
 
 ---
 
+## 12. LATEST SESSION SUMMARY (January 23, 2026)
+
+### VM Template Updates
+- **Sticky CTA** - PBK style (stacked mobile, inline desktop)
+- **Quantity handlers** - Fixed +/- buttons (was missing handler init)
+- **Ingredients** - Apple card style with comma separation → grid display
+
+### Backend Fix
+- **Migration 004** - Fixed UUID type mismatch for store_id/user_id
+- Railway deployments now passing health checks
+
+### Key Commits
+```
+165cf5b VM-fix-qty-handlers-ingredients-apple-card-style
+369843f Fix-migration-004-UUID-type-mismatch
+3c8c77b VM-sticky-cta-PBK-style-stacked-mobile-inline-desktop
+```
+
+### Test URL
+```
+https://jariecommstore.netlify.app/store/nimoration
+```
+
+---
+
 **End of Project Instructions**
-*Last Updated: January 21, 2026*
+*Last Updated: January 23, 2026*
