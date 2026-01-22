@@ -603,7 +603,7 @@ async function handleCompleteOrder() {
   
   goToStep('stepLoading');
   
-  const { store, currentProduct, quantity, selectedPrice } = state;
+  const { store, currentProduct, quantity, selectedPrice, vmExtras, vmTotal } = state;
   
   if (!store?.slug || !currentProduct?.id) {
     alert('Missing information. Please refresh and try again.');
@@ -612,8 +612,19 @@ async function handleCompleteOrder() {
   }
   
   const data = currentProduct.data || {};
-  const price = selectedPrice || Number(data.price || 0);
-  const total = price * quantity;
+  const isVisualMenu = currentProduct.template === 'visual-menu';
+  const vmQuantity = window.JARI_VM_QUANTITY || quantity;
+  
+  // Calculate totals based on template type
+  const basePrice = selectedPrice || Number(data.price || 0);
+  let extrasTotal = 0;
+  
+  if (isVisualMenu && vmExtras?.length > 0) {
+    extrasTotal = vmExtras.reduce((sum, extra) => sum + (extra.subtotal || 0), 0);
+  }
+  
+  const subtotal = basePrice * vmQuantity;
+  const total = isVisualMenu ? (vmTotal || subtotal + extrasTotal) : basePrice * quantity;
   
   const orderData = {
     customer: {
@@ -624,9 +635,11 @@ async function handleCompleteOrder() {
     items: [{
       product_id: currentProduct.id,
       product_name: data.name || 'Product',
-      quantity: quantity,
-      unit_price: price,
-      total: total
+      quantity: isVisualMenu ? vmQuantity : quantity,
+      unit_price: basePrice,
+      total: subtotal,
+      // VM-specific: include extras
+      extras: isVisualMenu && vmExtras?.length > 0 ? vmExtras : undefined
     }],
     payment: {
       method: selectedPaymentMethod,
@@ -634,7 +647,10 @@ async function handleCompleteOrder() {
       mpesa_code: mpesaCode || null,
       payment_confirmed: paymentConfirmed
     },
-    total_amount: total
+    total_amount: total,
+    // VM-specific metadata
+    order_type: isVisualMenu ? 'food' : 'product',
+    template: currentProduct.template
   };
   
   try {
