@@ -5347,26 +5347,62 @@ textarea:focus-visible {
 }
 
 /* ===========================================
-   INGREDIENTS SECTION (Visual Menu)
+   VM INGREDIENTS CARD - Apple Specs Style
    =========================================== */
-.ingredients-section {
-    background: var(--bg-gray);
-    border-radius: 12px;
-    padding: 14px;
-    margin: 14px 0;
+.vm-ingredients-card {
+    background: #fafafa;
+    border-radius: 16px;
+    padding: 20px;
+    margin: 20px 0;
+    border: 1px solid rgba(0,0,0,0.04);
 }
 
-.ingredients-title {
-    font-size: var(--fs-body);
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: 6px;
+.vm-ingredients-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 16px;
+    letter-spacing: -0.01em;
 }
 
-.ingredients-list {
-    font-size: var(--fs-small);
-    color: var(--text-secondary);
-    line-height: 1.6;
+.vm-ingredients-icon {
+    font-size: 18px;
+}
+
+.vm-ingredients-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px 16px;
+}
+
+.vm-ingredient-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.vm-ingredient-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-primary, #f97316);
+    flex-shrink: 0;
+}
+
+.vm-ingredient-name {
+    font-size: 14px;
+    color: #444;
+    line-height: 1.4;
+}
+
+/* Mobile: single column for long ingredient names */
+@media (max-width: 380px) {
+    .vm-ingredients-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* ===========================================

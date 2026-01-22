@@ -188,15 +188,33 @@ function renderAddOnsSection(addOns) {
 }
 
 /**
- * Render ingredients section
+ * Render ingredients section - Apple specs card style
  */
 function renderIngredientsSection(ingredients) {
   if (!ingredients) return '';
   
+  // Split by comma and clean up
+  const ingredientList = ingredients
+    .split(',')
+    .map(i => i.trim())
+    .filter(i => i.length > 0);
+  
+  if (ingredientList.length === 0) return '';
+  
   return `
-    <div class="ingredients-section">
-      <h4 class="ingredients-title">Ingredients</h4>
-      <p class="ingredients-list">${ingredients}</p>
+    <div class="vm-ingredients-card">
+      <h4 class="vm-ingredients-title">
+        <span class="vm-ingredients-icon">🥗</span>
+        Ingredients
+      </h4>
+      <div class="vm-ingredients-grid">
+        ${ingredientList.map(ingredient => `
+          <div class="vm-ingredient-item">
+            <span class="vm-ingredient-dot"></span>
+            <span class="vm-ingredient-name">${ingredient}</span>
+          </div>
+        `).join('')}
+      </div>
     </div>
   `;
 }

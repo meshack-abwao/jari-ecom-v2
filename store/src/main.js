@@ -4,6 +4,7 @@ import { renderHeader, renderProductsGrid, renderSingleProduct, renderFooter, re
 import { renderCheckoutModal, initCheckout, openCheckout } from './checkout.js';
 import { initPixel, pixel } from './pixel.js';
 import { initPortfolioBookingHandlers } from './templates/portfolioBookingHandlers.js';
+import { initVisualMenuHandlers } from './templates/visual-menu/vm-handlers.js';
 import './booking/bookingHandlers.js'; // Auto-registers event listener
 
 const app = document.getElementById('app');
@@ -219,6 +220,12 @@ function renderProductView(product) {
     state.currentProduct = product;
     initPortfolioBookingHandlers();
   }
+  
+  // Visual-Menu template specific handlers
+  if (product.template === 'visual-menu') {
+    initVisualMenuHandlers(product);
+  }
+  
   initCheckout();
 }
 
