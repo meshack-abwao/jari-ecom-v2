@@ -2,6 +2,7 @@ import authRoutes from './auth.js';
 import storesRoutes from './stores.js';
 import productsRoutes from './products.js';
 import ordersRoutes from './orders.js';
+import foodOrdersRoutes from './food-orders.js';
 import publicRoutes from './public.js';
 import pixelRoutes from './pixel.js';
 import bookingsRoutes from './bookings.js';
@@ -23,6 +24,7 @@ export function setupRoutes(app) {
   app.use('/api/store', storesRoutes);
   app.use('/api/products', productsRoutes);
   app.use('/api/orders', ordersRoutes);
+  app.use('/api/food-orders', foodOrdersRoutes);
   app.use('/api/bookings', bookingsRoutes);
   app.use('/api/upload', uploadRoutes);
   app.use('/api/mpesa', mpesaRoutes);
