@@ -53,6 +53,10 @@ export function renderCheckoutModal() {
               <span>Subtotal</span>
               <span>KES <span id="checkoutSubtotal">0</span></span>
             </div>
+            <!-- VM Extras (hidden by default, shown for visual-menu template) -->
+            <div class="breakdown-extras" id="checkoutExtras" style="display: none;">
+              <!-- Populated dynamically -->
+            </div>
             <div class="breakdown-row">
               <span>Delivery</span>
               <span class="delivery-free">FREE</span>
@@ -325,8 +329,22 @@ export function openCheckout() {
   
   const data = currentProduct.data || {};
   const media = currentProduct.media || {};
-  const price = selectedPrice || Number(data.price || 0);
-  const total = price * quantity;
+  const isVisualMenu = currentProduct.template === 'visual-menu';
+  
+  // Get VM-specific data from window globals
+  const vmQuantity = window.JARI_VM_QUANTITY || quantity;
+  const vmExtras = window.JARI_SELECTED_ADDONS || [];
+  
+  // Calculate base price and extras
+  const basePrice = selectedPrice || Number(data.price || 0);
+  let extrasTotal = 0;
+  
+  if (isVisualMenu && vmExtras.length > 0) {
+    extrasTotal = vmExtras.reduce((sum, extra) => sum + (extra.subtotal || 0), 0);
+  }
+  
+  const subtotal = basePrice * vmQuantity;
+  const total = subtotal + extrasTotal;
   
   // Track checkout start
   pixel.checkoutStart(total);
@@ -337,10 +355,34 @@ export function openCheckout() {
     thumbEl.innerHTML = `<img src="${media.images[0]}" alt="${data.name || 'Product'}">`;
   }
   document.getElementById('checkoutProductName').textContent = data.name || 'Product';
-  document.getElementById('checkoutQty').textContent = quantity;
-  document.getElementById('checkoutSubtotal').textContent = total.toLocaleString();
+  document.getElementById('checkoutQty').textContent = vmQuantity;
+  document.getElementById('checkoutSubtotal').textContent = subtotal.toLocaleString();
+  
+  // Handle VM extras display
+  const extrasEl = document.getElementById('checkoutExtras');
+  if (extrasEl) {
+    if (isVisualMenu && vmExtras.length > 0) {
+      extrasEl.style.display = 'block';
+      extrasEl.innerHTML = vmExtras.map(extra => `
+        <div class="breakdown-row extras-row">
+          <span class="extras-label">+ ${extra.name}${extra.quantity > 1 ? ` ×${extra.quantity}` : ''}</span>
+          <span class="extras-price">KES ${extra.subtotal.toLocaleString()}</span>
+        </div>
+      `).join('');
+    } else {
+      extrasEl.style.display = 'none';
+      extrasEl.innerHTML = '';
+    }
+  }
+  
   document.getElementById('checkoutTotal').textContent = total.toLocaleString();
   document.getElementById('finalTotal').textContent = total.toLocaleString();
+  
+  // Store extras in state for order creation
+  if (isVisualMenu) {
+    state.vmExtras = vmExtras;
+    state.vmTotal = total;
+  }
   
   // Reset state
   selectedPaymentMethod = null;
