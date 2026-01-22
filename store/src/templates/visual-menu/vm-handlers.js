@@ -133,33 +133,51 @@ function initBackButton() {
 }
 
 /**
- * Initialize sticky CTA handlers (quantity + add-ons)
+ * Initialize sticky CTA handlers (quantity + add-ons with qty selectors)
  */
 function initStickyCTAHandlers(basePrice, maxStock, addOns) {
   const decreaseBtn = document.getElementById('decreaseQty');
   const increaseBtn = document.getElementById('increaseQty');
   const qtyDisplay = document.getElementById('quantity');
   const priceDisplay = document.getElementById('displayPrice');
-  const addonItems = document.querySelectorAll('.vm-addon-item');
+  
+  // New: Get addon cards and their controls
+  const addonCards = document.querySelectorAll('.vm-addon-card');
   
   let quantity = 1;
-  let selectedAddOns = [];
+  let addonQuantities = {}; // { index: qty }
   
   function updateDisplay() {
-    // Calculate total with add-ons
-    const addOnsTotal = selectedAddOns.reduce((sum, addon) => sum + (addon.price || 0), 0);
+    // Calculate add-ons total based on quantities
+    let addOnsTotal = 0;
+    const selectedAddOns = [];
+    
+    Object.entries(addonQuantities).forEach(([index, qty]) => {
+      if (qty > 0 && addOns[index]) {
+        const addon = addOns[index];
+        addOnsTotal += (addon.price || 0) * qty;
+        selectedAddOns.push({
+          name: addon.name,
+          price: addon.price || 0,
+          quantity: qty,
+          subtotal: (addon.price || 0) * qty
+        });
+      }
+    });
+    
     const unitPrice = basePrice + addOnsTotal;
     const total = unitPrice * quantity;
     
     if (qtyDisplay) qtyDisplay.textContent = quantity;
     if (priceDisplay) priceDisplay.textContent = total.toLocaleString();
     
-    // Store for checkout
+    // Store for checkout - include addon quantities
     window.JARI_SELECTED_ADDONS = selectedAddOns;
     window.JARI_VM_QUANTITY = quantity;
+    window.JARI_ADDON_QUANTITIES = addonQuantities;
   }
   
-  // Quantity buttons
+  // Main quantity buttons
   if (decreaseBtn) {
     decreaseBtn.addEventListener('click', () => {
       if (quantity > 1) {
@@ -178,25 +196,38 @@ function initStickyCTAHandlers(basePrice, maxStock, addOns) {
     });
   }
   
-  // Add-on selection
-  addonItems.forEach((item, index) => {
-    item.addEventListener('click', () => {
-      item.classList.toggle('selected');
-      
-      const addonData = {
-        name: item.querySelector('.vm-addon-name')?.textContent || '',
-        price: parseFloat(item.dataset.addonPrice || 0),
-        index: index
-      };
-      
-      if (item.classList.contains('selected')) {
-        selectedAddOns.push(addonData);
-      } else {
-        selectedAddOns = selectedAddOns.filter(a => a.index !== index);
-      }
-      
-      updateDisplay();
-    });
+  // Add-on quantity controls
+  addonCards.forEach((card) => {
+    const index = parseInt(card.dataset.addonIndex);
+    const decreaseAddon = card.querySelector('.vm-addon-decrease');
+    const increaseAddon = card.querySelector('.vm-addon-increase');
+    const qtyValue = card.querySelector('.vm-addon-qty-value');
+    
+    addonQuantities[index] = 0;
+    
+    if (decreaseAddon) {
+      decreaseAddon.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (addonQuantities[index] > 0) {
+          addonQuantities[index]--;
+          if (qtyValue) qtyValue.textContent = addonQuantities[index];
+          card.classList.toggle('has-quantity', addonQuantities[index] > 0);
+          updateDisplay();
+        }
+      });
+    }
+    
+    if (increaseAddon) {
+      increaseAddon.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (addonQuantities[index] < 10) { // Max 10 per addon
+          addonQuantities[index]++;
+          if (qtyValue) qtyValue.textContent = addonQuantities[index];
+          card.classList.add('has-quantity');
+          updateDisplay();
+        }
+      });
+    }
   });
 }
 
