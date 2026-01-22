@@ -7,6 +7,7 @@ import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import ProductsPage from './pages/ProductsPage';
 import OrdersPage from './pages/OrdersPage';
+import FoodOrdersPage from './pages/FoodOrdersPage';
 import SettingsPage from './pages/SettingsPage';
 import TemplatesPage from './pages/TemplatesPage';
 import AddOnsPage from './pages/AddOnsPage';
@@ -52,6 +53,7 @@ export default function App() {
               <Route path="products" element={<ProductsPage />} />
               <Route path="templates" element={<TemplatesPage />} />
               <Route path="orders" element={<OrdersPage />} />
+              <Route path="food-orders" element={<FoodOrdersPage />} />
               <Route path="bookings" element={<BookingsPage />} />
               <Route path="ads" element={<AdsPage />} />
               <Route path="add-ons" element={<AddOnsPage />} />
