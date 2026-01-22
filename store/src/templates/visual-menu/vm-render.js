@@ -161,7 +161,7 @@ function renderDietaryTags(tags) {
 }
 
 /**
- * Render add-ons/extras section with optional image thumbnails
+ * Render add-ons/extras section with quantity selectors
  */
 function renderAddOnsSection(addOns) {
   if (!addOns || addOns.length === 0) return '';
@@ -170,17 +170,29 @@ function renderAddOnsSection(addOns) {
   
   return `
     <div class="vm-addons-section">
-      <h4 class="vm-addons-title">Add Extras</h4>
-      <div class="vm-addons-list">
+      <h4 class="vm-addons-title">🍟 Add Extras</h4>
+      <div class="vm-addons-grid">
         ${validAddOns.map((addon, i) => `
-          <label class="vm-addon-item ${addon.image ? 'has-image' : ''}" data-addon-index="${i}" data-addon-price="${addon.price || 0}">
-            <input type="checkbox" class="vm-addon-checkbox" />
-            ${addon.image ? `<img src="${addon.image}" alt="${addon.name}" class="vm-addon-thumb" />` : ''}
-            <span class="vm-addon-info">
+          <div class="vm-addon-card" data-addon-index="${i}" data-addon-price="${addon.price || 0}" data-addon-name="${addon.name}">
+            ${addon.image ? `
+              <div class="vm-addon-image">
+                <img src="${addon.image}" alt="${addon.name}" />
+              </div>
+            ` : `
+              <div class="vm-addon-image vm-addon-placeholder">
+                <span>🍴</span>
+              </div>
+            `}
+            <div class="vm-addon-details">
               <span class="vm-addon-name">${addon.name}</span>
-              ${addon.price ? `<span class="vm-addon-price">+KES ${formatPrice(addon.price)}</span>` : ''}
-            </span>
-          </label>
+              <span class="vm-addon-price">+KES ${formatPrice(addon.price || 0)}</span>
+            </div>
+            <div class="vm-addon-qty-controls">
+              <button type="button" class="vm-addon-qty-btn vm-addon-decrease" data-index="${i}">−</button>
+              <span class="vm-addon-qty-value" data-index="${i}">0</span>
+              <button type="button" class="vm-addon-qty-btn vm-addon-increase" data-index="${i}">+</button>
+            </div>
+          </div>
         `).join('')}
       </div>
     </div>
