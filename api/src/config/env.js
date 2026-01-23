@@ -6,6 +6,7 @@ export const config = {
   corsOrigins: process.env.CORS_ORIGINS?.split(',') || [
     'http://localhost:5173', 
     'http://localhost:5174',
+    'https://jari-dashboard.netlify.app',
     'https://jariecommstore.netlify.app',
     'https://jariecomm.netlify.app'
   ]
