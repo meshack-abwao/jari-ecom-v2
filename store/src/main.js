@@ -6,6 +6,7 @@ import { initPixel, pixel } from './pixel.js';
 import { initPortfolioBookingHandlers } from './templates/portfolioBookingHandlers.js';
 import { initVisualMenuHandlers } from './templates/visual-menu/vm-handlers.js';
 import { initOrderTracking } from './order-tracking.js';
+import { renderLandingPage, initLandingHandlers } from './landing/landing.js';
 import './booking/bookingHandlers.js'; // Auto-registers event listener
 
 const app = document.getElementById('app');
@@ -49,6 +50,21 @@ async function init() {
   }
   
   const slug = getSlug();
+  
+  // If no store slug, show landing page
+  if (!slug) {
+    // Load landing page styles
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = '/src/landing/landing.css';
+    document.head.appendChild(link);
+    
+    // Render landing page
+    document.title = 'Jari.Ecom - E-commerce Made Simple for Kenyan Sellers';
+    app.innerHTML = renderLandingPage();
+    initLandingHandlers();
+    return;
+  }
   
   // Set global slug for booking system
   window.JARI_STORE_SLUG = slug;
