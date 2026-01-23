@@ -7,6 +7,7 @@ import { initPortfolioBookingHandlers } from './templates/portfolioBookingHandle
 import { initVisualMenuHandlers } from './templates/visual-menu/vm-handlers.js';
 import { initOrderTracking } from './order-tracking.js';
 import { renderLandingPage, initLandingHandlers } from './landing/landing.js';
+import './landing/landing.css'; // Import landing CSS so Vite bundles it
 import './booking/bookingHandlers.js'; // Auto-registers event listener
 
 const app = document.getElementById('app');
@@ -53,13 +54,7 @@ async function init() {
   
   // If no store slug, show landing page
   if (!slug) {
-    // Load landing page styles
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = '/src/landing/landing.css';
-    document.head.appendChild(link);
-    
-    // Render landing page
+    // Render landing page (CSS already imported at top)
     document.title = 'Jari.Ecom - E-commerce Made Simple for Kenyan Sellers';
     app.innerHTML = renderLandingPage();
     initLandingHandlers();
