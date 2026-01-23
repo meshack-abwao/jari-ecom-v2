@@ -14,9 +14,9 @@ export function setState(updates) {
 }
 
 export function getSlug() {
-  // Priority: URL param > Env variable > default
+  // Priority: URL param > Env variable > null (for landing page)
   const params = new URLSearchParams(window.location.search);
-  return params.get('store') || params.get('subdomain') || import.meta.env.VITE_STORE_SLUG || 'demo';
+  return params.get('store') || params.get('subdomain') || import.meta.env.VITE_STORE_SLUG || null;
 }
 
 export function getProductId() {
