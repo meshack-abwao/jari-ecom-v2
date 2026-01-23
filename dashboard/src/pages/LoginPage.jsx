@@ -19,7 +19,16 @@ export default function LoginPage() {
       navigate('/');
     } catch (err) {
       console.error('Login error:', err);
-      setError(err.message || 'Invalid email or password');
+      // Better error messages
+      if (err.code === 'ERR_NETWORK' || err.message === 'Network Error') {
+        setError('Unable to connect to server. Please check your internet connection.');
+      } else if (err.response?.status === 401) {
+        setError('Invalid email or password');
+      } else if (err.response?.data?.error) {
+        setError(err.response.data.error);
+      } else {
+        setError(err.message || 'Login failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
