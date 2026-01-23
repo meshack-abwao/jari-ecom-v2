@@ -1,21 +1,26 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { foodOrdersAPI } from '../api/client';
+import { 
+  UtensilsCrossed, Clock, Bell, DollarSign, 
+  ChevronDown, X, Check, Phone, MapPin,
+  RefreshCw, Truck, Package, AlertCircle, Download
+} from 'lucide-react';
 
 // ===========================================
 // FOOD ORDERS PAGE - Visual Menu Template
-// Kanban-style order management
+// Unified design matching BookingsPage
 // ===========================================
 
 // Status configuration
 const STATUS_CONFIG = {
-  pending: { label: 'Pending', color: '#f59e0b', bgColor: '#fef3c7' },
-  confirmed: { label: 'Confirmed', color: '#3b82f6', bgColor: '#dbeafe' },
-  preparing: { label: 'Preparing', color: '#8b5cf6', bgColor: '#ede9fe' },
-  ready: { label: 'Ready', color: '#10b981', bgColor: '#d1fae5' },
-  out_for_delivery: { label: 'Out for Delivery', color: '#06b6d4', bgColor: '#cffafe' },
-  delivered: { label: 'Delivered', color: '#22c55e', bgColor: '#dcfce7' },
-  picked_up: { label: 'Picked Up', color: '#22c55e', bgColor: '#dcfce7' },
-  cancelled: { label: 'Cancelled', color: '#ef4444', bgColor: '#fee2e2' }
+  pending: { label: 'Pending', color: '#f59e0b', bgColor: '#fef3c7', icon: Clock },
+  confirmed: { label: 'Confirmed', color: '#3b82f6', bgColor: '#dbeafe', icon: Check },
+  preparing: { label: 'Preparing', color: '#8b5cf6', bgColor: '#ede9fe', icon: UtensilsCrossed },
+  ready: { label: 'Ready', color: '#10b981', bgColor: '#d1fae5', icon: Package },
+  out_for_delivery: { label: 'Out for Delivery', color: '#06b6d4', bgColor: '#cffafe', icon: Truck },
+  delivered: { label: 'Delivered', color: '#22c55e', bgColor: '#dcfce7', icon: Check },
+  picked_up: { label: 'Picked Up', color: '#22c55e', bgColor: '#dcfce7', icon: Check },
+  cancelled: { label: 'Cancelled', color: '#ef4444', bgColor: '#fee2e2', icon: X }
 };
 
 // Status flow for next action
@@ -23,22 +28,32 @@ const NEXT_STATUS = {
   pending: 'confirmed',
   confirmed: 'preparing',
   preparing: 'ready',
-  ready: null // Depends on order type
+  ready: null // Depends on order type (delivery vs pickup)
 };
 
 export default function FoodOrdersPage() {
   const [orders, setOrders] = useState([]);
-  const [stats, setStats] = useState(null);
+  const [stats, setStats] = useState({ today: 0, pending: 0, preparing: 0, completed: 0, revenue: 0 });
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [filter, setFilter] = useState('active'); // 'active', 'completed', 'all'
-  
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [viewFilter, setViewFilter] = useState('all'); // 'all', 'today', 'pending'
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  // Handle resize
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   // Fetch orders and stats
   useEffect(() => {
     fetchData();
   }, []);
-  
-  const fetchData = async () => {
+
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       const [ordersRes, statsRes] = await Promise.all([
@@ -46,38 +61,31 @@ export default function FoodOrdersPage() {
         foodOrdersAPI.getStats()
       ]);
       setOrders(ordersRes.data.orders || []);
-      setStats(statsRes.data.stats || {});
+      setStats(statsRes.data.stats || { today: 0, pending: 0, preparing: 0, completed: 0, revenue: 0 });
     } catch (err) {
       console.error('Failed to fetch food orders:', err);
     } finally {
       setLoading(false);
     }
-  };
-  
+  }, []);
+
   // Update order status
   const handleStatusUpdate = async (orderId, newStatus) => {
     try {
       await foodOrdersAPI.updateStatus(orderId, newStatus);
-      fetchData(); // Refresh
+      fetchData();
       if (selectedOrder?.id === orderId) {
-        const res = await foodOrdersAPI.getById(orderId);
-        setSelectedOrder(res.data.order);
+        setSelectedOrder(prev => ({ ...prev, status: newStatus }));
       }
     } catch (err) {
       console.error('Failed to update status:', err);
+      alert('Failed to update status');
     }
   };
-  
-  // Filter orders by status groups
-  const getOrdersByStatus = (statuses) => {
-    return orders.filter(o => statuses.includes(o.status));
-  };
-  
+
   // Format price
-  const formatPrice = (amount) => {
-    return `KES ${(amount || 0).toLocaleString()}`;
-  };
-  
+  const formatPrice = (amount) => `KES ${(amount || 0).toLocaleString()}`;
+
   // Format time ago
   const timeAgo = (date) => {
     const mins = Math.floor((Date.now() - new Date(date)) / 60000);
@@ -88,129 +96,311 @@ export default function FoodOrdersPage() {
     return `${Math.floor(hrs / 24)}d ago`;
   };
 
-  // Styles
+  // Filter orders
+  const getFilteredOrders = () => {
+    let filtered = [...orders];
+    
+    // View filter (today, pending, etc.)
+    if (viewFilter === 'today') {
+      const today = new Date().toDateString();
+      filtered = filtered.filter(o => new Date(o.created_at).toDateString() === today);
+    } else if (viewFilter === 'pending') {
+      filtered = filtered.filter(o => o.status === 'pending');
+    }
+    
+    // Status filter
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter(o => o.status === statusFilter);
+    }
+    
+    // Search filter
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      filtered = filtered.filter(o => 
+        o.customer_name?.toLowerCase().includes(q) ||
+        o.customer_phone?.includes(q) ||
+        o.order_number?.toLowerCase().includes(q)
+      );
+    }
+    
+    // Sort by created_at desc
+    filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    
+    return filtered;
+  };
+
+  const filteredOrders = getFilteredOrders();
+  
+  // Counts
+  const pendingOrders = orders.filter(o => o.status === 'pending');
+  const preparingOrders = orders.filter(o => o.status === 'preparing');
+  const confirmedOrders = orders.filter(o => o.status === 'confirmed');
+  const readyOrders = orders.filter(o => o.status === 'ready');
+  const completedOrders = orders.filter(o => ['delivered', 'picked_up'].includes(o.status));
+  const cancelledOrders = orders.filter(o => o.status === 'cancelled');
+  const todayOrders = orders.filter(o => new Date(o.created_at).toDateString() === new Date().toDateString());
+
+  // ==================== STYLES ====================
   const styles = {
     container: {
-      padding: '24px',
-      maxWidth: '1600px',
-      margin: '0 auto'
+      padding: isMobile ? '16px' : '24px',
+      maxWidth: '1400px',
+      margin: '0 auto',
     },
     header: {
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'center',
-      marginBottom: '24px'
+      marginBottom: '24px',
+      flexWrap: 'wrap',
+      gap: '16px',
     },
-    title: {
-      fontSize: '24px',
-      fontWeight: '600',
-      color: '#1f2937',
+    titleSection: {
       display: 'flex',
       alignItems: 'center',
-      gap: '12px'
+      gap: '12px',
     },
-    statsRow: {
+    title: {
+      fontSize: isMobile ? '20px' : '24px',
+      fontWeight: '700',
+      color: 'var(--text-primary, #111)',
+      margin: 0,
+    },
+    subtitle: {
+      fontSize: '14px',
+      color: 'var(--text-muted, #6b7280)',
+      margin: '4px 0 0',
+    },
+    refreshBtn: {
       display: 'flex',
+      alignItems: 'center',
+      gap: '8px',
+      padding: '10px 16px',
+      borderRadius: '10px',
+      border: '1px solid var(--border-color, #e5e7eb)',
+      background: 'var(--bg-secondary, white)',
+      cursor: 'pointer',
+      fontSize: '14px',
+      fontWeight: '500',
+      color: 'var(--text-primary, #111)',
+      transition: 'all 0.2s',
+    },
+    
+    // Stats Grid - Matching Bookings
+    statsGrid: {
+      display: 'grid',
       gap: '16px',
       marginBottom: '24px',
-      flexWrap: 'wrap'
     },
     statCard: {
-      background: 'white',
+      background: 'var(--bg-secondary, white)',
+      borderRadius: '16px',
+      padding: '20px',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '16px',
+      border: '1px solid var(--border-color, #e5e7eb)',
+      cursor: 'pointer',
+      transition: 'all 0.2s',
+    },
+    statCardActive: {
+      borderColor: 'var(--accent-color, #8b5cf6)',
+      boxShadow: '0 0 0 1px var(--accent-color, #8b5cf6)',
+    },
+    statCardAlert: {
+      animation: 'pulse 2s infinite',
+    },
+    statIconBox: {
+      width: '48px',
+      height: '48px',
       borderRadius: '12px',
-      padding: '16px 20px',
-      minWidth: '120px',
-      boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      flexShrink: 0,
+    },
+    statInfo: {
+      flex: 1,
+      minWidth: 0,
     },
     statLabel: {
       fontSize: '12px',
-      color: '#6b7280',
-      marginBottom: '4px'
+      fontWeight: '600',
+      color: 'var(--text-muted, #6b7280)',
+      textTransform: 'uppercase',
+      letterSpacing: '0.5px',
     },
     statValue: {
-      fontSize: '24px',
-      fontWeight: '600',
-      color: '#1f2937'
+      fontSize: '28px',
+      fontWeight: '700',
+      color: 'var(--text-primary, #111)',
+      lineHeight: 1.2,
     },
-    kanban: {
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-      gap: '16px',
-      alignItems: 'start'
-    },
-    column: {
-      background: '#f3f4f6',
-      borderRadius: '12px',
-      padding: '12px',
-      minHeight: '400px'
-    },
-    columnHeader: {
+    
+    // Filter Pills
+    filterRow: {
       display: 'flex',
-      justifyContent: 'space-between',
+      gap: '8px',
+      marginBottom: '20px',
+      flexWrap: 'wrap',
       alignItems: 'center',
-      marginBottom: '12px',
-      padding: '0 4px'
     },
-    columnTitle: {
-      fontSize: '14px',
-      fontWeight: '600',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '8px'
-    },
-    columnCount: {
-      background: '#e5e7eb',
+    filterPill: {
+      padding: '8px 16px',
       borderRadius: '100px',
-      padding: '2px 8px',
-      fontSize: '12px',
-      fontWeight: '500'
-    },
-    orderCard: {
-      background: 'white',
-      borderRadius: '10px',
-      padding: '14px',
-      marginBottom: '10px',
-      boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
-      cursor: 'pointer',
-      transition: 'box-shadow 0.2s'
-    },
-    orderNumber: {
-      fontSize: '14px',
-      fontWeight: '600',
-      color: '#1f2937',
-      marginBottom: '4px'
-    },
-    orderCustomer: {
+      border: '1px solid var(--border-color, #e5e7eb)',
+      background: 'var(--bg-secondary, white)',
       fontSize: '13px',
-      color: '#4b5563',
-      marginBottom: '8px'
+      fontWeight: '500',
+      cursor: 'pointer',
+      transition: 'all 0.2s',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '6px',
+    },
+    filterPillActive: {
+      background: 'var(--accent-color, #8b5cf6)',
+      borderColor: 'var(--accent-color, #8b5cf6)',
+      color: 'white',
+    },
+    filterCount: {
+      background: 'rgba(0,0,0,0.1)',
+      padding: '2px 8px',
+      borderRadius: '100px',
+      fontSize: '11px',
+    },
+    
+    // Search
+    searchInput: {
+      padding: '10px 16px',
+      borderRadius: '10px',
+      border: '1px solid var(--border-color, #e5e7eb)',
+      background: 'var(--bg-secondary, white)',
+      fontSize: '14px',
+      width: isMobile ? '100%' : '280px',
+      color: 'var(--text-primary, #111)',
+    },
+    
+    // Needs Attention Section
+    attentionHeader: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '10px',
+      marginBottom: '16px',
+    },
+    attentionBadge: {
+      background: '#fef3c7',
+      color: '#d97706',
+      padding: '4px 12px',
+      borderRadius: '100px',
+      fontSize: '13px',
+      fontWeight: '600',
+    },
+    
+    // Order Card
+    orderCard: {
+      background: 'var(--bg-secondary, white)',
+      borderRadius: '12px',
+      padding: '16px 20px',
+      marginBottom: '12px',
+      border: '1px solid var(--border-color, #e5e7eb)',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '16px',
+      cursor: 'pointer',
+      transition: 'all 0.2s',
+    },
+    orderDateBox: {
+      width: '56px',
+      height: '64px',
+      borderRadius: '12px',
+      background: 'var(--accent-color, #8b5cf6)',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      color: 'white',
+      flexShrink: 0,
+    },
+    orderDateDay: {
+      fontSize: '10px',
+      fontWeight: '600',
+      textTransform: 'uppercase',
+      opacity: 0.9,
+    },
+    orderDateNum: {
+      fontSize: '22px',
+      fontWeight: '700',
+      lineHeight: 1,
+    },
+    orderDateMonth: {
+      fontSize: '10px',
+      fontWeight: '500',
+      textTransform: 'uppercase',
+      opacity: 0.9,
+    },
+    orderInfo: {
+      flex: 1,
+      minWidth: 0,
+    },
+    orderName: {
+      fontSize: '15px',
+      fontWeight: '600',
+      color: 'var(--text-primary, #111)',
+      marginBottom: '4px',
     },
     orderMeta: {
       display: 'flex',
-      justifyContent: 'space-between',
       alignItems: 'center',
-      fontSize: '12px',
-      color: '#6b7280'
+      gap: '12px',
+      fontSize: '13px',
+      color: 'var(--text-muted, #6b7280)',
     },
-    orderType: {
-      display: 'inline-flex',
+    orderMetaItem: {
+      display: 'flex',
       alignItems: 'center',
       gap: '4px',
-      padding: '2px 8px',
-      borderRadius: '100px',
-      background: '#f3f4f6',
-      fontSize: '11px'
     },
-    orderTotal: {
+    orderActions: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '10px',
+    },
+    statusBadge: {
+      padding: '6px 14px',
+      borderRadius: '100px',
+      fontSize: '12px',
       fontWeight: '600',
-      color: '#1f2937'
-    }
-  };
-
-  
-  // Modal styles
-  const modalStyles = {
-    overlay: {
+    },
+    expandBtn: {
+      background: 'none',
+      border: 'none',
+      cursor: 'pointer',
+      padding: '8px',
+      borderRadius: '8px',
+      color: 'var(--text-muted, #6b7280)',
+      transition: 'all 0.2s',
+    },
+    
+    // Empty State
+    emptyState: {
+      textAlign: 'center',
+      padding: '60px 20px',
+      color: 'var(--text-muted, #6b7280)',
+    },
+    emptyIcon: {
+      width: '64px',
+      height: '64px',
+      borderRadius: '50%',
+      background: 'var(--bg-tertiary, #f3f4f6)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      margin: '0 auto 16px',
+    },
+    
+    // Modal
+    modalOverlay: {
       position: 'fixed',
       top: 0,
       left: 0,
@@ -221,483 +411,449 @@ export default function FoodOrdersPage() {
       alignItems: 'center',
       justifyContent: 'center',
       zIndex: 1000,
-      padding: '20px'
+      padding: '20px',
     },
     modal: {
-      background: 'white',
-      borderRadius: '16px',
+      background: 'var(--bg-primary, white)',
+      borderRadius: '20px',
       width: '100%',
-      maxWidth: '600px',
+      maxWidth: '560px',
       maxHeight: '90vh',
-      overflow: 'auto'
+      overflow: 'auto',
     },
     modalHeader: {
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'center',
       padding: '20px 24px',
-      borderBottom: '1px solid #e5e7eb'
+      borderBottom: '1px solid var(--border-color, #e5e7eb)',
     },
     modalTitle: {
       fontSize: '18px',
-      fontWeight: '600'
+      fontWeight: '600',
+      color: 'var(--text-primary, #111)',
     },
     closeBtn: {
-      background: 'none',
+      background: 'var(--bg-tertiary, #f3f4f6)',
       border: 'none',
-      fontSize: '24px',
+      width: '36px',
+      height: '36px',
+      borderRadius: '50%',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
       cursor: 'pointer',
-      color: '#6b7280'
+      color: 'var(--text-muted, #6b7280)',
     },
     modalBody: {
-      padding: '24px'
+      padding: '24px',
     },
-    section: {
-      marginBottom: '20px'
+    modalSection: {
+      marginBottom: '24px',
     },
-    sectionTitle: {
-      fontSize: '12px',
+    modalSectionTitle: {
+      fontSize: '13px',
       fontWeight: '600',
-      color: '#6b7280',
+      color: 'var(--text-muted, #6b7280)',
       textTransform: 'uppercase',
-      marginBottom: '12px'
+      letterSpacing: '0.5px',
+      marginBottom: '12px',
     },
-    customerInfo: {
-      display: 'grid',
-      gridTemplateColumns: '1fr 1fr',
-      gap: '16px'
-    },
-    infoItem: {
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '4px'
-    },
-    infoLabel: {
-      fontSize: '11px',
-      color: '#9ca3af'
-    },
-    infoValue: {
-      fontSize: '14px',
-      color: '#1f2937'
-    },
-    itemsList: {
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '12px'
-    },
-    itemRow: {
+    modalRow: {
       display: 'flex',
       justifyContent: 'space-between',
-      alignItems: 'flex-start',
-      padding: '12px',
-      background: '#f9fafb',
-      borderRadius: '8px'
+      alignItems: 'center',
+      padding: '10px 0',
+      borderBottom: '1px solid var(--border-color, #f3f4f6)',
     },
-    itemName: {
-      fontSize: '14px',
-      fontWeight: '500'
-    },
-    itemExtras: {
-      fontSize: '12px',
-      color: '#6b7280',
-      marginTop: '4px'
-    },
-    itemPrice: {
-      fontSize: '14px',
-      fontWeight: '500',
-      textAlign: 'right'
-    },
-    totals: {
-      borderTop: '1px solid #e5e7eb',
-      paddingTop: '16px',
+    modalActions: {
       display: 'flex',
-      flexDirection: 'column',
-      gap: '8px'
-    },
-    totalRow: {
-      display: 'flex',
-      justifyContent: 'space-between',
-      fontSize: '14px'
-    },
-    grandTotal: {
-      fontWeight: '600',
-      fontSize: '16px',
-      paddingTop: '8px',
-      borderTop: '1px solid #e5e7eb'
+      gap: '12px',
+      padding: '20px 24px',
+      borderTop: '1px solid var(--border-color, #e5e7eb)',
     },
     actionBtn: {
-      width: '100%',
-      padding: '14px',
+      flex: 1,
+      padding: '12px 20px',
       borderRadius: '10px',
       border: 'none',
       fontSize: '14px',
       fontWeight: '600',
       cursor: 'pointer',
-      marginTop: '16px'
+      transition: 'all 0.2s',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: '8px',
     },
-    primaryBtn: {
-      background: '#2563eb',
-      color: 'white'
-    },
-    secondaryBtn: {
-      background: '#f3f4f6',
-      color: '#374151'
-    }
   };
 
 
-  // Order Card Component
-  const OrderCard = ({ order }) => (
-    <div 
-      style={styles.orderCard}
-      onClick={() => setSelectedOrder(order)}
-      onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)'}
-      onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 1px 2px rgba(0,0,0,0.05)'}
-    >
-      <div style={styles.orderNumber}>{order.order_number}</div>
-      <div style={styles.orderCustomer}>{order.customer_name || 'Guest'}</div>
-      <div style={styles.orderMeta}>
-        <span style={styles.orderType}>
-          {order.order_type === 'delivery' ? '🚚' : '🏪'} 
-          {order.order_type === 'delivery' ? 'Delivery' : 'Pickup'}
-        </span>
-        <span>{(order.items || []).length} items</span>
-      </div>
-      <div style={{ ...styles.orderMeta, marginTop: '8px' }}>
-        <span style={styles.orderTotal}>{formatPrice(order.total)}</span>
-        <span>⏱️ {timeAgo(order.created_at)}</span>
-      </div>
-    </div>
-  );
-  
-  // Kanban Column Component
-  const KanbanColumn = ({ title, status, color, orders }) => (
-    <div style={styles.column}>
-      <div style={styles.columnHeader}>
-        <span style={{ ...styles.columnTitle, color }}>
-          <span style={{ 
-            width: '8px', 
-            height: '8px', 
-            borderRadius: '50%', 
-            background: color 
-          }}></span>
-          {title}
-        </span>
-        <span style={styles.columnCount}>{orders.length}</span>
-      </div>
-      {orders.map(order => (
-        <OrderCard key={order.id} order={order} />
-      ))}
-      {orders.length === 0 && (
-        <div style={{ 
-          textAlign: 'center', 
-          color: '#9ca3af', 
-          fontSize: '13px',
-          padding: '40px 20px' 
-        }}>
-          No orders
+  // ==================== LOADING STATE ====================
+  if (loading) {
+    return (
+      <div style={styles.container}>
+        <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+          <div className="loading-spinner" style={{ margin: '0 auto 16px' }}></div>
+          <p style={{ color: 'var(--text-muted, #6b7280)' }}>Loading orders...</p>
         </div>
-      )}
-    </div>
-  );
+      </div>
+    );
+  }
 
-
-  // Order Detail Modal
-  const OrderModal = ({ order, onClose }) => {
-    if (!order) return null;
-    
-    const items = order.items || [];
+  // ==================== ORDER CARD COMPONENT ====================
+  const OrderCard = ({ order }) => {
+    const date = new Date(order.created_at);
     const statusConfig = STATUS_CONFIG[order.status] || STATUS_CONFIG.pending;
-    const nextStatus = NEXT_STATUS[order.status];
-    
-    // For ready status, next depends on order type
-    const getNextStatusForReady = () => {
-      if (order.order_type === 'delivery') return 'out_for_delivery';
-      return 'picked_up';
-    };
-    
-    const finalNextStatus = order.status === 'ready' 
-      ? getNextStatusForReady() 
-      : nextStatus;
+    const itemCount = order.items?.length || 0;
     
     return (
-      <div style={modalStyles.overlay} onClick={onClose}>
-        <div style={modalStyles.modal} onClick={e => e.stopPropagation()}>
-          <div style={modalStyles.modalHeader}>
+      <div 
+        style={styles.orderCard}
+        onClick={() => setSelectedOrder(order)}
+        onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--accent-color, #8b5cf6)'}
+        onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border-color, #e5e7eb)'}
+      >
+        <div style={{
+          ...styles.orderDateBox,
+          background: order.order_type === 'pickup' 
+            ? 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)'
+            : 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
+        }}>
+          <div style={styles.orderDateDay}>{date.toLocaleDateString('en-US', { weekday: 'short' })}</div>
+          <div style={styles.orderDateNum}>{date.getDate()}</div>
+          <div style={styles.orderDateMonth}>{date.toLocaleDateString('en-US', { month: 'short' })}</div>
+        </div>
+        
+        <div style={styles.orderInfo}>
+          <div style={styles.orderName}>{order.customer_name || 'Guest'}</div>
+          <div style={styles.orderMeta}>
+            <span style={styles.orderMetaItem}>
+              {order.order_type === 'pickup' ? <Package size={14} /> : <Truck size={14} />}
+              {order.order_type === 'pickup' ? 'Pickup' : 'Delivery'}
+            </span>
+            <span style={styles.orderMetaItem}>
+              <Phone size={14} />
+              {order.customer_phone || '-'}
+            </span>
+            <span style={{ fontWeight: '600', color: 'var(--text-primary, #111)' }}>
+              {formatPrice(order.total)}
+            </span>
+          </div>
+        </div>
+        
+        <div style={styles.orderActions}>
+          <span style={{
+            ...styles.statusBadge,
+            background: statusConfig.bgColor,
+            color: statusConfig.color
+          }}>
+            {statusConfig.label}
+          </span>
+          <button style={styles.expandBtn}>
+            <ChevronDown size={18} />
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  // ==================== ORDER DETAIL MODAL ====================
+  const OrderDetailModal = () => {
+    if (!selectedOrder) return null;
+    
+    const statusConfig = STATUS_CONFIG[selectedOrder.status] || STATUS_CONFIG.pending;
+    const nextStatus = NEXT_STATUS[selectedOrder.status];
+    const finalStatus = selectedOrder.order_type === 'pickup' ? 'picked_up' : 'delivered';
+    
+    return (
+      <div style={styles.modalOverlay} onClick={() => setSelectedOrder(null)}>
+        <div style={styles.modal} onClick={e => e.stopPropagation()}>
+          <div style={styles.modalHeader}>
             <div>
-              <div style={modalStyles.modalTitle}>Order {order.order_number}</div>
-              <div style={{ 
-                display: 'inline-block',
-                marginTop: '8px',
-                padding: '4px 12px',
-                borderRadius: '100px',
-                fontSize: '12px',
-                fontWeight: '500',
-                background: statusConfig.bgColor,
-                color: statusConfig.color
-              }}>
-                {statusConfig.label}
+              <div style={styles.modalTitle}>Order {selectedOrder.order_number}</div>
+              <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
+                {new Date(selectedOrder.created_at).toLocaleString()}
               </div>
             </div>
-            <button style={modalStyles.closeBtn} onClick={onClose}>×</button>
+            <button style={styles.closeBtn} onClick={() => setSelectedOrder(null)}>
+              <X size={20} />
+            </button>
           </div>
           
-          <div style={modalStyles.modalBody}>
+          <div style={styles.modalBody}>
             {/* Customer Info */}
-            <div style={modalStyles.section}>
-              <div style={modalStyles.sectionTitle}>Customer</div>
-              <div style={modalStyles.customerInfo}>
-                <div style={modalStyles.infoItem}>
-                  <span style={modalStyles.infoLabel}>Name</span>
-                  <span style={modalStyles.infoValue}>{order.customer_name || 'Guest'}</span>
-                </div>
-                <div style={modalStyles.infoItem}>
-                  <span style={modalStyles.infoLabel}>Phone</span>
-                  <span style={modalStyles.infoValue}>{order.customer_phone || '-'}</span>
-                </div>
-                <div style={modalStyles.infoItem}>
-                  <span style={modalStyles.infoLabel}>Order Type</span>
-                  <span style={modalStyles.infoValue}>
-                    {order.order_type === 'delivery' ? '🚚 Delivery' : '🏪 Pickup'}
-                  </span>
-                </div>
-                {order.order_type === 'delivery' && (
-                  <div style={modalStyles.infoItem}>
-                    <span style={modalStyles.infoLabel}>Address</span>
-                    <span style={modalStyles.infoValue}>{order.delivery_address || '-'}</span>
+            <div style={styles.modalSection}>
+              <div style={styles.modalSectionTitle}>Customer</div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <div style={{ fontWeight: '600', marginBottom: '4px' }}>{selectedOrder.customer_name || 'Guest'}</div>
+                  <div style={{ fontSize: '14px', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Phone size={14} /> {selectedOrder.customer_phone || '-'}
                   </div>
-                )}
+                </div>
+                <span style={{
+                  ...styles.statusBadge,
+                  background: statusConfig.bgColor,
+                  color: statusConfig.color
+                }}>
+                  {statusConfig.label}
+                </span>
               </div>
-              {order.delivery_instructions && (
-                <div style={{ marginTop: '12px', padding: '12px', background: '#fef3c7', borderRadius: '8px', fontSize: '13px' }}>
-                  📝 {order.delivery_instructions}
+              {selectedOrder.delivery_address && (
+                <div style={{ marginTop: '12px', fontSize: '14px', color: 'var(--text-muted)', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                  <MapPin size={14} style={{ marginTop: '2px', flexShrink: 0 }} /> 
+                  {selectedOrder.delivery_address}
                 </div>
               )}
             </div>
             
             {/* Order Items */}
-            <div style={modalStyles.section}>
-              <div style={modalStyles.sectionTitle}>Items</div>
-              <div style={modalStyles.itemsList}>
-                {items.map((item, idx) => (
-                  <div key={idx} style={modalStyles.itemRow}>
-                    <div>
-                      <div style={modalStyles.itemName}>
-                        {item.quantity}× {item.productName}
-                      </div>
-                      {item.extras && item.extras.length > 0 && (
-                        <div style={modalStyles.itemExtras}>
-                          {item.extras.map((e, i) => `+ ${e.name}`).join(', ')}
-                        </div>
-                      )}
-                      {item.specialInstructions && (
-                        <div style={{ ...modalStyles.itemExtras, fontStyle: 'italic' }}>
-                          "{item.specialInstructions}"
-                        </div>
-                      )}
-                    </div>
-                    <div style={modalStyles.itemPrice}>
-                      {formatPrice(item.itemTotal)}
-                    </div>
+            <div style={styles.modalSection}>
+              <div style={styles.modalSectionTitle}>Items</div>
+              {(selectedOrder.items || []).map((item, idx) => (
+                <div key={idx} style={{ 
+                  padding: '12px 0', 
+                  borderBottom: idx < selectedOrder.items.length - 1 ? '1px solid var(--border-color, #f3f4f6)' : 'none'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                    <span style={{ fontWeight: '500' }}>{item.quantity}× {item.productName || item.product_name}</span>
+                    <span style={{ fontWeight: '600' }}>{formatPrice(item.total || item.itemTotal)}</span>
                   </div>
-                ))}
-              </div>
+                  {item.extras && item.extras.length > 0 && (
+                    <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginLeft: '16px' }}>
+                      {item.extras.map((extra, i) => (
+                        <div key={i}>+ {extra.name} ({formatPrice(extra.price)})</div>
+                      ))}
+                    </div>
+                  )}
+                  {item.specialInstructions && (
+                    <div style={{ fontSize: '13px', color: '#f59e0b', marginTop: '4px' }}>
+                      📝 {item.specialInstructions}
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
             
             {/* Totals */}
-            <div style={modalStyles.totals}>
-              <div style={modalStyles.totalRow}>
+            <div style={styles.modalSection}>
+              <div style={styles.modalRow}>
                 <span>Subtotal</span>
-                <span>{formatPrice(order.subtotal)}</span>
+                <span>{formatPrice(selectedOrder.subtotal)}</span>
               </div>
-              {order.delivery_fee > 0 && (
-                <div style={modalStyles.totalRow}>
+              {selectedOrder.delivery_fee > 0 && (
+                <div style={styles.modalRow}>
                   <span>Delivery Fee</span>
-                  <span>{formatPrice(order.delivery_fee)}</span>
+                  <span>{formatPrice(selectedOrder.delivery_fee)}</span>
                 </div>
               )}
-              {order.discount > 0 && (
-                <div style={{ ...modalStyles.totalRow, color: '#22c55e' }}>
-                  <span>Discount</span>
-                  <span>-{formatPrice(order.discount)}</span>
-                </div>
-              )}
-              <div style={{ ...modalStyles.totalRow, ...modalStyles.grandTotal }}>
+              <div style={{ ...styles.modalRow, borderBottom: 'none', fontWeight: '700', fontSize: '18px' }}>
                 <span>Total</span>
-                <span>{formatPrice(order.total)}</span>
+                <span>{formatPrice(selectedOrder.total)}</span>
               </div>
             </div>
             
-            {/* Payment Status */}
-            <div style={{ 
-              marginTop: '16px', 
-              padding: '12px', 
-              background: order.payment_status === 'paid' ? '#dcfce7' : '#fef3c7',
-              borderRadius: '8px',
-              fontSize: '13px',
-              display: 'flex',
-              justifyContent: 'space-between'
-            }}>
-              <span>{order.payment_method === 'mpesa' ? 'M-Pesa' : order.payment_method || 'Cash'}</span>
-              <span style={{ fontWeight: '500' }}>
-                {order.payment_status === 'paid' ? '✓ Paid' : '⏳ Pending'}
-              </span>
+            {/* Payment */}
+            <div style={styles.modalSection}>
+              <div style={styles.modalSectionTitle}>Payment</div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span>{selectedOrder.payment_method === 'mpesa' ? 'M-Pesa' : selectedOrder.payment_method || 'Cash'}</span>
+                <span style={{
+                  padding: '4px 12px',
+                  borderRadius: '100px',
+                  fontSize: '12px',
+                  fontWeight: '500',
+                  background: selectedOrder.payment_status === 'paid' ? '#dcfce7' : '#fef3c7',
+                  color: selectedOrder.payment_status === 'paid' ? '#16a34a' : '#d97706'
+                }}>
+                  {selectedOrder.payment_status === 'paid' ? '✓ Paid' : 'Pending'}
+                </span>
+              </div>
+              {selectedOrder.mpesa_receipt && (
+                <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '8px' }}>
+                  Receipt: {selectedOrder.mpesa_receipt}
+                </div>
+              )}
             </div>
-            
-            {/* Action Buttons */}
-            {finalNextStatus && order.status !== 'cancelled' && (
-              <button 
-                style={{ ...modalStyles.actionBtn, ...modalStyles.primaryBtn }}
-                onClick={() => handleStatusUpdate(order.id, finalNextStatus)}
-              >
-                Mark as {STATUS_CONFIG[finalNextStatus]?.label}
-              </button>
-            )}
-            
-            {order.status !== 'cancelled' && order.status !== 'delivered' && order.status !== 'picked_up' && (
-              <button 
-                style={{ ...modalStyles.actionBtn, ...modalStyles.secondaryBtn, marginTop: '8px' }}
-                onClick={() => handleStatusUpdate(order.id, 'cancelled')}
-              >
-                Cancel Order
-              </button>
-            )}
           </div>
+          
+          {/* Actions */}
+          {selectedOrder.status !== 'delivered' && selectedOrder.status !== 'picked_up' && selectedOrder.status !== 'cancelled' && (
+            <div style={styles.modalActions}>
+              {selectedOrder.status !== 'cancelled' && (
+                <button
+                  style={{ ...styles.actionBtn, background: '#fee2e2', color: '#dc2626' }}
+                  onClick={() => handleStatusUpdate(selectedOrder.id, 'cancelled')}
+                >
+                  <X size={16} /> Cancel
+                </button>
+              )}
+              {nextStatus && (
+                <button
+                  style={{ ...styles.actionBtn, background: STATUS_CONFIG[nextStatus].bgColor, color: STATUS_CONFIG[nextStatus].color }}
+                  onClick={() => handleStatusUpdate(selectedOrder.id, nextStatus)}
+                >
+                  <Check size={16} /> Mark {STATUS_CONFIG[nextStatus].label}
+                </button>
+              )}
+              {selectedOrder.status === 'ready' && (
+                <button
+                  style={{ ...styles.actionBtn, background: '#dcfce7', color: '#16a34a' }}
+                  onClick={() => handleStatusUpdate(selectedOrder.id, finalStatus)}
+                >
+                  <Check size={16} /> {selectedOrder.order_type === 'pickup' ? 'Picked Up' : 'Delivered'}
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </div>
     );
   };
 
 
-  // Main render
-  if (loading) {
-    return (
-      <div style={styles.container}>
-        <div style={{ textAlign: 'center', padding: '60px', color: '#6b7280' }}>
-          Loading food orders...
-        </div>
-      </div>
-    );
-  }
-  
+  // ==================== RENDER ====================
   return (
     <div style={styles.container}>
       {/* Header */}
       <div style={styles.header}>
-        <h1 style={styles.title}>
-          🍽️ Food Orders
-        </h1>
-        <button 
-          onClick={fetchData}
-          style={{
-            padding: '8px 16px',
-            borderRadius: '8px',
-            border: '1px solid #e5e7eb',
-            background: 'white',
-            cursor: 'pointer',
-            fontSize: '13px'
-          }}
+        <div style={styles.titleSection}>
+          <UtensilsCrossed size={28} color="var(--accent-color, #8b5cf6)" />
+          <div>
+            <h1 style={styles.title}>Food Orders</h1>
+            <p style={styles.subtitle}>Manage your restaurant orders</p>
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <button style={styles.refreshBtn} onClick={fetchData}>
+            <RefreshCw size={16} /> Refresh
+          </button>
+          <button style={{ ...styles.refreshBtn, background: 'var(--accent-color, #8b5cf6)', color: 'white', borderColor: 'var(--accent-color, #8b5cf6)' }}>
+            <Download size={16} /> Export CSV
+          </button>
+        </div>
+      </div>
+
+      {/* Stats Grid */}
+      <div style={{
+        ...styles.statsGrid,
+        gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)'
+      }}>
+        <div 
+          style={{...styles.statCard, ...(viewFilter === 'today' ? styles.statCardActive : {})}}
+          onClick={() => setViewFilter(viewFilter === 'today' ? 'all' : 'today')}
         >
-          ↻ Refresh
-        </button>
-      </div>
-      
-      {/* Stats Row */}
-      {stats && (
-        <div style={styles.statsRow}>
-          <div style={styles.statCard}>
-            <div style={styles.statLabel}>Today's Orders</div>
-            <div style={styles.statValue}>{stats.total || 0}</div>
+          <div style={{...styles.statIconBox, background: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)'}}>
+            <UtensilsCrossed size={22} color="white" />
           </div>
-          <div style={styles.statCard}>
-            <div style={styles.statLabel}>Pending</div>
-            <div style={{ ...styles.statValue, color: '#f59e0b' }}>{stats.pending || 0}</div>
-          </div>
-          <div style={styles.statCard}>
-            <div style={styles.statLabel}>Preparing</div>
-            <div style={{ ...styles.statValue, color: '#8b5cf6' }}>{stats.preparing || 0}</div>
-          </div>
-          <div style={styles.statCard}>
-            <div style={styles.statLabel}>Completed</div>
-            <div style={{ ...styles.statValue, color: '#22c55e' }}>{stats.completed || 0}</div>
-          </div>
-          <div style={styles.statCard}>
-            <div style={styles.statLabel}>Revenue</div>
-            <div style={styles.statValue}>{formatPrice(stats.revenue)}</div>
+          <div style={styles.statInfo}>
+            <div style={styles.statLabel}>TODAY</div>
+            <div style={styles.statValue}>{todayOrders.length}</div>
           </div>
         </div>
-      )}
-      
-      {/* Kanban Board */}
-      <div style={styles.kanban}>
-        <KanbanColumn 
-          title="Pending" 
-          status="pending"
-          color="#f59e0b"
-          orders={getOrdersByStatus(['pending'])}
-        />
-        <KanbanColumn 
-          title="Confirmed" 
-          status="confirmed"
-          color="#3b82f6"
-          orders={getOrdersByStatus(['confirmed'])}
-        />
-        <KanbanColumn 
-          title="Preparing" 
-          status="preparing"
-          color="#8b5cf6"
-          orders={getOrdersByStatus(['preparing'])}
-        />
-        <KanbanColumn 
-          title="Ready" 
-          status="ready"
-          color="#10b981"
-          orders={getOrdersByStatus(['ready', 'out_for_delivery'])}
-        />
-      </div>
-      
-      {/* Completed Section */}
-      {getOrdersByStatus(['delivered', 'picked_up']).length > 0 && (
-        <div style={{ marginTop: '24px' }}>
-          <div style={{ 
-            fontSize: '14px', 
-            fontWeight: '600', 
-            color: '#6b7280',
-            marginBottom: '12px'
-          }}>
-            ✓ Completed Today ({getOrdersByStatus(['delivered', 'picked_up']).length})
+
+        <div 
+          style={{...styles.statCard, ...(viewFilter === 'pending' ? styles.statCardActive : {}), ...(pendingOrders.length > 0 ? { borderColor: '#f59e0b' } : {})}}
+          onClick={() => setViewFilter(viewFilter === 'pending' ? 'all' : 'pending')}
+        >
+          <div style={{...styles.statIconBox, background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'}}>
+            <Clock size={22} color="white" />
           </div>
-          <div style={{ 
-            display: 'flex', 
-            gap: '8px', 
-            flexWrap: 'wrap' 
-          }}>
-            {getOrdersByStatus(['delivered', 'picked_up']).slice(0, 10).map(order => (
-              <div 
-                key={order.id}
-                onClick={() => setSelectedOrder(order)}
-                style={{
-                  padding: '8px 12px',
-                  background: '#dcfce7',
-                  borderRadius: '8px',
-                  fontSize: '13px',
-                  cursor: 'pointer'
-                }}
-              >
-                {order.order_number} ✓
-              </div>
-            ))}
+          <div style={styles.statInfo}>
+            <div style={styles.statLabel}>PENDING</div>
+            <div style={styles.statValue}>{pendingOrders.length}</div>
           </div>
         </div>
-      )}
-      
-      {/* Order Detail Modal */}
-      {selectedOrder && (
-        <OrderModal 
-          order={selectedOrder} 
-          onClose={() => setSelectedOrder(null)} 
+
+        <div style={styles.statCard}>
+          <div style={{...styles.statIconBox, background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)'}}>
+            <Bell size={22} color="white" />
+          </div>
+          <div style={styles.statInfo}>
+            <div style={styles.statLabel}>PREPARING</div>
+            <div style={styles.statValue}>{preparingOrders.length}</div>
+          </div>
+        </div>
+
+        <div style={styles.statCard}>
+          <div style={{...styles.statIconBox, background: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)'}}>
+            <DollarSign size={22} color="white" />
+          </div>
+          <div style={styles.statInfo}>
+            <div style={styles.statLabel}>REVENUE</div>
+            <div style={styles.statValue}>{formatPrice(stats.revenue || completedOrders.reduce((sum, o) => sum + (o.total || 0), 0))}</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Filters */}
+      <div style={styles.filterRow}>
+        {[
+          { key: 'all', label: 'All', count: orders.length },
+          { key: 'pending', label: 'Pending', count: pendingOrders.length },
+          { key: 'confirmed', label: 'Confirmed', count: confirmedOrders.length },
+          { key: 'preparing', label: 'Preparing', count: preparingOrders.length },
+          { key: 'ready', label: 'Ready', count: readyOrders.length },
+          { key: 'completed', label: 'Completed', count: completedOrders.length },
+        ].map(f => (
+          <button
+            key={f.key}
+            style={{
+              ...styles.filterPill,
+              ...(statusFilter === f.key ? styles.filterPillActive : {})
+            }}
+            onClick={() => setStatusFilter(f.key)}
+          >
+            {f.label}
+            <span style={{
+              ...styles.filterCount,
+              background: statusFilter === f.key ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.06)'
+            }}>{f.count}</span>
+          </button>
+        ))}
+        
+        <input
+          type="text"
+          placeholder="Search by name, phone, order #"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          style={styles.searchInput}
         />
+      </div>
+
+      {/* Needs Attention */}
+      {pendingOrders.length > 0 && statusFilter === 'all' && viewFilter === 'all' && (
+        <div style={styles.attentionHeader}>
+          <AlertCircle size={18} color="#d97706" />
+          <span style={{ fontWeight: '600', color: 'var(--text-primary, #111)' }}>Needs Attention</span>
+          <span style={styles.attentionBadge}>{pendingOrders.length}</span>
+        </div>
       )}
+
+      {/* Orders List */}
+      {filteredOrders.length === 0 ? (
+        <div style={styles.emptyState}>
+          <div style={styles.emptyIcon}>
+            <UtensilsCrossed size={28} color="var(--text-muted, #9ca3af)" />
+          </div>
+          <h3 style={{ margin: '0 0 8px', color: 'var(--text-primary, #111)' }}>No orders found</h3>
+          <p style={{ margin: 0 }}>
+            {statusFilter !== 'all' 
+              ? `No ${statusFilter} orders` 
+              : 'Orders from Visual Menu template will appear here'}
+          </p>
+        </div>
+      ) : (
+        <div>
+          {filteredOrders.map(order => (
+            <OrderCard key={order.id} order={order} />
+          ))}
+        </div>
+      )}
+
+      {/* Modal */}
+      <OrderDetailModal />
     </div>
   );
 }
