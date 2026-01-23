@@ -317,6 +317,7 @@ router.post('/:slug/bookings', async (req, res, next) => {
 router.get('/order/:orderNumber', async (req, res, next) => {
   try {
     const { orderNumber } = req.params;
+    console.log('[Order Tracking API] Looking up order:', orderNumber);
     
     // Find order by order number
     const result = await db.query(`
@@ -344,11 +345,15 @@ router.get('/order/:orderNumber', async (req, res, next) => {
       WHERE fo.order_number = $1
     `, [orderNumber.toUpperCase()]);
     
+    console.log('[Order Tracking API] Query result rows:', result.rows.length);
+    
     if (result.rows.length === 0) {
+      console.log('[Order Tracking API] Order not found:', orderNumber.toUpperCase());
       return res.status(404).json({ error: 'Order not found' });
     }
     
     const order = result.rows[0];
+    console.log('[Order Tracking API] Found order:', order.order_number, 'status:', order.status);
     
     // Calculate estimated ready time
     let estimatedReadyTime = null;
