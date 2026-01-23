@@ -41,7 +41,7 @@ export default function AdsPage() {
       
       if (slug) {
         setStoreSlug(slug);
-        const baseUrl = import.meta.env.VITE_STORE_URL || 'https://jariecommstore.netlify.app';
+        const baseUrl = import.meta.env.VITE_STORE_URL || 'https://jarisolutionsecom.store';
         setStoreUrl(`${baseUrl}/?store=${slug}`);
       }
     } catch (error) {
