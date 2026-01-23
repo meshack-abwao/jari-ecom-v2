@@ -28,7 +28,14 @@ export default function RegisterPage() {
         setError(response.data.error || 'Registration failed');
       }
     } catch (err) {
-      setError(err.response?.data?.error || 'Network error. Please try again.');
+      // Better error messages for common cases
+      if (err.response?.status === 409) {
+        setError('This email or store URL already exists. Try logging in instead.');
+      } else if (err.code === 'ERR_NETWORK' || err.message === 'Network Error') {
+        setError('Unable to connect to server. Please check your internet connection.');
+      } else {
+        setError(err.response?.data?.error || 'Registration failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
