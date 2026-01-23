@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { authAPI } from '../api/client';
+import { BRAND } from '../constants/brand';
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -47,9 +48,9 @@ export default function RegisterPage() {
     <div style={styles.container}>
       <div style={styles.formCard} className="glass-card">
         <div style={styles.header}>
-          <img src="https://jarisolutions.com/wp-content/uploads/2024/09/cropped-cropped-jari-solutions-logo-180x180.png" alt="Jari" style={styles.logo} />
-          <h1 style={styles.title}>Join Jari.Ecom</h1>
-          <p style={styles.subtitle}>Start selling in under 5 minutes</p>
+          <img src={BRAND.LOGO_URL} alt="Jari" style={styles.logo} />
+          <h1 style={styles.title}>Join {BRAND.APP_NAME}</h1>
+          <p style={styles.subtitle}>{BRAND.TAGLINE_REGISTER}</p>
         </div>
 
         {error && <div style={styles.error}>{error}</div>}

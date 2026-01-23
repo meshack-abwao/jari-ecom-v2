@@ -3,6 +3,7 @@ import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useTheme } from '../hooks/useTheme';
 import { settingsAPI } from '../api/client';
+import { BRAND } from '../constants/brand';
 import { Home, Package, ShoppingCart, Settings, Zap, LogOut, Sun, Moon, Menu, X, User, Store, Crown, ArrowUpRight, LayoutGrid, Megaphone, Calendar, UtensilsCrossed } from 'lucide-react';
 
 export default function Layout() {
@@ -201,10 +202,10 @@ export default function Layout() {
       {/* Sidebar */}
       <aside className={`dashboard-sidebar glass-card ${mobileMenuOpen ? 'mobile-open' : ''}`}>
         <div style={styles.logo}>
-          <img src="http://jarisolutions.com/wp-content/uploads/2025/11/cropped-Jari-Business-Solutions-1.png" alt="Jari" style={styles.logoImg} />
+          <img src={BRAND.LOGO_URL} alt="Jari" style={styles.logoImg} />
           <div>
-            <h2 style={styles.logoText}>Jari.Ecom</h2>
-            <p style={styles.logoSub}>Dashboard</p>
+            <h2 style={styles.logoText}>{BRAND.APP_NAME}</h2>
+            <p style={styles.logoSub}>{BRAND.TAGLINE_SIDEBAR}</p>
           </div>
         </div>
 

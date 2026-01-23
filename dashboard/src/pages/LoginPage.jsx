@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { BRAND } from '../constants/brand';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -38,9 +39,9 @@ export default function LoginPage() {
     <div style={styles.container}>
       <div style={styles.formCard} className="glass-card">
         <div style={styles.header}>
-          <img src="https://jarisolutions.com/wp-content/uploads/2024/09/cropped-cropped-jari-solutions-logo-180x180.png" alt="Jari" style={styles.logo} />
-          <h1 style={styles.title}>Jari.Ecom</h1>
-          <p style={styles.subtitle}>Sign in to your dashboard</p>
+          <img src={BRAND.LOGO_URL} alt="Jari" style={styles.logo} />
+          <h1 style={styles.title}>{BRAND.APP_NAME}</h1>
+          <p style={styles.subtitle}>{BRAND.TAGLINE_LOGIN}</p>
         </div>
 
         {error && <div style={styles.error}>{error}</div>}

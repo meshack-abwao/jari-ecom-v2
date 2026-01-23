@@ -1,0 +1,20 @@
+// ===========================================
+// BRAND CONSTANTS
+// Centralized brand assets for easy updates
+// ===========================================
+
+// Logo hosted on Cloudinary for fast, reliable loading
+// To update: Upload new logo to Cloudinary and replace URL here
+export const BRAND = {
+  // Main logo (square, 180x180 or similar)
+  // UPDATE THIS URL after uploading to Cloudinary!
+  LOGO_URL: 'https://res.cloudinary.com/dmfrtzgkv/image/upload/v1234567890/jari-logo.png',
+  
+  // App name
+  APP_NAME: 'Jari.Ecom',
+  
+  // Taglines
+  TAGLINE_LOGIN: 'Sign in to your dashboard',
+  TAGLINE_REGISTER: 'Start selling in under 5 minutes',
+  TAGLINE_SIDEBAR: 'Dashboard',
+};
