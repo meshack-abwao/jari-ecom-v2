@@ -91,5 +91,41 @@
 
 ---
 
+## 🌐 CUSTOM DOMAINS & INFRASTRUCTURE
+
+### 10. Cloudflare Migration for Custom Domains
+**Status:** Researched, post-launch implementation
+**Value:** Free custom domains for users, better performance in Africa
+**Why Cloudflare over Netlify:**
+- Free tier handles 100 custom domains (vs Netlify Pro $19/mo)
+- Superior CDN performance, especially in Africa
+- Better DDoS protection
+- Cloudflare for SaaS feature designed for multi-tenant apps
+
+**Cost Comparison:**
+| Stores | Netlify Pro | Cloudflare Free |
+|--------|-------------|-----------------|
+| 100    | $19/mo      | $0              |
+| 500    | $19/mo      | $40/mo          |
+| 1000   | $19/mo      | $90/mo          |
+
+**Migration Steps:**
+1. Create Cloudflare account
+2. Add jarisolutionsecom.store to Cloudflare
+3. Update nameservers at Namecheap
+4. Enable "Cloudflare for SaaS"
+5. Configure SSL settings
+6. Update API for domain registration
+
+**Timeline:** February 2026 (post-launch)
+
+### 11. Dashboard Domain Propagation Issue
+**Status:** In progress (January 23, 2026)
+**Issue:** dashboard.jarisolutionsecom.store showing SSL certificate warning
+**Resolution:** Wait for DNS propagation + Netlify SSL auto-provision
+**Expected:** 5-15 minutes, up to 24 hours worst case
+
+---
+
 *Last updated: January 23, 2026*
 *Add ideas here as they come up during development*
