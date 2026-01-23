@@ -64,19 +64,29 @@ const STATUS_ORDER_PICKUP = ['pending', 'confirmed', 'preparing', 'ready', 'pick
 
 // Fetch order from API
 async function fetchOrder(orderNumber) {
+  const url = `${API_URL}/s/order/${orderNumber}`;
+  console.log('[Order Tracking] Fetching order:', orderNumber);
+  console.log('[Order Tracking] API URL:', url);
+  
   try {
-    const res = await fetch(`${API_URL}/s/order/${orderNumber}`);
+    const res = await fetch(url);
+    console.log('[Order Tracking] Response status:', res.status);
+    
     if (!res.ok) {
       if (res.status === 404) {
-        return { error: 'Order not found' };
+        console.log('[Order Tracking] Order not found in database');
+        return { error: 'Order not found. Please check your order number.' };
       }
-      throw new Error('Failed to fetch order');
+      const errorText = await res.text();
+      console.error('[Order Tracking] API error:', errorText);
+      throw new Error(`Failed to fetch order: ${res.status}`);
     }
     const data = await res.json();
+    console.log('[Order Tracking] Order data:', data);
     return data;
   } catch (err) {
-    console.error('Error fetching order:', err);
-    return { error: 'Failed to load order. Please try again.' };
+    console.error('[Order Tracking] Fetch error:', err);
+    return { error: 'Failed to load order. Please check your connection and try again.' };
   }
 }
 
@@ -265,13 +275,17 @@ function renderTrackingPage(order) {
 }
 
 // Render error state
-function renderError(message) {
+function renderError(message, orderNumber = '') {
   return `
     <div class="ot-container">
       <div class="ot-card ot-error">
         <div class="ot-error-icon">😕</div>
         <div class="ot-error-title">Order Not Found</div>
         <div class="ot-error-message">${message}</div>
+        ${orderNumber ? `<div class="ot-error-order">Looking for: <strong>${orderNumber}</strong></div>` : ''}
+        <p style="font-size: 0.8rem; color: #666; margin-top: 1rem;">
+          If you just placed this order, please wait a moment and refresh the page.
+        </p>
         <a href="/" class="ot-btn">Back to Store</a>
       </div>
     </div>
@@ -296,6 +310,8 @@ function renderLoading() {
 export async function initOrderTracking(orderNumber) {
   const app = document.getElementById('app');
   
+  console.log('[Order Tracking] Initializing for order:', orderNumber);
+  
   // Show loading
   app.innerHTML = renderLoading();
   
@@ -303,7 +319,7 @@ export async function initOrderTracking(orderNumber) {
   const result = await fetchOrder(orderNumber);
   
   if (result.error) {
-    app.innerHTML = renderError(result.error);
+    app.innerHTML = renderError(result.error, orderNumber);
     return;
   }
   
