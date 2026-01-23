@@ -27,7 +27,7 @@ const TEMPLATES = {
     price: 600,
     description: 'For restaurants and food businesses',
     icon: '🍽️',
-    fields: ['basic', 'gallery', 'stories', 'dietary', 'testimonials']
+    fields: ['basic', 'gallery', 'stories', 'dietary', 'addons', 'testimonials']
   },
   'deep-dive': {
     name: 'Deep Dive',
@@ -85,6 +85,9 @@ const getInitialFormData = () => ({
   ingredients: '',
   allergens: '',
   
+  // Add-ons (visual-menu)
+  addOns: [{ name: '', price: '', image: '' }],
+  
   // Specifications (deep-dive)
   specifications: [{ label: '', value: '' }],
   warranty: '',
@@ -129,7 +132,7 @@ export default function ProductsPage() {
   const [formData, setFormData] = useState(getInitialFormData());
   const [expandedSections, setExpandedSections] = useState({
     basic: true, gallery: false, stories: false, testimonials: false,
-    packages: false, dietary: false, specifications: false, whatsIncluded: false, showcase: false, warranty: false, eventDetails: false, tickets: false, policies: false
+    packages: false, dietary: false, addons: false, specifications: false, whatsIncluded: false, showcase: false, warranty: false, eventDetails: false, tickets: false, policies: false
   });
 
   useEffect(() => { loadProducts(); loadStoreInfo(); loadCategories(); }, []);
@@ -253,6 +256,7 @@ export default function ProductsPage() {
             calories: formData.calories,
             ingredients: formData.ingredients,
             allergens: formData.allergens,
+            addOns: formData.addOns.filter(a => a.name?.trim()),
           }),
           
           ...(selectedTemplate === 'deep-dive' && {
@@ -346,6 +350,9 @@ export default function ProductsPage() {
       calories: data.calories || '',
       ingredients: data.ingredients || '',
       allergens: data.allergens || '',
+      addOns: data.addOns?.length > 0 
+        ? data.addOns 
+        : [{ name: '', price: '', image: '' }],
       
       specifications: data.specifications?.length > 0
         ? data.specifications
@@ -396,7 +403,7 @@ export default function ProductsPage() {
     setSelectedTemplate('quick-decision');
     setShowModal(false);
     setExpandedSections({ basic: true, gallery: false, stories: false, testimonials: false,
-      packages: false, dietary: false, specifications: false, whatsIncluded: false, showcase: false, warranty: false, eventDetails: false, tickets: false, policies: false });
+      packages: false, dietary: false, addons: false, specifications: false, whatsIncluded: false, showcase: false, warranty: false, eventDetails: false, tickets: false, policies: false });
   };
 
   const toggleSection = (section) => {
@@ -1082,6 +1089,89 @@ export default function ProductsPage() {
                           className="dashboard-input"
                         />
                       </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* ADD-ONS (visual-menu) */}
+              {showField('addons') && (
+                <div style={styles.section}>
+                  <SectionHeader section="addons" title="Add-Ons / Extras" icon="🍟" />
+                  {expandedSections.addons && (
+                    <div style={styles.sectionContent}>
+                      <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '16px' }}>
+                        Add extras customers can add to their order (e.g., Extra Cheese, Bacon, Fries)
+                      </p>
+                      {formData.addOns.map((addon, idx) => (
+                        <div key={idx} style={{ 
+                          display: 'grid', 
+                          gridTemplateColumns: '1fr 100px 1fr auto', 
+                          gap: '12px', 
+                          marginBottom: '12px',
+                          alignItems: 'start'
+                        }}>
+                          <div>
+                            <input
+                              type="text"
+                              value={addon.name}
+                              onChange={e => {
+                                const newAddOns = [...formData.addOns];
+                                newAddOns[idx] = { ...newAddOns[idx], name: e.target.value };
+                                updateField('addOns', newAddOns);
+                              }}
+                              placeholder="Add-on name (e.g. Extra Cheese)"
+                              className="dashboard-input"
+                            />
+                          </div>
+                          <div>
+                            <input
+                              type="number"
+                              value={addon.price}
+                              onChange={e => {
+                                const newAddOns = [...formData.addOns];
+                                newAddOns[idx] = { ...newAddOns[idx], price: e.target.value };
+                                updateField('addOns', newAddOns);
+                              }}
+                              placeholder="Price"
+                              className="dashboard-input"
+                              min="0"
+                            />
+                          </div>
+                          <div>
+                            <input
+                              type="text"
+                              value={addon.image || ''}
+                              onChange={e => {
+                                const newAddOns = [...formData.addOns];
+                                newAddOns[idx] = { ...newAddOns[idx], image: e.target.value };
+                                updateField('addOns', newAddOns);
+                              }}
+                              placeholder="Image URL (optional)"
+                              className="dashboard-input"
+                            />
+                          </div>
+                          {formData.addOns.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const newAddOns = formData.addOns.filter((_, i) => i !== idx);
+                                updateField('addOns', newAddOns);
+                              }}
+                              style={styles.removeBtn}
+                            >
+                              ✕
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                      <button
+                        type="button"
+                        onClick={() => updateField('addOns', [...formData.addOns, { name: '', price: '', image: '' }])}
+                        style={styles.addBtn}
+                      >
+                        + Add Another Extra
+                      </button>
                     </div>
                   )}
                 </div>
