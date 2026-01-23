@@ -1,5 +1,6 @@
 // Remove trailing slash if present
-const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3000').replace(/\/$/, '');
+// Production fallback ensures it works even if env var not set
+const API_URL = (import.meta.env.VITE_API_URL || 'https://jari-ecom-v2-production.up.railway.app').replace(/\/$/, '');
 
 export async function fetchStore(slug) {
   const res = await fetch(`${API_URL}/s/${slug}`);

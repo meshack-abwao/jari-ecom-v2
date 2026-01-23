@@ -4,7 +4,8 @@
 // URL: /order/{orderNumber}
 // ===========================================
 
-const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3000').replace(/\/$/, '');
+// Production fallback ensures it works even if env var not set
+const API_URL = (import.meta.env.VITE_API_URL || 'https://jari-ecom-v2-production.up.railway.app').replace(/\/$/, '');
 
 // Status display configuration
 const STATUS_CONFIG = {

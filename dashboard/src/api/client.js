@@ -8,7 +8,8 @@ const getApiUrl = () => {
     // Remove trailing slash if present
     return import.meta.env.VITE_API_URL.replace(/\/$/, '');
   }
-  return 'http://localhost:3000';
+  // Production fallback - ensures login works even if env var not set
+  return 'https://jari-ecom-v2-production.up.railway.app';
 };
 
 const API_BASE_URL = getApiUrl();
