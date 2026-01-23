@@ -5592,3 +5592,33 @@ textarea:focus-visible {
 .register-btn {
     background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%) !important;
 }
+
+
+/* ===========================================
+   CHECKOUT - TRACK ORDER BUTTON
+   For food orders success screen
+   =========================================== */
+.success-track-order {
+    margin: 20px 0;
+}
+
+.btn-track-order {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 28px;
+    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+    color: white;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.btn-track-order:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(139, 92, 246, 0.4);
+}

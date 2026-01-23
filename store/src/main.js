@@ -5,6 +5,7 @@ import { renderCheckoutModal, initCheckout, openCheckout } from './checkout.js';
 import { initPixel, pixel } from './pixel.js';
 import { initPortfolioBookingHandlers } from './templates/portfolioBookingHandlers.js';
 import { initVisualMenuHandlers } from './templates/visual-menu/vm-handlers.js';
+import { initOrderTracking } from './order-tracking.js';
 import './booking/bookingHandlers.js'; // Auto-registers event listener
 
 const app = document.getElementById('app');
@@ -17,9 +18,36 @@ let currentStoryIndex = 0;
 let storyTimer = null;
 
 // ===========================================
+// ROUTING - Check for order tracking page
+// ===========================================
+function checkOrderTrackingRoute() {
+  const path = window.location.pathname;
+  // Match /order/ABC-123 pattern
+  const match = path.match(/^\/order\/([A-Z0-9-]+)$/i);
+  if (match) {
+    return match[1].toUpperCase(); // Return order number
+  }
+  return null;
+}
+
+// ===========================================
 // INIT
 // ===========================================
 async function init() {
+  // Check if this is an order tracking page
+  const orderNumber = checkOrderTrackingRoute();
+  if (orderNumber) {
+    // Load order tracking styles
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = '/src/styles/order-tracking.css';
+    document.head.appendChild(link);
+    
+    // Initialize order tracking
+    initOrderTracking(orderNumber);
+    return;
+  }
+  
   const slug = getSlug();
   
   // Set global slug for booking system

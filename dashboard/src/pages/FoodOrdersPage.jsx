@@ -70,12 +70,33 @@ export default function FoodOrdersPage() {
   }, []);
 
   // Update order status
-  const handleStatusUpdate = async (orderId, newStatus) => {
+  const handleStatusUpdate = async (orderId, newStatus, extraData = {}) => {
     try {
-      await foodOrdersAPI.updateStatus(orderId, newStatus);
+      // Get table number and estimated time from inputs if available
+      const tableInput = document.getElementById('orderTableNumber');
+      const timeInput = document.getElementById('orderEstimatedTime');
+      
+      const updateData = {
+        status: newStatus,
+        ...extraData
+      };
+      
+      if (tableInput?.value) {
+        updateData.table_number = tableInput.value;
+      }
+      if (timeInput?.value) {
+        updateData.estimated_minutes = parseInt(timeInput.value, 10);
+      }
+      
+      await foodOrdersAPI.updateStatus(orderId, newStatus, updateData);
       fetchData();
       if (selectedOrder?.id === orderId) {
-        setSelectedOrder(prev => ({ ...prev, status: newStatus }));
+        setSelectedOrder(prev => ({ 
+          ...prev, 
+          status: newStatus,
+          table_number: updateData.table_number || prev.table_number,
+          estimated_minutes: updateData.estimated_minutes || prev.estimated_minutes
+        }));
       }
     } catch (err) {
       console.error('Failed to update status:', err);
@@ -257,6 +278,7 @@ export default function FoodOrdersPage() {
       display: 'flex',
       alignItems: 'center',
       gap: '6px',
+      color: 'var(--text-primary, #111)',
     },
     filterPillActive: {
       background: 'var(--accent-color, #8b5cf6)',
@@ -264,7 +286,7 @@ export default function FoodOrdersPage() {
       color: 'white',
     },
     filterCount: {
-      background: 'rgba(0,0,0,0.1)',
+      background: 'rgba(255,255,255,0.15)',
       padding: '2px 8px',
       borderRadius: '100px',
       fontSize: '11px',
@@ -676,6 +698,78 @@ export default function FoodOrdersPage() {
                 </div>
               )}
             </div>
+            
+            {/* Table/Location & Estimated Time (editable when pending/confirmed) */}
+            {['pending', 'confirmed'].includes(selectedOrder.status) && (
+              <div style={styles.modalSection}>
+                <div style={styles.modalSectionTitle}>Order Details</div>
+                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                  <div style={{ flex: 1, minWidth: '120px' }}>
+                    <label style={{ display: 'block', fontSize: '12px', color: 'var(--text-muted)', marginBottom: '6px' }}>
+                      {selectedOrder.order_type === 'pickup' || selectedOrder.order_type === 'dine_in' ? 'Table #' : 'Location Note'}
+                    </label>
+                    <input
+                      type="text"
+                      placeholder={selectedOrder.order_type === 'pickup' ? 'e.g. 5' : 'e.g. Gate'}
+                      defaultValue={selectedOrder.table_number || ''}
+                      id="orderTableNumber"
+                      style={{
+                        width: '100%',
+                        padding: '10px 12px',
+                        borderRadius: '8px',
+                        border: '1px solid var(--border-color, #e5e7eb)',
+                        background: 'var(--bg-tertiary, #f9fafb)',
+                        fontSize: '14px',
+                        color: 'var(--text-primary, #111)'
+                      }}
+                    />
+                  </div>
+                  <div style={{ flex: 1, minWidth: '120px' }}>
+                    <label style={{ display: 'block', fontSize: '12px', color: 'var(--text-muted)', marginBottom: '6px' }}>
+                      Est. Time (mins)
+                    </label>
+                    <input
+                      type="number"
+                      placeholder="e.g. 20"
+                      defaultValue={selectedOrder.estimated_minutes || ''}
+                      id="orderEstimatedTime"
+                      min="1"
+                      max="180"
+                      style={{
+                        width: '100%',
+                        padding: '10px 12px',
+                        borderRadius: '8px',
+                        border: '1px solid var(--border-color, #e5e7eb)',
+                        background: 'var(--bg-tertiary, #f9fafb)',
+                        fontSize: '14px',
+                        color: 'var(--text-primary, #111)'
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {/* Show table/time if already set */}
+            {!['pending', 'confirmed'].includes(selectedOrder.status) && (selectedOrder.table_number || selectedOrder.estimated_minutes) && (
+              <div style={styles.modalSection}>
+                <div style={styles.modalSectionTitle}>Order Details</div>
+                <div style={{ display: 'flex', gap: '20px' }}>
+                  {selectedOrder.table_number && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span>🍽️</span>
+                      <span>Table {selectedOrder.table_number}</span>
+                    </div>
+                  )}
+                  {selectedOrder.estimated_minutes && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span>⏱️</span>
+                      <span>~{selectedOrder.estimated_minutes} mins</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
           
           {/* Actions */}

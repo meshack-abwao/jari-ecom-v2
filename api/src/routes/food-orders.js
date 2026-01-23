@@ -228,7 +228,7 @@ router.post('/', async (req, res, next) => {
 // -----------------------------------------
 router.put('/:id/status', auth, async (req, res, next) => {
   try {
-    const { status, note } = req.body;
+    const { status, note, table_number, estimated_minutes } = req.body;
     
     const validStatuses = [
       'pending', 'confirmed', 'preparing', 'ready',
@@ -281,10 +281,26 @@ router.put('/:id/status', auth, async (req, res, next) => {
     // Set timestamp fields based on status
     if (status === 'confirmed') {
       updateQuery += `, confirmed_at = NOW()`;
+      // Calculate estimated ready time if estimated_minutes provided
+      if (estimated_minutes) {
+        updateQuery += `, estimated_ready_at = NOW() + interval '${parseInt(estimated_minutes, 10)} minutes'`;
+      }
     } else if (status === 'ready') {
       updateQuery += `, ready_at = NOW()`;
     } else if (status === 'delivered' || status === 'picked_up') {
       updateQuery += `, completed_at = NOW()`;
+    }
+    
+    // Update table_number if provided
+    if (table_number !== undefined) {
+      params.push(table_number);
+      updateQuery += `, table_number = $${params.length}`;
+    }
+    
+    // Update estimated_minutes if provided
+    if (estimated_minutes !== undefined) {
+      params.push(parseInt(estimated_minutes, 10));
+      updateQuery += `, estimated_minutes = $${params.length}`;
     }
     
     updateQuery += ` WHERE id = $${params.length + 1} RETURNING *`;

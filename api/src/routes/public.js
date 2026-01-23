@@ -310,4 +310,81 @@ router.post('/:slug/bookings', async (req, res, next) => {
   }
 });
 
+// ===========================================
+// PUBLIC ORDER TRACKING - Customer can check order status
+// No auth required - accessible via order number
+// ===========================================
+router.get('/order/:orderNumber', async (req, res, next) => {
+  try {
+    const { orderNumber } = req.params;
+    
+    // Find order by order number
+    const result = await db.query(`
+      SELECT 
+        fo.order_number,
+        fo.status,
+        fo.order_type,
+        fo.table_number,
+        fo.items,
+        fo.subtotal,
+        fo.delivery_fee,
+        fo.total,
+        fo.estimated_minutes,
+        fo.estimated_ready_at,
+        fo.status_history,
+        fo.created_at,
+        fo.confirmed_at,
+        fo.ready_at,
+        fo.completed_at,
+        s.name as store_name,
+        s.slug as store_slug,
+        s.config as store_config
+      FROM food_orders fo
+      JOIN stores s ON fo.store_id = s.id
+      WHERE fo.order_number = $1
+    `, [orderNumber.toUpperCase()]);
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+    
+    const order = result.rows[0];
+    
+    // Calculate estimated ready time
+    let estimatedReadyTime = null;
+    if (order.estimated_minutes && order.confirmed_at) {
+      estimatedReadyTime = new Date(new Date(order.confirmed_at).getTime() + order.estimated_minutes * 60000);
+    } else if (order.estimated_ready_at) {
+      estimatedReadyTime = order.estimated_ready_at;
+    }
+    
+    // Public-safe response (no sensitive data)
+    res.json({
+      success: true,
+      order: {
+        order_number: order.order_number,
+        status: order.status,
+        order_type: order.order_type,
+        table_number: order.table_number,
+        items: order.items,
+        subtotal: order.subtotal,
+        delivery_fee: order.delivery_fee,
+        total: order.total,
+        estimated_ready_at: estimatedReadyTime,
+        estimated_minutes: order.estimated_minutes,
+        status_history: order.status_history,
+        created_at: order.created_at,
+        store: {
+          name: order.store_name,
+          slug: order.store_slug,
+          phone: order.store_config?.phone || null,
+          whatsapp: order.store_config?.whatsapp || order.store_config?.phone || null
+        }
+      }
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
 export default router;

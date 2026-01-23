@@ -235,6 +235,14 @@ export function renderCheckoutModal() {
             <h2 class="success-title">Order Confirmed!</h2>
             <p class="order-number">Order #<span id="orderNumber">-</span></p>
             <div class="success-message" id="successMessage"></div>
+            
+            <!-- Track Order Link (for food orders) -->
+            <div class="success-track-order" id="trackOrderSection" style="display: none;">
+              <a href="#" id="trackOrderLink" class="btn-track-order" target="_blank">
+                📍 Track Your Order
+              </a>
+            </div>
+            
             <div class="success-next-steps">
               <div class="next-step-item">
                 <span class="step-num">1</span>
@@ -669,6 +677,17 @@ async function handleCompleteOrder() {
         : `Prepare KES ${total.toLocaleString()} for payment on delivery.`;
       
       document.getElementById('successMessage').textContent = message;
+      
+      // Show tracking link for food orders (Visual Menu template)
+      if (isVisualMenu) {
+        const trackSection = document.getElementById('trackOrderSection');
+        const trackLink = document.getElementById('trackOrderLink');
+        if (trackSection && trackLink) {
+          trackSection.style.display = 'block';
+          trackLink.href = `/order/${result.order_number}`;
+        }
+      }
+      
       goToStep('stepSuccess');
     } else {
       alert(result.error || 'Order failed. Please try again.');
