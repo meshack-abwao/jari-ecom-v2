@@ -22,8 +22,10 @@ export default function RegisterPage() {
 
     try {
       const response = await authAPI.register(formData);
-      if (response.data.success) {
-        navigate('/login');
+      // API returns { token, user } on success - check for token
+      if (response.data.token) {
+        // Registration successful - redirect to login
+        navigate('/login', { state: { message: 'Account created! Please sign in.' } });
       } else {
         setError(response.data.error || 'Registration failed');
       }
