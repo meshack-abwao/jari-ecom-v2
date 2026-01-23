@@ -1,5 +1,5 @@
 import { state } from './state.js';
-import { createOrder } from './api.js';
+import { createOrder, createFoodOrder } from './api.js';
 import { pixel } from './pixel.js';
 
 let selectedPaymentMethod = null;
@@ -654,7 +654,10 @@ async function handleCompleteOrder() {
   };
   
   try {
-    const result = await createOrder(store.slug, orderData);
+    // Route to correct API based on template
+    const result = isVisualMenu 
+      ? await createFoodOrder(store.slug, orderData)
+      : await createOrder(store.slug, orderData);
     
     if (result.success) {
       pixel.purchase(result.order_number, total, currentProduct.id);

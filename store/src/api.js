@@ -43,3 +43,49 @@ export async function createOrder(slug, orderData) {
   console.log('Order created:', result);
   return { success: true, order_number: result.order_number };
 }
+
+// Food orders (Visual Menu template)
+export async function createFoodOrder(slug, orderData) {
+  const payload = {
+    slug: slug,
+    customer_name: orderData.customer?.name,
+    customer_phone: orderData.customer?.phone,
+    delivery_address: orderData.customer?.location,
+    order_type: orderData.order_type || 'delivery',
+    items: orderData.items.map(item => ({
+      productId: item.product_id,
+      productName: item.product_name,
+      quantity: item.quantity,
+      unitPrice: item.unit_price,
+      extras: item.extras || [],
+      specialInstructions: item.special_instructions || '',
+      itemTotal: item.total
+    })),
+    subtotal: orderData.items.reduce((sum, i) => sum + (i.total || 0), 0),
+    delivery_fee: orderData.delivery_fee || 0,
+    total: orderData.total_amount,
+    payment_method: orderData.payment?.method,
+    payment_status: orderData.payment?.payment_confirmed ? 'paid' : 'pending',
+    mpesa_receipt: orderData.payment?.mpesa_code
+  };
+  
+  console.log('Creating FOOD order with payload:', JSON.stringify(payload, null, 2));
+  
+  const res = await fetch(`${API_URL}/api/food-orders`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  
+  console.log('Food order response status:', res.status);
+  
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({}));
+    console.error('Food Order API error:', error);
+    throw new Error(error.error || 'Food order failed');
+  }
+  
+  const result = await res.json();
+  console.log('Food order created:', result);
+  return { success: true, order_number: result.order?.order_number || result.order_number };
+}
