@@ -154,6 +154,7 @@ router.post('/', async (req, res, next) => {
       customer_phone,
       customer_email,
       order_type = 'delivery',
+      table_number,   // For dine-in orders
       delivery_address,
       delivery_instructions,
       scheduled_time,
@@ -200,14 +201,14 @@ router.post('/', async (req, res, next) => {
     const result = await db.query(`
       INSERT INTO food_orders (
         store_id, order_number, customer_name, customer_phone, customer_email,
-        order_type, delivery_address, delivery_instructions, scheduled_time,
+        order_type, table_number, delivery_address, delivery_instructions, scheduled_time,
         items, subtotal, delivery_fee, discount, total,
         payment_method, payment_status, mpesa_receipt, status_history
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
       RETURNING *
     `, [
       resolvedStoreId, orderNumber, customer_name, customer_phone, customer_email,
-      order_type, delivery_address, delivery_instructions, scheduled_time,
+      order_type, table_number || null, delivery_address, delivery_instructions, scheduled_time,
       JSON.stringify(items), subtotal || 0, delivery_fee, discount, total || 0,
       payment_method, payment_status || 'pending', mpesa_receipt, JSON.stringify(statusHistory)
     ]);

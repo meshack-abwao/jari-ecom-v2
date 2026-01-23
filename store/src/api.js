@@ -51,7 +51,8 @@ export async function createFoodOrder(slug, orderData) {
     customer_name: orderData.customer?.name,
     customer_phone: orderData.customer?.phone,
     delivery_address: orderData.customer?.location,
-    order_type: orderData.order_type || 'delivery',
+    table_number: orderData.table_number || null,
+    order_type: orderData.table_number ? 'dine_in' : (orderData.order_type || 'delivery'),
     items: orderData.items.map(item => ({
       productId: item.product_id,
       productName: item.product_name,

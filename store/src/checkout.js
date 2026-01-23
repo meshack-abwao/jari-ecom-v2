@@ -111,9 +111,13 @@ export function renderCheckoutModal() {
               <label for="customerPhone">Phone Number (M-Pesa)</label>
               <input type="tel" id="customerPhone" placeholder="0712 345 678" required autocomplete="tel">
             </div>
-            <div class="form-field">
+            <div class="form-field" id="locationField">
               <label for="customerLocation">Delivery Location</label>
               <input type="text" id="customerLocation" placeholder="Westlands, Nairobi" required>
+            </div>
+            <div class="form-field" id="tableNumberField" style="display: none;">
+              <label for="tableNumber">Table Number (optional)</label>
+              <input type="text" id="tableNumber" placeholder="e.g. Table 5, Outdoor, Counter">
             </div>
           </form>
           
@@ -392,6 +396,12 @@ export function openCheckout() {
     state.vmTotal = total;
   }
   
+  // Show table number field for VM orders (optional for dine-in)
+  const tableField = document.getElementById('tableNumberField');
+  if (tableField) {
+    tableField.style.display = isVisualMenu ? 'block' : 'none';
+  }
+  
   // Reset state
   selectedPaymentMethod = null;
   paymentConfirmed = false;
@@ -640,6 +650,8 @@ async function handleCompleteOrder() {
       phone: document.getElementById('customerPhone')?.value.trim(),
       location: document.getElementById('customerLocation')?.value.trim()
     },
+    // Table number (for dine-in VM orders)
+    table_number: document.getElementById('tableNumber')?.value.trim() || null,
     items: [{
       product_id: currentProduct.id,
       product_name: data.name || 'Product',
