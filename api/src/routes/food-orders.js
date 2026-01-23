@@ -148,33 +148,49 @@ router.get('/:id', auth, async (req, res, next) => {
 router.post('/', async (req, res, next) => {
   try {
     const {
-      storeId,
-      customerName,
-      customerPhone,
-      customerEmail,
-      orderType = 'delivery',
-      deliveryAddress,
-      deliveryInstructions,
-      scheduledTime,
+      slug,           // Store slug (from storefront)
+      storeId,        // Or direct store ID
+      customer_name,
+      customer_phone,
+      customer_email,
+      order_type = 'delivery',
+      delivery_address,
+      delivery_instructions,
+      scheduled_time,
       items,
       subtotal,
-      deliveryFee = 0,
+      delivery_fee = 0,
       discount = 0,
       total,
-      paymentMethod
+      payment_method,
+      payment_status,
+      mpesa_receipt
     } = req.body;
     
-    // Validate required fields
-    if (!storeId || !items || items.length === 0) {
-      return res.status(400).json({ error: 'Store ID and items are required' });
+    // Get store ID from slug if not provided directly
+    let resolvedStoreId = storeId;
+    if (!resolvedStoreId && slug) {
+      const storeResult = await db.query(
+        'SELECT id FROM stores WHERE slug = $1',
+        [slug]
+      );
+      if (storeResult.rows.length === 0) {
+        return res.status(404).json({ error: 'Store not found' });
+      }
+      resolvedStoreId = storeResult.rows[0].id;
     }
     
-    if (!customerPhone) {
+    // Validate required fields
+    if (!resolvedStoreId || !items || items.length === 0) {
+      return res.status(400).json({ error: 'Store ID/slug and items are required' });
+    }
+    
+    if (!customer_phone) {
       return res.status(400).json({ error: 'Customer phone is required' });
     }
     
     // Generate order number
-    const orderNumber = await generateFoodOrderNumber(storeId);
+    const orderNumber = await generateFoodOrderNumber(resolvedStoreId);
     
     // Initial status history
     const statusHistory = [
@@ -186,20 +202,20 @@ router.post('/', async (req, res, next) => {
         store_id, order_number, customer_name, customer_phone, customer_email,
         order_type, delivery_address, delivery_instructions, scheduled_time,
         items, subtotal, delivery_fee, discount, total,
-        payment_method, status_history
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+        payment_method, payment_status, mpesa_receipt, status_history
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
       RETURNING *
     `, [
-      storeId, orderNumber, customerName, customerPhone, customerEmail,
-      orderType, deliveryAddress, deliveryInstructions, scheduledTime,
-      JSON.stringify(items), subtotal, deliveryFee, discount, total,
-      paymentMethod, JSON.stringify(statusHistory)
+      resolvedStoreId, orderNumber, customer_name, customer_phone, customer_email,
+      order_type, delivery_address, delivery_instructions, scheduled_time,
+      JSON.stringify(items), subtotal || 0, delivery_fee, discount, total || 0,
+      payment_method, payment_status || 'pending', mpesa_receipt, JSON.stringify(statusHistory)
     ]);
     
     res.status(201).json({ 
       success: true, 
       order: result.rows[0],
-      orderNumber 
+      order_number: orderNumber 
     });
   } catch (err) {
     next(err);
