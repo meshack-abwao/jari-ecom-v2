@@ -5,6 +5,7 @@
 import { bookingState, updateBookingState, resetBookingState } from './bookingState.js';
 import { bookingApi } from './bookingApi.js';
 import { renderBookingModal, renderStep, renderCalendarDays, renderTimeSlots, renderBookingSuccess } from './bookingModal.js';
+import { pixel } from '../pixel.js';
 
 // Open the booking modal
 export async function openBookingModal(storeSlug, product, preSelectedPackage = null, storeConfig = null) {
@@ -18,6 +19,10 @@ export async function openBookingModal(storeSlug, product, preSelectedPackage = 
     selectedPackage: preSelectedPackage,
     loading: true
   });
+  
+  // Track checkout/booking start
+  const price = preSelectedPackage?.price || product?.data?.price || 0;
+  pixel.checkoutStart(price, 'KES', [{ id: product?.id, name: product?.data?.name, price }]);
   
   // Render initial modal
   renderModal();
@@ -500,6 +505,10 @@ async function handleConfirm() {
       mpesa_code: mpesaCode || null,
       payment_confirmed: paymentConfirmed
     });
+    
+    // Track successful booking as purchase
+    const serviceName = selectedPackage?.name || product?.data?.name || 'Service';
+    pixel.bookingConfirmed(booking?.id || booking?.booking_number, serviceName, totalAmount, 'KES');
     
     // Show success - update step to show all complete
     updateBookingState({ submitting: false, step: 6 }); // Step 6 = success (all perceived steps complete)
