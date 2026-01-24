@@ -102,6 +102,8 @@ export const settingsAPI = {
 // ===========================================
 export const pixelAPI = {
   getStats: (storeId, period = 'today') => api.get(`/pixel/stats/${storeId}?period=${period}`),
+  getAbandoned: (storeId, period = 'week') => api.get(`/pixel/abandoned/${storeId}?period=${period}`),
+  debug: (storeId) => api.get(`/pixel/debug/${storeId}`),
 };
 
 // ===========================================
