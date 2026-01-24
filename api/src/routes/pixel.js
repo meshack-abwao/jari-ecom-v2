@@ -39,11 +39,11 @@ router.get('/debug/:storeId', async (req, res) => {
     
     // Get all events for this store
     const events = await pool.query(
-      `SELECT event, utm_source, utm_medium, created_at 
+      `SELECT event, utm_source, utm_medium, created_at, session_id, data
        FROM pixel_events 
        WHERE store_id = $1 
        ORDER BY created_at DESC 
-       LIMIT 20`,
+       LIMIT 50`,
       [storeId]
     );
     
@@ -91,7 +91,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-// GET /pixel/stats/:storeId - Get traffic stats (authenticated)
+// GET /pixel/stats/:storeId - Get comprehensive traffic & conversion stats
 router.get('/stats/:storeId', async (req, res) => {
   try {
     const { storeId } = req.params;
@@ -99,7 +99,6 @@ router.get('/stats/:storeId', async (req, res) => {
     
     // Calculate date range
     let dateFilter;
-    const now = new Date();
     
     switch (period) {
       case 'today':
@@ -143,7 +142,7 @@ router.get('/stats/:storeId', async (req, res) => {
         AND ${dateFilter}
     `, [storeId]);
     
-    // Get conversion funnel
+    // Get conversion funnel (all events)
     const funnelResult = await pool.query(`
       SELECT 
         event,
@@ -160,6 +159,67 @@ router.get('/stats/:storeId', async (req, res) => {
     funnelResult.rows.forEach(row => {
       funnel[row.event] = parseInt(row.count);
     });
+    
+    // Calculate abandoned checkouts
+    // Abandoned = sessions with checkout_start but no purchase within 30 minutes
+    const abandonedResult = await pool.query(`
+      WITH checkout_sessions AS (
+        SELECT DISTINCT session_id, MIN(created_at) as checkout_time
+        FROM pixel_events
+        WHERE store_id = $1 
+          AND event = 'checkout_start'
+          AND ${dateFilter}
+          AND session_id IS NOT NULL
+        GROUP BY session_id
+      ),
+      purchase_sessions AS (
+        SELECT DISTINCT session_id
+        FROM pixel_events
+        WHERE store_id = $1 
+          AND event = 'purchase'
+          AND ${dateFilter}
+          AND session_id IS NOT NULL
+      )
+      SELECT COUNT(*) as abandoned
+      FROM checkout_sessions cs
+      WHERE cs.session_id NOT IN (SELECT session_id FROM purchase_sessions)
+        AND cs.checkout_time < NOW() - INTERVAL '30 minutes'
+    `, [storeId]);
+    
+    const abandonedCheckouts = parseInt(abandonedResult.rows[0]?.abandoned || 0);
+    
+    // Get conversion rates by source
+    const sourceConversionResult = await pool.query(`
+      WITH source_visitors AS (
+        SELECT utm_source, COUNT(DISTINCT session_id) as visitors
+        FROM pixel_events
+        WHERE store_id = $1 
+          AND event = 'page_view'
+          AND ${dateFilter}
+          AND session_id IS NOT NULL
+        GROUP BY utm_source
+      ),
+      source_purchases AS (
+        SELECT utm_source, COUNT(DISTINCT session_id) as purchases
+        FROM pixel_events
+        WHERE store_id = $1 
+          AND event = 'purchase'
+          AND ${dateFilter}
+          AND session_id IS NOT NULL
+        GROUP BY utm_source
+      )
+      SELECT 
+        sv.utm_source,
+        sv.visitors,
+        COALESCE(sp.purchases, 0) as purchases,
+        CASE WHEN sv.visitors > 0 
+          THEN ROUND((COALESCE(sp.purchases, 0)::numeric / sv.visitors) * 100, 1)
+          ELSE 0 
+        END as conversion_rate
+      FROM source_visitors sv
+      LEFT JOIN source_purchases sp ON sv.utm_source = sp.utm_source
+      ORDER BY sv.visitors DESC
+    `, [storeId]);
     
     // Calculate comparison (previous period)
     let comparisonFilter;
@@ -197,6 +257,16 @@ router.get('/stats/:storeId', async (req, res) => {
       ? Math.round(((currentTotal - previousTotal) / previousTotal) * 100) 
       : 0;
     
+    // Calculate overall metrics
+    const checkoutsStarted = funnel.checkout_start || 0;
+    const purchases = funnel.purchase || 0;
+    const conversionRate = currentTotal > 0 
+      ? ((purchases / currentTotal) * 100).toFixed(1) 
+      : '0.0';
+    const abandonmentRate = checkoutsStarted > 0 
+      ? ((abandonedCheckouts / checkoutsStarted) * 100).toFixed(1) 
+      : '0.0';
+    
     res.json({
       total: currentTotal,
       change,
@@ -205,11 +275,190 @@ router.get('/stats/:storeId', async (req, res) => {
         visitors: parseInt(row.visitors),
         percentage: currentTotal > 0 ? Math.round((parseInt(row.visitors) / currentTotal) * 100) : 0
       })),
-      funnel
+      sourceConversions: sourceConversionResult.rows.map(row => ({
+        source: row.utm_source,
+        visitors: parseInt(row.visitors),
+        purchases: parseInt(row.purchases),
+        conversionRate: parseFloat(row.conversion_rate)
+      })),
+      funnel,
+      metrics: {
+        checkoutsStarted,
+        purchases,
+        abandonedCheckouts,
+        conversionRate: parseFloat(conversionRate),
+        abandonmentRate: parseFloat(abandonmentRate)
+      }
     });
   } catch (error) {
     console.error('Pixel stats error:', error);
     res.status(500).json({ error: 'Failed to fetch stats' });
+  }
+});
+
+// GET /pixel/abandoned/:storeId - Get detailed abandoned checkout data
+router.get('/abandoned/:storeId', async (req, res) => {
+  try {
+    const { storeId } = req.params;
+    const { period = 'week' } = req.query;
+    
+    let dateFilter;
+    switch (period) {
+      case 'today':
+        dateFilter = `created_at >= CURRENT_DATE`;
+        break;
+      case 'week':
+        dateFilter = `created_at >= CURRENT_DATE - INTERVAL '7 days'`;
+        break;
+      case 'month':
+        dateFilter = `created_at >= CURRENT_DATE - INTERVAL '30 days'`;
+        break;
+      default:
+        dateFilter = `created_at >= CURRENT_DATE - INTERVAL '7 days'`;
+    }
+    
+    // Get abandoned sessions with details
+    const abandonedResult = await pool.query(`
+      WITH checkout_sessions AS (
+        SELECT 
+          session_id, 
+          MIN(created_at) as checkout_time,
+          MAX(data) as checkout_data,
+          MAX(utm_source) as source,
+          MAX(device) as device
+        FROM pixel_events
+        WHERE store_id = $1 
+          AND event = 'checkout_start'
+          AND ${dateFilter}
+          AND session_id IS NOT NULL
+        GROUP BY session_id
+      ),
+      purchase_sessions AS (
+        SELECT DISTINCT session_id
+        FROM pixel_events
+        WHERE store_id = $1 
+          AND event = 'purchase'
+          AND ${dateFilter}
+          AND session_id IS NOT NULL
+      )
+      SELECT 
+        cs.session_id,
+        cs.checkout_time,
+        cs.checkout_data,
+        cs.source,
+        cs.device
+      FROM checkout_sessions cs
+      WHERE cs.session_id NOT IN (SELECT session_id FROM purchase_sessions)
+        AND cs.checkout_time < NOW() - INTERVAL '30 minutes'
+      ORDER BY cs.checkout_time DESC
+      LIMIT 100
+    `, [storeId]);
+    
+    // Get abandonment by source
+    const bySourceResult = await pool.query(`
+      WITH checkout_sessions AS (
+        SELECT session_id, utm_source
+        FROM pixel_events
+        WHERE store_id = $1 
+          AND event = 'checkout_start'
+          AND ${dateFilter}
+          AND session_id IS NOT NULL
+      ),
+      purchase_sessions AS (
+        SELECT DISTINCT session_id
+        FROM pixel_events
+        WHERE store_id = $1 
+          AND event = 'purchase'
+          AND ${dateFilter}
+          AND session_id IS NOT NULL
+      )
+      SELECT 
+        cs.utm_source as source,
+        COUNT(*) as abandoned
+      FROM checkout_sessions cs
+      WHERE cs.session_id NOT IN (SELECT session_id FROM purchase_sessions)
+      GROUP BY cs.utm_source
+      ORDER BY abandoned DESC
+    `, [storeId]);
+    
+    // Get abandonment by device
+    const byDeviceResult = await pool.query(`
+      WITH checkout_sessions AS (
+        SELECT session_id, device
+        FROM pixel_events
+        WHERE store_id = $1 
+          AND event = 'checkout_start'
+          AND ${dateFilter}
+          AND session_id IS NOT NULL
+      ),
+      purchase_sessions AS (
+        SELECT DISTINCT session_id
+        FROM pixel_events
+        WHERE store_id = $1 
+          AND event = 'purchase'
+          AND ${dateFilter}
+          AND session_id IS NOT NULL
+      )
+      SELECT 
+        COALESCE(cs.device, 'unknown') as device,
+        COUNT(*) as abandoned
+      FROM checkout_sessions cs
+      WHERE cs.session_id NOT IN (SELECT session_id FROM purchase_sessions)
+      GROUP BY cs.device
+      ORDER BY abandoned DESC
+    `, [storeId]);
+    
+    // Get abandonment by hour of day
+    const byHourResult = await pool.query(`
+      WITH checkout_sessions AS (
+        SELECT session_id, created_at
+        FROM pixel_events
+        WHERE store_id = $1 
+          AND event = 'checkout_start'
+          AND ${dateFilter}
+          AND session_id IS NOT NULL
+      ),
+      purchase_sessions AS (
+        SELECT DISTINCT session_id
+        FROM pixel_events
+        WHERE store_id = $1 
+          AND event = 'purchase'
+          AND ${dateFilter}
+          AND session_id IS NOT NULL
+      )
+      SELECT 
+        EXTRACT(HOUR FROM cs.created_at) as hour,
+        COUNT(*) as abandoned
+      FROM checkout_sessions cs
+      WHERE cs.session_id NOT IN (SELECT session_id FROM purchase_sessions)
+      GROUP BY EXTRACT(HOUR FROM cs.created_at)
+      ORDER BY hour
+    `, [storeId]);
+    
+    res.json({
+      recentAbandoned: abandonedResult.rows.map(row => ({
+        sessionId: row.session_id,
+        time: row.checkout_time,
+        data: row.checkout_data,
+        source: row.source,
+        device: row.device
+      })),
+      bySource: bySourceResult.rows.map(row => ({
+        source: row.source || 'direct',
+        abandoned: parseInt(row.abandoned)
+      })),
+      byDevice: byDeviceResult.rows.map(row => ({
+        device: row.device,
+        abandoned: parseInt(row.abandoned)
+      })),
+      byHour: byHourResult.rows.map(row => ({
+        hour: parseInt(row.hour),
+        abandoned: parseInt(row.abandoned)
+      }))
+    });
+  } catch (error) {
+    console.error('Abandoned checkout error:', error);
+    res.status(500).json({ error: 'Failed to fetch abandoned data' });
   }
 });
 
