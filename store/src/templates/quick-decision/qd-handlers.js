@@ -5,12 +5,26 @@
 // ===========================================
 
 import { state } from '../../state.js';
+import { initGalleryHandlers, initStoryHandlers } from '../../shared/media-components.js';
+import { initPolicyModalHandlers } from '../../shared/policy-modals.js';
 
 /**
  * Initialize Quick Decision template event handlers
  * Called after template is rendered into DOM
+ * @param {object} product - Product object
  */
-export function initQuickDecisionHandlers() {
+export function initQuickDecisionHandlers(product) {
+  const media = product?.media || {};
+  
+  // Gallery handlers
+  initGalleryHandlers(media.images || []);
+  
+  // Story handlers
+  initStoryHandlers(media.stories || []);
+  
+  // Policy modal handlers
+  initPolicyModalHandlers();
+  
   // Back button
   const backBtn = document.getElementById('backBtn');
   if (backBtn) {

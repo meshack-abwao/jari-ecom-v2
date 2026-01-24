@@ -5,6 +5,8 @@ import { renderCheckoutModal, initCheckout, openCheckout } from './checkout.js';
 import { initPixel, pixel } from './pixel.js';
 import { initPortfolioBookingHandlers } from './templates/portfolioBookingHandlers.js';
 import { initVisualMenuHandlers } from './templates/visual-menu/vm-handlers.js';
+import { initDeepDiveHandlers } from './templates/deep-dive/dd-handlers.js';
+import { initQuickDecisionHandlers } from './templates/quick-decision/qd-handlers.js';
 import { initOrderTracking } from './order-tracking.js';
 import { renderLandingPage, initLandingHandlers } from './landing/landing.js';
 import './landing/landing.css'; // Import landing CSS so Vite bundles it
@@ -263,6 +265,16 @@ function renderProductView(product) {
   // Visual-Menu template specific handlers
   if (product.template === 'visual-menu') {
     initVisualMenuHandlers(product);
+  }
+  
+  // Deep-Dive template specific handlers
+  if (product.template === 'deep-dive') {
+    initDeepDiveHandlers(product);
+  }
+  
+  // Quick-Decision template specific handlers
+  if (product.template === 'quick-decision') {
+    initQuickDecisionHandlers(product);
   }
   
   initCheckout();
