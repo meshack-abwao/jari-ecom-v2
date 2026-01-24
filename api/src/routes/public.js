@@ -99,6 +99,10 @@ router.get('/:slug', async (req, res, next) => {
         font_family: config.font_family || config.fontFamily || 'Inter',
         // Contact
         contact_phone: config.contact_phone || config.contactPhone || '',
+        // Pixel tracking (Meta, TikTok, Google)
+        config: {
+          pixels: config.pixels || {}
+        },
         // Payment (M-Pesa)
         payment: {
           type: config.payment_type || config.paymentType || '',
