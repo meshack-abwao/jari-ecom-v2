@@ -70,6 +70,7 @@ export function initPlatformPixels() {
   if (pixelsInitialized) return;
   
   const store = state.store;
+  console.log('🎯 Pixel init - store data:', { storeId: store?.id, config: store?.config });
   const pixels = store?.config?.pixels || {};
   
   // Initialize Meta Pixel
