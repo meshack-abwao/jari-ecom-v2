@@ -208,9 +208,9 @@ export function initStoryHandlers(stories) {
   }
   
   // Open story on bubble click
-  document.querySelectorAll('.story-bubble').forEach(bubble => {
-    bubble.addEventListener('click', () => {
-      const index = parseInt(bubble.dataset.storyIndex);
+  document.querySelectorAll('.story-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const index = parseInt(item.dataset.storyIndex);
       showStory(index);
     });
   });

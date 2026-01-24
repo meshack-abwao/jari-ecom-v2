@@ -248,7 +248,7 @@ function renderProductView(product) {
   
   initProductHandlers(product);
   initGalleryHandlers(product);
-  initStoryHandlers(product);
+  initStoryHandlers(product.media?.stories || []);
   initShowcaseHandlers();
   initProductPolicyHandlers();
   initStorePolicyHandlers();
