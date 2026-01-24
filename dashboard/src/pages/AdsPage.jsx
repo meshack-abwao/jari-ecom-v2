@@ -581,17 +581,19 @@ const styles = {
     background: '#22c55e', borderRadius: '50%'
   },
   
-  // Setup Banner
+  // Setup Banner - Sleek inline style
   setupBanner: {
-    display: 'flex', alignItems: 'center', gap: '16px', padding: '16px 20px',
-    marginBottom: '24px', background: 'rgba(251, 191, 36, 0.08)', border: '1px solid rgba(251, 191, 36, 0.2)'
+    display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px',
+    marginBottom: '24px', background: 'var(--bg-secondary)', border: '1px solid var(--border-color)',
+    borderRadius: '12px'
   },
   setupBannerText: { flex: 1 },
-  setupBannerTitle: { fontSize: '15px', fontWeight: '600', color: 'var(--text-primary)', margin: 0 },
-  setupBannerDesc: { fontSize: '13px', color: 'var(--text-muted)', margin: '4px 0 0 0' },
+  setupBannerTitle: { fontSize: '14px', fontWeight: '500', color: 'var(--text-primary)', margin: 0 },
+  setupBannerDesc: { fontSize: '12px', color: 'var(--text-muted)', margin: '2px 0 0 0' },
   setupBannerBtn: {
-    padding: '10px 20px', background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-    border: 'none', borderRadius: '8px', color: 'white', fontSize: '13px', fontWeight: '600', cursor: 'pointer'
+    padding: '8px 16px', background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+    border: 'none', borderRadius: '8px', color: 'white', fontSize: '13px', fontWeight: '600', cursor: 'pointer',
+    whiteSpace: 'nowrap'
   },
   
   filterRow: { display: 'flex', alignItems: 'center', gap: '12px', marginTop: '8px', marginBottom: '24px' },
@@ -607,14 +609,14 @@ const styles = {
   sectionTitle: { fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)', margin: 0 },
   sectionSubtitle: { fontSize: '13px', color: 'var(--text-muted)', margin: '4px 0 0 0' },
   
-  // Funnel
+  // Funnel - THIN bars like traffic sources
   funnelContainer: { display: 'flex', flexDirection: 'column', gap: '12px' },
   funnelStep: { display: 'flex', alignItems: 'center', gap: '12px' },
-  funnelLabel: { width: '140px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
-  funnelStepName: { fontSize: '14px', fontWeight: '500', color: 'var(--text-primary)' },
-  funnelStepValue: { fontSize: '13px', color: 'var(--text-muted)', fontWeight: '600' },
-  funnelBarContainer: { flex: 1, height: '24px', background: 'var(--bg-tertiary)', borderRadius: '6px', overflow: 'hidden' },
-  funnelBar: { height: '100%', background: 'linear-gradient(90deg, #8b5cf6, #a855f7)', borderRadius: '6px', transition: 'width 0.5s ease', minWidth: '4px' },
+  funnelLabel: { width: '120px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
+  funnelStepName: { fontSize: '14px', fontWeight: '500', color: 'var(--text-primary)', textTransform: 'capitalize' },
+  funnelStepValue: { fontSize: '13px', color: 'var(--text-muted)' },
+  funnelBarContainer: { flex: 1, height: '8px', background: 'var(--bg-tertiary)', borderRadius: '4px', overflow: 'hidden' },
+  funnelBar: { height: '100%', background: 'linear-gradient(90deg, #8b5cf6, #a855f7)', borderRadius: '4px', transition: 'width 0.5s ease', minWidth: '4px' },
   funnelDropOff: { width: '50px', fontSize: '12px', fontWeight: '600', color: '#ef4444', textAlign: 'right' },
   
   // Sources
