@@ -3,6 +3,7 @@
 // Isolated - prefix: pbk
 // ===========================================
 import { state } from '../state.js';
+import { navigateToCollection } from '../shared/utils.js';
 
 let currentImageIndex = 0;
 let heroImages = []; // Store image objects with captions
@@ -79,8 +80,7 @@ export function initPortfolioBookingHandlers() {
   
   // Back button
   document.getElementById('backBtn')?.addEventListener('click', () => {
-    window.history.pushState({}, '', window.location.pathname);
-    window.dispatchEvent(new Event('popstate'));
+    navigateToCollection();
   });
   
   // Stories

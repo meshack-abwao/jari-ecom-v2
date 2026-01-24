@@ -7,6 +7,7 @@
 import { state } from '../../state.js';
 import { initGalleryHandlers, initStoryHandlers } from '../../shared/media-components.js';
 import { initPolicyModalHandlers } from '../../shared/policy-modals.js';
+import { navigateToCollection } from '../../shared/utils.js';
 
 /**
  * Initialize Quick Decision template event handlers
@@ -29,7 +30,7 @@ export function initQuickDecisionHandlers(product) {
   const backBtn = document.getElementById('backBtn');
   if (backBtn) {
     backBtn.addEventListener('click', () => {
-      window.history.back();
+      navigateToCollection();
     });
   }
   

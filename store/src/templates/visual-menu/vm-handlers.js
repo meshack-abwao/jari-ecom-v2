@@ -4,6 +4,7 @@
 
 import { initStoryHandlers } from '../../shared/media-components.js';
 import { initPolicyModalHandlers } from '../../shared/policy-modals.js';
+import { navigateToCollection } from '../../shared/utils.js';
 
 /**
  * Initialize all Visual Menu template handlers
@@ -122,13 +123,7 @@ function initBackButton() {
   if (!backBtn) return;
   
   backBtn.addEventListener('click', () => {
-    if (window.history.length > 1) {
-      window.history.back();
-    } else {
-      const urlParts = window.location.pathname.split('/');
-      urlParts.pop();
-      window.location.href = urlParts.join('/') || '/';
-    }
+    navigateToCollection();
   });
 }
 

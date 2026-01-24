@@ -5,6 +5,7 @@
 // ===========================================
 
 import { state } from '../../state.js';
+import { navigateToCollection } from '../../shared/utils.js';
 
 /**
  * Initialize Event Landing template event handlers
@@ -15,7 +16,7 @@ export function initEventLandingHandlers() {
   const backBtn = document.getElementById('backBtn');
   if (backBtn) {
     backBtn.addEventListener('click', () => {
-      window.history.back();
+      navigateToCollection();
     });
   }
   

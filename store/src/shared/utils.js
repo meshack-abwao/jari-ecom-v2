@@ -127,3 +127,15 @@ export function isEmpty(value) {
   if (typeof value === 'object') return Object.keys(value).length === 0;
   return false;
 }
+
+/**
+ * Navigate back to collection page (SPA-friendly)
+ * Works consistently across all templates
+ */
+export function navigateToCollection() {
+  // Clear the product ID from URL and trigger re-render via popstate
+  const url = new URL(window.location.href);
+  url.searchParams.delete('product');
+  window.history.pushState({}, '', url.toString());
+  window.dispatchEvent(new Event('popstate'));
+}

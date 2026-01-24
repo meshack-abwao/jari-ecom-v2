@@ -6,7 +6,7 @@
 import { initGalleryHandlers, initStoryHandlers } from '../../shared/media-components.js';
 import { initPolicyModalHandlers } from '../../shared/policy-modals.js';
 import { initShowcaseViewerHandlers } from './dd-showcase-viewer.js';
-import { formatPrice } from '../../shared/utils.js';
+import { formatPrice, navigateToCollection } from '../../shared/utils.js';
 
 /**
  * Initialize all Deep Dive template handlers
@@ -128,15 +128,7 @@ function initBackButton() {
   if (!backBtn) return;
   
   backBtn.addEventListener('click', () => {
-    // Check if there's a history state to go back to
-    if (window.history.length > 1) {
-      window.history.back();
-    } else {
-      // Navigate to collection page
-      const urlParts = window.location.pathname.split('/');
-      urlParts.pop(); // Remove product slug
-      window.location.href = urlParts.join('/') || '/';
-    }
+    navigateToCollection();
   });
 }
 
