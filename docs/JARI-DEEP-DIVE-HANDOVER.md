@@ -149,6 +149,22 @@ import './landing/landing.css';
 - Only THEN animate current bar with transition
 - Added auto-advance timer (5 seconds)
 
+### Bug 5: Back Button Not Working on Some Templates
+**Symptom:** Clicking "Back to All Products" did nothing or navigated incorrectly
+**Cause:** Different templates used different approaches:
+- Some used `window.history.back()` (fails on direct links)
+- Some used URL manipulation (inconsistent)
+**Fix:** Created shared `navigateToCollection()` utility function in `shared/utils.js`:
+```javascript
+export function navigateToCollection() {
+  const url = new URL(window.location.href);
+  url.searchParams.delete('product');
+  window.history.pushState({}, '', url.toString());
+  window.dispatchEvent(new Event('popstate'));
+}
+```
+Updated ALL template handlers to use this shared function.
+
 ---
 
 ## 📁 KEY FILES MODIFIED
@@ -183,6 +199,16 @@ return params.get('store') || import.meta.env.VITE_STORE_SLUG || null;
 - Complete rewrite of progress bar logic
 - Added auto-advance timer
 - Added proper cleanup on close
+
+### shared/utils.js Changes
+- Added `navigateToCollection()` function for SPA-friendly back navigation
+
+### All Template Handlers Updated
+- `dd-handlers.js` - Use `navigateToCollection()`
+- `vm-handlers.js` - Use `navigateToCollection()`
+- `qd-handlers.js` - Use `navigateToCollection()`
+- `el-handlers.js` - Use `navigateToCollection()`
+- `portfolioBookingHandlers.js` - Use `navigateToCollection()`
 
 ---
 
@@ -257,11 +283,28 @@ if (!slug) {
 cd C:\path; git add -A; git commit -m "message"; git push origin main
 ```
 
+### Formula 7: Back Button Navigation (SPA)
+```javascript
+// ❌ WRONG - Fails on direct links, inconsistent behavior
+window.history.back();
+
+// ❌ WRONG - Full page reload, loses state
+window.location.href = '/collection';
+
+// ✅ CORRECT - SPA-friendly, triggers popstate listener
+import { navigateToCollection } from '../../shared/utils.js';
+// Then in click handler:
+navigateToCollection();
+// This removes ?product= param and triggers re-render
+```
+
 ---
 
 ## 📊 COMMITS THIS SESSION
 
 ```
+5a11474 Fix-back-button-across-all-templates-use-shared-navigateToCollection
+62f42f1 Add-comprehensive-handover-document-with-debug-formulas
 aa4691a Fix-story-progress-bar-animate-only-current-bar-add-auto-advance
 c059f9a Fix-add-missing-template-handler-calls-for-DeepDive-and-QuickDecision
 257ce27 Fix-story-handlers-pass-stories-array-and-fix-click-target
