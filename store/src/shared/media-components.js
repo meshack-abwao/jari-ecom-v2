@@ -175,6 +175,7 @@ export function initStoryHandlers(stories) {
   if (!stories || stories.length === 0) return;
   
   let currentStoryIndex = 0;
+  let storyTimer = null;
   const viewer = document.getElementById('storyViewer');
   const storyImage = document.getElementById('storyImage');
   const closeBtn = document.getElementById('storyClose');
@@ -186,25 +187,66 @@ export function initStoryHandlers(stories) {
   
   function showStory(index) {
     if (!stories[index] || !stories[index].url) return;
+    
+    // Clear any existing timer
+    if (storyTimer) {
+      clearTimeout(storyTimer);
+      storyTimer = null;
+    }
+    
     currentStoryIndex = index;
     storyImage.src = stories[index].url;
     viewer.classList.add('active');
     
+    // Reset ALL progress bars first
     progressBars.forEach((bar, i) => {
-      bar.style.width = i < index ? '100%' : i === index ? '0%' : '0%';
-      if (i === index) {
-        bar.style.transition = 'width 5s linear';
-        setTimeout(() => bar.style.width = '100%', 50);
+      bar.style.transition = 'none';
+      if (i < index) {
+        // Already viewed - full
+        bar.style.width = '100%';
+      } else {
+        // Not yet viewed - empty
+        bar.style.width = '0%';
       }
     });
+    
+    // Animate ONLY the current bar after a brief delay
+    const currentBar = progressBars[index];
+    if (currentBar) {
+      // Force reflow to ensure transition works
+      currentBar.offsetHeight;
+      currentBar.style.transition = 'width 5s linear';
+      setTimeout(() => {
+        currentBar.style.width = '100%';
+      }, 50);
+    }
+    
+    // Auto-advance after 5 seconds
+    storyTimer = setTimeout(() => {
+      if (currentStoryIndex < stories.length - 1) {
+        showStory(currentStoryIndex + 1);
+      } else {
+        closeViewer();
+      }
+    }, 5000);
   }
   
   function closeViewer() {
+    // Clear timer
+    if (storyTimer) {
+      clearTimeout(storyTimer);
+      storyTimer = null;
+    }
+    
     viewer.classList.remove('active');
+    
+    // Reset all progress bars
     progressBars.forEach(bar => {
       bar.style.transition = 'none';
       bar.style.width = '0%';
     });
+    
+    currentStoryIndex = 0;
   }
   
   // Open story on bubble click
