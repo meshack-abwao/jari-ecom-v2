@@ -315,6 +315,25 @@ export const mpesaAPI = {
 };
 
 // ===========================================
+// COMPLAINTS API (Phase F)
+// ===========================================
+export const complaintsAPI = {
+  // Get all complaints for merchant's store
+  getAll: () => api.get('/complaints'),
+  
+  // Get complaint statistics
+  getStats: () => api.get('/complaints/stats'),
+  
+  // Respond to a complaint (resolve/reject)
+  respond: (complaintId, resolution, status) => 
+    api.put(`/complaints/${complaintId}/respond`, { resolution, status }),
+  
+  // Generate complaint link for an order
+  generateLink: (orderId) => 
+    api.post('/complaints/generate-link', { orderId }),
+};
+
+// ===========================================
 // LEGACY API (for backwards compatibility)
 // ===========================================
 export const legacyApi = {
