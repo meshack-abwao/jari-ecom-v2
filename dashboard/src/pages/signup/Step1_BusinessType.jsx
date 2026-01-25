@@ -18,8 +18,8 @@ export default function Step1_BusinessType({ data, updateData, nextStep }) {
     {
       id: 'painPoints',
       type: 'multi',
-      question: "What's making your business life harder than it needs to be?",
-      subtitle: "Pick all that apply—we've got solutions for each one",
+      question: "What's holding your business back right now?",
+      subtitle: "Pick what resonates—we'll help you fix these",
       options: [
         {
           value: 'endless_questions',
@@ -64,8 +64,8 @@ export default function Step1_BusinessType({ data, updateData, nextStep }) {
       id: 'customerJobs',
       type: 'multi',
       maxSelections: 2,
-      question: "When customers buy from you, what are they really looking for?",
-      subtitle: "Pick 1-2 options — first one is your primary customer mindset",
+      question: "How do your customers think when they're buying?",
+      subtitle: "Pick 1-2 that match your customers' mindset",
       options: [
         {
           value: 'functional_quick',
@@ -132,8 +132,8 @@ export default function Step1_BusinessType({ data, updateData, nextStep }) {
     {
       id: 'desiredOutcomes',
       type: 'multi',
-      question: "What would success look like for you?",
-      subtitle: "Pick your top goals—we'll help you get there",
+      question: "What does winning look like for you?",
+      subtitle: "Pick your top goals—your store will help you achieve them",
       options: [
         {
           value: 'save_time',
@@ -293,19 +293,18 @@ export default function Step1_BusinessType({ data, updateData, nextStep }) {
           transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
         }}>
           <h1 style={styles.introHeading}>
-            Welcome! Let's build your perfect online store.
+            Ready to grow your business?
           </h1>
           <p style={styles.introText}>
-            We know running a business in Kenya is challenging. Before we start,
-            we'd love to understand what you're looking for—this helps us set up
-            your store exactly right.
+            You're about to create an online store that actually works for your business.
+            Let's start by understanding what makes your business unique.
           </p>
           <p style={styles.introSubtext}>
-            Takes about 60 seconds. No wrong answers.
+            Takes 60 seconds. Every answer helps us set you up for success.
           </p>
           
           <button onClick={handleStartQuestionnaire} style={styles.startButton}>
-            Let's get started →
+            Build My Store →
           </button>
 
           <p style={styles.skipText}>
@@ -359,6 +358,21 @@ export default function Step1_BusinessType({ data, updateData, nextStep }) {
             const selectionIndex = isJobQuestion && isSelected 
               ? (answers[currentQ.id] || []).indexOf(option.value) + 1
               : null;
+            
+            // Extract primary color from gradient for clean border
+            const getBorderColor = (gradient) => {
+              if (!gradient) return '#667eea';
+              // Map gradients to their primary colors
+              const colorMap = {
+                'linear-gradient(135deg, #f59e0b 0%, #ea580c 100%)': '#f59e0b', // Orange
+                'linear-gradient(135deg, #ec4899 0%, #db2777 100%)': '#ec4899', // Pink
+                'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)': '#8b5cf6', // Purple
+                'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)': '#3b82f6', // Blue
+                'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)': '#f59e0b', // Gold
+                'linear-gradient(135deg, #10b981 0%, #059669 100%)': '#10b981', // Green
+              };
+              return colorMap[gradient] || '#667eea';
+            };
 
             return (
               <button
@@ -373,28 +387,37 @@ export default function Step1_BusinessType({ data, updateData, nextStep }) {
                 style={{
                   ...styles.optionCard,
                   ...(isJobQuestion && styles.jobCard),
-                  borderColor: isSelected ? (option.gradient ? 'transparent' : '#667eea') : 'rgba(0, 0, 0, 0.08)',
-                  borderImage: isSelected && option.gradient ? `${option.gradient} 1` : 'none',
-                  background: isSelected && option.gradient 
-                    ? `${option.gradient}`
-                    : isSelected 
-                    ? 'rgba(102, 126, 234, 0.04)' 
-                    : 'white',
+                  // Clean selection style for job question - solid color border
+                  ...(isJobQuestion && {
+                    borderColor: isSelected ? getBorderColor(option.gradient) : 'rgba(0, 0, 0, 0.08)',
+                    borderWidth: isSelected ? '3px' : '2px',
+                    background: 'white',
+                  }),
+                  // Default selection style for other questions
+                  ...(!isJobQuestion && {
+                    borderColor: isSelected ? '#667eea' : 'rgba(0, 0, 0, 0.08)',
+                    background: isSelected ? 'rgba(102, 126, 234, 0.04)' : 'white',
+                  }),
                   animationDelay: `${index * 50}ms`,
                 }}
               >
                 {/* Selection order badge for job question */}
                 {isJobQuestion && selectionIndex && (
                   <div style={{
-                    ...styles.selectionBadge,
-                    background: selectionIndex === 1 
-                      ? 'rgba(255, 255, 255, 0.95)' 
-                      : 'rgba(255, 255, 255, 0.75)',
+                    position: 'absolute',
+                    top: '16px',
+                    right: '16px',
+                    padding: '6px 14px',
+                    borderRadius: '980px',
+                    background: 'white',
+                    border: `2px solid ${getBorderColor(option.gradient)}`,
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
                   }}>
                     <span style={{
                       fontSize: '11px',
-                      fontWeight: 600,
-                      color: '#667eea',
+                      fontWeight: 700,
+                      color: getBorderColor(option.gradient),
+                      letterSpacing: '0.5px',
                     }}>
                       {selectionIndex === 1 ? 'PRIMARY' : 'SECONDARY'}
                     </span>
@@ -403,12 +426,23 @@ export default function Step1_BusinessType({ data, updateData, nextStep }) {
 
                 <div style={{
                   ...styles.iconCircle,
-                  background: isSelected && option.gradient
-                    ? 'rgba(255, 255, 255, 0.2)'
-                    : isSelected
-                    ? 'linear-gradient(135deg, #667eea, #764ba2)'
-                    : '#f5f5f7',
-                  color: isSelected ? 'white' : '#667eea',
+                  // Job question: gradient icon circle when selected
+                  ...(isJobQuestion && isSelected && {
+                    background: option.gradient,
+                    color: 'white',
+                  }),
+                  // Job question: gray when not selected
+                  ...(isJobQuestion && !isSelected && {
+                    background: '#f5f5f7',
+                    color: '#86868b',
+                  }),
+                  // Other questions: standard styling
+                  ...(!isJobQuestion && {
+                    background: isSelected 
+                      ? 'linear-gradient(135deg, #667eea, #764ba2)'
+                      : '#f5f5f7',
+                    color: isSelected ? 'white' : '#667eea',
+                  }),
                 }}
                   dangerouslySetInnerHTML={{ __html: option.svg }}
                 />
@@ -416,7 +450,7 @@ export default function Step1_BusinessType({ data, updateData, nextStep }) {
                 <div style={styles.optionContent}>
                   <div style={{
                     ...styles.optionLabel,
-                    color: isSelected && option.gradient ? 'white' : '#1d1d1f',
+                    color: '#1d1d1f', // Always dark text
                   }}>
                     {option.label}
                   </div>
@@ -425,7 +459,7 @@ export default function Step1_BusinessType({ data, updateData, nextStep }) {
                   {isJobQuestion && option.customerThinking && (
                     <div style={{
                       ...styles.customerThinking,
-                      color: isSelected && option.gradient ? 'rgba(255,255,255,0.95)' : '#6b7280',
+                      color: isSelected ? '#4b5563' : '#6b7280', // Darker when selected
                     }}>
                       {option.customerThinking}
                     </div>
@@ -433,7 +467,7 @@ export default function Step1_BusinessType({ data, updateData, nextStep }) {
                   
                   <div style={{
                     ...styles.optionSubtext,
-                    color: isSelected && option.gradient ? 'rgba(255,255,255,0.9)' : '#86868b',
+                    color: '#86868b', // Always gray
                   }}>
                     {isJobQuestion ? `Examples: ${option.examples}` : option.subtext}
                   </div>
@@ -441,16 +475,23 @@ export default function Step1_BusinessType({ data, updateData, nextStep }) {
                   {/* Show template name for job question */}
                   {isJobQuestion && option.template && (
                     <div style={{
-                      ...styles.templateBadge,
-                      background: isSelected ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.05)',
-                      color: isSelected ? 'white' : '#667eea',
+                      display: 'inline-block',
+                      padding: '6px 12px',
+                      borderRadius: '980px',
+                      fontSize: '12px',
+                      fontWeight: 600,
+                      marginTop: '4px',
+                      letterSpacing: '0.3px',
+                      background: isSelected ? `${getBorderColor(option.gradient)}15` : 'rgba(0,0,0,0.05)',
+                      color: isSelected ? getBorderColor(option.gradient) : '#667eea',
+                      border: isSelected ? `1px solid ${getBorderColor(option.gradient)}30` : 'none',
                     }}>
                       Template: {option.template}
                     </div>
                   )}
                 </div>
 
-                {isSelected && !option.gradient && (
+                {isSelected && !isJobQuestion && (
                   <div style={styles.selectedCheck}>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
                       <path d="M20 6L9 17l-5-5"/>
@@ -479,7 +520,7 @@ export default function Step1_BusinessType({ data, updateData, nextStep }) {
                 cursor: canContinue() ? 'pointer' : 'not-allowed',
               }}
             >
-              {currentQuestion === questions.length - 1 ? "Let's build your store →" : 'Continue →'}
+              {currentQuestion === questions.length - 1 ? "Start Growing My Business →" : 'Continue →'}
             </button>
           )}
         </div>
@@ -542,7 +583,7 @@ const styles = {
     fontWeight: 600,
     border: 'none',
     borderRadius: '980px',
-    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
     color: 'white',
     cursor: 'pointer',
     boxShadow: '0 8px 24px rgba(102, 126, 234, 0.3)',
@@ -583,7 +624,7 @@ const styles = {
 
   progressFill: {
     height: '100%',
-    background: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)',
+    background: 'linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 75%, #f5576c 100%)',
     transition: 'width 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
     borderRadius: '2px',
   },
@@ -741,7 +782,7 @@ const styles = {
     fontWeight: 600,
     border: 'none',
     borderRadius: '980px',
-    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
     color: 'white',
     cursor: 'pointer',
     transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
