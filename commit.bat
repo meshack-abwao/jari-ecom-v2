@@ -1,6 +1,6 @@
 @echo off
 cd /d C:\Users\ADMIN\Desktop\jari-ecom-v2
 git add -A
-git commit -m "F2.2-Dashboard-complaintsAPI-client-getAll-stats-respond-generateLink"
+git commit -m "Fix: Migration 009 - DROP and recreate tables to fix partial state error"
 git push origin main
-git log --oneline -6
+git log --oneline -5
