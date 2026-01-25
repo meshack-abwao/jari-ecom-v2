@@ -7,39 +7,46 @@ export default function Step3_BasicInfo({ data, updateData, nextStep, prevStep }
     email: data.email || '',
     phone: data.phone || '',
     password: data.password || '',
-    confirmPassword: '',
   });
-  
+
   const [errors, setErrors] = useState({});
-  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleChange = (field, value) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    // Clear error when user starts typing
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: '' }));
+    }
+  };
 
   const validate = () => {
     const newErrors = {};
 
-    if (!formData.storeName || formData.storeName.length < 3) {
-      newErrors.storeName = 'Store name must be at least 3 characters';
+    if (!formData.storeName.trim()) {
+      newErrors.storeName = 'Store name is required';
     }
 
-    if (!formData.ownerName || formData.ownerName.length < 2) {
-      newErrors.ownerName = 'Your name must be at least 2 characters';
+    if (!formData.ownerName.trim()) {
+      newErrors.ownerName = 'Your name is required';
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!formData.email || !emailRegex.test(formData.email)) {
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Please enter a valid email';
     }
 
-    const phoneRegex = /^\+254[17]\d{8}$/;
-    if (!formData.phone || !phoneRegex.test(formData.phone)) {
-      newErrors.phone = 'Format: +254712345678 or +254112345678';
+    if (!formData.phone.trim()) {
+      newErrors.phone = 'Phone number is required';
+    } else if (!/^(\+254|0)[17]\d{8}$/.test(formData.phone.replace(/\s/g, ''))) {
+      newErrors.phone = 'Please enter a valid Kenyan phone number';
     }
 
-    if (!formData.password || formData.password.length < 6) {
+    if (!formData.password) {
+      newErrors.password = 'Password is required';
+    } else if (formData.password.length < 6) {
       newErrors.password = 'Password must be at least 6 characters';
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
     }
 
     return newErrors;
@@ -47,247 +54,231 @@ export default function Step3_BasicInfo({ data, updateData, nextStep, prevStep }
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
     const newErrors = validate();
-    setErrors(newErrors);
 
-    if (Object.keys(newErrors).length === 0) {
-      // Update signup data (remove confirmPassword)
-      const { confirmPassword, ...dataToSave } = formData;
-      updateData(dataToSave);
-      nextStep();
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
     }
-  };
 
-  const handleChange = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    // Clear error for this field
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
+    // Normalize phone number
+    let normalizedPhone = formData.phone.replace(/\s/g, '');
+    if (normalizedPhone.startsWith('0')) {
+      normalizedPhone = '+254' + normalizedPhone.slice(1);
     }
-  };
 
-  // Generate slug preview
-  const slugPreview = formData.storeName
-    .toLowerCase()
-    .replace(/[^a-z0-9]/g, '-')
-    .replace(/-+/g, '-')
-    .slice(0, 30);
+    updateData({
+      ...formData,
+      phone: normalizedPhone,
+    });
+
+    nextStep();
+  };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.content}>
-        <button onClick={prevStep} style={styles.backButton}>
+    <form onSubmit={handleSubmit} style={styles.form}>
+      {/* Store Name */}
+      <div style={styles.fieldGroup}>
+        <label style={styles.label}>Store Name</label>
+        <input
+          type="text"
+          value={formData.storeName}
+          onChange={(e) => handleChange('storeName', e.target.value)}
+          placeholder="e.g., Nairobi Cafe"
+          style={{
+            ...styles.input,
+            borderColor: errors.storeName ? '#ef4444' : '#d2d2d7',
+          }}
+        />
+        {errors.storeName && <span style={styles.error}>{errors.storeName}</span>}
+      </div>
+
+      {/* Owner Name */}
+      <div style={styles.fieldGroup}>
+        <label style={styles.label}>Your Name</label>
+        <input
+          type="text"
+          value={formData.ownerName}
+          onChange={(e) => handleChange('ownerName', e.target.value)}
+          placeholder="e.g., John Kamau"
+          style={{
+            ...styles.input,
+            borderColor: errors.ownerName ? '#ef4444' : '#d2d2d7',
+          }}
+        />
+        {errors.ownerName && <span style={styles.error}>{errors.ownerName}</span>}
+      </div>
+
+      {/* Email */}
+      <div style={styles.fieldGroup}>
+        <label style={styles.label}>Email Address</label>
+        <input
+          type="email"
+          value={formData.email}
+          onChange={(e) => handleChange('email', e.target.value)}
+          placeholder="your@email.com"
+          style={{
+            ...styles.input,
+            borderColor: errors.email ? '#ef4444' : '#d2d2d7',
+          }}
+        />
+        {errors.email && <span style={styles.error}>{errors.email}</span>}
+      </div>
+
+      {/* Phone */}
+      <div style={styles.fieldGroup}>
+        <label style={styles.label}>Phone Number (M-Pesa)</label>
+        <input
+          type="tel"
+          value={formData.phone}
+          onChange={(e) => handleChange('phone', e.target.value)}
+          placeholder="+254712345678 or 0712345678"
+          style={{
+            ...styles.input,
+            borderColor: errors.phone ? '#ef4444' : '#d2d2d7',
+          }}
+        />
+        {errors.phone && <span style={styles.error}>{errors.phone}</span>}
+        <span style={styles.hint}>This will be your M-Pesa payment number</span>
+      </div>
+
+      {/* Password */}
+      <div style={styles.fieldGroup}>
+        <label style={styles.label}>Password</label>
+        <div style={styles.passwordContainer}>
+          <input
+            type={showPassword ? 'text' : 'password'}
+            value={formData.password}
+            onChange={(e) => handleChange('password', e.target.value)}
+            placeholder="At least 6 characters"
+            style={{
+              ...styles.input,
+              borderColor: errors.password ? '#ef4444' : '#d2d2d7',
+              marginBottom: 0,
+            }}
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            style={styles.eyeButton}
+          >
+            {showPassword ? '👁️' : '👁️‍🗨️'}
+          </button>
+        </div>
+        {errors.password && <span style={styles.error}>{errors.password}</span>}
+      </div>
+
+      {/* Buttons */}
+      <div style={styles.buttonGroup}>
+        <button
+          type="button"
+          onClick={prevStep}
+          style={styles.backButton}
+        >
           ← Back
         </button>
-
-        <h2 style={styles.heading}>Let's set up your store</h2>
-        <p style={styles.subheading}>Quick details - takes less than a minute</p>
-
-        <form onSubmit={handleSubmit} style={styles.form}>
-          {/* Store Name */}
-          <div style={styles.formGroup}>
-            <label style={styles.label}>Store Name *</label>
-            <input
-              type="text"
-              value={formData.storeName}
-              onChange={(e) => handleChange('storeName', e.target.value)}
-              placeholder="Jari Solutions"
-              style={{
-                ...styles.input,
-                borderColor: errors.storeName ? '#ef4444' : '#d1d5db',
-              }}
-            />
-            {errors.storeName && <span style={styles.error}>{errors.storeName}</span>}
-            {slugPreview && !errors.storeName && (
-              <span style={styles.hint}>
-                Your store URL: jarisolutionsecom.store/?store={slugPreview}
-              </span>
-            )}
-          </div>
-
-          {/* Owner Name */}
-          <div style={styles.formGroup}>
-            <label style={styles.label}>Your Name *</label>
-            <input
-              type="text"
-              value={formData.ownerName}
-              onChange={(e) => handleChange('ownerName', e.target.value)}
-              placeholder="John Doe"
-              style={{
-                ...styles.input,
-                borderColor: errors.ownerName ? '#ef4444' : '#d1d5db',
-              }}
-            />
-            {errors.ownerName && <span style={styles.error}>{errors.ownerName}</span>}
-          </div>
-
-          {/* Email */}
-          <div style={styles.formGroup}>
-            <label style={styles.label}>Email Address *</label>
-            <input
-              type="email"
-              value={formData.email}
-              onChange={(e) => handleChange('email', e.target.value)}
-              placeholder="you@example.com"
-              style={{
-                ...styles.input,
-                borderColor: errors.email ? '#ef4444' : '#d1d5db',
-              }}
-            />
-            {errors.email && <span style={styles.error}>{errors.email}</span>}
-          </div>
-
-          {/* Phone */}
-          <div style={styles.formGroup}>
-            <label style={styles.label}>Phone Number (M-Pesa) *</label>
-            <input
-              type="tel"
-              value={formData.phone}
-              onChange={(e) => handleChange('phone', e.target.value)}
-              placeholder="+254712345678"
-              style={{
-                ...styles.input,
-                borderColor: errors.phone ? '#ef4444' : '#d1d5db',
-              }}
-            />
-            {errors.phone && <span style={styles.error}>{errors.phone}</span>}
-            {!errors.phone && (
-              <span style={styles.hint}>We'll send an OTP to verify this number</span>
-            )}
-          </div>
-
-          {/* Password */}
-          <div style={styles.formGroup}>
-            <label style={styles.label}>Password *</label>
-            <input
-              type="password"
-              value={formData.password}
-              onChange={(e) => handleChange('password', e.target.value)}
-              placeholder="••••••••"
-              style={{
-                ...styles.input,
-                borderColor: errors.password ? '#ef4444' : '#d1d5db',
-              }}
-            />
-            {errors.password && <span style={styles.error}>{errors.password}</span>}
-          </div>
-
-          {/* Confirm Password */}
-          <div style={styles.formGroup}>
-            <label style={styles.label}>Confirm Password *</label>
-            <input
-              type="password"
-              value={formData.confirmPassword}
-              onChange={(e) => handleChange('confirmPassword', e.target.value)}
-              placeholder="••••••••"
-              style={{
-                ...styles.input,
-                borderColor: errors.confirmPassword ? '#ef4444' : '#d1d5db',
-              }}
-            />
-            {errors.confirmPassword && <span style={styles.error}>{errors.confirmPassword}</span>}
-          </div>
-
-          <button type="submit" style={styles.submitButton} disabled={loading}>
-            {loading ? 'Saving...' : 'Continue →'}
-          </button>
-        </form>
+        <button type="submit" style={styles.nextButton}>
+          Continue →
+        </button>
       </div>
-    </div>
+    </form>
   );
 }
 
 const styles = {
-  container: {
-    display: 'flex',
-    justifyContent: 'center',
-  },
-  
-  content: {
-    width: '100%',
-    maxWidth: '500px',
-  },
-  
-  backButton: {
-    background: 'rgba(255, 255, 255, 0.2)',
-    color: 'white',
-    border: 'none',
-    padding: '0.5rem 1rem',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    marginBottom: '1rem',
-    fontSize: '0.875rem',
-    fontWeight: '500',
-  },
-  
-  heading: {
-    fontSize: '2rem',
-    fontWeight: 'bold',
-    color: 'white',
-    textAlign: 'center',
-    marginBottom: '0.5rem',
-  },
-  
-  subheading: {
-    fontSize: '1.125rem',
-    color: 'rgba(255, 255, 255, 0.9)',
-    textAlign: 'center',
-    marginBottom: '2rem',
-  },
-  
   form: {
-    background: 'rgba(255, 255, 255, 0.95)',
-    borderRadius: '16px',
-    padding: '2rem',
+    width: '100%',
+    maxWidth: '480px',
+    margin: '0 auto',
   },
-  
-  formGroup: {
-    marginBottom: '1.5rem',
+
+  fieldGroup: {
+    marginBottom: '24px',
   },
-  
+
   label: {
     display: 'block',
-    fontSize: '0.875rem',
-    fontWeight: '600',
-    color: '#374151',
-    marginBottom: '0.5rem',
+    fontSize: '14px',
+    fontWeight: 600,
+    color: '#1d1d1f',
+    marginBottom: '8px',
+    letterSpacing: '-0.01em',
   },
-  
+
   input: {
     width: '100%',
-    padding: '0.75rem',
-    border: '2px solid',
-    borderRadius: '8px',
-    fontSize: '1rem',
-    transition: 'border-color 0.3s ease',
-    boxSizing: 'border-box',
+    padding: '14px 16px',
+    fontSize: '16px',
+    border: '2px solid #d2d2d7',
+    borderRadius: '12px',
+    outline: 'none',
+    transition: 'all 0.2s ease',
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Inter", sans-serif',
+    backgroundColor: 'white',
   },
-  
+
+  passwordContainer: {
+    position: 'relative',
+  },
+
+  eyeButton: {
+    position: 'absolute',
+    right: '12px',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    fontSize: '20px',
+    padding: '4px',
+  },
+
   error: {
     display: 'block',
-    fontSize: '0.75rem',
+    fontSize: '12px',
     color: '#ef4444',
-    marginTop: '0.25rem',
+    marginTop: '6px',
   },
-  
+
   hint: {
     display: 'block',
-    fontSize: '0.75rem',
-    color: '#6b7280',
-    marginTop: '0.25rem',
+    fontSize: '12px',
+    color: '#86868b',
+    marginTop: '6px',
   },
-  
-  submitButton: {
-    width: '100%',
-    backgroundColor: '#10b981',
-    color: 'white',
-    border: 'none',
-    padding: '1rem',
+
+  buttonGroup: {
+    display: 'flex',
+    gap: '12px',
+    marginTop: '32px',
+  },
+
+  backButton: {
+    flex: 1,
+    padding: '14px 24px',
+    fontSize: '16px',
+    fontWeight: 500,
+    border: '2px solid #d2d2d7',
     borderRadius: '12px',
-    fontSize: '1rem',
-    fontWeight: '600',
+    background: 'white',
+    color: '#1d1d1f',
     cursor: 'pointer',
-    marginTop: '1rem',
+    transition: 'all 0.2s ease',
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Inter", sans-serif',
+  },
+
+  nextButton: {
+    flex: 2,
+    padding: '14px 24px',
+    fontSize: '16px',
+    fontWeight: 500,
+    border: 'none',
+    borderRadius: '12px',
+    background: 'linear-gradient(135deg, #f97316, #ea580c)',
+    color: 'white',
+    cursor: 'pointer',
+    transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Inter", sans-serif',
+    boxShadow: '0 4px 12px rgba(249, 115, 22, 0.25)',
   },
 };

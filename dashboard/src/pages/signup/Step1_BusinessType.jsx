@@ -1,130 +1,120 @@
 import { useState } from 'react';
-import { authAPI } from '../../api/client';
 
 export default function Step1_BusinessType({ data, updateData, nextStep }) {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [selectedType, setSelectedType] = useState('');
 
   const businessTypes = [
     {
       id: 'food',
       name: 'Food & Restaurants',
-      icon: '🍽️',
-      description: 'Restaurants, cafes, food delivery',
-      examples: 'Menu ordering, food galleries, quick checkout',
-      color: '#f59e0b',
+      description: 'Menus, food delivery, cafes',
+      image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=80',
+      gradient: 'linear-gradient(135deg, #f59e0b 0%, #ea580c 100%)',
     },
     {
       id: 'services',
       name: 'Services & Booking',
-      icon: '📸',
-      description: 'Photography, consulting, salons',
-      examples: 'Portfolio showcase, booking calendar, packages',
-      color: '#8b5cf6',
+      description: 'Photography, consulting, appointments',
+      image: 'https://images.unsplash.com/photo-1556740758-90de374c12ad?w=800&q=80',
+      gradient: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
     },
     {
       id: 'products',
       name: 'Products & Retail',
-      icon: '🛍️',
-      description: 'Online shops, retail stores',
-      examples: 'Product catalog, quick buy, inventory',
-      color: '#3b82f6',
+      description: 'Online shops, fashion, merchandise',
+      image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&q=80',
+      gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
     },
     {
       id: 'premium',
       name: 'Premium & Luxury',
-      icon: '💎',
-      description: 'High-end products, luxury goods',
-      examples: 'Detailed specs, premium imagery, trust signals',
-      color: '#ec4899',
+      description: 'High-end products, jewelry, watches',
+      image: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800&q=80',
+      gradient: 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)',
     },
     {
       id: 'events',
       name: 'Events & Tickets',
-      icon: '🎫',
-      description: 'Concerts, conferences, workshops',
-      examples: 'Event landing pages, ticket booking, countdown',
-      color: '#10b981',
+      description: 'Concerts, workshops, conferences',
+      image: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&q=80',
+      gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
     },
   ];
 
-  const handleSelect = async (businessType) => {
-    setLoading(true);
-    setError('');
+  const handleSelect = (type) => {
+    setSelectedType(type.id);
+    
+    // Map business type to template
+    const templateMap = {
+      food: 'vm',
+      services: 'pbk',
+      products: 'qd',
+      premium: 'dd',
+      events: 'events'
+    };
+    
+    // Map to smart add-ons
+    const addonMap = {
+      food: ['mpesa_stk', 'whatsapp_auto'],
+      services: ['mpesa_stk'],
+      products: ['mpesa_stk', 'whatsapp_auto'],
+      premium: ['mpesa_stk', 'priority_support'],
+      events: ['mpesa_stk', 'whatsapp_auto']
+    };
 
-    try {
-      // Call API to get template recommendations
-      const response = await authAPI.post('/auth/signup/business-type', {
-        businessType: businessType.id,
-      });
+    // Update signup data
+    updateData({
+      businessType: type.id,
+      defaultTemplate: templateMap[type.id],
+      smartAddons: addonMap[type.id],
+    });
 
-      const { defaultTemplate, templateName, smartAddons } = response.data;
-
-      // Update signup data
-      updateData({
-        businessType: businessType.id,
-        defaultTemplate,
-        templateName,
-        smartAddons,
-      });
-
-      // Move to next step
+    // Auto-advance after short delay (visual feedback)
+    setTimeout(() => {
       nextStep();
-    } catch (err) {
-      setError('Failed to load template. Please try again.');
-      setLoading(false);
-    }
+    }, 400);
   };
 
   return (
     <div style={styles.container}>
-      <div style={styles.content}>
-        <h2 style={styles.heading}>What are you selling?</h2>
-        <p style={styles.subheading}>
-          Choose your business type to get the perfect template
-        </p>
+      <div style={styles.grid}>
+        {businessTypes.map((type) => (
+          <div
+            key={type.id}
+            onClick={() => handleSelect(type)}
+            style={{
+              ...styles.card,
+              transform: selectedType === type.id ? 'scale(0.98)' : 'scale(1)',
+              opacity: selectedType && selectedType !== type.id ? 0.5 : 1,
+            }}
+          >
+            {/* Image with gradient overlay */}
+            <div style={styles.imageContainer}>
+              <img 
+                src={type.image} 
+                alt={type.name}
+                style={styles.image}
+              />
+              <div style={{
+                ...styles.gradientOverlay,
+                background: type.gradient,
+              }} />
+            </div>
 
-        {error && <div style={styles.error}>{error}</div>}
-
-        <div style={styles.grid}>
-          {businessTypes.map((type) => (
-            <button
-              key={type.id}
-              onClick={() => handleSelect(type)}
-              disabled={loading}
-              style={{
-                ...styles.card,
-                borderColor: type.color,
-                opacity: loading ? 0.6 : 1,
-                cursor: loading ? 'not-allowed' : 'pointer',
-              }}
-              className="glass-card"
-            >
-              <div style={styles.iconContainer}>
-                <span style={{ ...styles.icon, color: type.color }}>{type.icon}</span>
-              </div>
-              
+            {/* Content */}
+            <div style={styles.cardContent}>
               <h3 style={styles.cardTitle}>{type.name}</h3>
               <p style={styles.cardDescription}>{type.description}</p>
-              
-              <div style={styles.examples}>
-                <span style={styles.examplesLabel}>Includes:</span>
-                <span style={styles.examplesText}>{type.examples}</span>
-              </div>
+            </div>
 
-              <div style={{ ...styles.selectButton, backgroundColor: type.color }}>
-                {loading ? 'Loading...' : 'Choose This'}
+            {/* Selected indicator */}
+            {selectedType === type.id && (
+              <div style={styles.selectedBadge}>
+                <div style={styles.checkmark}>✓</div>
               </div>
-            </button>
-          ))}
-        </div>
-
-        {/* Trust messaging */}
-        <div style={styles.trustBar}>
-          <span style={styles.trustItem}>✓ Free template included</span>
-          <span style={styles.trustItem}>✓ Change anytime</span>
-          <span style={styles.trustItem}>✓ 50+ merchants already selling</span>
-        </div>
+            )}
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -132,123 +122,86 @@ export default function Step1_BusinessType({ data, updateData, nextStep }) {
 
 const styles = {
   container: {
-    display: 'flex',
-    justifyContent: 'center',
-  },
-  
-  content: {
     width: '100%',
-    maxWidth: '900px',
   },
-  
-  heading: {
-    fontSize: '2rem',
-    fontWeight: 'bold',
-    color: 'white',
-    textAlign: 'center',
-    marginBottom: '0.5rem',
-  },
-  
-  subheading: {
-    fontSize: '1.125rem',
-    color: 'rgba(255, 255, 255, 0.9)',
-    textAlign: 'center',
-    marginBottom: '2rem',
-  },
-  
-  error: {
-    backgroundColor: '#fee2e2',
-    color: '#991b1b',
-    padding: '1rem',
-    borderRadius: '8px',
-    marginBottom: '1rem',
-    textAlign: 'center',
-  },
-  
+
   grid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-    gap: '1.5rem',
-    marginBottom: '2rem',
+    gap: '20px',
   },
-  
+
   card: {
-    background: 'rgba(255, 255, 255, 0.95)',
-    borderRadius: '16px',
-    padding: '2rem',
-    border: '3px solid',
-    transition: 'all 0.3s ease',
-    textAlign: 'center',
     position: 'relative',
-    backdropFilter: 'blur(10px)',
+    background: 'white',
+    borderRadius: '16px',
+    overflow: 'hidden',
+    cursor: 'pointer',
+    transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+    border: '2px solid transparent',
   },
-  
-  iconContainer: {
-    marginBottom: '1rem',
-  },
-  
-  icon: {
-    fontSize: '3rem',
-  },
-  
-  cardTitle: {
-    fontSize: '1.25rem',
-    fontWeight: '600',
-    color: '#1f2937',
-    marginBottom: '0.5rem',
-  },
-  
-  cardDescription: {
-    fontSize: '0.875rem',
-    color: '#6b7280',
-    marginBottom: '1rem',
-  },
-  
-  examples: {
-    backgroundColor: '#f3f4f6',
-    borderRadius: '8px',
-    padding: '0.75rem',
-    marginBottom: '1.5rem',
-    textAlign: 'left',
-  },
-  
-  examplesLabel: {
-    fontSize: '0.75rem',
-    fontWeight: '600',
-    color: '#4b5563',
-    display: 'block',
-    marginBottom: '0.25rem',
-  },
-  
-  examplesText: {
-    fontSize: '0.75rem',
-    color: '#6b7280',
-    lineHeight: '1.4',
-  },
-  
-  selectButton: {
-    padding: '0.75rem 1.5rem',
-    borderRadius: '8px',
-    color: 'white',
-    fontWeight: '600',
-    fontSize: '0.875rem',
-    border: 'none',
+
+  imageContainer: {
+    position: 'relative',
     width: '100%',
+    height: '180px',
+    overflow: 'hidden',
   },
-  
-  trustBar: {
+
+  image: {
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+    transition: 'transform 0.4s ease',
+  },
+
+  gradientOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    opacity: 0.3,
+    transition: 'opacity 0.3s ease',
+  },
+
+  cardContent: {
+    padding: '20px',
+  },
+
+  cardTitle: {
+    fontSize: '18px',
+    fontWeight: 600,
+    color: '#1d1d1f',
+    marginBottom: '6px',
+    letterSpacing: '-0.01em',
+  },
+
+  cardDescription: {
+    fontSize: '14px',
+    color: '#86868b',
+    lineHeight: 1.4,
+    margin: 0,
+  },
+
+  selectedBadge: {
+    position: 'absolute',
+    top: '12px',
+    right: '12px',
+    width: '32px',
+    height: '32px',
+    background: 'white',
+    borderRadius: '50%',
     display: 'flex',
+    alignItems: 'center',
     justifyContent: 'center',
-    gap: '2rem',
-    flexWrap: 'wrap',
-    padding: '1.5rem',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: '12px',
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
   },
-  
-  trustItem: {
-    color: 'white',
-    fontSize: '0.875rem',
-    fontWeight: '500',
+
+  checkmark: {
+    color: '#10b981',
+    fontSize: '18px',
+    fontWeight: 'bold',
   },
 };
