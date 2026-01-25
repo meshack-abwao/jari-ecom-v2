@@ -9,6 +9,7 @@
     "migrate": "node migrations/run.js"
   },
   "dependencies": {
+    "africastalking": "^0.7.3",
     "axios": "^1.13.2",
     "bcryptjs": "^3.0.0",
     "cloudinary": "^2.9.0",
