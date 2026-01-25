@@ -242,6 +242,22 @@ export const cardsAPI = {
 };
 
 // ===========================================
+// TEMPLATES API (Template Management)
+// ===========================================
+export const templatesAPI = {
+  // Get available templates with unlock status
+  getAvailable: () => api.get('/templates/available'),
+  
+  // Unlock a template (after payment)
+  unlock: (templateId, paymentRef) => 
+    api.post('/templates/unlock', { templateId, paymentRef }),
+  
+  // Assign template to a product
+  assign: (productId, templateId) => 
+    api.put(`/templates/assign/${productId}`, { templateId }),
+};
+
+// ===========================================
 // M-PESA PAYMENTS API
 // ===========================================
 export const mpesaAPI = {
