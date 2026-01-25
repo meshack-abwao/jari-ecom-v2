@@ -180,3 +180,10 @@ export function renderLandingPage() {
 </script>
   `;
 }
+
+// Handler initialization for landing page
+export function initLandingHandlers() {
+  // Mobile menu toggle is already handled via onclick in HTML
+  // No additional handlers needed for now
+  console.log('Landing page handlers initialized');
+}
