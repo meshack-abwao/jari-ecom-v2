@@ -13,6 +13,7 @@ import FoodOrdersPage from './pages/FoodOrdersPage';
 import SettingsPage from './pages/SettingsPage';
 import TemplatesPage from './pages/TemplatesPage';
 import AddOnsPage from './pages/AddOnsPage';
+import SubscriptionPage from './pages/SubscriptionPage';
 import AdsPage from './pages/AdsPage';
 import BookingsPage from './pages/BookingsPage';
 
@@ -61,6 +62,7 @@ export default function App() {
               <Route path="bookings" element={<BookingsPage />} />
               <Route path="ads" element={<AdsPage />} />
               <Route path="add-ons" element={<AddOnsPage />} />
+              <Route path="subscription" element={<SubscriptionPage />} />
               <Route path="settings" element={<SettingsPage />} />
             </Route>
           </Routes>
