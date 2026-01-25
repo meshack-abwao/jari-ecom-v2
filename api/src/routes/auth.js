@@ -53,6 +53,10 @@ router.post('/signup/business-type', async (req, res, next) => {
 /**
  * Step 2: Complete Registration (with all collected data)
  * POST /api/auth/signup/complete
+ * 
+ * SIMPLIFIED VERSION: Works without Migration 008 tables
+ * Creates basic user + store only
+ * Phase A tables (verification, settlement, etc.) will be added when migration runs
  */
 router.post('/signup/complete', async (req, res, next) => {
   try {
@@ -73,16 +77,10 @@ router.post('/signup/complete', async (req, res, next) => {
       // Step 5 data
       verificationTier, // 'BASIC', 'VERIFIED', 'BUSINESS'
       
-      // Optional documents (if VERIFIED/BUSINESS selected)
-      nationalIdFront,
-      nationalIdBack,
-      businessRegDoc,
-      kraDoc
-      
     } = req.body;
     
     // Validation
-    if (!storeName || !ownerName || !email || !phone || !password || !businessType) {
+    if (!storeName || !ownerName || !email || !phone || !password) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
     
@@ -91,7 +89,11 @@ router.post('/signup/complete', async (req, res, next) => {
       .toLowerCase()
       .replace(/[^a-z0-9]/g, '-')
       .replace(/-+/g, '-')
+      .replace(/^-+|-+$/g, '') // Remove leading/trailing hyphens
       .slice(0, 50);
+    
+    // Add random suffix if slug is too short
+    const finalSlug = slug.length < 3 ? `${slug}-${Date.now().toString(36)}` : slug;
     
     const hash = await bcrypt.hash(password, 10);
     
@@ -104,12 +106,19 @@ router.post('/signup/complete', async (req, res, next) => {
       const userResult = await client.query(
         `INSERT INTO users (email, password_hash, profile)
          VALUES ($1, $2, $3) RETURNING id, email, profile`,
-        [email, hash, { business_name: storeName, owner_name: ownerName, phone }]
+        [email, hash, { 
+          business_name: storeName, 
+          owner_name: ownerName, 
+          phone,
+          business_type: businessType,
+          verification_tier: verificationTier,
+          selected_addons: selectedAddons
+        }]
       );
       
       const user = userResult.rows[0];
       
-      // 2. Create store with business_type and initial settings
+      // 2. Create store
       const templateMap = {
         food: 'vm',
         services: 'pbk',
@@ -118,91 +127,124 @@ router.post('/signup/complete', async (req, res, next) => {
         events: 'events'
       };
       
-      const defaultTemplate = templateMap[businessType];
+      const defaultTemplate = templateMap[businessType] || 'qd';
       
-      const storeResult = await client.query(
-        `INSERT INTO stores (
-          user_id, slug, config, business_type, 
-          card_limit, unlocked_themes, onboarding_completed
-        )
-         VALUES ($1, $2, $3, $4, $5, $6, $7)
-         RETURNING id`,
-        [
-          user.id,
-          slug,
-          { 
-            name: storeName, 
-            tagline: '', 
-            theme: 'warm-sunset',
-            contact_phone: phone
-          },
-          businessType,
-          3, // Initial 3 cards
-          JSON.stringify([defaultTemplate]), // Free template unlocked
-          true // Onboarding complete
-        ]
-      );
+      // Check if stores table has new columns (business_type, card_limit, etc.)
+      const storeColumnsCheck = await client.query(`
+        SELECT column_name 
+        FROM information_schema.columns 
+        WHERE table_name = 'stores' AND column_name IN ('business_type', 'card_limit', 'unlocked_themes')
+      `);
+      
+      const hasNewColumns = storeColumnsCheck.rows.length === 3;
+      
+      let storeResult;
+      if (hasNewColumns) {
+        // Use new schema
+        storeResult = await client.query(
+          `INSERT INTO stores (
+            user_id, slug, config, business_type, 
+            card_limit, unlocked_themes, onboarding_completed
+          )
+           VALUES ($1, $2, $3, $4, $5, $6, $7)
+           RETURNING id, slug`,
+          [
+            user.id,
+            finalSlug,
+            { 
+              name: storeName, 
+              tagline: '', 
+              theme: 'warm-sunset',
+              contact_phone: phone
+            },
+            businessType,
+            3, // Initial 3 cards
+            JSON.stringify([defaultTemplate]), // Free template unlocked
+            true // Onboarding complete
+          ]
+        );
+      } else {
+        // Use old schema (backward compatible)
+        storeResult = await client.query(
+          `INSERT INTO stores (user_id, slug, config)
+           VALUES ($1, $2, $3)
+           RETURNING id, slug`,
+          [
+            user.id,
+            finalSlug,
+            { 
+              name: storeName, 
+              tagline: '', 
+              theme: 'warm-sunset',
+              contact_phone: phone,
+              business_type: businessType,
+              verification_tier: verificationTier
+            }
+          ]
+        );
+      }
       
       const storeId = storeResult.rows[0].id;
+      const returnedSlug = storeResult.rows[0].slug;
       
-      // 3. Create merchant verification record
-      const tierDefaults = {
-        BASIC: { monthly_limit: 50000, per_tx_limit: 10000, delay: 3 },
-        VERIFIED: { monthly_limit: 500000, per_tx_limit: 50000, delay: 2 },
-        BUSINESS: { monthly_limit: null, per_tx_limit: null, delay: 0 }
-      };
-      
-      const tierConfig = tierDefaults[verificationTier] || tierDefaults.BASIC;
-      
-      await client.query(
-        `INSERT INTO merchant_verification (
-          store_id, tier, phone_verified, email_verified,
-          monthly_limit, per_transaction_limit, settlement_delay_days,
-          national_id_front_url, national_id_back_url,
-          business_reg_document_url, kra_document_url
-        )
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
-        [
-          storeId,
-          verificationTier,
-          false, // Will verify via OTP
-          false, // Will verify via email link
-          tierConfig.monthly_limit,
-          tierConfig.per_tx_limit,
-          tierConfig.delay,
-          nationalIdFront || null,
-          nationalIdBack || null,
-          businessRegDoc || null,
-          kraDoc || null
-        ]
-      );
-      
-      // 4. Create settlement rules
-      await client.query(
-        `INSERT INTO settlement_rules (
-          store_id, hold_period_days
-        )
-         VALUES ($1, $2)`,
-        [storeId, tierConfig.delay]
-      );
-      
-      // 5. Create complaint metrics (initialize)
-      await client.query(
-        `INSERT INTO complaint_metrics (store_id)
-         VALUES ($1)`,
-        [storeId]
-      );
-      
-      // 6. Create merchant badges (initialize)
-      await client.query(
-        `INSERT INTO merchant_badges (store_id)
-         VALUES ($1)`,
-        [storeId]
-      );
-      
-      // 7. Activate selected add-ons (if payment successful)
-      // NOTE: This will be handled by M-Pesa callback in Phase E
-      // For now, just store the selected add-ons in user profile
+      // 3-6. Try to create Phase A tables if they exist (graceful degradation)
+      try {
+        // Check if merchant_verification table exists
+        const tableCheck = await client.query(`
+          SELECT EXISTS (
+            SELECT FROM information_schema.tables 
+            WHERE table_name = 'merchant_verification'
+          );
+        `);
+        
+        if (tableCheck.rows[0].exists) {
+          const tierDefaults = {
+            BASIC: { monthly_limit: 50000, per_tx_limit: 10000, delay: 3 },
+            VERIFIED: { monthly_limit: 500000, per_tx_limit: 50000, delay: 2 },
+            BUSINESS: { monthly_limit: null, per_tx_limit: null, delay: 0 }
+          };
+          
+          const tierConfig = tierDefaults[verificationTier] || tierDefaults.BASIC;
+          
+          await client.query(
+            `INSERT INTO merchant_verification (
+              store_id, tier, phone_verified, email_verified,
+              monthly_limit, per_transaction_limit, settlement_delay_days
+            )
+             VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+            [
+              storeId,
+              verificationTier,
+              false,
+              false,
+              tierConfig.monthly_limit,
+              tierConfig.per_tx_limit,
+              tierConfig.delay
+            ]
+          );
+          
+          await client.query(
+            `INSERT INTO settlement_rules (store_id, hold_period_days)
+             VALUES ($1, $2)`,
+            [storeId, tierConfig.delay]
+          );
+          
+          await client.query(
+            `INSERT INTO complaint_metrics (store_id)
+             VALUES ($1)`,
+            [storeId]
+          );
+          
+          await client.query(
+            `INSERT INTO merchant_badges (store_id)
+             VALUES ($1)`,
+            [storeId]
+          );
+        }
+      } catch (phaseAError) {
+        // Phase A tables don't exist - that's okay, continue without them
+        console.log('Phase A tables not found, continuing with basic signup:', phaseAError.message);
+      }
       
       await client.query('COMMIT');
       
@@ -223,14 +265,10 @@ router.post('/signup/complete', async (req, res, next) => {
         },
         store: {
           id: storeId,
-          slug,
+          slug: returnedSlug,
           name: storeName,
-          storeUrl: `https://jarisolutionsecom.store/?store=${slug}`,
+          storeUrl: `https://jarisolutionsecom.store/?store=${returnedSlug}`,
           dashboardUrl: `https://dashboard.jarisolutionsecom.store`
-        },
-        verification: {
-          tier: verificationTier,
-          settlementDelay: tierConfig.delay
         }
       });
       
@@ -242,10 +280,11 @@ router.post('/signup/complete', async (req, res, next) => {
     }
     
   } catch (err) {
+    console.error('Signup error:', err);
     if (err.code === '23505') {
-      return res.status(409).json({ error: 'Email or store URL already exists' });
+      return res.status(409).json({ error: 'Email or store name already exists. Please try different values.' });
     }
-    next(err);
+    res.status(500).json({ error: 'Failed to create account. Please try again.' });
   }
 });
 
