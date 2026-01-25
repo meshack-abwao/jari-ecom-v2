@@ -9,6 +9,7 @@ import bookingsRoutes from './bookings.js';
 import uploadRoutes from './upload.js';
 import mpesaRoutes from './mpesa.js';
 import cloudinaryRoutes from './cloudinary.js';
+import otpRoutes from './otp.js';
 
 export function setupRoutes(app) {
   // Health check
@@ -30,6 +31,7 @@ export function setupRoutes(app) {
   app.use('/api/upload', uploadRoutes);
   app.use('/api/mpesa', mpesaRoutes);
   app.use('/api/cloudinary', cloudinaryRoutes);
+  app.use('/api/otp', otpRoutes);
   
   // Public store routes (no /api prefix for cleaner URLs)
   app.use('/s', publicRoutes);
