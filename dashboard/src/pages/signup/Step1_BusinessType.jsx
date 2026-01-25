@@ -1,15 +1,20 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function Step1_BusinessType({ data, updateData, nextStep }) {
-  const [step, setStep] = useState('intro'); // 'intro' | 'questionnaire'
+  const [step, setStep] = useState('intro');
   const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
   const [answers, setAnswers] = useState({
-    painPoints: [],         // Multi-select
-    sellingWhat: null,      // Single select
-    desiredOutcomes: [],    // Multi-select
+    painPoints: [],
+    sellingWhat: null,
+    desiredOutcomes: [],
   });
 
-  // JTBD Questions with SVG icons
+  // Fade-in animation on mount
+  useEffect(() => {
+    setTimeout(() => setIsVisible(true), 100);
+  }, []);
+
   const questions = [
     {
       id: 'painPoints',
@@ -137,7 +142,11 @@ export default function Step1_BusinessType({ data, updateData, nextStep }) {
   const progress = currentQ ? ((currentQuestion + 1) / questions.length) * 100 : 0;
 
   const handleStartQuestionnaire = () => {
-    setStep('questionnaire');
+    setIsVisible(false);
+    setTimeout(() => {
+      setStep('questionnaire');
+      setIsVisible(true);
+    }, 300);
   };
 
   const handleToggleMulti = (questionId, value) => {
@@ -152,11 +161,13 @@ export default function Step1_BusinessType({ data, updateData, nextStep }) {
 
   const handleSelectSingle = (questionId, value) => {
     setAnswers(prev => ({ ...prev, [questionId]: value }));
-    
-    // Auto-advance after brief pause
     setTimeout(() => {
       if (currentQuestion < questions.length - 1) {
-        setCurrentQuestion(currentQuestion + 1);
+        setIsVisible(false);
+        setTimeout(() => {
+          setCurrentQuestion(currentQuestion + 1);
+          setIsVisible(true);
+        }, 200);
       } else {
         processAnswersAndContinue();
       }
@@ -165,7 +176,11 @@ export default function Step1_BusinessType({ data, updateData, nextStep }) {
 
   const handleContinue = () => {
     if (currentQuestion < questions.length - 1) {
-      setCurrentQuestion(currentQuestion + 1);
+      setIsVisible(false);
+      setTimeout(() => {
+        setCurrentQuestion(currentQuestion + 1);
+        setIsVisible(true);
+      }, 200);
     } else {
       processAnswersAndContinue();
     }
@@ -173,7 +188,11 @@ export default function Step1_BusinessType({ data, updateData, nextStep }) {
 
   const handleBack = () => {
     if (currentQuestion > 0) {
-      setCurrentQuestion(currentQuestion - 1);
+      setIsVisible(false);
+      setTimeout(() => {
+        setCurrentQuestion(currentQuestion - 1);
+        setIsVisible(true);
+      }, 200);
     }
   };
 
@@ -216,7 +235,11 @@ export default function Step1_BusinessType({ data, updateData, nextStep }) {
   if (step === 'intro') {
     return (
       <div style={styles.introContainer}>
-        <div style={styles.introContent}>
+        <div style={{
+          ...styles.introCard,
+          opacity: isVisible ? 1 : 0,
+          transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
+        }}>
           <h1 style={styles.introHeading}>
             Welcome! Let's build your perfect online store.
           </h1>
@@ -244,116 +267,130 @@ export default function Step1_BusinessType({ data, updateData, nextStep }) {
   // Questionnaire
   return (
     <div style={styles.container}>
-      {/* Progress */}
-      <div style={styles.progressSection}>
-        <div style={styles.progressBar}>
-          <div style={{ ...styles.progressFill, width: `${progress}%` }} />
+      <div style={{
+        opacity: isVisible ? 1 : 0,
+        transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
+        transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+      }}>
+        {/* Progress */}
+        <div style={styles.progressSection}>
+          <div style={styles.progressBar}>
+            <div style={{ ...styles.progressFill, width: `${progress}%` }} />
+          </div>
+          <p style={styles.progressText}>
+            Question {currentQuestion + 1} of {questions.length}
+          </p>
         </div>
-        <p style={styles.progressText}>
-          Question {currentQuestion + 1} of {questions.length}
-        </p>
-      </div>
 
-      {/* Question */}
-      <div style={styles.questionSection}>
-        <h2 style={styles.question}>{currentQ.question}</h2>
-        <p style={styles.subtitle}>{currentQ.subtitle}</p>
-      </div>
+        {/* Question */}
+        <div style={styles.questionSection}>
+          <h2 style={styles.question}>{currentQ.question}</h2>
+          <p style={styles.subtitle}>{currentQ.subtitle}</p>
+        </div>
 
-      {/* Options */}
-      <div style={styles.optionsGrid}>
-        {currentQ.options.map((option) => {
-          const isSelected = currentQ.type === 'multi'
-            ? (answers[currentQ.id] || []).includes(option.value)
-            : answers[currentQ.id] === option.value;
+        {/* Options */}
+        <div style={styles.optionsGrid}>
+          {currentQ.options.map((option, index) => {
+            const isSelected = currentQ.type === 'multi'
+              ? (answers[currentQ.id] || []).includes(option.value)
+              : answers[currentQ.id] === option.value;
 
-          return (
+            return (
+              <button
+                key={option.value}
+                onClick={() => {
+                  if (currentQ.type === 'multi') {
+                    handleToggleMulti(currentQ.id, option.value);
+                  } else {
+                    handleSelectSingle(currentQ.id, option.value);
+                  }
+                }}
+                style={{
+                  ...styles.optionCard,
+                  borderColor: isSelected ? '#667eea' : 'rgba(0, 0, 0, 0.08)',
+                  background: isSelected ? 'rgba(102, 126, 234, 0.04)' : 'white',
+                  animationDelay: `${index * 50}ms`,
+                }}
+              >
+                <div style={{
+                  ...styles.iconCircle,
+                  background: isSelected 
+                    ? 'linear-gradient(135deg, #667eea, #764ba2)'
+                    : '#f5f5f7',
+                  color: isSelected ? 'white' : '#667eea',
+                }}
+                  dangerouslySetInnerHTML={{ __html: option.svg }}
+                />
+                
+                <div style={styles.optionContent}>
+                  <div style={styles.optionLabel}>{option.label}</div>
+                  <div style={styles.optionSubtext}>{option.subtext}</div>
+                </div>
+
+                {isSelected && (
+                  <div style={styles.selectedCheck}>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                      <path d="M20 6L9 17l-5-5"/>
+                    </svg>
+                  </div>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Navigation */}
+        <div style={styles.navigation}>
+          {currentQuestion > 0 && (
+            <button onClick={handleBack} style={styles.backButton}>
+              ← Back
+            </button>
+          )}
+          
+          {currentQ.type === 'multi' && (
             <button
-              key={option.value}
-              onClick={() => {
-                if (currentQ.type === 'multi') {
-                  handleToggleMulti(currentQ.id, option.value);
-                } else {
-                  handleSelectSingle(currentQ.id, option.value);
-                }
-              }}
+              onClick={handleContinue}
+              disabled={!canContinue()}
               style={{
-                ...styles.optionCard,
-                borderColor: isSelected ? '#667eea' : 'rgba(0, 0, 0, 0.08)',
-                background: isSelected ? 'rgba(102, 126, 234, 0.04)' : 'white',
+                ...styles.continueButton,
+                opacity: canContinue() ? 1 : 0.4,
+                cursor: canContinue() ? 'pointer' : 'not-allowed',
               }}
             >
-              <div style={{
-                ...styles.iconCircle,
-                background: isSelected 
-                  ? 'linear-gradient(135deg, #667eea, #764ba2)'
-                  : '#f5f5f7',
-                color: isSelected ? 'white' : '#667eea',
-              }}
-                dangerouslySetInnerHTML={{ __html: option.svg }}
-              />
-              
-              <div style={styles.optionContent}>
-                <div style={styles.optionLabel}>{option.label}</div>
-                <div style={styles.optionSubtext}>{option.subtext}</div>
-              </div>
-
-              {isSelected && (
-                <div style={styles.selectedCheck}>
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                    <path d="M20 6L9 17l-5-5"/>
-                  </svg>
-                </div>
-              )}
+              {currentQuestion === questions.length - 1 ? "Let's build your store →" : 'Continue →'}
             </button>
-          );
-        })}
-      </div>
-
-      {/* Navigation */}
-      <div style={styles.navigation}>
-        {currentQuestion > 0 && (
-          <button onClick={handleBack} style={styles.backButton}>
-            ← Back
-          </button>
-        )}
-        
-        {currentQ.type === 'multi' && (
-          <button
-            onClick={handleContinue}
-            disabled={!canContinue()}
-            style={{
-              ...styles.continueButton,
-              opacity: canContinue() ? 1 : 0.4,
-              cursor: canContinue() ? 'pointer' : 'not-allowed',
-            }}
-          >
-            {currentQuestion === questions.length - 1 ? "Let's build your store →" : 'Continue →'}
-          </button>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
 }
 
 const styles = {
-  // Intro styles
+  // Intro - Frosted glass on gradient
   introContainer: {
     minHeight: '100vh',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     padding: '40px 20px',
-    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    background: '#f5f5f7',
+    position: 'relative',
+    overflow: 'hidden',
   },
 
-  introContent: {
+  introCard: {
     maxWidth: '600px',
-    textAlign: 'center',
-    background: 'white',
-    padding: '64px 48px',
+    width: '100%',
+    background: 'rgba(255, 255, 255, 0.7)',
+    backdropFilter: 'saturate(180%) blur(20px)',
+    WebkitBackdropFilter: 'saturate(180%) blur(20px)',
+    padding: 'clamp(40px, 8vw, 64px) clamp(32px, 6vw, 48px)',
     borderRadius: '24px',
-    boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
+    boxShadow: '0 20px 60px rgba(0, 0, 0, 0.12), 0 0 1px rgba(0, 0, 0, 0.08)',
+    border: '1px solid rgba(255, 255, 255, 0.2)',
+    textAlign: 'center',
+    transition: 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
   },
 
   introHeading: {
@@ -379,12 +416,12 @@ const styles = {
   },
 
   startButton: {
-    padding: '16px 48px',
+    padding: '18px 48px',
     fontSize: '17px',
     fontWeight: 600,
     border: 'none',
-    borderRadius: '12px',
-    background: 'linear-gradient(135deg, #667eea, #764ba2)',
+    borderRadius: '980px',
+    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
     color: 'white',
     cursor: 'pointer',
     boxShadow: '0 8px 24px rgba(102, 126, 234, 0.3)',
@@ -404,10 +441,10 @@ const styles = {
     fontWeight: 500,
   },
 
-  // Questionnaire styles
+  // Questionnaire
   container: {
     minHeight: '100vh',
-    padding: '40px 20px',
+    padding: '40px 20px 64px',
     maxWidth: '900px',
     margin: '0 auto',
   },
@@ -426,7 +463,7 @@ const styles = {
 
   progressFill: {
     height: '100%',
-    background: 'linear-gradient(90deg, #667eea, #764ba2)',
+    background: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)',
     transition: 'width 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
     borderRadius: '2px',
   },
@@ -463,7 +500,7 @@ const styles = {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
     gap: '16px',
-    marginBottom: '40px',
+    marginBottom: '48px',
   },
 
   optionCard: {
@@ -474,7 +511,7 @@ const styles = {
     gap: '16px',
     padding: '24px',
     border: '2px solid',
-    borderRadius: '16px',
+    borderRadius: '20px',
     background: 'white',
     cursor: 'pointer',
     transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
@@ -485,7 +522,7 @@ const styles = {
   iconCircle: {
     width: '48px',
     height: '48px',
-    borderRadius: '12px',
+    borderRadius: '14px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -514,8 +551,8 @@ const styles = {
 
   selectedCheck: {
     position: 'absolute',
-    top: '16px',
-    right: '16px',
+    top: '20px',
+    right: '20px',
     width: '24px',
     height: '24px',
     color: '#667eea',
@@ -525,28 +562,29 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-between',
     gap: '16px',
+    marginTop: '16px',
   },
 
   backButton: {
-    padding: '12px 24px',
+    padding: '14px 28px',
     fontSize: '15px',
     fontWeight: 500,
     border: 'none',
     background: 'transparent',
     color: '#86868b',
     cursor: 'pointer',
-    borderRadius: '10px',
+    borderRadius: '980px',
     transition: 'all 0.2s ease',
     fontFamily: '-apple-system, BlinkMacSystemFont, "Inter", sans-serif',
   },
 
   continueButton: {
-    padding: '14px 32px',
+    padding: '16px 40px',
     fontSize: '16px',
     fontWeight: 600,
     border: 'none',
-    borderRadius: '12px',
-    background: 'linear-gradient(135deg, #667eea, #764ba2)',
+    borderRadius: '980px',
+    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
     color: 'white',
     cursor: 'pointer',
     transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
