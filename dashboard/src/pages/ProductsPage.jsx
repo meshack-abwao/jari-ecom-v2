@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { productsAPI, settingsAPI } from '../api/client';
-import { Plus, Edit, Trash2, X, Eye, EyeOff, ExternalLink, Tag, ChevronDown, ChevronUp } from 'lucide-react';
+import { productsAPI, settingsAPI, cardsAPI } from '../api/client';
+import { Plus, Edit, Trash2, X, Eye, EyeOff, ExternalLink, Tag, ChevronDown, ChevronUp, ShoppingBag, AlertCircle } from 'lucide-react';
 import ImageUploader from '../components/ImageUploader';
 
 // ===========================================
@@ -134,8 +134,13 @@ export default function ProductsPage() {
     basic: true, gallery: false, stories: false, testimonials: false,
     packages: false, dietary: false, addons: false, specifications: false, whatsIncluded: false, showcase: false, warranty: false, eventDetails: false, tickets: false, policies: false
   });
+  
+  // Card balance state (Phase C)
+  const [cardBalance, setCardBalance] = useState({ cardLimit: 3, cardsUsed: 0, cardsRemaining: 3, canAddProduct: true });
+  const [showBuyCardsModal, setShowBuyCardsModal] = useState(false);
+  const [cardBundles, setCardBundles] = useState([]);
 
-  useEffect(() => { loadProducts(); loadStoreInfo(); loadCategories(); }, []);
+  useEffect(() => { loadProducts(); loadStoreInfo(); loadCategories(); loadCardBalance(); }, []);
 
   // ===========================================
   // CATEGORIES
@@ -209,6 +214,41 @@ export default function ProductsPage() {
     } catch (error) { 
       console.error('Failed to load store info:', error); 
     }
+  };
+
+  // ===========================================
+  // CARD BALANCE (Phase C)
+  // ===========================================
+  const loadCardBalance = async () => {
+    try {
+      const response = await cardsAPI.getBalance();
+      setCardBalance(response.data);
+    } catch (error) {
+      console.error('Failed to load card balance:', error);
+    }
+  };
+
+  const loadCardBundles = async () => {
+    try {
+      const response = await cardsAPI.getBundles();
+      setCardBundles(response.data.bundles || []);
+    } catch (error) {
+      console.error('Failed to load card bundles:', error);
+    }
+  };
+
+  const handleBuyCards = () => {
+    loadCardBundles();
+    setShowBuyCardsModal(true);
+  };
+
+  const handleAddProductClick = async () => {
+    // Check card limit before opening modal
+    if (!cardBalance.canAddProduct) {
+      handleBuyCards();
+      return;
+    }
+    setShowModal(true);
   };
 
   // ===========================================
@@ -449,6 +489,14 @@ export default function ProductsPage() {
           <p style={styles.subtitle}>Manage your product catalog ({products.length} products)</p>
         </div>
         <div style={styles.headerActions}>
+          {/* Card Balance Display */}
+          <div style={styles.cardBalanceBox}>
+            <ShoppingBag size={16} />
+            <span>{cardBalance.cardsRemaining}/{cardBalance.cardLimit} cards</span>
+            {!cardBalance.canAddProduct && (
+              <button onClick={handleBuyCards} style={styles.buyCardsBtn}>Buy More</button>
+            )}
+          </div>
           <button onClick={() => setShowCategoryModal(true)} style={styles.categoryBtn}>
             <Tag size={18} /> Categories
           </button>
@@ -457,7 +505,7 @@ export default function ProductsPage() {
               <Eye size={18} /> View Store
             </button>
           )}
-          <button onClick={() => setShowModal(true)} className="btn btn-primary">
+          <button onClick={handleAddProductClick} className="btn btn-primary">
             <Plus size={20} /> Add Product
           </button>
         </div>
@@ -546,6 +594,60 @@ export default function ProductsPage() {
               <button onClick={() => setShowCategoryModal(false)} style={styles.cancelBtn}>Cancel</button>
               <button onClick={saveCategories} className="btn btn-primary" style={{ flex: 1 }}>Save Categories</button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Buy Cards Modal (Phase C) */}
+      {showBuyCardsModal && (
+        <div style={styles.modalOverlay} onClick={() => setShowBuyCardsModal(false)}>
+          <div style={{ ...styles.modal, maxWidth: '500px' }} className="glass-card" onClick={e => e.stopPropagation()}>
+            <div style={styles.modalHeader}>
+              <h2 style={styles.modalTitle}>Buy Product Cards</h2>
+              <button onClick={() => setShowBuyCardsModal(false)} style={styles.closeBtn}><X size={24} /></button>
+            </div>
+            
+            <div style={{ marginBottom: '20px', padding: '16px', background: 'var(--bg-tertiary)', borderRadius: '12px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ color: 'var(--text-muted)' }}>Current Balance</span>
+                <span style={{ fontSize: '24px', fontWeight: '700', color: 'var(--text-primary)' }}>
+                  {cardBalance.cardsRemaining} cards
+                </span>
+              </div>
+              <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '8px' }}>
+                You've used {cardBalance.cardsUsed} of {cardBalance.cardLimit} cards
+              </p>
+            </div>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {cardBundles.map(bundle => (
+                <div key={bundle.id} style={{
+                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                  padding: '16px', background: 'var(--bg-secondary)', borderRadius: '12px',
+                  border: '1px solid var(--border-color)', cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--accent-color)'}
+                onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border-color)'}
+                >
+                  <div>
+                    <div style={{ fontWeight: '600', color: 'var(--text-primary)', marginBottom: '4px' }}>
+                      {bundle.name}
+                    </div>
+                    <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
+                      {bundle.cards} cards • KES {bundle.pricePerCard}/card
+                    </div>
+                  </div>
+                  <button className="btn btn-primary" style={{ padding: '10px 20px' }}>
+                    KES {bundle.price}
+                  </button>
+                </div>
+              ))}
+            </div>
+            
+            <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '16px', textAlign: 'center' }}>
+              Cards are added to your current balance. Never expires.
+            </p>
           </div>
         </div>
       )}
@@ -1628,6 +1730,10 @@ const styles = {
   subtitle: { fontSize: '15px', color: 'var(--text-muted)' },
   headerActions: { display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' },
   viewBtn: { display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 16px', background: 'var(--accent-light)', border: '1px solid var(--border-color)', borderRadius: '10px', color: 'var(--accent-color)', fontSize: '13px', fontWeight: '600', cursor: 'pointer' },
+  
+  // Card Balance Styles (Phase C)
+  cardBalanceBox: { display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 14px', background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: '10px', fontSize: '13px', fontWeight: '500', color: 'var(--text-secondary)' },
+  buyCardsBtn: { marginLeft: '8px', padding: '4px 10px', background: 'var(--accent-color)', border: 'none', borderRadius: '6px', fontSize: '11px', fontWeight: '600', color: '#fff', cursor: 'pointer' },
   
   modalOverlay: { position: 'fixed', inset: 0, background: 'rgba(0, 0, 0, 0.7)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', zIndex: 1000, padding: '20px', overflowY: 'auto' },
   modal: { width: '100%', maxWidth: '700px', padding: '32px', margin: '20px 0' },
