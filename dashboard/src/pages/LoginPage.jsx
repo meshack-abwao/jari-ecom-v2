@@ -63,7 +63,7 @@ export default function LoginPage() {
         </form>
 
         <p style={styles.footer}>
-          Don't have an account? <Link to="/register" style={styles.link}>Create one</Link>
+          Don't have an account? <Link to="/signup" style={styles.link}>Create one</Link>
         </p>
       </div>
 
