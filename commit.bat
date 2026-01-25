@@ -1,6 +1,6 @@
 @echo off
 cd /d C:\Users\ADMIN\Desktop\jari-ecom-v2
 git add -A
-git commit -m "Fix: Migration 009 - DROP and recreate tables to fix partial state error"
+git commit -m "Docs: Comprehensive handover Jan 25-26 + Formula 13 migration partial state"
 git push origin main
-git log --oneline -5
+git log --oneline -8

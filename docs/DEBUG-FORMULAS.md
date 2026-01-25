@@ -404,4 +404,53 @@ req.user.id       // ❌ WRONG - this doesn't exist
 
 ---
 
+## Formula 13: Migration Partial State Errors (NEW - Jan 26, 2026)
+
+**Problem:** Migration fails with `column "X" of relation "Y" does not exist`
+
+**Cause:** `CREATE TABLE IF NOT EXISTS` doesn't add missing columns to existing tables. Previous run may have created table with incomplete schema.
+
+**Example Error:**
+```
+❌ Migration failed: column "complaint_rate" of relation "complaint_metrics" does not exist
+```
+
+**Root Cause:**
+```sql
+-- First run: Table created but migration failed midway
+CREATE TABLE IF NOT EXISTS complaint_metrics (
+  id SERIAL PRIMARY KEY,
+  store_id UUID,
+  total_complaints INTEGER
+  -- Migration failed here, complaint_rate never added
+);
+
+-- Second run: IF NOT EXISTS skips table creation
+-- But code expects complaint_rate column that doesn't exist!
+```
+
+**Fix Pattern:**
+```sql
+-- Option 1: DROP and recreate (safe for NEW tables with no data)
+DROP TABLE IF EXISTS tablename CASCADE;
+CREATE TABLE tablename (
+  -- all columns
+);
+
+-- Option 2: ALTER for adding columns to existing tables (preserves data)
+ALTER TABLE tablename ADD COLUMN IF NOT EXISTS new_column TYPE;
+```
+
+**When to use which:**
+- **DROP + CREATE**: New tables, no production data yet
+- **ALTER ADD COLUMN**: Existing tables with data you need to keep
+
+**Prevention:**
+1. Always test migrations locally before pushing
+2. Use transactions in migrations when possible
+3. For complex migrations, split into multiple files
+4. Add `CASCADE` to DROP to handle foreign key dependencies
+
+---
+
 **End of Debug Formulas**
