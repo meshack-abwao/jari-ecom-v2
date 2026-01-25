@@ -6,7 +6,7 @@ export default function Step1_BusinessType({ data, updateData, nextStep }) {
   const [isVisible, setIsVisible] = useState(false);
   const [answers, setAnswers] = useState({
     painPoints: [],
-    customerJob: null,      // CHANGED from 'sellingWhat'
+    customerJobs: [],      // CHANGED to array for multi-select
     desiredOutcomes: [],
   });
 
@@ -59,12 +59,13 @@ export default function Step1_BusinessType({ data, updateData, nextStep }) {
         },
       ],
     },
-    // 🎯 NEW JTBD-BASED QUESTION 2
+    // 🎯 NEW JTBD-BASED QUESTION 2 (Multi-select, max 2)
     {
-      id: 'customerJob',
-      type: 'single',
+      id: 'customerJobs',
+      type: 'multi',
+      maxSelections: 2,
       question: "When customers buy from you, what are they really looking for?",
-      subtitle: "Think about their mindset, not just the product category",
+      subtitle: "Pick 1-2 options — first one is your primary customer mindset",
       options: [
         {
           value: 'functional_quick',
@@ -182,10 +183,23 @@ export default function Step1_BusinessType({ data, updateData, nextStep }) {
   const handleToggleMulti = (questionId, value) => {
     setAnswers(prev => {
       const current = prev[questionId] || [];
-      const newValue = current.includes(value)
-        ? current.filter(v => v !== value)
-        : [...current, value];
-      return { ...prev, [questionId]: newValue };
+      
+      // Check if this question has max selections limit
+      const question = questions.find(q => q.id === questionId);
+      const maxSelections = question?.maxSelections;
+      
+      if (current.includes(value)) {
+        // Remove if already selected
+        return { ...prev, [questionId]: current.filter(v => v !== value) };
+      } else {
+        // Add if not at max
+        if (maxSelections && current.length >= maxSelections) {
+          // At max, replace last selection
+          const newValue = [...current.slice(0, -1), value];
+          return { ...prev, [questionId]: newValue };
+        }
+        return { ...prev, [questionId]: [...current, value] };
+      }
     });
   };
 
@@ -245,7 +259,9 @@ export default function Step1_BusinessType({ data, updateData, nextStep }) {
       discovery_explore: { template: 'pbk', businessType: 'services' },
     };
 
-    const selectedJob = jobToTemplateMap[answers.customerJob] || { template: 'qd', businessType: 'products' };
+    // Use first selection as primary
+    const primaryJob = answers.customerJobs[0];
+    const selectedJob = jobToTemplateMap[primaryJob] || { template: 'qd', businessType: 'products' };
 
     // Map to smart add-ons based on business type
     const addonMap = {
@@ -257,7 +273,8 @@ export default function Step1_BusinessType({ data, updateData, nextStep }) {
 
     updateData({
       businessType: selectedJob.businessType,
-      customerJob: answers.customerJob,
+      customerJobs: answers.customerJobs, // Store all selected jobs
+      primaryCustomerJob: primaryJob,      // Store primary job
       defaultTemplate: selectedJob.template,
       smartAddons: addonMap[selectedJob.businessType],
       jtbdAnswers: answers,
@@ -319,6 +336,14 @@ export default function Step1_BusinessType({ data, updateData, nextStep }) {
         <div style={styles.questionSection}>
           <h2 style={styles.question}>{currentQ.question}</h2>
           <p style={styles.subtitle}>{currentQ.subtitle}</p>
+          
+          {/* Show selection counter for job question */}
+          {currentQ.id === 'customerJobs' && (answers.customerJobs || []).length > 0 && (
+            <p style={styles.selectionHelper}>
+              {(answers.customerJobs || []).length} of 2 selected
+              {(answers.customerJobs || []).length === 1 && ' • You can pick one more (optional)'}
+            </p>
+          )}
         </div>
 
         <div style={styles.optionsGrid}>
@@ -328,7 +353,12 @@ export default function Step1_BusinessType({ data, updateData, nextStep }) {
               : answers[currentQ.id] === option.value;
 
             // Special styling for Question 2 (customer job)
-            const isJobQuestion = currentQ.id === 'customerJob';
+            const isJobQuestion = currentQ.id === 'customerJobs';
+            
+            // Get selection order for multi-select job question
+            const selectionIndex = isJobQuestion && isSelected 
+              ? (answers[currentQ.id] || []).indexOf(option.value) + 1
+              : null;
 
             return (
               <button
@@ -353,6 +383,24 @@ export default function Step1_BusinessType({ data, updateData, nextStep }) {
                   animationDelay: `${index * 50}ms`,
                 }}
               >
+                {/* Selection order badge for job question */}
+                {isJobQuestion && selectionIndex && (
+                  <div style={{
+                    ...styles.selectionBadge,
+                    background: selectionIndex === 1 
+                      ? 'rgba(255, 255, 255, 0.95)' 
+                      : 'rgba(255, 255, 255, 0.75)',
+                  }}>
+                    <span style={{
+                      fontSize: '11px',
+                      fontWeight: 600,
+                      color: '#667eea',
+                    }}>
+                      {selectionIndex === 1 ? 'PRIMARY' : 'SECONDARY'}
+                    </span>
+                  </div>
+                )}
+
                 <div style={{
                   ...styles.iconCircle,
                   background: isSelected && option.gradient
@@ -568,6 +616,13 @@ const styles = {
     lineHeight: 1.5,
   },
 
+  selectionHelper: {
+    fontSize: '14px',
+    color: '#667eea',
+    marginTop: '12px',
+    fontWeight: 500,
+  },
+
   optionsGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
@@ -649,6 +704,15 @@ const styles = {
     width: '24px',
     height: '24px',
     color: '#667eea',
+  },
+
+  selectionBadge: {
+    position: 'absolute',
+    top: '16px',
+    right: '16px',
+    padding: '6px 12px',
+    borderRadius: '980px',
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
   },
 
   navigation: {
