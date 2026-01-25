@@ -20,17 +20,29 @@ export default function Step5_VerificationTier({ data, updateData, nextStep, pre
       tagline: 'Build Customer Trust',
       limits: ['KES 500,000/month', 'KES 50,000/transaction'],
       settlement: '2-day hold',
-      required: ['Phone + Email', 'National ID upload'],
+      required: [
+        'Phone + Email verification',
+        'National ID (front + back)',
+        'Business Registration Certificate',
+        'KRA PIN Certificate',
+        'Business Permit'
+      ],
       gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
       badge: 'Recommended',
     },
     {
       id: 'BUSINESS',
-      name: 'Business',
+      name: 'Premium',
       tagline: 'Unlimited Power',
-      limits: ['Unlimited transactions', 'No limits'],
+      limits: ['Unlimited transactions', 'No monthly limits'],
       settlement: 'Instant settlement',
-      required: ['All above', 'Business Registration', 'KRA PIN'],
+      required: [
+        'All VERIFIED documents',
+        'CR12 Certificate',
+        'Certificate of Incorporation',
+        'Bank Statements (3 months)',
+        'Director ID copies'
+      ],
       gradient: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
       badge: 'Premium',
     },
@@ -256,7 +268,7 @@ const styles = {
 
   listItem: {
     display: 'flex',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     gap: '8px',
     fontSize: '14px',
     color: '#374151',
@@ -268,6 +280,7 @@ const styles = {
     fontWeight: 'bold',
     fontSize: '16px',
     flexShrink: 0,
+    marginTop: '2px',
   },
 
   checkSmall: {
@@ -275,6 +288,7 @@ const styles = {
     fontWeight: 'bold',
     fontSize: '14px',
     flexShrink: 0,
+    marginTop: '2px',
   },
 
   footer: {
