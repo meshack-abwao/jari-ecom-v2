@@ -1,6 +1,8 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import compression from 'compression';
+import rateLimit from 'express-rate-limit';
 import { config } from './config/env.js';
 import { setupRoutes } from './routes/index.js';
 import { errorHandler } from './middleware/error.js';
@@ -8,12 +10,72 @@ import db from './config/database.js';
 
 const app = express();
 
-// Middleware
+// ===========================================
+// MIDDLEWARE - Order matters!
+// ===========================================
+
+// 1. Compression (gzip) - 60-80% smaller responses
+app.use(compression());
+
+// 2. CORS
 app.use(cors({ origin: config.corsOrigins, credentials: true }));
+
+// 3. Body parsing
 app.use(express.json());
 app.use(express.text()); // For sendBeacon which sends as text/plain
 
-// Routes
+// ===========================================
+// RATE LIMITING - Protect sensitive endpoints
+// ===========================================
+
+// Auth rate limiter: 5 attempts per 15 minutes
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5,
+  message: { error: 'Too many login attempts. Please try again in 15 minutes.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// General API limiter: 100 requests per minute
+const apiLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 100,
+  message: { error: 'Too many requests. Please slow down.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Apply rate limiters
+app.use('/api/auth/login', authLimiter);
+app.use('/api/auth/signup', authLimiter);
+app.use('/api/otp', authLimiter);
+app.use('/api', apiLimiter);
+
+// ===========================================
+// HEALTH CHECK - For Railway monitoring
+// ===========================================
+app.get('/health', async (req, res) => {
+  try {
+    await db.query('SELECT 1');
+    res.json({ 
+      status: 'healthy', 
+      timestamp: new Date().toISOString(),
+      version: '2.0.0',
+      uptime: process.uptime()
+    });
+  } catch (err) {
+    res.status(503).json({ 
+      status: 'unhealthy', 
+      error: 'Database connection failed',
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+// ===========================================
+// ROUTES
+// ===========================================
 setupRoutes(app);
 
 // Error handler (must be last)
