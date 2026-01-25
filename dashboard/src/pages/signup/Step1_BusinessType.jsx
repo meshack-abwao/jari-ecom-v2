@@ -6,11 +6,10 @@ export default function Step1_BusinessType({ data, updateData, nextStep }) {
   const [isVisible, setIsVisible] = useState(false);
   const [answers, setAnswers] = useState({
     painPoints: [],
-    sellingWhat: null,
+    customerJob: null,      // CHANGED from 'sellingWhat'
     desiredOutcomes: [],
   });
 
-  // Fade-in animation on mount
   useEffect(() => {
     setTimeout(() => setIsVisible(true), 100);
   }, []);
@@ -60,41 +59,72 @@ export default function Step1_BusinessType({ data, updateData, nextStep }) {
         },
       ],
     },
+    // 🎯 NEW JTBD-BASED QUESTION 2
     {
-      id: 'sellingWhat',
+      id: 'customerJob',
       type: 'single',
-      question: "What are you selling?",
-      subtitle: "This helps us set up the perfect template for your business",
+      question: "When customers buy from you, what are they really looking for?",
+      subtitle: "Think about their mindset, not just the product category",
       options: [
         {
-          value: 'food',
-          label: "Food & Drinks",
-          subtext: "Restaurant, cafe, catering, food delivery",
-          svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><path d="M6 1v3M10 1v3M14 1v3"/></svg>`,
+          value: 'functional_quick',
+          label: "Quick, practical solutions",
+          customerThinking: ""I need to see what's available right now"",
+          examples: "Fast food menus, daily essentials, quick-service items",
+          template: 'Visual Menu',
+          businessType: 'food',
+          gradient: 'linear-gradient(135deg, #f59e0b 0%, #ea580c 100%)',
+          svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m16 12-4-4-4 4M12 16V8"/></svg>`,
         },
         {
-          value: 'services',
-          label: "Services & Appointments",
-          subtext: "Photography, salon, consulting, training, events",
-          svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>`,
+          value: 'emotional_perfect',
+          label: "Something perfect for a special moment",
+          customerThinking: ""This needs to be amazing—show me every detail"",
+          examples: "Wedding cakes, custom jewelry, milestone gifts, artisan products",
+          template: 'Deep Dive',
+          businessType: 'premium',
+          gradient: 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)',
+          svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`,
         },
         {
-          value: 'products',
-          label: "Physical Products",
-          subtext: "Fashion, electronics, beauty, home goods",
-          svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18M16 10a4 4 0 0 1-8 0"/></svg>`,
+          value: 'trust_booking',
+          label: "A reliable service they can book confidently",
+          customerThinking: ""I need to see availability and know what's included"",
+          examples: "Photography, salon services, consulting, event planning",
+          template: 'Portfolio & Booking',
+          businessType: 'services',
+          gradient: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+          svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>`,
         },
         {
-          value: 'premium',
-          label: "High-End Products",
-          subtext: "Jewelry, luxury goods, custom items",
+          value: 'convenience_fast',
+          label: "The easiest possible purchase",
+          customerThinking: ""I know what I want—just let me buy it quickly"",
+          examples: "Repeat purchases, simple products, known items",
+          template: 'Quick Decision',
+          businessType: 'products',
+          gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+          svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 5 5L20 7"/></svg>`,
+        },
+        {
+          value: 'social_status',
+          label: "To impress others or stand out",
+          customerThinking: ""I want something exclusive that reflects my taste"",
+          examples: "Designer fashion, luxury goods, limited editions, status symbols",
+          template: 'Premium Showcase',
+          businessType: 'premium',
+          gradient: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
           svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`,
         },
         {
-          value: 'events',
-          label: "Events & Tickets",
-          subtext: "Workshops, concerts, conferences, classes",
-          svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>`,
+          value: 'discovery_explore',
+          label: "Inspiration and new possibilities",
+          customerThinking: ""Show me your range—I need ideas"",
+          examples: "Custom services, creative work, made-to-order items",
+          template: 'Portfolio Gallery',
+          businessType: 'services',
+          gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+          svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>`,
         },
       ],
     },
@@ -205,26 +235,31 @@ export default function Step1_BusinessType({ data, updateData, nextStep }) {
   };
 
   const processAnswersAndContinue = () => {
-    const templateMap = {
-      food: 'vm',
-      services: 'pbk',
-      products: 'qd',
-      premium: 'dd',
-      events: 'events',
+    // Map customer job to template
+    const jobToTemplateMap = {
+      functional_quick: { template: 'vm', businessType: 'food' },
+      emotional_perfect: { template: 'dd', businessType: 'premium' },
+      trust_booking: { template: 'pbk', businessType: 'services' },
+      convenience_fast: { template: 'qd', businessType: 'products' },
+      social_status: { template: 'premium', businessType: 'premium' },
+      discovery_explore: { template: 'pbk', businessType: 'services' },
     };
 
+    const selectedJob = jobToTemplateMap[answers.customerJob] || { template: 'qd', businessType: 'products' };
+
+    // Map to smart add-ons based on business type
     const addonMap = {
       food: ['mpesa_stk', 'whatsapp_auto'],
       services: ['mpesa_stk'],
       products: ['mpesa_stk', 'whatsapp_auto'],
       premium: ['mpesa_stk', 'priority_support'],
-      events: ['mpesa_stk', 'whatsapp_auto'],
     };
 
     updateData({
-      businessType: answers.sellingWhat,
-      defaultTemplate: templateMap[answers.sellingWhat],
-      smartAddons: addonMap[answers.sellingWhat],
+      businessType: selectedJob.businessType,
+      customerJob: answers.customerJob,
+      defaultTemplate: selectedJob.template,
+      smartAddons: addonMap[selectedJob.businessType],
       jtbdAnswers: answers,
     });
 
@@ -272,7 +307,6 @@ export default function Step1_BusinessType({ data, updateData, nextStep }) {
         transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
         transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
       }}>
-        {/* Progress */}
         <div style={styles.progressSection}>
           <div style={styles.progressBar}>
             <div style={{ ...styles.progressFill, width: `${progress}%` }} />
@@ -282,18 +316,19 @@ export default function Step1_BusinessType({ data, updateData, nextStep }) {
           </p>
         </div>
 
-        {/* Question */}
         <div style={styles.questionSection}>
           <h2 style={styles.question}>{currentQ.question}</h2>
           <p style={styles.subtitle}>{currentQ.subtitle}</p>
         </div>
 
-        {/* Options */}
         <div style={styles.optionsGrid}>
           {currentQ.options.map((option, index) => {
             const isSelected = currentQ.type === 'multi'
               ? (answers[currentQ.id] || []).includes(option.value)
               : answers[currentQ.id] === option.value;
+
+            // Special styling for Question 2 (customer job)
+            const isJobQuestion = currentQ.id === 'customerJob';
 
             return (
               <button
@@ -307,14 +342,22 @@ export default function Step1_BusinessType({ data, updateData, nextStep }) {
                 }}
                 style={{
                   ...styles.optionCard,
-                  borderColor: isSelected ? '#667eea' : 'rgba(0, 0, 0, 0.08)',
-                  background: isSelected ? 'rgba(102, 126, 234, 0.04)' : 'white',
+                  ...(isJobQuestion && styles.jobCard),
+                  borderColor: isSelected ? (option.gradient ? 'transparent' : '#667eea') : 'rgba(0, 0, 0, 0.08)',
+                  borderImage: isSelected && option.gradient ? `${option.gradient} 1` : 'none',
+                  background: isSelected && option.gradient 
+                    ? `${option.gradient}`
+                    : isSelected 
+                    ? 'rgba(102, 126, 234, 0.04)' 
+                    : 'white',
                   animationDelay: `${index * 50}ms`,
                 }}
               >
                 <div style={{
                   ...styles.iconCircle,
-                  background: isSelected 
+                  background: isSelected && option.gradient
+                    ? 'rgba(255, 255, 255, 0.2)'
+                    : isSelected
                     ? 'linear-gradient(135deg, #667eea, #764ba2)'
                     : '#f5f5f7',
                   color: isSelected ? 'white' : '#667eea',
@@ -323,11 +366,43 @@ export default function Step1_BusinessType({ data, updateData, nextStep }) {
                 />
                 
                 <div style={styles.optionContent}>
-                  <div style={styles.optionLabel}>{option.label}</div>
-                  <div style={styles.optionSubtext}>{option.subtext}</div>
+                  <div style={{
+                    ...styles.optionLabel,
+                    color: isSelected && option.gradient ? 'white' : '#1d1d1f',
+                  }}>
+                    {option.label}
+                  </div>
+                  
+                  {/* Show customer thinking for job question */}
+                  {isJobQuestion && option.customerThinking && (
+                    <div style={{
+                      ...styles.customerThinking,
+                      color: isSelected && option.gradient ? 'rgba(255,255,255,0.95)' : '#6b7280',
+                    }}>
+                      {option.customerThinking}
+                    </div>
+                  )}
+                  
+                  <div style={{
+                    ...styles.optionSubtext,
+                    color: isSelected && option.gradient ? 'rgba(255,255,255,0.9)' : '#86868b',
+                  }}>
+                    {isJobQuestion ? `Examples: ${option.examples}` : option.subtext}
+                  </div>
+                  
+                  {/* Show template name for job question */}
+                  {isJobQuestion && option.template && (
+                    <div style={{
+                      ...styles.templateBadge,
+                      background: isSelected ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.05)',
+                      color: isSelected ? 'white' : '#667eea',
+                    }}>
+                      Template: {option.template}
+                    </div>
+                  )}
                 </div>
 
-                {isSelected && (
+                {isSelected && !option.gradient && (
                   <div style={styles.selectedCheck}>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
                       <path d="M20 6L9 17l-5-5"/>
@@ -339,7 +414,6 @@ export default function Step1_BusinessType({ data, updateData, nextStep }) {
           })}
         </div>
 
-        {/* Navigation */}
         <div style={styles.navigation}>
           {currentQuestion > 0 && (
             <button onClick={handleBack} style={styles.backButton}>
@@ -367,7 +441,6 @@ export default function Step1_BusinessType({ data, updateData, nextStep }) {
 }
 
 const styles = {
-  // Intro - Frosted glass on gradient
   introContainer: {
     minHeight: '100vh',
     display: 'flex',
@@ -441,7 +514,6 @@ const styles = {
     fontWeight: 500,
   },
 
-  // Questionnaire
   container: {
     minHeight: '100vh',
     padding: '40px 20px 64px',
@@ -519,6 +591,10 @@ const styles = {
     fontFamily: '-apple-system, BlinkMacSystemFont, "Inter", sans-serif',
   },
 
+  jobCard: {
+    padding: '28px',
+  },
+
   iconCircle: {
     width: '48px',
     height: '48px',
@@ -537,16 +613,33 @@ const styles = {
   optionLabel: {
     fontSize: '16px',
     fontWeight: 600,
-    color: '#1d1d1f',
-    marginBottom: '6px',
+    marginBottom: '8px',
     lineHeight: 1.3,
     letterSpacing: '-0.01em',
   },
 
+  customerThinking: {
+    fontSize: '15px',
+    fontStyle: 'italic',
+    marginBottom: '10px',
+    lineHeight: 1.5,
+    fontWeight: 500,
+  },
+
   optionSubtext: {
     fontSize: '14px',
-    color: '#86868b',
     lineHeight: 1.5,
+    marginBottom: '12px',
+  },
+
+  templateBadge: {
+    display: 'inline-block',
+    padding: '6px 12px',
+    borderRadius: '980px',
+    fontSize: '12px',
+    fontWeight: 600,
+    marginTop: '4px',
+    letterSpacing: '0.3px',
   },
 
   selectedCheck: {
