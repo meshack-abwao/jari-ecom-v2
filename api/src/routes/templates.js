@@ -4,8 +4,8 @@
 // ============================================================================
 
 import express from 'express';
-import { query } from '../config/database.js';
-import { authenticateToken } from '../middleware/auth.js';
+import db from '../config/database.js';
+import { auth } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -21,12 +21,12 @@ const TEMPLATES = {
 // ============================================================================
 // GET /api/templates/available - Get available templates for store
 // ============================================================================
-router.get('/available', authenticateToken, async (req, res) => {
+router.get('/available', auth, async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user.userId;
     
     // Get store with unlocked_themes
-    const storeResult = await query(
+    const storeResult = await db.query(
       `SELECT id, business_type, unlocked_themes FROM stores WHERE user_id = $1`,
       [userId]
     );
@@ -60,9 +60,9 @@ router.get('/available', authenticateToken, async (req, res) => {
 // ============================================================================
 // POST /api/templates/unlock - Purchase/unlock a template
 // ============================================================================
-router.post('/unlock', authenticateToken, async (req, res) => {
+router.post('/unlock', auth, async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user.userId;
     const { templateId, paymentRef } = req.body;
     
     // Validate template
@@ -72,7 +72,7 @@ router.post('/unlock', authenticateToken, async (req, res) => {
     }
     
     // Get store
-    const storeResult = await query(
+    const storeResult = await db.query(
       `SELECT id, unlocked_themes FROM stores WHERE user_id = $1`,
       [userId]
     );
@@ -90,7 +90,7 @@ router.post('/unlock', authenticateToken, async (req, res) => {
     }
     
     // Record purchase
-    await query(
+    await db.query(
       `INSERT INTO theme_purchases 
        (store_id, theme_id, theme_name, amount_paid, total_paid, payment_ref, payment_status)
        VALUES ($1, $2, $3, $4, $5, $6, 'completed')`,
@@ -99,7 +99,7 @@ router.post('/unlock', authenticateToken, async (req, res) => {
     
     // Update store's unlocked themes
     const newUnlocked = [...unlockedThemes, templateId];
-    await query(
+    await db.query(
       `UPDATE stores SET unlocked_themes = $1 WHERE id = $2`,
       [JSON.stringify(newUnlocked), store.id]
     );
@@ -119,9 +119,9 @@ router.post('/unlock', authenticateToken, async (req, res) => {
 // ============================================================================
 // PUT /api/templates/assign/:productId - Assign template to product
 // ============================================================================
-router.put('/assign/:productId', authenticateToken, async (req, res) => {
+router.put('/assign/:productId', auth, async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user.userId;
     const { productId } = req.params;
     const { templateId } = req.body;
     
@@ -131,7 +131,7 @@ router.put('/assign/:productId', authenticateToken, async (req, res) => {
     }
     
     // Get store
-    const storeResult = await query(
+    const storeResult = await db.query(
       `SELECT id, unlocked_themes, business_type FROM stores WHERE user_id = $1`,
       [userId]
     );
@@ -155,7 +155,7 @@ router.put('/assign/:productId', authenticateToken, async (req, res) => {
     }
     
     // Verify product belongs to store
-    const productResult = await query(
+    const productResult = await db.query(
       `SELECT id FROM products WHERE id = $1 AND store_id = $2`,
       [productId, store.id]
     );
@@ -165,7 +165,7 @@ router.put('/assign/:productId', authenticateToken, async (req, res) => {
     }
     
     // Update product template
-    await query(
+    await db.query(
       `UPDATE products SET template = $1, updated_at = NOW() WHERE id = $2`,
       [templateId, productId]
     );

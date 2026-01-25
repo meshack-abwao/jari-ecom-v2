@@ -4,8 +4,8 @@
 // ============================================================================
 
 import express from 'express';
-import { query } from '../config/database.js';
-import { authenticateToken } from '../middleware/auth.js';
+import db from '../config/database.js';
+import { auth } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -19,12 +19,12 @@ const CARD_BUNDLES = {
 // ============================================================================
 // GET /api/cards/balance - Get store's card balance
 // ============================================================================
-router.get('/balance', authenticateToken, async (req, res) => {
+router.get('/balance', auth, async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user.userId;
     
     // Get store and card limit
-    const storeResult = await query(
+    const storeResult = await db.query(
       `SELECT id, product_card_limit FROM stores WHERE user_id = $1`,
       [userId]
     );
@@ -37,7 +37,7 @@ router.get('/balance', authenticateToken, async (req, res) => {
     const cardLimit = store.product_card_limit || 3;
     
     // Count products (cards used)
-    const productCount = await query(
+    const productCount = await db.query(
       `SELECT COUNT(*) as count FROM products WHERE store_id = $1`,
       [store.id]
     );
@@ -60,12 +60,12 @@ router.get('/balance', authenticateToken, async (req, res) => {
 // ============================================================================
 // POST /api/cards/check-limit - Check if store can add more products
 // ============================================================================
-router.post('/check-limit', authenticateToken, async (req, res) => {
+router.post('/check-limit', auth, async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user.userId;
     
     // Get store and card limit
-    const storeResult = await query(
+    const storeResult = await db.query(
       `SELECT id, product_card_limit FROM stores WHERE user_id = $1`,
       [userId]
     );
@@ -78,7 +78,7 @@ router.post('/check-limit', authenticateToken, async (req, res) => {
     const cardLimit = store.product_card_limit || 3;
     
     // Count products
-    const productCount = await query(
+    const productCount = await db.query(
       `SELECT COUNT(*) as count FROM products WHERE store_id = $1`,
       [store.id]
     );
@@ -102,7 +102,7 @@ router.post('/check-limit', authenticateToken, async (req, res) => {
 // ============================================================================
 // GET /api/cards/bundles - Get available card bundles
 // ============================================================================
-router.get('/bundles', authenticateToken, async (req, res) => {
+router.get('/bundles', auth, async (req, res) => {
   try {
     res.json({
       bundles: Object.entries(CARD_BUNDLES).map(([id, bundle]) => ({
@@ -120,9 +120,9 @@ router.get('/bundles', authenticateToken, async (req, res) => {
 // ============================================================================
 // POST /api/cards/purchase - Purchase card bundle (after M-Pesa payment)
 // ============================================================================
-router.post('/purchase', authenticateToken, async (req, res) => {
+router.post('/purchase', auth, async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user.userId;
     const { bundleType, paymentRef } = req.body;
     
     // Validate bundle type
@@ -132,7 +132,7 @@ router.post('/purchase', authenticateToken, async (req, res) => {
     }
     
     // Get store
-    const storeResult = await query(
+    const storeResult = await db.query(
       `SELECT id, product_card_limit FROM stores WHERE user_id = $1`,
       [userId]
     );
@@ -146,7 +146,7 @@ router.post('/purchase', authenticateToken, async (req, res) => {
     const newLimit = previousLimit + bundle.cards;
     
     // Record purchase
-    await query(
+    await db.query(
       `INSERT INTO card_purchases 
        (store_id, bundle_type, cards_added, previous_card_limit, new_card_limit, 
         amount_paid, total_paid, payment_ref, payment_status)
@@ -156,7 +156,7 @@ router.post('/purchase', authenticateToken, async (req, res) => {
     );
     
     // Update store's card limit (ADD, not SET)
-    await query(
+    await db.query(
       `UPDATE stores SET product_card_limit = $1 WHERE id = $2`,
       [newLimit, store.id]
     );
@@ -177,12 +177,12 @@ router.post('/purchase', authenticateToken, async (req, res) => {
 // ============================================================================
 // GET /api/cards/history - Get purchase history
 // ============================================================================
-router.get('/history', authenticateToken, async (req, res) => {
+router.get('/history', auth, async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user.userId;
     
     // Get store
-    const storeResult = await query(
+    const storeResult = await db.query(
       `SELECT id FROM stores WHERE user_id = $1`,
       [userId]
     );
@@ -191,7 +191,7 @@ router.get('/history', authenticateToken, async (req, res) => {
       return res.status(404).json({ error: 'Store not found' });
     }
     
-    const purchases = await query(
+    const purchases = await db.query(
       `SELECT * FROM card_purchases 
        WHERE store_id = $1 
        ORDER BY purchased_at DESC`,
