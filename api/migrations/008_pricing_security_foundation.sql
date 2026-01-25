@@ -1,6 +1,7 @@
 -- Migration 008: Pricing and Security Foundation
 -- Created: January 25, 2026
 -- Purpose: Add pricing config, verification tiers, settlement rules, fraud detection, complaints, badges
+-- FIXED: Changed INTEGER to UUID for all store_id foreign keys
 
 -- ============================================================================
 -- A1: PRICING CONFIGURATION
@@ -12,11 +13,11 @@ CREATE TABLE IF NOT EXISTS pricing_config (
   item_id VARCHAR(50) NOT NULL UNIQUE,
   
   -- Pricing
-  price_once DECIMAL(10,2), -- For one-time purchases (cards, themes)
-  price_monthly DECIMAL(10,2), -- For subscriptions/addons
+  price_once DECIMAL(10,2),
+  price_monthly DECIMAL(10,2),
   
   -- Processing fees
-  processing_fee_percent DECIMAL(5,2) DEFAULT 3.50, -- IntaSend 3% + Jari 0.5%
+  processing_fee_percent DECIMAL(5,2) DEFAULT 3.50,
   show_processing_fee BOOLEAN DEFAULT true,
   
   -- Metadata
@@ -57,8 +58,8 @@ ON CONFLICT (item_id) DO NOTHING;
 -- ============================================================================
 
 CREATE TABLE IF NOT EXISTS merchant_verification (
-  id SERIAL PRIMARY KEY,
-  store_id INTEGER REFERENCES stores(id) UNIQUE NOT NULL,
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  store_id UUID REFERENCES stores(id) UNIQUE NOT NULL,
   tier VARCHAR(20) DEFAULT 'BASIC' CHECK (tier IN ('BASIC', 'VERIFIED', 'BUSINESS', 'PREMIUM')),
   
   phone_verified BOOLEAN DEFAULT false,
@@ -71,7 +72,7 @@ CREATE TABLE IF NOT EXISTS merchant_verification (
   national_id_back_url TEXT,
   national_id_verified BOOLEAN DEFAULT false,
   national_id_verified_at TIMESTAMP,
-  national_id_verified_by INTEGER,
+  national_id_verified_by UUID,
   
   business_reg_number VARCHAR(100),
   business_reg_document_url TEXT,
@@ -105,8 +106,8 @@ CREATE TABLE IF NOT EXISTS merchant_verification (
 -- ============================================================================
 
 CREATE TABLE IF NOT EXISTS settlement_rules (
-  id SERIAL PRIMARY KEY,
-  store_id INTEGER REFERENCES stores(id) UNIQUE NOT NULL,
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  store_id UUID REFERENCES stores(id) UNIQUE NOT NULL,
   
   risk_level VARCHAR(20) DEFAULT 'MEDIUM' CHECK (risk_level IN ('LOW', 'MEDIUM', 'HIGH')),
   merchant_age_days INTEGER DEFAULT 0,
@@ -155,8 +156,8 @@ ON CONFLICT (threshold_type) DO NOTHING;
 -- ============================================================================
 
 CREATE TABLE IF NOT EXISTS customer_complaints (
-  id SERIAL PRIMARY KEY,
-  store_id INTEGER REFERENCES stores(id) NOT NULL,
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  store_id UUID REFERENCES stores(id) NOT NULL,
   
   customer_name VARCHAR(255) NOT NULL,
   customer_phone VARCHAR(20) NOT NULL,
@@ -164,8 +165,8 @@ CREATE TABLE IF NOT EXISTS customer_complaints (
   store_url TEXT NOT NULL,
   
   complaint_type VARCHAR(50) NOT NULL CHECK (complaint_type IN ('product_not_delivered', 'quality_issue', 'refund_request', 'wrong_item', 'damaged_product', 'service_issue', 'other')),
-  order_id INTEGER REFERENCES orders(id),
-  booking_id INTEGER REFERENCES bookings(id),
+  order_id UUID REFERENCES orders(id),
+  booking_id UUID REFERENCES bookings(id),
   complaint_text TEXT NOT NULL,
   
   is_verified_customer BOOLEAN DEFAULT false,
@@ -184,8 +185,8 @@ CREATE TABLE IF NOT EXISTS customer_complaints (
 );
 
 CREATE TABLE IF NOT EXISTS complaint_metrics (
-  id SERIAL PRIMARY KEY,
-  store_id INTEGER REFERENCES stores(id) UNIQUE NOT NULL,
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  store_id UUID REFERENCES stores(id) UNIQUE NOT NULL,
   
   total_complaints INTEGER DEFAULT 0,
   verified_complaints INTEGER DEFAULT 0,
@@ -211,8 +212,8 @@ CREATE TABLE IF NOT EXISTS complaint_metrics (
 -- ============================================================================
 
 CREATE TABLE IF NOT EXISTS chargebacks (
-  id SERIAL PRIMARY KEY,
-  store_id INTEGER REFERENCES stores(id) NOT NULL,
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  store_id UUID REFERENCES stores(id) NOT NULL,
   
   original_transaction_ref VARCHAR(100) NOT NULL,
   amount DECIMAL(10,2) NOT NULL,
@@ -237,8 +238,8 @@ CREATE TABLE IF NOT EXISTS chargebacks (
 -- ============================================================================
 
 CREATE TABLE IF NOT EXISTS merchant_badges (
-  id SERIAL PRIMARY KEY,
-  store_id INTEGER REFERENCES stores(id) UNIQUE NOT NULL,
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  store_id UUID REFERENCES stores(id) UNIQUE NOT NULL,
   
   current_badge VARCHAR(20) DEFAULT 'none' CHECK (current_badge IN ('none', 'bronze', 'silver', 'gold', 'platinum')),
   
@@ -296,8 +297,8 @@ ALTER TABLE products ADD COLUMN IF NOT EXISTS assigned_template VARCHAR(20);
 -- ============================================================================
 
 CREATE TABLE IF NOT EXISTS card_purchases (
-  id SERIAL PRIMARY KEY,
-  store_id INTEGER REFERENCES stores(id) NOT NULL,
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  store_id UUID REFERENCES stores(id) NOT NULL,
   
   bundle_type VARCHAR(50) NOT NULL,
   cards_added INTEGER NOT NULL,
@@ -314,8 +315,8 @@ CREATE TABLE IF NOT EXISTS card_purchases (
 );
 
 CREATE TABLE IF NOT EXISTS theme_purchases (
-  id SERIAL PRIMARY KEY,
-  store_id INTEGER REFERENCES stores(id) NOT NULL,
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  store_id UUID REFERENCES stores(id) NOT NULL,
   
   theme_id VARCHAR(50) NOT NULL,
   theme_name VARCHAR(100),
