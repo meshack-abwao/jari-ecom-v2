@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { productsAPI, settingsAPI, cardsAPI } from '../api/client';
-import { Plus, Edit, Trash2, X, Eye, EyeOff, ExternalLink, Tag, ChevronDown, ChevronUp, ShoppingBag, AlertCircle } from 'lucide-react';
+import { productsAPI, settingsAPI, cardsAPI, templatesAPI } from '../api/client';
+import { Plus, Edit, Trash2, X, Eye, EyeOff, ExternalLink, Tag, ChevronDown, ChevronUp, ShoppingBag, AlertCircle, Layers } from 'lucide-react';
 import ImageUploader from '../components/ImageUploader';
 
 // ===========================================
@@ -139,8 +139,13 @@ export default function ProductsPage() {
   const [cardBalance, setCardBalance] = useState({ cardLimit: 3, cardsUsed: 0, cardsRemaining: 3, canAddProduct: true });
   const [showBuyCardsModal, setShowBuyCardsModal] = useState(false);
   const [cardBundles, setCardBundles] = useState([]);
+  
+  // Template management state (Phase C2)
+  const [availableTemplates, setAvailableTemplates] = useState([]);
+  const [showUnlockModal, setShowUnlockModal] = useState(false);
+  const [templateToUnlock, setTemplateToUnlock] = useState(null);
 
-  useEffect(() => { loadProducts(); loadStoreInfo(); loadCategories(); loadCardBalance(); }, []);
+  useEffect(() => { loadProducts(); loadStoreInfo(); loadCategories(); loadCardBalance(); loadAvailableTemplates(); }, []);
 
   // ===========================================
   // CATEGORIES
@@ -249,6 +254,45 @@ export default function ProductsPage() {
       return;
     }
     setShowModal(true);
+  };
+
+  // ===========================================
+  // TEMPLATE MANAGEMENT (Phase C2)
+  // ===========================================
+  const loadAvailableTemplates = async () => {
+    try {
+      const response = await templatesAPI.getAvailable();
+      setAvailableTemplates(response.data.templates || []);
+    } catch (error) {
+      console.error('Failed to load templates:', error);
+    }
+  };
+
+  const handleTemplateChange = async (productId, newTemplateId) => {
+    const template = availableTemplates.find(t => t.id === newTemplateId);
+    
+    // Check if template is locked
+    if (template && !template.unlocked) {
+      setTemplateToUnlock(template);
+      setShowUnlockModal(true);
+      return;
+    }
+    
+    try {
+      await templatesAPI.assign(productId, newTemplateId);
+      // Update local state
+      setProducts(products.map(p => 
+        p.id === productId ? { ...p, template: newTemplateId } : p
+      ));
+    } catch (error) {
+      console.error('Failed to change template:', error);
+      if (error.response?.data?.requiresUnlock) {
+        setTemplateToUnlock(availableTemplates.find(t => t.id === newTemplateId));
+        setShowUnlockModal(true);
+      } else {
+        alert('Failed to change template');
+      }
+    }
   };
 
   // ===========================================
@@ -657,6 +701,37 @@ export default function ProductsPage() {
             <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '16px', textAlign: 'center' }}>
               Cards are added to your current balance. Never expires.
             </p>
+          </div>
+        </div>
+      )}
+
+      {/* Unlock Template Modal (Phase C2) */}
+      {showUnlockModal && templateToUnlock && (
+        <div style={styles.modalOverlay} onClick={() => setShowUnlockModal(false)}>
+          <div style={{ ...styles.modal, maxWidth: '420px' }} className="glass-card" onClick={e => e.stopPropagation()}>
+            <div style={styles.modalHeader}>
+              <h2 style={styles.modalTitle}>Unlock Template</h2>
+              <button onClick={() => setShowUnlockModal(false)} style={styles.closeBtn}><X size={24} /></button>
+            </div>
+            
+            <div style={{ textAlign: 'center', padding: '20px 0' }}>
+              <div style={{ fontSize: '48px', marginBottom: '16px' }}>🔓</div>
+              <h3 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '8px', color: 'var(--text-primary)' }}>
+                {templateToUnlock.name}
+              </h3>
+              <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginBottom: '24px' }}>
+                {templateToUnlock.description}
+              </p>
+              <div style={{ fontSize: '32px', fontWeight: '700', color: 'var(--accent-color)', marginBottom: '24px' }}>
+                KES {templateToUnlock.price}
+              </div>
+              <button className="btn btn-primary" style={{ width: '100%', padding: '14px' }}>
+                Pay with M-Pesa
+              </button>
+              <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '12px' }}>
+                One-time payment. Use on unlimited products.
+              </p>
+            </div>
           </div>
         </div>
       )}
@@ -1686,6 +1761,23 @@ export default function ProductsPage() {
                 </div>
                 <div style={styles.cardContent}>
                   <h3 style={styles.productName}>{data.name || 'Untitled'}</h3>
+                  
+                  {/* Template Selector (Phase C2) */}
+                  <div style={styles.templateSelector}>
+                    <Layers size={14} style={{ color: 'var(--text-muted)' }} />
+                    <select
+                      value={product.template || 'quick-decision'}
+                      onChange={(e) => handleTemplateChange(product.id, e.target.value)}
+                      style={styles.templateSelect}
+                    >
+                      {availableTemplates.map(t => (
+                        <option key={t.id} value={t.id} disabled={!t.unlocked}>
+                          {t.name} {!t.unlocked ? `🔒 KES ${t.price}` : ''}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
                   <p style={styles.productDesc}>{data.description || 'No description'}</p>
                   <div style={styles.productFooter}>
                     <div>
@@ -1743,6 +1835,10 @@ const styles = {
   // Card Balance Styles (Phase C)
   cardBalanceBox: { display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 14px', background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: '10px', fontSize: '13px', fontWeight: '500', color: 'var(--text-secondary)' },
   buyCardsBtn: { marginLeft: '8px', padding: '4px 10px', background: 'var(--accent-color)', border: 'none', borderRadius: '6px', fontSize: '11px', fontWeight: '600', color: '#fff', cursor: 'pointer' },
+  
+  // Template Selector Styles (Phase C2)
+  templateSelector: { display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' },
+  templateSelect: { flex: 1, padding: '6px 10px', fontSize: '12px', border: '1px solid var(--border-color)', borderRadius: '6px', background: 'var(--bg-secondary)', color: 'var(--text-primary)', cursor: 'pointer' },
   
   modalOverlay: { position: 'fixed', inset: 0, background: 'rgba(0, 0, 0, 0.7)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', zIndex: 1000, padding: '20px', overflowY: 'auto' },
   modal: { width: '100%', maxWidth: '700px', padding: '32px', margin: '20px 0' },

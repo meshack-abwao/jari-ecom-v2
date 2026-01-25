@@ -1,6 +1,6 @@
 @echo off
 cd /d C:\Users\ADMIN\Desktop\jari-ecom-v2
 git add -A
-git commit -m "C2.2-Dashboard-templatesAPI-client-available-unlock-assign"
+git commit -m "C2.3-Dashboard-template-selector-per-product-card-unlock-modal"
 git push origin main
-git log --oneline -5
+git log --oneline -6
