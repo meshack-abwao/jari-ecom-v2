@@ -4,6 +4,7 @@ export default function Step1_BusinessType({ data, updateData, nextStep }) {
   const [step, setStep] = useState('intro');
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
+  const [hoveredCard, setHoveredCard] = useState(null);
   const [answers, setAnswers] = useState({
     painPoints: [],
     customerJobs: [],      // CHANGED to array for multi-select
@@ -377,6 +378,8 @@ export default function Step1_BusinessType({ data, updateData, nextStep }) {
             return (
               <button
                 key={option.value}
+                onMouseEnter={() => setHoveredCard(option.value)}
+                onMouseLeave={() => setHoveredCard(null)}
                 onClick={() => {
                   if (currentQ.type === 'multi') {
                     handleToggleMulti(currentQ.id, option.value);
@@ -397,6 +400,17 @@ export default function Step1_BusinessType({ data, updateData, nextStep }) {
                   ...(!isJobQuestion && {
                     borderColor: isSelected ? '#667eea' : 'rgba(0, 0, 0, 0.08)',
                     background: isSelected ? 'rgba(102, 126, 234, 0.04)' : 'white',
+                  }),
+                  // Hover animation (desktop only)
+                  ...(hoveredCard === option.value && {
+                    transform: 'translateY(-4px) scale(1.02)',
+                    boxShadow: isJobQuestion 
+                      ? `0 12px 24px ${getBorderColor(option.gradient)}20, 0 0 0 1px ${getBorderColor(option.gradient)}30`
+                      : '0 12px 24px rgba(102, 126, 234, 0.15)',
+                  }),
+                  // Active/click animation
+                  ...(hoveredCard === option.value && {
+                    transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                   }),
                   animationDelay: `${index * 50}ms`,
                 }}
@@ -685,6 +699,7 @@ const styles = {
     transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
     textAlign: 'left',
     fontFamily: '-apple-system, BlinkMacSystemFont, "Inter", sans-serif',
+    transform: 'scale(1)',
   },
 
   jobCard: {
