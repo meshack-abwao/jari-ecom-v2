@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Step1_BusinessType from './signup/Step1_BusinessType';
 import Step2_TemplatePreview from './signup/Step2_TemplatePreview';
@@ -12,6 +12,7 @@ const LOGO_URL = 'https://res.cloudinary.com/dmfrtzgkv/image/upload/v1737283841/
 
 export default function SignupWizard() {
   const [currentStep, setCurrentStep] = useState(1);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const [signupData, setSignupData] = useState({
     businessType: '',
     defaultTemplate: '',
@@ -31,6 +32,16 @@ export default function SignupWizard() {
   });
   
   const navigate = useNavigate();
+
+  // Scroll to top smoothly whenever step changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    // Trigger transition animation
+    setIsTransitioning(true);
+    const timer = setTimeout(() => setIsTransitioning(false), 50);
+    return () => clearTimeout(timer);
+  }, [currentStep]);
 
   const nextStep = () => setCurrentStep(prev => Math.min(prev + 1, 7));
   const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 1));
@@ -82,7 +93,12 @@ export default function SignupWizard() {
       )}
 
       {/* Main content - No nested containers */}
-      <main style={styles.main}>
+      <main style={{
+        ...styles.main,
+        opacity: isTransitioning ? 0 : 1,
+        transform: isTransitioning ? 'translateY(20px)' : 'translateY(0)',
+        transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+      }}>
         {/* Contextual title (for steps 3-6) */}
         {titles && (
           <div style={styles.titleSection}>

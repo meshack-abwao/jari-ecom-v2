@@ -469,6 +469,28 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* Page Slide-Up Animation (Apple-inspired) */
+@keyframes pageSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Apply to all main page content */
+.dashboard-main {
+  animation: pageSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Override for each route change */
+.dashboard-main[data-page] {
+  animation: pageSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 @keyframes spin {
   to { transform: rotate(360deg); }
 }

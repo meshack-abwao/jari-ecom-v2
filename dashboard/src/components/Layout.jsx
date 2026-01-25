@@ -262,7 +262,7 @@ export default function Layout() {
         </button>
       </aside>
 
-      <main className="dashboard-main"><Outlet /></main>
+      <main className="dashboard-main" data-page><Outlet /></main>
     </div>
   );
 }
