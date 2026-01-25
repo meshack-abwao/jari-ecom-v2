@@ -257,6 +257,13 @@ export default function ProductsPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      // Block if creating new product and no cards remaining
+      if (!editingProduct && !cardBalance.canAddProduct) {
+        alert('❌ Product limit reached! Purchase more cards to add products.');
+        handleBuyCards();
+        return;
+      }
+      
       // Build V2 JSONB structure
       const productPayload = {
         template: selectedTemplate,
@@ -332,6 +339,7 @@ export default function ProductsPage() {
       
       resetForm();
       loadProducts();
+      loadCardBalance(); // Refresh card balance after product change
       alert('✅ Product saved successfully!');
     } catch (error) {
       console.error('Failed to save product:', error);
@@ -421,6 +429,7 @@ export default function ProductsPage() {
     try {
       await productsAPI.delete(id);
       setProducts(products.filter(p => p.id !== id));
+      loadCardBalance(); // Refresh card balance after deletion
     } catch (error) { 
       console.error('Delete failed:', error);
       alert('Failed to delete product.'); 
