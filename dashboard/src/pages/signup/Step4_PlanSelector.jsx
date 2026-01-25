@@ -78,6 +78,8 @@ export default function Step4_PlanSelector({ data, updateData, nextStep, prevSte
     nextStep();
   };
 
+  const PHI = 1.618;
+
   return (
     <div style={styles.container}>
       {/* Base Plan Card */}
@@ -126,7 +128,7 @@ export default function Step4_PlanSelector({ data, updateData, nextStep, prevSte
                 onClick={() => toggleAddon(addon.id)}
                 style={{
                   ...styles.addonCard,
-                  borderColor: isSelected ? addon.color : '#e5e7eb',
+                  borderColor: isSelected ? addon.color : 'rgba(0, 0, 0, 0.08)',
                   backgroundColor: isSelected ? `${addon.color}08` : 'white',
                 }}
               >
@@ -144,7 +146,7 @@ export default function Step4_PlanSelector({ data, updateData, nextStep, prevSte
                   
                   <div style={{
                     ...styles.checkbox,
-                    borderColor: isSelected ? addon.color : '#d1d5db',
+                    borderColor: isSelected ? addon.color : 'rgba(0, 0, 0, 0.15)',
                     backgroundColor: isSelected ? addon.color : 'white',
                   }}>
                     {isSelected && <span style={styles.checkIcon}>✓</span>}
@@ -177,7 +179,7 @@ export default function Step4_PlanSelector({ data, updateData, nextStep, prevSte
             ← Back
           </button>
           <button onClick={handleContinue} style={styles.continueButton}>
-            Continue to Verification →
+            Continue →
           </button>
         </div>
       </div>
@@ -185,36 +187,39 @@ export default function Step4_PlanSelector({ data, updateData, nextStep, prevSte
   );
 }
 
+const PHI = 1.618;
+
 const styles = {
   container: {
     maxWidth: '900px',
     margin: '0 auto',
     width: '100%',
+    padding: `0 clamp(20px, 5vw, 32px) clamp(40px, 8vh, 64px)`,
   },
 
   basePlanCard: {
     background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-    borderRadius: '20px',
-    padding: '32px',
-    marginBottom: '40px',
+    borderRadius: '24px',
+    padding: `${Math.round(32 * PHI)}px 32px 32px`,
+    marginBottom: `${Math.round(40 * PHI)}px`,
     color: 'white',
-    boxShadow: '0 8px 24px rgba(102, 126, 234, 0.25)',
+    boxShadow: '0 12px 32px rgba(102, 126, 234, 0.25)',
   },
 
   basePlanHeader: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: '24px',
+    marginBottom: '32px',
     gap: '24px',
     flexWrap: 'wrap',
   },
 
   basePlanBadge: {
     display: 'inline-block',
-    padding: '4px 12px',
+    padding: '6px 16px',
     background: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: '20px',
+    borderRadius: '980px', // Pill
     fontSize: '12px',
     fontWeight: 600,
     marginBottom: '12px',
@@ -229,7 +234,7 @@ const styles = {
   },
 
   basePlanSubtitle: {
-    fontSize: '14px',
+    fontSize: '15px',
     opacity: 0.9,
     margin: 0,
   },
@@ -242,12 +247,13 @@ const styles = {
     display: 'flex',
     alignItems: 'baseline',
     justifyContent: 'flex-end',
-    gap: '4px',
+    gap: '6px',
   },
 
   currency: {
-    fontSize: '16px',
-    opacity: 0.8,
+    fontSize: '18px',
+    opacity: 0.85,
+    fontWeight: 500,
   },
 
   amount: {
@@ -259,7 +265,7 @@ const styles = {
 
   period: {
     fontSize: '14px',
-    opacity: 0.8,
+    opacity: 0.85,
     display: 'block',
     marginTop: '4px',
   },
@@ -270,66 +276,63 @@ const styles = {
     margin: 0,
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-    gap: '12px',
+    gap: '14px',
   },
 
   featureItem: {
     display: 'flex',
     alignItems: 'center',
-    gap: '8px',
+    gap: '10px',
     fontSize: '14px',
     opacity: 0.95,
   },
 
   checkmark: {
-    fontSize: '16px',
+    fontSize: '18px',
     fontWeight: 'bold',
   },
 
   addonsSection: {
-    marginBottom: '40px',
+    marginBottom: `${Math.round(48 * PHI)}px`,
   },
 
   sectionTitle: {
     fontSize: '24px',
     fontWeight: 700,
     color: '#1d1d1f',
-    marginBottom: '8px',
+    marginBottom: '10px',
     letterSpacing: '-0.02em',
   },
 
   sectionSubtitle: {
-    fontSize: '14px',
+    fontSize: '15px',
     color: '#86868b',
-    marginBottom: '24px',
+    marginBottom: `${Math.round(24 * PHI)}px`,
+    lineHeight: PHI,
   },
 
   addonsGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
-    gap: '16px',
+    gap: `${Math.round(16 * PHI)}px`,
   },
 
   addonCard: {
     position: 'relative',
     background: 'white',
-    border: '2px solid #e5e7eb',
-    borderRadius: '16px',
-    padding: '20px',
+    border: '2px solid',
+    borderRadius: '20px', // Rounded
+    padding: '24px',
     cursor: 'pointer',
-    transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
-    ':hover': {
-      transform: 'translateY(-2px)',
-      boxShadow: '0 8px 16px rgba(0, 0, 0, 0.1)',
-    },
+    transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
   },
 
   recommendedBadge: {
     position: 'absolute',
-    top: '12px',
-    right: '12px',
-    padding: '4px 10px',
-    borderRadius: '12px',
+    top: '14px',
+    right: '14px',
+    padding: '4px 12px',
+    borderRadius: '980px', // Pill
     fontSize: '11px',
     fontWeight: 600,
     color: 'white',
@@ -340,13 +343,13 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: '16px',
+    marginBottom: '18px',
   },
 
   iconCircle: {
     width: '48px',
     height: '48px',
-    borderRadius: '50%',
+    borderRadius: '14px', // Rounded square
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -355,7 +358,7 @@ const styles = {
   checkbox: {
     width: '24px',
     height: '24px',
-    borderRadius: '6px',
+    borderRadius: '8px', // Rounded
     border: '2px solid',
     display: 'flex',
     alignItems: 'center',
@@ -378,9 +381,9 @@ const styles = {
   },
 
   addonDescription: {
-    fontSize: '13px',
+    fontSize: '14px',
     color: '#86868b',
-    lineHeight: 1.4,
+    lineHeight: PHI,
     marginBottom: '16px',
   },
 
@@ -397,22 +400,22 @@ const styles = {
   },
 
   footer: {
-    borderTop: '1px solid #e5e7eb',
-    paddingTop: '32px',
+    borderTop: '1px solid rgba(0, 0, 0, 0.08)',
+    paddingTop: `${Math.round(32 * PHI)}px`,
   },
 
   totalSection: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: '24px',
-    padding: '20px',
+    marginBottom: `${Math.round(24 * PHI)}px`,
+    padding: '24px',
     background: '#f9fafb',
-    borderRadius: '12px',
+    borderRadius: '16px',
   },
 
   totalLabel: {
-    fontSize: '14px',
+    fontSize: '15px',
     color: '#86868b',
     fontWeight: 500,
   },
@@ -426,35 +429,35 @@ const styles = {
 
   buttonGroup: {
     display: 'flex',
-    gap: '12px',
+    gap: '16px',
   },
 
   backButton: {
     flex: 1,
-    padding: '16px 24px',
+    padding: '16px 28px',
     fontSize: '16px',
     fontWeight: 500,
-    border: '2px solid #e5e7eb',
-    borderRadius: '12px',
-    background: 'white',
+    border: 'none',
+    borderRadius: '980px', // Pill
+    background: '#f5f5f7',
     color: '#1d1d1f',
     cursor: 'pointer',
-    transition: 'all 0.2s ease',
+    transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
     fontFamily: '-apple-system, BlinkMacSystemFont, "Inter", sans-serif',
   },
 
   continueButton: {
     flex: 2,
-    padding: '16px 24px',
+    padding: '16px 32px',
     fontSize: '16px',
     fontWeight: 600,
     border: 'none',
-    borderRadius: '12px',
-    background: 'linear-gradient(135deg, #f97316, #ea580c)',
+    borderRadius: '980px', // Pill
+    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
     color: 'white',
     cursor: 'pointer',
     transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
     fontFamily: '-apple-system, BlinkMacSystemFont, "Inter", sans-serif',
-    boxShadow: '0 4px 12px rgba(249, 115, 22, 0.25)',
+    boxShadow: '0 8px 20px rgba(102, 126, 234, 0.3)',
   },
 };
