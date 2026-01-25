@@ -349,4 +349,59 @@ export const authAPI = {
 
 ---
 
+## Formula 12: API Route Import Errors (NEW - Jan 25, 2026)
+
+**Problem:** Railway fails with `SyntaxError: The requested module '../middleware/auth.js' does not provide an export named 'authenticateToken'`
+
+**Cause:** New route files copy-pasted or assumed wrong import names
+
+**Investigation Pattern:**
+```javascript
+// 1. Check what the middleware ACTUALLY exports
+// File: api/src/middleware/auth.js
+export function auth(req, res, next) { ... }  // ✅ Exports "auth", NOT "authenticateToken"
+
+// 2. Check how working routes import it
+// File: api/src/routes/products.js
+import { auth } from '../middleware/auth.js';  // ✅ CORRECT
+import db from '../config/database.js';         // ✅ "db" default export
+
+// 3. Common wrong patterns:
+import { authenticateToken } from '../middleware/auth.js';  // ❌ WRONG
+import { query } from '../config/database.js';               // ❌ WRONG
+```
+
+**Fix Pattern:**
+```javascript
+// Correct imports for Jari API routes:
+import express from 'express';
+import db from '../config/database.js';    // Default export
+import { auth } from '../middleware/auth.js';  // Named export "auth"
+
+// Correct middleware usage:
+router.get('/endpoint', auth, async (req, res) => {
+  const userId = req.user.userId;  // ✅ "userId" NOT "id"
+  await db.query('SELECT ...', [userId]);  // ✅ "db.query" NOT "query"
+});
+```
+
+**User Object Properties:**
+```javascript
+// After auth middleware, req.user contains:
+req.user.userId   // ✅ The user's ID
+req.user.email    // ✅ The user's email
+// NOT:
+req.user.id       // ❌ WRONG - this doesn't exist
+```
+
+**Prevention Checklist for New Routes:**
+1. ✅ Check middleware exports: `import { auth } from '../middleware/auth.js'`
+2. ✅ Check database exports: `import db from '../config/database.js'`
+3. ✅ Use `auth` not `authenticateToken` in route handlers
+4. ✅ Use `db.query()` not `query()`
+5. ✅ Use `req.user.userId` not `req.user.id`
+6. ✅ Look at existing working routes (products.js, stores.js) as reference
+
+---
+
 **End of Debug Formulas**
