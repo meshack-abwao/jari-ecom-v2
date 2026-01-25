@@ -11,6 +11,7 @@ import mpesaRoutes from './mpesa.js';
 import cloudinaryRoutes from './cloudinary.js';
 import otpRoutes from './otp.js';
 import cardsRoutes from './cards.js';
+import templatesRoutes from './templates.js';
 
 export function setupRoutes(app) {
   // Health check
@@ -34,6 +35,7 @@ export function setupRoutes(app) {
   app.use('/api/cloudinary', cloudinaryRoutes);
   app.use('/api/otp', otpRoutes);
   app.use('/api/cards', cardsRoutes);
+  app.use('/api/templates', templatesRoutes);
   
   // Public store routes (no /api prefix for cleaner URLs)
   app.use('/s', publicRoutes);
