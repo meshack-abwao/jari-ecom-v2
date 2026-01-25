@@ -2,7 +2,7 @@
 const LOGIN_URL = 'https://dashboard.jarisolutionsecom.store/login';
 const SIGNUP_URL = 'https://dashboard.jarisolutionsecom.store/signup'; // FIXED: Was /login
 const WHATSAPP_URL = 'https://wa.me/254751433625?text=Hi!%20I%27m%20interested%20in%20Jari.Ecom';
-const LOGO_URL = 'https://res.cloudinary.com/dmfrtzgkv/image/upload/v1737283841/jari/Jari-Business-Solutions-1_r2z9ow.png';
+const LOGO_URL = 'https://res.cloudinary.com/dmfrtzgkv/image/upload/v1769147046/jari-ecom-SQUARE-ALIGNED_ebd5qg.png';
 
 export function renderLandingPage() {
   return `
