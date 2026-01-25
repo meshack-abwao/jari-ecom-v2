@@ -7,7 +7,7 @@
 // To update: Upload new logo to Cloudinary and replace URL here
 export const BRAND = {
   // Main logo (square, 180x180 or similar)
-  LOGO_URL: 'https://res.cloudinary.com/dmfrtzgkv/image/upload/v1769146392/jari-ecom-SQUARE-OFFSET_or11pz.png',
+  LOGO_URL: 'https://res.cloudinary.com/dmfrtzgkv/image/upload/v1769147046/jari-ecom-SQUARE-ALIGNED_ebd5qg.png',
   
   // App name
   APP_NAME: 'Jari.Ecom',
