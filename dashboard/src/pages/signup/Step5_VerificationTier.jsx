@@ -7,33 +7,32 @@ export default function Step5_VerificationTier({ data, updateData, nextStep, pre
     {
       id: 'BASIC',
       name: 'Basic',
-      icon: '🌱',
-      description: 'Start selling immediately',
-      limits: 'KES 50,000/month, KES 10,000/transaction',
+      tagline: 'Start Selling Today',
+      limits: ['KES 50,000/month', 'KES 10,000/transaction'],
       settlement: '3-day hold',
       required: ['Phone verification', 'Email verification'],
-      color: '#3b82f6',
+      gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+      badge: null,
     },
     {
       id: 'VERIFIED',
       name: 'Verified',
-      icon: '✓',
-      description: 'Build customer trust',
-      limits: 'KES 500,000/month, KES 50,000/transaction',
+      tagline: 'Build Customer Trust',
+      limits: ['KES 500,000/month', 'KES 50,000/transaction'],
       settlement: '2-day hold',
       required: ['Phone + Email', 'National ID upload'],
-      color: '#10b981',
+      gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
       badge: 'Recommended',
     },
     {
       id: 'BUSINESS',
       name: 'Business',
-      icon: '🏢',
-      description: 'Unlimited selling power',
-      limits: 'Unlimited transactions',
+      tagline: 'Unlimited Power',
+      limits: ['Unlimited transactions', 'No limits'],
       settlement: 'Instant settlement',
       required: ['All above', 'Business Registration', 'KRA PIN'],
-      color: '#8b5cf6',
+      gradient: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+      badge: 'Premium',
     },
   ];
 
@@ -48,87 +47,89 @@ export default function Step5_VerificationTier({ data, updateData, nextStep, pre
 
   return (
     <div style={styles.container}>
-      <div style={styles.content}>
+      <div style={styles.header}>
+        <p style={styles.helpText}>
+          💡 You can upgrade your verification level anytime after signup
+        </p>
+      </div>
+
+      <div style={styles.tiersGrid}>
+        {tiers.map((tier) => {
+          const isSelected = selectedTier === tier.id;
+
+          return (
+            <div
+              key={tier.id}
+              onClick={() => handleSelect(tier.id)}
+              style={{
+                ...styles.tierCard,
+                border: isSelected ? '3px solid' : '2px solid #e5e7eb',
+                borderImage: isSelected ? `${tier.gradient} 1` : 'none',
+                transform: isSelected ? 'scale(1.02)' : 'scale(1)',
+              }}
+            >
+              {tier.badge && (
+                <div style={{...styles.badge, background: tier.gradient}}>
+                  {tier.badge}
+                </div>
+              )}
+
+              <div style={styles.tierTop}>
+                <div style={styles.tierNameSection}>
+                  <h3 style={styles.tierName}>{tier.name}</h3>
+                  <p style={styles.tierTagline}>{tier.tagline}</p>
+                </div>
+
+                <div style={{
+                  ...styles.radioButton,
+                  borderColor: isSelected ? 'transparent' : '#d1d5db',
+                  background: isSelected ? tier.gradient : 'white',
+                }}>
+                  {isSelected && <span style={styles.radioCheck}>✓</span>}
+                </div>
+              </div>
+
+              <div style={styles.tierContent}>
+                {/* Limits */}
+                <div style={styles.section}>
+                  <div style={styles.sectionTitle}>Transaction Limits</div>
+                  {tier.limits.map((limit, idx) => (
+                    <div key={idx} style={styles.listItem}>
+                      <span style={styles.dot}>•</span>
+                      <span>{limit}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Settlement */}
+                <div style={styles.section}>
+                  <div style={styles.sectionTitle}>Settlement</div>
+                  <div style={styles.listItem}>
+                    <span style={styles.dot}>•</span>
+                    <span>{tier.settlement}</span>
+                  </div>
+                </div>
+
+                {/* Required Docs */}
+                <div style={styles.section}>
+                  <div style={styles.sectionTitle}>Required Documents</div>
+                  {tier.required.map((doc, idx) => (
+                    <div key={idx} style={styles.listItem}>
+                      <span style={styles.checkSmall}>✓</span>
+                      <span>{doc}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      <div style={styles.footer}>
         <button onClick={prevStep} style={styles.backButton}>
           ← Back
         </button>
-
-        <h2 style={styles.heading}>Choose Your Verification Level</h2>
-        <p style={styles.subheading}>
-          Higher verification = More trust from customers + Better limits
-        </p>
-
-        <div style={styles.tiersContainer}>
-          {tiers.map((tier) => {
-            const isSelected = selectedTier === tier.id;
-
-            return (
-              <div
-                key={tier.id}
-                onClick={() => handleSelect(tier.id)}
-                style={{
-                  ...styles.tierCard,
-                  borderColor: isSelected ? tier.color : '#d1d5db',
-                  backgroundColor: isSelected ? '#f0fdf4' : 'rgba(255, 255, 255, 0.95)',
-                  transform: isSelected ? 'scale(1.02)' : 'scale(1)',
-                  cursor: 'pointer',
-                }}
-              >
-                {tier.badge && (
-                  <span style={{ ...styles.badge, backgroundColor: tier.color }}>
-                    {tier.badge}
-                  </span>
-                )}
-
-                <div style={styles.tierHeader}>
-                  <span style={{ ...styles.tierIcon, color: tier.color }}>{tier.icon}</span>
-                  <div style={styles.tierCheckbox}>
-                    {isSelected && (
-                      <span style={{ ...styles.checkbox, backgroundColor: tier.color }}>✓</span>
-                    )}
-                  </div>
-                </div>
-
-                <h3 style={styles.tierName}>{tier.name}</h3>
-                <p style={styles.tierDescription}>{tier.description}</p>
-
-                <div style={styles.tierDetails}>
-                  <div style={styles.detailRow}>
-                    <span style={styles.detailLabel}>💰 Limits:</span>
-                    <span style={styles.detailValue}>{tier.limits}</span>
-                  </div>
-
-                  <div style={styles.detailRow}>
-                    <span style={styles.detailLabel}>⏱️ Settlement:</span>
-                    <span style={styles.detailValue}>{tier.settlement}</span>
-                  </div>
-                </div>
-
-                <div style={styles.requirements}>
-                  <span style={styles.requirementsLabel}>Required:</span>
-                  <ul style={styles.requirementsList}>
-                    {tier.required.map((req, index) => (
-                      <li key={index} style={styles.requirementItem}>
-                        • {req}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Reassurance */}
-        <div style={styles.reassurance}>
-          <p style={styles.reassuranceText}>
-            ✓ You can upgrade your verification anytime from your dashboard
-          </p>
-          <p style={styles.reassuranceText}>
-            🔒 All verification documents are encrypted and stored securely
-          </p>
-        </div>
-
         <button onClick={handleContinue} style={styles.continueButton}>
           Continue with {tiers.find(t => t.id === selectedTier)?.name} →
         </button>
@@ -139,188 +140,176 @@ export default function Step5_VerificationTier({ data, updateData, nextStep, pre
 
 const styles = {
   container: {
-    display: 'flex',
-    justifyContent: 'center',
-  },
-  
-  content: {
+    maxWidth: '1000px',
+    margin: '0 auto',
     width: '100%',
-    maxWidth: '900px',
   },
-  
-  backButton: {
-    background: 'rgba(255, 255, 255, 0.2)',
-    color: 'white',
-    border: 'none',
-    padding: '0.5rem 1rem',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    marginBottom: '1rem',
-    fontSize: '0.875rem',
-    fontWeight: '500',
+
+  header: {
+    marginBottom: '32px',
   },
-  
-  heading: {
-    fontSize: '2rem',
-    fontWeight: 'bold',
-    color: 'white',
+
+  helpText: {
+    fontSize: '14px',
+    color: '#667eea',
+    background: '#f3f4ff',
+    padding: '12px 20px',
+    borderRadius: '10px',
     textAlign: 'center',
-    marginBottom: '0.5rem',
+    margin: 0,
   },
-  
-  subheading: {
-    fontSize: '1.125rem',
-    color: 'rgba(255, 255, 255, 0.9)',
-    textAlign: 'center',
-    marginBottom: '2rem',
-  },
-  
-  tiersContainer: {
+
+  tiersGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-    gap: '1.5rem',
-    marginBottom: '2rem',
+    gap: '20px',
+    marginBottom: '32px',
   },
-  
+
   tierCard: {
-    borderRadius: '16px',
-    padding: '2rem',
-    border: '3px solid',
     position: 'relative',
-    transition: 'all 0.3s ease',
+    background: 'white',
+    borderRadius: '16px',
+    padding: '24px',
+    cursor: 'pointer',
+    transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
   },
-  
+
   badge: {
     position: 'absolute',
-    top: '-12px',
-    left: '50%',
-    transform: 'translateX(-50%)',
+    top: '16px',
+    right: '16px',
+    padding: '4px 12px',
+    borderRadius: '12px',
+    fontSize: '11px',
+    fontWeight: 600,
     color: 'white',
-    fontSize: '0.75rem',
-    fontWeight: '600',
-    padding: '0.375rem 0.75rem',
-    borderRadius: '6px',
+    letterSpacing: '0.5px',
   },
-  
-  tierHeader: {
+
+  tierTop: {
     display: 'flex',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '1rem',
+    alignItems: 'flex-start',
+    marginBottom: '20px',
+    paddingBottom: '20px',
+    borderBottom: '1px solid #f3f4f6',
   },
-  
-  tierIcon: {
-    fontSize: '2.5rem',
+
+  tierNameSection: {
+    flex: 1,
   },
-  
-  tierCheckbox: {
+
+  tierName: {
+    fontSize: '22px',
+    fontWeight: 700,
+    color: '#1d1d1f',
+    marginBottom: '4px',
+    letterSpacing: '-0.02em',
+  },
+
+  tierTagline: {
+    fontSize: '13px',
+    color: '#86868b',
+    margin: 0,
+  },
+
+  radioButton: {
     width: '28px',
     height: '28px',
-    border: '2px solid #d1d5db',
     borderRadius: '50%',
+    border: '2px solid',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+    transition: 'all 0.2s ease',
+    flexShrink: 0,
   },
-  
-  checkbox: {
-    width: '100%',
-    height: '100%',
-    borderRadius: '50%',
+
+  radioCheck: {
     color: 'white',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: '1rem',
+    fontSize: '16px',
     fontWeight: 'bold',
   },
-  
-  tierName: {
-    fontSize: '1.5rem',
-    fontWeight: '700',
-    color: '#1f2937',
-    marginBottom: '0.5rem',
-  },
-  
-  tierDescription: {
-    fontSize: '0.875rem',
-    color: '#6b7280',
-    marginBottom: '1.5rem',
-  },
-  
-  tierDetails: {
-    backgroundColor: '#f9fafb',
-    borderRadius: '8px',
-    padding: '1rem',
-    marginBottom: '1rem',
-  },
-  
-  detailRow: {
+
+  tierContent: {
     display: 'flex',
-    justifyContent: 'space-between',
-    marginBottom: '0.5rem',
-    fontSize: '0.875rem',
+    flexDirection: 'column',
+    gap: '16px',
   },
-  
-  detailLabel: {
-    color: '#6b7280',
-    fontWeight: '500',
+
+  section: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
   },
-  
-  detailValue: {
-    color: '#1f2937',
-    fontWeight: '600',
-    textAlign: 'right',
-  },
-  
-  requirements: {
-    borderTop: '1px solid #e5e7eb',
-    paddingTop: '1rem',
-  },
-  
-  requirementsLabel: {
-    fontSize: '0.75rem',
-    fontWeight: '600',
+
+  sectionTitle: {
+    fontSize: '12px',
+    fontWeight: 600,
     color: '#6b7280',
     textTransform: 'uppercase',
-    letterSpacing: '0.05em',
+    letterSpacing: '0.5px',
+    marginBottom: '4px',
   },
-  
-  requirementsList: {
-    listStyle: 'none',
-    padding: 0,
-    margin: '0.5rem 0 0 0',
+
+  listItem: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    fontSize: '14px',
+    color: '#374151',
+    lineHeight: 1.5,
   },
-  
-  requirementItem: {
-    fontSize: '0.875rem',
-    color: '#4b5563',
-    marginBottom: '0.25rem',
+
+  dot: {
+    color: '#d1d5db',
+    fontWeight: 'bold',
+    fontSize: '16px',
+    flexShrink: 0,
   },
-  
-  reassurance: {
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+
+  checkSmall: {
+    color: '#10b981',
+    fontWeight: 'bold',
+    fontSize: '14px',
+    flexShrink: 0,
+  },
+
+  footer: {
+    display: 'flex',
+    gap: '12px',
+    paddingTop: '24px',
+    borderTop: '1px solid #e5e7eb',
+  },
+
+  backButton: {
+    flex: 1,
+    padding: '16px 24px',
+    fontSize: '16px',
+    fontWeight: 500,
+    border: '2px solid #e5e7eb',
     borderRadius: '12px',
-    padding: '1.5rem',
-    marginBottom: '2rem',
-    textAlign: 'center',
-  },
-  
-  reassuranceText: {
-    color: 'white',
-    fontSize: '0.875rem',
-    marginBottom: '0.5rem',
-  },
-  
-  continueButton: {
-    width: '100%',
-    backgroundColor: '#10b981',
-    color: 'white',
-    border: 'none',
-    padding: '1rem',
-    borderRadius: '12px',
-    fontSize: '1rem',
-    fontWeight: '600',
+    background: 'white',
+    color: '#1d1d1f',
     cursor: 'pointer',
+    transition: 'all 0.2s ease',
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Inter", sans-serif',
+  },
+
+  continueButton: {
+    flex: 2,
+    padding: '16px 24px',
+    fontSize: '16px',
+    fontWeight: 600,
+    border: 'none',
+    borderRadius: '12px',
+    background: 'linear-gradient(135deg, #f97316, #ea580c)',
+    color: 'white',
+    cursor: 'pointer',
+    transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Inter", sans-serif',
+    boxShadow: '0 4px 12px rgba(249, 115, 22, 0.25)',
   },
 };
