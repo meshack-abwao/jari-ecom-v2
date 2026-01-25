@@ -7,8 +7,7 @@ import Step4_PlanSelector from './signup/Step4_PlanSelector';
 import Step5_VerificationTier from './signup/Step5_VerificationTier';
 import Step6_Payment from './signup/Step6_Payment';
 import Step7_Success from './signup/Step7_Success';
-
-const LOGO_URL = 'https://res.cloudinary.com/dmfrtzgkv/image/upload/v1737283841/jari/Jari-Business-Solutions-1_r2z9ow.png';
+import { BRAND } from '../constants/brand';
 
 export default function SignupWizard() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -73,7 +72,7 @@ export default function SignupWizard() {
         <header style={styles.header}>
           <div style={styles.headerContent}>
             <a href="https://jarisolutionsecom.store" style={styles.logoLink}>
-              <img src={LOGO_URL} alt="Jari" style={styles.logo} />
+              <img src={BRAND.LOGO_URL} alt="Jari" style={styles.logo} />
             </a>
             
             <div style={styles.headerRight}>

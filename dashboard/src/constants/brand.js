@@ -6,8 +6,8 @@
 // Logo hosted on Cloudinary for fast, reliable loading
 // To update: Upload new logo to Cloudinary and replace URL here
 export const BRAND = {
-  // Main logo (square, 180x180 or similar)
-  LOGO_URL: 'https://res.cloudinary.com/dmfrtzgkv/image/upload/v1769147046/jari-ecom-SQUARE-ALIGNED_ebd5qg.png',
+  // Main logo (SVG for perfect scaling)
+  LOGO_URL: 'https://res.cloudinary.com/dmfrtzgkv/image/upload/v1769367543/image_aqegw9.svg',
   
   // App name
   APP_NAME: 'Jari.Ecom',
