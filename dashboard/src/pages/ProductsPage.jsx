@@ -295,6 +295,27 @@ export default function ProductsPage() {
     }
   };
 
+  const handleUnlockTemplate = async () => {
+    if (!templateToUnlock) return;
+    
+    try {
+      // Demo mode: Generate a mock payment reference
+      const demoPaymentRef = `DEMO-${Date.now()}`;
+      
+      await templatesAPI.unlock(templateToUnlock.id, demoPaymentRef);
+      
+      // Refresh templates list
+      await loadAvailableTemplates();
+      
+      setShowUnlockModal(false);
+      setTemplateToUnlock(null);
+      alert(`✅ ${templateToUnlock.name} template unlocked!`);
+    } catch (error) {
+      console.error('Failed to unlock template:', error);
+      alert('Failed to unlock template. Please try again.');
+    }
+  };
+
   // ===========================================
   // FORM HANDLERS
   // ===========================================
@@ -725,8 +746,8 @@ export default function ProductsPage() {
               <div style={{ fontSize: '32px', fontWeight: '700', color: 'var(--accent-color)', marginBottom: '24px' }}>
                 KES {templateToUnlock.price}
               </div>
-              <button className="btn btn-primary" style={{ width: '100%', padding: '14px' }}>
-                Pay with M-Pesa
+              <button onClick={handleUnlockTemplate} className="btn btn-primary" style={{ width: '100%', padding: '14px' }}>
+                Unlock Template (Demo)
               </button>
               <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '12px' }}>
                 One-time payment. Use on unlimited products.
