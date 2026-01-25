@@ -321,7 +321,6 @@ export default function SettingsPage() {
                   placeholder="Logo image URL"
                   allowUrl={true}
                 />
-                )}
               </div>
 
               {/* Contact Phone */}

@@ -1719,7 +1719,7 @@ const styles = {
     flexDirection: 'column',
     gap: '10px',
   },
-  bookingCard: {
+  bookingCardSimple: {
     display: 'flex',
     alignItems: 'center',
     gap: '16px',

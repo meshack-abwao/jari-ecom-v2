@@ -69,7 +69,7 @@ export default function Step1_BusinessType({ data, updateData, nextStep }) {
         {
           value: 'functional_quick',
           label: "Quick, practical solutions",
-          customerThinking: ""I need to see what's available right now"",
+          customerThinking: "'I need to see what's available right now'",
           examples: "Fast food menus, daily essentials, quick-service items",
           template: 'Visual Menu',
           businessType: 'food',
@@ -79,7 +79,7 @@ export default function Step1_BusinessType({ data, updateData, nextStep }) {
         {
           value: 'emotional_perfect',
           label: "Something perfect for a special moment",
-          customerThinking: ""This needs to be amazing—show me every detail"",
+          customerThinking: "'This needs to be amazing—show me every detail'",
           examples: "Wedding cakes, custom jewelry, milestone gifts, artisan products",
           template: 'Deep Dive',
           businessType: 'premium',
@@ -89,7 +89,7 @@ export default function Step1_BusinessType({ data, updateData, nextStep }) {
         {
           value: 'trust_booking',
           label: "A reliable service they can book confidently",
-          customerThinking: ""I need to see availability and know what's included"",
+          customerThinking: "'I need to see availability and know what's included'",
           examples: "Photography, salon services, consulting, event planning",
           template: 'Portfolio & Booking',
           businessType: 'services',
@@ -99,7 +99,7 @@ export default function Step1_BusinessType({ data, updateData, nextStep }) {
         {
           value: 'convenience_fast',
           label: "The easiest possible purchase",
-          customerThinking: ""I know what I want—just let me buy it quickly"",
+          customerThinking: "'I know what I want—just let me buy it quickly'",
           examples: "Repeat purchases, simple products, known items",
           template: 'Quick Decision',
           businessType: 'products',
@@ -109,7 +109,7 @@ export default function Step1_BusinessType({ data, updateData, nextStep }) {
         {
           value: 'social_status',
           label: "To impress others or stand out",
-          customerThinking: ""I want something exclusive that reflects my taste"",
+          customerThinking: "'I want something exclusive that reflects my taste'",
           examples: "Designer fashion, luxury goods, limited editions, status symbols",
           template: 'Premium Showcase',
           businessType: 'premium',
@@ -119,7 +119,7 @@ export default function Step1_BusinessType({ data, updateData, nextStep }) {
         {
           value: 'discovery_explore',
           label: "Inspiration and new possibilities",
-          customerThinking: ""Show me your range—I need ideas"",
+          customerThinking: "'Show me your range—I need ideas'",
           examples: "Custom services, creative work, made-to-order items",
           template: 'Portfolio Gallery',
           businessType: 'services',
