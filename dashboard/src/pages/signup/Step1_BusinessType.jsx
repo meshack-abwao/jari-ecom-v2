@@ -1,318 +1,414 @@
 import { useState } from 'react';
 
 export default function Step1_BusinessType({ data, updateData, nextStep }) {
-  const [selectedType, setSelectedType] = useState('');
-  const [hoveredType, setHoveredType] = useState(null);
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [answers, setAnswers] = useState({
+    mainJob: null,          // What job are they hiring our platform to do?
+    sellingWhat: null,      // What are they selling?
+    biggestPain: null,      // What's their biggest pain point?
+    idealOutcome: null,     // What does success look like?
+  });
 
-  const businessScenarios = [
+  // JTBD/ODI-Aligned Questions
+  const questions = [
     {
-      id: 'food',
-      question: "Want customers to order food without endless back-and-forth?",
-      painPoint: "Tired of 'Is it available?' messages at 2am",
-      solution: "Menu that shows what's in stock, accepts orders instantly",
-      image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=80',
-      gradient: 'linear-gradient(135deg, #f59e0b 0%, #ea580c 100%)',
+      id: 'mainJob',
+      question: "What's the #1 thing slowing down your sales right now?",
+      subtitle: "Be honest—we've heard it all 😊",
+      options: [
+        {
+          value: 'customer_questions',
+          label: "Answering the same questions over and over",
+          subtext: "'What colors?', 'Is it available?', 'How much?'",
+          icon: '💬',
+        },
+        {
+          value: 'payment_chaos',
+          label: "Chasing payments and confirming orders",
+          subtext: "Lost M-Pesa codes, screenshot confusion",
+          icon: '💸',
+        },
+        {
+          value: 'no_showcase',
+          label: "Can't show my products properly",
+          subtext: "WhatsApp compresses photos, stories disappear",
+          icon: '📸',
+        },
+        {
+          value: 'booking_mess',
+          label: "Scheduling appointments is a nightmare",
+          subtext: "Double bookings, no-shows, phone tag",
+          icon: '📅',
+        },
+        {
+          value: 'looking_unprofessional',
+          label: "My business looks too casual/amateur",
+          subtext: "Need to compete with bigger brands",
+          icon: '✨',
+        },
+      ],
     },
     {
-      id: 'services',
-      question: "Losing bookings because clients can't find available times?",
-      painPoint: "Playing phone tag to schedule appointments",
-      solution: "Calendar that shows open slots, books automatically",
-      image: 'https://images.unsplash.com/photo-1556740758-90de374c12ad?w=800&q=80',
-      gradient: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+      id: 'sellingWhat',
+      question: "What are you selling?",
+      subtitle: "This helps us set up the right template for you",
+      options: [
+        {
+          value: 'food',
+          label: "Food & Drinks",
+          subtext: "Restaurant, cafe, catering, food delivery",
+          icon: '🍽️',
+        },
+        {
+          value: 'services',
+          label: "Services & Appointments",
+          subtext: "Photography, salon, consulting, training",
+          icon: '📸',
+        },
+        {
+          value: 'products',
+          label: "Physical Products",
+          subtext: "Fashion, electronics, beauty, merchandise",
+          icon: '🛍️',
+        },
+        {
+          value: 'premium',
+          label: "High-End Products",
+          subtext: "Jewelry, luxury goods, custom items",
+          icon: '💎',
+        },
+        {
+          value: 'events',
+          label: "Events & Tickets",
+          subtext: "Workshops, concerts, conferences",
+          icon: '🎫',
+        },
+      ],
     },
     {
-      id: 'products',
-      question: "Spending all day answering 'What colors do you have?'",
-      painPoint: "Same questions, different customers, every single day",
-      solution: "Product catalog with photos, prices, and instant checkout",
-      image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&q=80',
-      gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+      id: 'biggestPain',
+      question: "Which one would make your life SO much easier?",
+      subtitle: "Pick your biggest wish",
+      options: [
+        {
+          value: 'auto_orders',
+          label: "Customers order without asking questions",
+          subtext: "They see the menu/catalog, pick, pay, done",
+          icon: '🎯',
+        },
+        {
+          value: 'auto_booking',
+          label: "Customers book themselves",
+          subtext: "They pick a time, confirm, I just show up",
+          icon: '✅',
+        },
+        {
+          value: 'look_professional',
+          label: "Look as professional as big brands",
+          subtext: "Not just screenshots and WhatsApp status",
+          icon: '🏆',
+        },
+        {
+          value: 'payment_tracking',
+          label: "Automatically track who paid",
+          subtext: "No more 'Did you send?', 'Check your phone'",
+          icon: '💰',
+        },
+        {
+          value: 'showcase_products',
+          label: "Show products in their best light",
+          subtext: "High-quality photos, all details visible",
+          icon: '🌟',
+        },
+      ],
     },
     {
-      id: 'premium',
-      question: "Your products deserve better than blurry WhatsApp photos?",
-      painPoint: "Competing with cheap sellers when you offer premium quality",
-      solution: "Showcase every detail with stunning galleries and trust signals",
-      image: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800&q=80',
-      gradient: 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)',
-    },
-    {
-      id: 'events',
-      question: "Manually tracking RSVPs and payments in spreadsheets?",
-      painPoint: "Losing track of who paid, who's coming, who cancelled",
-      solution: "Event page with automatic RSVP tracking and M-Pesa payments",
-      image: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&q=80',
-      gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+      id: 'idealOutcome',
+      question: "What does success look like for you?",
+      subtitle: "Dream big—we're here to help you get there",
+      options: [
+        {
+          value: 'save_time',
+          label: "Save 5+ hours per week",
+          subtext: "Less customer service, more business growth",
+          icon: '⏰',
+        },
+        {
+          value: 'increase_sales',
+          label: "Double my sales in 3 months",
+          subtext: "More customers, bigger orders, repeat buyers",
+          icon: '📈',
+        },
+        {
+          value: 'scale_up',
+          label: "Hire staff and scale my business",
+          subtext: "Systems that work without me",
+          icon: '🚀',
+        },
+        {
+          value: 'look_legit',
+          label: "Be taken seriously as a business",
+          subtext: "Professional presence, trust signals",
+          icon: '💼',
+        },
+        {
+          value: 'less_stress',
+          label: "Run my business without burning out",
+          subtext: "Enjoy it again, not just survive",
+          icon: '😌',
+        },
+      ],
     },
   ];
 
-  const handleSelect = (scenario) => {
-    setSelectedType(scenario.id);
-    
+  const currentQ = questions[currentQuestion];
+  const progress = ((currentQuestion + 1) / questions.length) * 100;
+
+  const handleAnswer = (value) => {
+    const newAnswers = { ...answers, [currentQ.id]: value };
+    setAnswers(newAnswers);
+
+    // Auto-advance after brief pause (visual feedback)
+    setTimeout(() => {
+      if (currentQuestion < questions.length - 1) {
+        setCurrentQuestion(currentQuestion + 1);
+      } else {
+        // All questions answered - determine business type and advance
+        processAnswersAndContinue(newAnswers);
+      }
+    }, 300);
+  };
+
+  const handleBack = () => {
+    if (currentQuestion > 0) {
+      setCurrentQuestion(currentQuestion - 1);
+    }
+  };
+
+  const processAnswersAndContinue = (finalAnswers) => {
+    // Map sellingWhat to template
     const templateMap = {
       food: 'vm',
       services: 'pbk',
       products: 'qd',
       premium: 'dd',
-      events: 'events'
+      events: 'events',
     };
-    
+
+    // Map to smart add-ons based on pain points
     const addonMap = {
       food: ['mpesa_stk', 'whatsapp_auto'],
       services: ['mpesa_stk'],
       products: ['mpesa_stk', 'whatsapp_auto'],
       premium: ['mpesa_stk', 'priority_support'],
-      events: ['mpesa_stk', 'whatsapp_auto']
+      events: ['mpesa_stk', 'whatsapp_auto'],
     };
 
     updateData({
-      businessType: scenario.id,
-      defaultTemplate: templateMap[scenario.id],
-      smartAddons: addonMap[scenario.id],
+      businessType: finalAnswers.sellingWhat,
+      defaultTemplate: templateMap[finalAnswers.sellingWhat],
+      smartAddons: addonMap[finalAnswers.sellingWhat],
+      jtbdAnswers: finalAnswers, // Store for later personalization
     });
 
+    // Small delay then advance
     setTimeout(() => {
       nextStep();
-    }, 400);
+    }, 500);
   };
 
   return (
-    <div style={styles.fullContainer}>
-      {/* Header - No container, full width */}
-      <div style={styles.header}>
-        <h2 style={styles.heading}>We get it. Running a business in Kenya is tough.</h2>
-        <p style={styles.subheading}>
-          Pick the scenario that sounds most like your daily hustle:
+    <div style={styles.container}>
+      {/* Progress indicator */}
+      <div style={styles.progressContainer}>
+        <div style={styles.progressBar}>
+          <div style={{
+            ...styles.progressFill,
+            width: `${progress}%`,
+          }} />
+        </div>
+        <p style={styles.progressText}>
+          Question {currentQuestion + 1} of {questions.length}
         </p>
       </div>
 
-      {/* Grid - Edge to edge on mobile, max-width on desktop */}
-      <div style={styles.grid}>
-        {businessScenarios.map((scenario) => (
-          <div
-            key={scenario.id}
-            onClick={() => handleSelect(scenario)}
-            onMouseEnter={() => setHoveredType(scenario.id)}
-            onMouseLeave={() => setHoveredType(null)}
-            style={{
-              ...styles.card,
-              transform: selectedType === scenario.id ? 'scale(0.98)' : 
-                         hoveredType === scenario.id ? 'translateY(-4px)' : 'scale(1)',
-              opacity: selectedType && selectedType !== scenario.id ? 0.6 : 1,
-              boxShadow: hoveredType === scenario.id 
-                ? '0 20px 40px rgba(0, 0, 0, 0.15)' 
-                : selectedType === scenario.id
-                ? '0 8px 24px rgba(0, 0, 0, 0.12)'
-                : '0 4px 12px rgba(0, 0, 0, 0.08)',
-            }}
-          >
-            {/* Image - Taller, more prominent */}
-            <div style={styles.imageContainer}>
-              <img 
-                src={scenario.image} 
-                alt={scenario.question}
-                style={{
-                  ...styles.image,
-                  transform: hoveredType === scenario.id ? 'scale(1.08)' : 'scale(1)',
-                }}
-              />
-              <div style={{
-                ...styles.gradientOverlay,
-                background: scenario.gradient,
-                opacity: hoveredType === scenario.id ? 0.5 : 0.35,
-              }} />
-              
-              {/* Selected checkmark overlaid on image */}
-              {selectedType === scenario.id && (
-                <div style={styles.selectedBadge}>
-                  <div style={styles.checkmark}>✓</div>
-                </div>
-              )}
-            </div>
-
-            {/* Content - More breathing room */}
-            <div style={styles.cardContent}>
-              {/* Question - Prominent */}
-              <h3 style={styles.question}>{scenario.question}</h3>
-              
-              {/* Pain Point - Always visible, subtle */}
-              <div style={styles.painPoint}>
-                <span style={styles.painIcon}>😤</span>
-                <span style={styles.painText}>{scenario.painPoint}</span>
-              </div>
-
-              {/* Solution - Prominent */}
-              <div style={styles.solution}>
-                <span style={styles.solutionIcon}>✨</span>
-                <span style={styles.solutionText}>{scenario.solution}</span>
-              </div>
-            </div>
-          </div>
-        ))}
+      {/* Question */}
+      <div style={styles.questionSection}>
+        <h1 style={styles.question}>{currentQ.question}</h1>
+        <p style={styles.subtitle}>{currentQ.subtitle}</p>
       </div>
 
-      {/* Footer - No container needed */}
-      <p style={styles.footerText}>
-        💡 Don't worry—you can switch templates anytime
-      </p>
+      {/* Options */}
+      <div style={styles.optionsContainer}>
+        {currentQ.options.map((option) => {
+          const isSelected = answers[currentQ.id] === option.value;
+          
+          return (
+            <button
+              key={option.value}
+              onClick={() => handleAnswer(option.value)}
+              style={{
+                ...styles.optionButton,
+                background: isSelected ? 'linear-gradient(135deg, #667eea, #764ba2)' : 'white',
+                color: isSelected ? 'white' : '#1d1d1f',
+                transform: isSelected ? 'scale(0.98)' : 'scale(1)',
+                boxShadow: isSelected 
+                  ? '0 8px 24px rgba(102, 126, 234, 0.3)'
+                  : '0 2px 8px rgba(0, 0, 0, 0.08)',
+              }}
+            >
+              <div style={styles.optionIcon}>{option.icon}</div>
+              <div style={styles.optionContent}>
+                <div style={{
+                  ...styles.optionLabel,
+                  color: isSelected ? 'white' : '#1d1d1f',
+                }}>
+                  {option.label}
+                </div>
+                <div style={{
+                  ...styles.optionSubtext,
+                  color: isSelected ? 'rgba(255, 255, 255, 0.9)' : '#86868b',
+                }}>
+                  {option.subtext}
+                </div>
+              </div>
+              {isSelected && (
+                <div style={styles.checkmark}>✓</div>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Back button */}
+      {currentQuestion > 0 && (
+        <button onClick={handleBack} style={styles.backButton}>
+          ← Back
+        </button>
+      )}
     </div>
   );
 }
 
 const styles = {
-  fullContainer: {
-    width: '100%',
+  container: {
     minHeight: '100vh',
     padding: '40px 20px',
-  },
-
-  header: {
-    textAlign: 'center',
-    marginBottom: '48px',
     maxWidth: '800px',
-    margin: '0 auto 48px',
-  },
-
-  heading: {
-    fontSize: 'clamp(28px, 5vw, 40px)',
-    fontWeight: 700,
-    color: '#1d1d1f',
-    marginBottom: '16px',
-    letterSpacing: '-0.02em',
-    lineHeight: 1.1,
-  },
-
-  subheading: {
-    fontSize: 'clamp(16px, 3vw, 20px)',
-    color: '#86868b',
-    margin: 0,
-    fontWeight: 400,
-    lineHeight: 1.4,
-  },
-
-  grid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-    gap: '32px',
-    maxWidth: '1400px',
-    margin: '0 auto 48px',
-  },
-
-  card: {
-    position: 'relative',
-    background: 'white',
-    borderRadius: '24px',
-    overflow: 'hidden',
-    cursor: 'pointer',
-    transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
-    border: 'none',
-  },
-
-  imageContainer: {
-    position: 'relative',
-    width: '100%',
-    height: '240px',
-    overflow: 'hidden',
-  },
-
-  image: {
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover',
-    transition: 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
-  },
-
-  gradientOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    transition: 'opacity 0.4s ease',
-  },
-
-  selectedBadge: {
-    position: 'absolute',
-    top: '20px',
-    right: '20px',
-    width: '44px',
-    height: '44px',
-    background: 'white',
-    borderRadius: '50%',
+    margin: '0 auto',
     display: 'flex',
-    alignItems: 'center',
+    flexDirection: 'column',
     justifyContent: 'center',
-    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.25)',
-    zIndex: 10,
   },
 
-  checkmark: {
-    color: '#10b981',
-    fontSize: '24px',
-    fontWeight: 'bold',
+  progressContainer: {
+    marginBottom: '48px',
   },
 
-  cardContent: {
-    padding: '32px 28px',
+  progressBar: {
+    height: '4px',
+    background: 'rgba(0, 0, 0, 0.08)',
+    borderRadius: '2px',
+    overflow: 'hidden',
+    marginBottom: '12px',
+  },
+
+  progressFill: {
+    height: '100%',
+    background: 'linear-gradient(90deg, #667eea, #764ba2)',
+    transition: 'width 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+    borderRadius: '2px',
+  },
+
+  progressText: {
+    fontSize: '13px',
+    color: '#86868b',
+    fontWeight: 500,
+    margin: 0,
+  },
+
+  questionSection: {
+    marginBottom: '40px',
+    textAlign: 'center',
   },
 
   question: {
-    fontSize: '20px',
-    fontWeight: 600,
+    fontSize: 'clamp(24px, 5vw, 36px)',
+    fontWeight: 700,
     color: '#1d1d1f',
-    marginBottom: '16px',
-    lineHeight: 1.3,
+    marginBottom: '12px',
+    lineHeight: 1.2,
+    letterSpacing: '-0.02em',
+  },
+
+  subtitle: {
+    fontSize: 'clamp(15px, 3vw, 18px)',
+    color: '#86868b',
+    margin: 0,
+    lineHeight: 1.4,
+  },
+
+  optionsContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px',
+    marginBottom: '32px',
+  },
+
+  optionButton: {
+    width: '100%',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '16px',
+    padding: '20px 24px',
+    border: 'none',
+    borderRadius: '16px',
+    cursor: 'pointer',
+    transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+    textAlign: 'left',
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Inter", sans-serif',
+    position: 'relative',
+  },
+
+  optionIcon: {
+    fontSize: '32px',
+    flexShrink: 0,
+  },
+
+  optionContent: {
+    flex: 1,
+    minWidth: 0,
+  },
+
+  optionLabel: {
+    fontSize: '16px',
+    fontWeight: 600,
+    marginBottom: '4px',
     letterSpacing: '-0.01em',
   },
 
-  painPoint: {
-    display: 'flex',
-    gap: '10px',
-    padding: '14px 16px',
-    background: 'rgba(239, 68, 68, 0.06)',
-    borderRadius: '12px',
-    marginBottom: '16px',
-    border: '1px solid rgba(239, 68, 68, 0.1)',
-  },
-
-  painIcon: {
-    fontSize: '20px',
-    flexShrink: 0,
-  },
-
-  painText: {
+  optionSubtext: {
     fontSize: '14px',
-    color: '#dc2626',
-    lineHeight: 1.5,
-    fontStyle: 'italic',
+    lineHeight: 1.4,
   },
 
-  solution: {
-    display: 'flex',
-    gap: '10px',
-    alignItems: 'flex-start',
-  },
-
-  solutionIcon: {
+  checkmark: {
     fontSize: '20px',
+    fontWeight: 'bold',
     flexShrink: 0,
-    marginTop: '2px',
   },
 
-  solutionText: {
+  backButton: {
+    alignSelf: 'flex-start',
+    padding: '12px 24px',
     fontSize: '15px',
-    color: '#374151',
-    lineHeight: 1.6,
     fontWeight: 500,
-  },
-
-  footerText: {
-    fontSize: '15px',
+    border: 'none',
+    background: 'transparent',
     color: '#86868b',
-    textAlign: 'center',
-    margin: '0 auto',
-    maxWidth: '600px',
+    cursor: 'pointer',
+    borderRadius: '8px',
+    transition: 'all 0.2s ease',
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Inter", sans-serif',
   },
 };
