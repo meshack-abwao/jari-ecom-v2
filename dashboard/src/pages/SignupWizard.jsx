@@ -201,7 +201,7 @@ const styles = {
   },
 
   logo: {
-    height: '32px',
+    height: '40px',
     width: 'auto',
   },
 
