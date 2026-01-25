@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ordersAPI, productsAPI, settingsAPI, pixelAPI } from '../api/client';
-import { DollarSign, ShoppingCart, Package, ExternalLink, Eye, Calendar, Clock, Users, ChevronDown, ChevronUp, Copy, Check, Share2, BarChart3 } from 'lucide-react';
+import { ordersAPI, productsAPI, settingsAPI, pixelAPI, subscriptionsAPI } from '../api/client';
+import { DollarSign, ShoppingCart, Package, ExternalLink, Eye, Calendar, Clock, Users, ChevronDown, ChevronUp, Copy, Check, Share2, BarChart3, CreditCard, AlertCircle } from 'lucide-react';
 
 export default function DashboardPage() {
   const [stats, setStats] = useState({ total: 0, pending: 0, delivered: 0, revenue: 0, pending_revenue: 0 });
@@ -18,6 +18,7 @@ export default function DashboardPage() {
   const [topProducts, setTopProducts] = useState([]);
   const [topProductsView, setTopProductsView] = useState('revenue'); // 'orders' or 'revenue' - default to revenue (ODI)
   const [showAnalysis, setShowAnalysis] = useState(null); // which stat card analysis to show
+  const [subscription, setSubscription] = useState(null); // Phase D: subscription status
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -61,6 +62,14 @@ export default function DashboardPage() {
       if (slug) {
         const baseUrl = import.meta.env.VITE_STORE_URL || 'https://jarisolutionsecom.store';
         setStoreUrl(`${baseUrl}/?store=${slug}`);
+      }
+      
+      // Load subscription status (Phase D)
+      try {
+        const subRes = await subscriptionsAPI.getStatus();
+        setSubscription(subRes.data);
+      } catch (e) {
+        console.log('Subscription status not available');
       }
     } catch (error) {
       console.error('Failed to load data:', error);
@@ -186,6 +195,36 @@ export default function DashboardPage() {
 
   return (
     <div className="fade-in">
+      {/* Subscription Status Banner (Phase D) */}
+      {subscription && (subscription.status === 'trial' || subscription.status === 'expired') && (
+        <div style={{
+          ...styles.subscriptionBanner,
+          background: subscription.status === 'expired' 
+            ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' 
+            : 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
+        }}>
+          <div style={styles.subscriptionBannerContent}>
+            {subscription.status === 'expired' ? (
+              <AlertCircle size={20} />
+            ) : (
+              <CreditCard size={20} />
+            )}
+            <span>
+              {subscription.status === 'expired' 
+                ? 'Your trial has expired. Subscribe to continue using all features.'
+                : `Trial: ${subscription.daysRemaining} days remaining`
+              }
+            </span>
+          </div>
+          <button 
+            onClick={() => navigate('/subscription')} 
+            style={styles.subscriptionBannerBtn}
+          >
+            {subscription.status === 'expired' ? 'Subscribe Now' : 'View Plans'}
+          </button>
+        </div>
+      )}
+
       <div style={styles.header}>
         <div>
           <h1 style={styles.title}>Overview</h1>
@@ -554,6 +593,11 @@ const styles = {
   loadingContainer: { display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' },
   spinner: { width: '40px', height: '40px', border: '3px solid var(--border-color)', borderTopColor: 'var(--accent-color)', borderRadius: '50%', animation: 'spin 1s linear infinite' },
   loadingText: { marginTop: '16px', color: 'var(--text-muted)' },
+  
+  // Subscription Banner (Phase D)
+  subscriptionBanner: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 20px', borderRadius: '12px', marginBottom: '20px', color: '#fff' },
+  subscriptionBannerContent: { display: 'flex', alignItems: 'center', gap: '10px', fontSize: '14px', fontWeight: '500' },
+  subscriptionBannerBtn: { padding: '8px 16px', background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.3)', borderRadius: '8px', color: '#fff', fontSize: '13px', fontWeight: '600', cursor: 'pointer' },
   
   header: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px', flexWrap: 'wrap', gap: '16px' },
   title: { fontSize: '34px', fontWeight: '700', marginBottom: '6px', color: 'var(--text-primary)', letterSpacing: '-0.025em' },
