@@ -221,6 +221,27 @@ export const foodOrdersAPI = {
 };
 
 // ===========================================
+// CARDS API (Product Card Management)
+// ===========================================
+export const cardsAPI = {
+  // Get card balance
+  getBalance: () => api.get('/cards/balance'),
+  
+  // Check if can add more products
+  checkLimit: () => api.post('/cards/check-limit'),
+  
+  // Get available bundles
+  getBundles: () => api.get('/cards/bundles'),
+  
+  // Purchase card bundle
+  purchase: (bundleType, paymentRef) => 
+    api.post('/cards/purchase', { bundleType, paymentRef }),
+  
+  // Get purchase history
+  getHistory: () => api.get('/cards/history'),
+};
+
+// ===========================================
 // M-PESA PAYMENTS API
 // ===========================================
 export const mpesaAPI = {
