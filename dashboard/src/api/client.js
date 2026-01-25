@@ -56,6 +56,11 @@ export const authAPI = {
   login: (credentials) => api.post('/auth/login', credentials),
   register: (userData) => api.post('/auth/register', userData),
   getMe: () => api.get('/auth/me'),
+  
+  // Phase B: Enhanced Signup Endpoints
+  post: (endpoint, data) => api.post(endpoint, data), // Generic post for signup flow
+  signupBusinessType: (businessType) => api.post('/auth/signup/business-type', { businessType }),
+  signupComplete: (signupData) => api.post('/auth/signup/complete', signupData),
 };
 
 // ===========================================
