@@ -13,33 +13,16 @@ const LOGO_URL = 'https://res.cloudinary.com/dmfrtzgkv/image/upload/v1737283841/
 export default function SignupWizard() {
   const [currentStep, setCurrentStep] = useState(1);
   const [signupData, setSignupData] = useState({
-    // Step 1
     businessType: '',
     defaultTemplate: '',
     smartAddons: [],
-    
-    // Step 3
     storeName: '',
     ownerName: '',
     email: '',
     phone: '',
     password: '',
-    
-    // Step 4
     selectedAddons: [],
-    
-    // Step 5
     verificationTier: 'BASIC',
-    nationalIdFront: null,
-    nationalIdBack: null,
-    businessRegDoc: null,
-    kraDoc: null,
-    
-    // Step 6
-    paymentRef: '',
-    paymentStatus: 'pending',
-    
-    // Step 7 (Response data)
     token: '',
     storeId: '',
     slug: '',
@@ -49,319 +32,223 @@ export default function SignupWizard() {
   
   const navigate = useNavigate();
 
-  const nextStep = () => {
-    setCurrentStep(prev => Math.min(prev + 1, 7));
-  };
+  const nextStep = () => setCurrentStep(prev => Math.min(prev + 1, 7));
+  const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 1));
+  const updateData = (newData) => setSignupData(prev => ({ ...prev, ...newData }));
+  const goToDashboard = () => navigate('/');
 
-  const prevStep = () => {
-    setCurrentStep(prev => Math.max(prev - 1, 1));
-  };
-
-  const updateData = (newData) => {
-    setSignupData(prev => ({ ...prev, ...newData }));
-  };
-
-  const goToDashboard = () => {
-    navigate('/');
-  };
-
-  // Progress indicator
   const progress = (currentStep / 7) * 100;
+
+  // Dynamic titles based on step
+  const getTitles = () => {
+    switch (currentStep) {
+      case 1: return null; // No title for Step 1 (JTBD has its own header)
+      case 2: return null; // Auto-skips
+      case 3: return { title: "Let's create your account", subtitle: "Quick and easy—takes less than 2 minutes" };
+      case 4: return { title: "Choose your plan", subtitle: "Start free, upgrade anytime" };
+      case 5: return { title: "Build customer trust", subtitle: "Higher trust = more sales" };
+      case 6: return { title: "Complete your setup", subtitle: "Activate M-Pesa payments and start selling" };
+      case 7: return null; // Success has its own layout
+      default: return { title: "", subtitle: "" };
+    }
+  };
+
+  const titles = getTitles();
 
   return (
     <div style={styles.container}>
-      {/* Apple-style sticky header */}
-      <header style={styles.header}>
-        <div style={styles.headerContent}>
-          <a href="https://jarisolutionsecom.store" style={styles.logoLink}>
-            <img src={LOGO_URL} alt="Jari" style={styles.logoImg} />
-            <div style={styles.logoSeparator}></div>
-            <span style={styles.logoText}>
-              Jari<span style={styles.logoAccent}>.Ecom</span>
-            </span>
-          </a>
-          
-          {currentStep < 7 && (
+      {/* Minimal sticky header - Only for steps 2-7 */}
+      {currentStep > 1 && currentStep < 7 && (
+        <header style={styles.header}>
+          <div style={styles.headerContent}>
+            <a href="https://jarisolutionsecom.store" style={styles.logoLink}>
+              <img src={LOGO_URL} alt="Jari" style={styles.logo} />
+            </a>
+            
             <div style={styles.headerRight}>
-              <span style={styles.stepIndicator}>
-                Step {currentStep} of 7
-              </span>
-              <a href="/login" style={styles.loginLink}>
-                Already have an account?
-              </a>
+              <span style={styles.stepText}>Step {currentStep} of 7</span>
+              <a href="/login" style={styles.loginLink}>Sign in</a>
             </div>
-          )}
-        </div>
-        
-        {/* Progress bar */}
-        {currentStep < 7 && (
-          <div style={styles.progressBarContainer}>
+          </div>
+          
+          {/* Thin progress bar */}
+          <div style={styles.progressBar}>
             <div style={{
-              ...styles.progressBarFill,
-              width: `${progress}%`
+              ...styles.progressFill,
+              width: `${progress}%`,
             }} />
           </div>
-        )}
-      </header>
+        </header>
+      )}
 
-      {/* Main content area */}
+      {/* Main content - No nested containers */}
       <main style={styles.main}>
-        {/* Title section */}
-        {currentStep < 7 && (
+        {/* Contextual title (for steps 3-6) */}
+        {titles && (
           <div style={styles.titleSection}>
-            <h1 style={styles.mainTitle}>
-              {getTitleForStep(currentStep)}
-            </h1>
-            <p style={styles.subtitle}>
-              {getSubtitleForStep(currentStep)}
-            </p>
+            <h1 style={styles.mainTitle}>{titles.title}</h1>
+            <p style={styles.mainSubtitle}>{titles.subtitle}</p>
           </div>
         )}
 
-        {/* Step content */}
-        <div style={styles.stepContent}>
-          {currentStep === 1 && (
-            <Step1_BusinessType
-              data={signupData}
-              updateData={updateData}
-              nextStep={nextStep}
-            />
-          )}
-          
-          {currentStep === 2 && (
-            <Step2_TemplatePreview
-              data={signupData}
-              updateData={updateData}
-              nextStep={nextStep}
-              prevStep={prevStep}
-            />
-          )}
-          
-          {currentStep === 3 && (
-            <Step3_BasicInfo
-              data={signupData}
-              updateData={updateData}
-              nextStep={nextStep}
-              prevStep={prevStep}
-            />
-          )}
-          
-          {currentStep === 4 && (
-            <Step4_PlanSelector
-              data={signupData}
-              updateData={updateData}
-              nextStep={nextStep}
-              prevStep={prevStep}
-            />
-          )}
-          
-          {currentStep === 5 && (
-            <Step5_VerificationTier
-              data={signupData}
-              updateData={updateData}
-              nextStep={nextStep}
-              prevStep={prevStep}
-            />
-          )}
-          
-          {currentStep === 6 && (
-            <Step6_Payment
-              data={signupData}
-              updateData={updateData}
-              nextStep={nextStep}
-              prevStep={prevStep}
-            />
-          )}
-          
-          {currentStep === 7 && (
-            <Step7_Success
-              data={signupData}
-              goToDashboard={goToDashboard}
-            />
-          )}
-        </div>
+        {/* Step content - Direct rendering, no wrapper */}
+        {currentStep === 1 && (
+          <Step1_BusinessType 
+            data={signupData} 
+            updateData={updateData} 
+            nextStep={nextStep} 
+          />
+        )}
+        
+        {currentStep === 2 && (
+          <Step2_TemplatePreview 
+            data={signupData} 
+            nextStep={nextStep} 
+          />
+        )}
+        
+        {currentStep === 3 && (
+          <Step3_BasicInfo 
+            data={signupData} 
+            updateData={updateData} 
+            nextStep={nextStep} 
+            prevStep={prevStep} 
+          />
+        )}
+        
+        {currentStep === 4 && (
+          <Step4_PlanSelector 
+            data={signupData} 
+            updateData={updateData} 
+            nextStep={nextStep} 
+            prevStep={prevStep} 
+          />
+        )}
+        
+        {currentStep === 5 && (
+          <Step5_VerificationTier 
+            data={signupData} 
+            updateData={updateData} 
+            nextStep={nextStep} 
+            prevStep={prevStep} 
+          />
+        )}
+        
+        {currentStep === 6 && (
+          <Step6_Payment 
+            data={signupData} 
+            updateData={updateData} 
+            nextStep={nextStep} 
+            prevStep={prevStep} 
+          />
+        )}
+        
+        {currentStep === 7 && (
+          <Step7_Success 
+            data={signupData} 
+            goToDashboard={goToDashboard} 
+          />
+        )}
       </main>
-
-      {/* Footer */}
-      <footer style={styles.footer}>
-        <p style={styles.footerText}>
-          © 2026 Jari Business Solutions. Built for Kenyan entrepreneurs.
-        </p>
-      </footer>
     </div>
   );
 }
 
-// Helper functions for dynamic titles
-function getTitleForStep(step) {
-  const titles = {
-    1: "What are you selling?",
-    2: "See your store come to life",
-    3: "Let's create your account",
-    4: "Choose your plan",
-    5: "Build customer trust",
-    6: "Complete your setup",
-    7: "Welcome to Jari!"
-  };
-  return titles[step] || "";
-}
-
-function getSubtitleForStep(step) {
-  const subtitles = {
-    1: "We'll recommend the perfect template for your business",
-    2: "This is how your store will look to customers",
-    3: "Quick and easy - takes less than 2 minutes",
-    4: "Start free, upgrade anytime. No credit card required.",
-    5: "Higher trust = more sales. Upload documents to unlock better limits.",
-    6: "Activate M-Pesa payments and start selling",
-    7: ""
-  };
-  return subtitles[step] || "";
-}
-
-// Apple-inspired styling
 const styles = {
   container: {
     minHeight: '100vh',
-    display: 'flex',
-    flexDirection: 'column',
     background: '#f5f5f7',
-    fontFamily: '-apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif',
   },
-  
-  // Header (sticky)
+
+  // Minimal sticky header
   header: {
     position: 'sticky',
     top: 0,
     zIndex: 100,
-    background: 'rgba(255, 255, 255, 0.72)',
+    background: 'rgba(255, 255, 255, 0.8)',
     backdropFilter: 'saturate(180%) blur(20px)',
-    WebkitBackdropFilter: 'saturate(180%) blur(20px)',
     borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
   },
-  
+
   headerContent: {
-    maxWidth: '1200px',
+    maxWidth: '1400px',
     margin: '0 auto',
-    padding: '12px 24px',
+    padding: '16px 24px',
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  
+
   logoLink: {
     display: 'flex',
     alignItems: 'center',
-    gap: '12px',
     textDecoration: 'none',
   },
-  
-  logoImg: {
-    height: '36px',
+
+  logo: {
+    height: '32px',
     width: 'auto',
   },
-  
-  logoSeparator: {
-    width: '2px',
-    height: '30px',
-    background: '#d2d2d7',
-  },
-  
-  logoText: {
-    fontSize: '21px',
-    fontWeight: 600,
-    color: '#1d1d1f',
-    letterSpacing: '-0.02em',
-  },
-  
-  logoAccent: {
-    background: 'linear-gradient(135deg, #667eea, #764ba2)',
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
-    backgroundClip: 'text',
-  },
-  
+
   headerRight: {
     display: 'flex',
     alignItems: 'center',
     gap: '24px',
   },
-  
-  stepIndicator: {
-    fontSize: '14px',
+
+  stepText: {
+    fontSize: '13px',
     color: '#86868b',
     fontWeight: 500,
   },
-  
+
   loginLink: {
     fontSize: '14px',
     color: '#667eea',
     textDecoration: 'none',
-    fontWeight: 400,
+    fontWeight: 500,
   },
-  
-  progressBarContainer: {
+
+  // Thin gradient progress bar
+  progressBar: {
     height: '3px',
-    background: '#e8e8ed',
+    background: 'rgba(0, 0, 0, 0.06)',
     overflow: 'hidden',
   },
-  
-  progressBarFill: {
+
+  progressFill: {
     height: '100%',
     background: 'linear-gradient(90deg, #667eea, #764ba2)',
     transition: 'width 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
   },
-  
-  // Main content
+
+  // Main content area - No padding on Step 1
   main: {
-    flex: 1,
-    maxWidth: '900px',
     width: '100%',
-    margin: '0 auto',
-    padding: '48px 24px',
+    paddingTop: '0',
   },
-  
+
+  // Title section (Steps 3-6 only)
   titleSection: {
     textAlign: 'center',
-    marginBottom: '48px',
+    padding: '64px 24px 48px',
+    maxWidth: '800px',
+    margin: '0 auto',
   },
-  
+
   mainTitle: {
-    fontSize: '40px',
+    fontSize: 'clamp(32px, 5vw, 48px)',
     fontWeight: 700,
     color: '#1d1d1f',
     marginBottom: '12px',
-    letterSpacing: '-0.03em',
+    letterSpacing: '-0.02em',
     lineHeight: 1.1,
   },
-  
-  subtitle: {
-    fontSize: '19px',
-    color: '#86868b',
-    fontWeight: 400,
-    lineHeight: 1.47,
-    maxWidth: '600px',
-    margin: '0 auto',
-  },
-  
-  stepContent: {
-    background: 'white',
-    borderRadius: '18px',
-    padding: '40px',
-    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
-  },
-  
-  // Footer
-  footer: {
-    padding: '32px 24px',
-    textAlign: 'center',
-    borderTop: '1px solid #d2d2d7',
-    background: 'white',
-  },
-  
-  footerText: {
-    fontSize: '12px',
+
+  mainSubtitle: {
+    fontSize: 'clamp(16px, 3vw, 18px)',
     color: '#86868b',
     margin: 0,
+    lineHeight: 1.5,
   },
 };

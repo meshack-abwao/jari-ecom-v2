@@ -299,4 +299,54 @@ When something breaks, check in this order:
 
 ---
 
+## Formula 11: Signup Failures - Two-Layer Check
+
+**Problem:** "Failed to create account" during signup  
+**Layers to Check:**
+
+**Layer 1 - Backend (Database/Tables):**
+```javascript
+// Check if required tables exist
+const tableCheck = await client.query(`
+  SELECT EXISTS (
+    SELECT FROM information_schema.tables 
+    WHERE table_name = 'merchant_verification'
+  );
+`);
+
+// Use graceful degradation if tables missing
+if (tableCheck.rows[0].exists) {
+  // Create Phase A records
+} else {
+  // Skip Phase A, create basic user + store only
+}
+```
+
+**Layer 2 - Frontend (API Client Methods):**
+```javascript
+// Ensure authAPI has all required methods
+export const authAPI = {
+  post: (endpoint, data) => api.post(endpoint, data), // Generic
+  signupComplete: (data) => api.post('/auth/signup/complete', data), // Specific
+};
+
+// Common error: "Co.post is not a function"
+// Fix: Add missing method to authAPI object
+```
+
+**Testing Checklist:**
+1. ✅ Backend: Migration tables exist? Check Railway DB
+2. ✅ Backend: Graceful degradation working? Check logs
+3. ✅ Frontend: authAPI methods defined? Check client.js
+4. ✅ Frontend: Hard refresh after deploy (Ctrl+Shift+R)
+5. ✅ Network: Check browser DevTools Network tab
+6. ✅ Console: Check for JavaScript errors
+
+**Quick Fixes:**
+- Backend missing tables → Add graceful degradation
+- Frontend missing methods → Add to authAPI
+- Both deployed? → Wait 2-3 min, hard refresh
+
+---
+
 **End of Debug Formulas**
