@@ -9,6 +9,7 @@ import { formatPrice } from '../../shared/utils.js';
 import { renderStories, renderStoryViewer } from '../../shared/media-components.js';
 import { renderProductPolicyLinks, renderProductPolicyModals } from '../../shared/policy-modals.js';
 import { renderBreadcrumb } from '../../render.js';
+import { renderRelatedProducts } from '../../shared/related-products.js';
 
 // Dietary tag icons mapping
 const DIETARY_ICONS = {
@@ -84,6 +85,9 @@ export function renderVisualMenu(product) {
       </div>
       
       ${renderMenuTestimonials(testimonials)}
+      
+      <!-- Related Menu Items (Kalbach: Associative Nav) -->
+      ${renderRelatedProducts(product, 'visual-menu')}
       
       <!-- Sticky CTA - PBK Style (Stacked mobile, inline desktop) -->
       <div class="vm-sticky-cta">
