@@ -1,8 +1,8 @@
 # Jari.Ecom V2 - Project Instructions
 
 > **Purpose:** Feed this document into a Claude Project to maintain full context across all conversations.
-> **Last Updated:** January 23, 2026
-> **Current Phase:** Testing & Frontend Polish
+> **Last Updated:** January 27, 2026
+> **Current Phase:** Navigation Enhancement Complete - Pending Netlify Deploy
 
 ---
 
@@ -26,235 +26,231 @@ An e-commerce platform targeting solo entrepreneurs and small teams in Kenya and
 
 ---
 
-## 2. CURRENT STATUS (January 23, 2026)
+## 2. CURRENT STATUS (January 27, 2026)
+
+### 🚨 IMPORTANT: PENDING DEPLOY
+**All changes committed to GitHub but NOT deployed to Netlify (out of credits).**
+**Push tomorrow (Jan 28) when credits reset.**
 
 ### ✅ COMPLETED FEATURES
 
-**Templates (All 4 Complete)**
+**Templates (5 Complete)**
 | Template | Purpose | Status |
 |----------|---------|--------|
 | Deep Dive | High-value products with specs | ✅ Complete |
 | Quick Decision | Impulse buys, simple products | ✅ Complete |
 | Portfolio/Booking | Services (photographers, consultants) | ✅ Complete |
 | Visual Menu | Food/restaurant ordering | ✅ Complete |
+| Event Landing | Events and tickets | ✅ Complete |
 
-**Visual Menu System**
-- 8 font pairings with Google Fonts
-- 6 food color themes
-- Add-ons with quantity selectors
-- Ingredients display (Apple card style)
-- Sticky CTA (PBK style)
-
-**Food Orders System**
-- Database schema (migration 006 + 007)
-- API endpoints (CRUD, status, payment)
-- Dashboard FoodOrdersPage (Kanban-style)
-- Order routing (VM → food_orders table)
-- Customer order tracking page
-- Table number + estimated time
-
-**Booking System**
-- Calendar week view
-- Status filters
-- Search + Export CSV
-- Reschedule modal
-- Add to Calendar (.ics)
-
-**Mobile App**
-- Capacitor configured
-- Debug APK built (4.2MB)
-- Pending: Play Store submission
+**Navigation System (NEW - Jan 27)**
+| Feature | Description | Status |
+|---------|-------------|--------|
+| Breadcrumbs | Sticky pill with back button + trail | ✅ Complete |
+| Related Products | Template-aware JTBD cards | ✅ Complete |
+| Product Nav | Prev/Next at page bottom | ✅ Complete |
+| Enhanced Footer | Contact, social, back-to-top | ✅ Complete |
+| Dashboard Nav | Collapsible section groups | ✅ Complete |
+| Accessibility | Skip links, ARIA, focus states | ✅ Complete |
 
 ---
 
-## 3. PROJECT STRUCTURE
+## 3. NAVIGATION ARCHITECTURE (KALBACH PRINCIPLES)
 
-```
-C:\Users\ADMIN\Desktop\jari-ecom-v2\
-├── api/
-│   ├── migrations/
-│   │   ├── 001_initial.sql
-│   │   ├── 002_pixel_tracking.sql
-│   │   ├── 003_booking_system.sql
-│   │   ├── 006_food_orders.sql
-│   │   └── 007_food_orders_table_time.sql
-│   └── src/routes/
-│       ├── auth.js, stores.js, products.js, orders.js
-│       ├── bookings.js, food-orders.js, public.js
-│       └── index.js
-│
-├── dashboard/src/
-│   ├── pages/
-│   │   ├── DashboardPage.jsx, ProductsPage.jsx, OrdersPage.jsx
-│   │   ├── FoodOrdersPage.jsx, BookingsPage.jsx
-│   │   ├── AdsPage.jsx, TemplatesPage.jsx, SettingsPage.jsx
-│   ├── components/Layout.jsx
-│   ├── api/client.js
-│   └── App.jsx
-│
-├── store/src/
-│   ├── main.js, api.js, checkout.js, order-tracking.js
-│   ├── styles/base.css, order-tracking.css
-│   ├── shared/ (media-components, testimonials, utils)
-│   └── templates/
-│       ├── deep-dive/
-│       ├── visual-menu/ (vm-render.js, vm-handlers.js, vm-config.js)
-│       ├── portfolio-booking/
-│       └── quick-decision/
-│
-└── docs/
-    ├── PROJECT-INSTRUCTIONS.md (THIS FILE)
-    ├── JARI-DEEP-DIVE-HANDOVER-V2.md
-    ├── HANDOVER-VM-SESSION-2.md
-    ├── IDEA-SHELF.md
-    └── MOBILE-APP-GUIDE.md
-```
+### Structural Navigation
+- **Breadcrumbs** - Shows position: Store > Category > Product
+- **Back Button** - Integrated in breadcrumb pill
+- **Category Links** - Click to filter collection
+
+### Associative Navigation  
+- **Related Products** - Cross-selling by category
+- **Product Navigation** - Sequential (Prev/Next) browsing
+
+### Utility Navigation
+- **Footer Links** - Contact, social, policies
+- **Back to Top** - Quick scroll return
+- **Skip Link** - Keyboard accessibility
+
+### Template-Specific JTBD Messaging
+| Template | Section Title | CTA Text |
+|----------|--------------|----------|
+| Deep Dive | "You might also like" | "View Details →" |
+| Visual Menu | "More from the menu" | "View Item →" |
+| Portfolio Booking | "Other services" | "Learn More →" |
+| Quick Decision | "More products" | "Get This →" |
 
 ---
 
-## 4. CRITICAL TECHNICAL PATTERNS
+## 4. KEY DESIGN PRINCIPLES
 
-### ⚠️ API Response Pattern (CRITICAL)
+### Apple Design Language
+- Glassmorphism (backdrop-filter: blur)
+- Subtle shadows (0 2px 12px rgba(0,0,0,0.08))
+- Smooth transitions (0.2s ease)
+- Pill-shaped buttons (border-radius: full)
+- SF Pro / Inter typography
+
+### CSS Variable System (MANDATORY)
+```css
+/* NEVER use hardcoded values - ALWAYS use variables */
+--fs-micro: 10px;
+--fs-tiny: 11px;
+--fs-small: 13px;
+--fs-body: 15px;
+--space-xs: 4px;
+--space-sm: 8px;
+--space-md: 12px;
+--space-lg: 16px;
+--radius-sm: 12px;
+--radius: 16px;
+--radius-lg: 20px;
+--radius-full: 9999px;
+```
+
+### Template CSS Prefixes
+- Deep Dive: `dd-`
+- Quick Decision: (none, uses base)
+- Portfolio Booking: `pbk-`
+- Visual Menu: `vm-`
+- Event Landing: `el-`
+
+---
+
+## 5. CRITICAL TECHNICAL PATTERNS
+
+### API Response Pattern (CRITICAL)
 ```javascript
-// settingsAPI.getAll() returns store object DIRECTLY
+// ✅ CORRECT
 const response = await settingsAPI.getAll();
-const store = response.data;  // ✅ CORRECT
-const slug = store.slug;      // ✅ CORRECT
+const store = response.data;  // Store object is HERE
+const slug = store.slug;
 
-// WRONG patterns:
-const store = response.data.store;     // ❌ WRONG
+// ❌ WRONG
+const store = response.data.store;  // NOPE
 ```
 
-### Git Commands (Windows PowerShell)
+### Git Commands (Windows)
 ```powershell
 # Use semicolons, NOT &&
-cd C:\Users\ADMIN\Desktop\jari-ecom-v2; git add -A; git commit -m "message"; git push origin main
+cd C:\Users\ADMIN\Desktop\jari-ecom-v2; git add -A; git commit -m "message"
+
+# Or use -C flag
+git -C C:\Users\ADMIN\Desktop\jari-ecom-v2 commit -m "Message-With-Hyphens"
 ```
 
-### CSS Prefixes by Template
-| Template | Prefix |
-|----------|--------|
-| Quick Decision | `.qd-` |
-| Deep Dive | `.dd-` |
-| Visual Menu | `.vm-` |
-| Portfolio-Booking | `.pbk-` |
-
----
-
-## 5. DEBUG FORMULAS (20 Total)
-
-### Formula 1: API Response Structure
-`response.data` is store directly, NOT `response.data.store`
-
-### Formula 2: CSS Parse Errors
-Search for orphaned selectors, remove duplicates
-
-### Formula 3: Template Handler Init
-Must import AND call handler init function in main.js
-
-### Formula 4: CSS Isolation
-Use prefixes: `vm-`, `pbk-`, `dd-`, `qd-`
-
-### Formula 5: Migration UUID Types
-NEVER use INTEGER for store_id/user_id - always UUID
-
-### Formula 6: Git on Windows
-Use semicolons not `&&`
-
-### Formula 17: VM Orders Wrong Table
-Use `createFoodOrder()` not `createOrder()` for VM
-
-### Formula 18: API Slug Lookup
-API now looks up store by slug if storeId missing
-
-### Formula 19: Dark Mode Pills
-Add explicit `color: 'var(--text-primary, #111)'`
-
-### Formula 20: Order Tracking Route
-Check order route before getSlug() in main.js
-
----
-
-## 6. FOOD ORDERS SYSTEM
-
-### API Endpoints
-```
-GET    /api/food-orders          - List orders
-GET    /api/food-orders/stats    - Statistics
-POST   /api/food-orders          - Create order
-PUT    /api/food-orders/:id/status - Update status
-DELETE /api/food-orders/:id      - Cancel
-GET    /s/order/:orderNumber     - Public tracking
+### Smart Sticky CTA Pattern
+```javascript
+// Gracefully avoids footer overlap - in main.js
+function initSmartStickyCTA() {
+  const stickyCTA = document.querySelector('.sticky-cta, .pbk-sticky-cta, .vm-sticky-cta, .dd-sticky-cta');
+  const footer = document.querySelector('footer');
+  // ... scroll handler adjusts bottom position
+}
 ```
 
-### Status Flow
-```
-pending → confirmed → preparing → ready → delivered/picked_up
+### Global Navigation Functions
+```javascript
+// Defined in main.js, used in onclick handlers
+window.showCollection = function() { ... }
+window.filterByCategory = function(categoryName) { ... }
+window.viewRelatedProduct = function(productId) { ... }
 ```
 
 ---
 
-## 7. ENVIRONMENT URLS
+## 6. FILE REFERENCE
+
+### Navigation Components
+| Component | File |
+|-----------|------|
+| Breadcrumb | `store/src/render.js` → `renderBreadcrumb()` |
+| Product Nav | `store/src/render.js` → `renderProductNav()` |
+| Related Products | `store/src/shared/related-products.js` |
+| Footer | `store/src/render.js` → `renderFooter()` |
+| Smart Sticky | `store/src/main.js` → `initSmartStickyCTA()` |
+
+### CSS Files
+| Purpose | File |
+|---------|------|
+| Store base styles | `store/src/styles/base.css` |
+| Footer styles | `store/src/styles/footer.css` |
+| Dashboard styles | `dashboard/src/styles/globals.css` |
+| PBK template | `store/src/templates/portfolioBooking.css` |
+| VM template | `store/src/templates/visual-menu/vm-styles.css` |
+| DD template | `store/src/templates/deep-dive/dd-styles.css` |
+
+### Dashboard Navigation
+| Component | File |
+|-----------|------|
+| Layout/Sidebar | `dashboard/src/components/Layout.jsx` |
+| Nav styles | `dashboard/src/styles/globals.css` |
+
+---
+
+## 7. RECENT SESSION COMMITS (Jan 27, 2026)
+
+```
+d58caae RelatedProducts-Title-overlay-only-content-below-Apple-card-style
+c1f619d CTA-Add-smart-sticky-behavior-avoids-footer-all-templates
+eff2fa2 ProductNav-Move-to-bottom-before-footer-all-templates
+9f9a7d4 Breadcrumb-Center-justify-remove-box-add-back-padding
+fd89da7 Dashboard-Add-collapsible-nav-sections
+e25433c A11y-Add-ARIA-labels-to-breadcrumb-and-product-nav
+711849e A11y-Add-skip-link-CSS-and-focus-states
+576ea5d A11y-Add-skip-to-main-content-link
+... (33 total commits this session)
+```
+
+---
+
+## 8. ENVIRONMENT URLS
 
 | Environment | URL |
 |-------------|-----|
-| Dashboard | https://jari-dashboard.netlify.app |
-| Store | https://jariecommstore.netlify.app |
+| Dashboard | https://dashboard.jarisolutionsecom.store |
+| Store Landing | https://jarisolutionsecom.store |
+| Test Store | https://jarisolutionsecom.store/nimoration |
 | API | https://jari-api-production.up.railway.app |
-| Test Store | /store/nimoration |
+| GitHub | https://github.com/meshack-abwao/jari-ecom-v2 |
 
 ---
 
-## 8. RECENT COMMITS (Jan 23, 2026)
+## 9. DEBUGGING QUICK REFERENCE
 
-```
-73cfbc9 Dashboard-VM-addOns-field-editor-save-load
-2528f5e VM-order-tracking-page-table-number-estimated-time-dark-mode-fix
-03c555c API-food-orders-accept-slug-lookup-store-fix-field-names
-1afcd10 VM-orders-route-to-food-orders-API-not-regular-orders
-634ad91 FoodOrdersPage-redesign-unified-with-BookingsPage-style
-```
+| Problem | Solution |
+|---------|----------|
+| CSS not applying | Check specificity, append new styles, use !important |
+| Git && fails | Use semicolons or git -C flag |
+| CTA overlaps footer | Use initSmartStickyCTA() |
+| Import not found | Count directory levels carefully |
+| Template code not running | Check exact template string names |
+| Global function undefined | Ensure assigned to window object |
 
----
-
-## 9. NEXT PRIORITIES
-
-### Immediate:
-1. End-to-End Testing - VM flow
-2. Frontend Design Polish - Apple aesthetics
-3. Checkout Flow UX - Mobile experience
-4. Collection Page - Menu listing styling
-
-### Near-term:
-1. Dynamic Tab Visibility
-2. WhatsApp Integration (add-on)
-3. Store-Level Extras
+See `docs/DEBUG-FORMULAS.md` for complete debugging guide.
 
 ---
 
-## 10. KEY FILE REFERENCE
+## 10. NEXT SESSION CHECKLIST
 
-| Purpose | File |
-|---------|------|
-| Food Orders API | `api/src/routes/food-orders.js` |
-| Dashboard Food Orders | `dashboard/src/pages/FoodOrdersPage.jsx` |
-| Dashboard Products | `dashboard/src/pages/ProductsPage.jsx` |
-| VM Render | `store/src/templates/visual-menu/vm-render.js` |
-| VM Handlers | `store/src/templates/visual-menu/vm-handlers.js` |
-| Checkout | `store/src/checkout.js` |
-| Order Tracking | `store/src/order-tracking.js` |
+1. ✅ Check if Netlify credits reset
+2. ✅ Push to deploy: `git push origin main`
+3. ✅ Test all navigation features live
+4. ✅ Run `git log --oneline -10` to verify state
+5. ✅ Check `docs/HANDOVER-JAN-27-2026.md` for full context
 
 ---
 
-## 11. NEXT SESSION CHECKLIST
+## 11. DOCUMENTATION INDEX
 
-1. ✅ Run `git status; git log --oneline -10`
-2. ✅ Check `docs/JARI-DEEP-DIVE-HANDOVER-V2.md` for context
-3. ✅ Check `docs/IDEA-SHELF.md` for future features
-4. ✅ Commit after each successful change
-5. ✅ Test before proceeding
+| Document | Purpose |
+|----------|---------|
+| `PROJECT-INSTRUCTIONS.md` | This file - main reference |
+| `HANDOVER-JAN-27-2026.md` | Latest session handover |
+| `DEBUG-FORMULAS.md` | Debugging patterns |
+| `IDEA-SHELF.md` | Future feature ideas |
+| `ARCHITECTURE.md` | System architecture |
 
 ---
 
 **End of Project Instructions**
-*Last Updated: January 23, 2026*
+*Last Updated: January 27, 2026 - Navigation Enhancement Session*

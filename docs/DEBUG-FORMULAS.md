@@ -454,3 +454,230 @@ ALTER TABLE tablename ADD COLUMN IF NOT EXISTS new_column TYPE;
 ---
 
 **End of Debug Formulas**
+
+
+---
+
+## FORMULA 8: Git Commands on Windows (PowerShell vs CMD)
+
+**Problem:** Git commands fail with `&&` operator
+
+**Cause:** PowerShell handles `&&` differently than bash
+
+**Fix:** Use semicolons OR git -C flag
+
+```powershell
+# ✅ CORRECT - Using semicolons
+cd C:\path\to\repo; git add -A; git commit -m "message"; git push origin main
+
+# ✅ CORRECT - Using git -C flag
+git -C C:\path\to\repo add -A
+git -C C:\path\to\repo commit -m "message"
+git -C C:\path\to\repo push origin main
+
+# ✅ CORRECT - Hyphenated messages (no spaces)
+git commit -m "Fix-breadcrumb-styling"
+
+# ❌ WRONG - && in PowerShell
+cd path && git add -A && git commit  # FAILS
+```
+
+---
+
+## FORMULA 9: Sticky CTA Overlapping Footer
+
+**Problem:** Sticky CTA button covers footer content
+
+**Cause:** Fixed positioning doesn't account for footer visibility
+
+**Fix:** Use scroll listener to dynamically adjust CTA position
+
+```javascript
+function initSmartStickyCTA() {
+  const stickyCTA = document.querySelector('.sticky-cta, .pbk-sticky-cta, .vm-sticky-cta, .dd-sticky-cta');
+  const footer = document.querySelector('.store-footer-enhanced, .store-footer, footer');
+  
+  if (!stickyCTA || !footer) return;
+  
+  const handleScroll = () => {
+    const footerRect = footer.getBoundingClientRect();
+    const windowHeight = window.innerHeight;
+    const bottomOffset = 24;
+    
+    if (footerRect.top < windowHeight) {
+      const footerVisibleHeight = windowHeight - footerRect.top;
+      stickyCTA.style.bottom = `${footerVisibleHeight + bottomOffset}px`;
+      stickyCTA.style.transition = 'bottom 0.15s ease';
+    } else {
+      stickyCTA.style.bottom = '';
+      stickyCTA.style.transition = '';
+    }
+  };
+  
+  window.addEventListener('scroll', handleScroll, { passive: true });
+  handleScroll();
+}
+```
+
+**Key:** Call this after rendering product view in `renderProductView()`.
+
+---
+
+## FORMULA 10: CSS Override Not Working
+
+**Problem:** New CSS styles not applying to elements
+
+**Cause:** Specificity issues or styles defined earlier taking precedence
+
+**Fix:** Use `!important` strategically OR append new CSS at end of file
+
+```css
+/* When overriding existing styles, append at END of base.css */
+/* Use !important only when necessary */
+
+.related-card {
+    flex: 0 0 220px !important;  /* Override earlier definition */
+    display: flex !important;
+}
+```
+
+**Better approach:** Create a new section like "REDESIGN V3" appended to file.
+
+---
+
+## FORMULA 11: React State Not Persisting
+
+**Problem:** Collapsed nav state resets on page change
+
+**Cause:** Component re-renders, useState resets
+
+**Fix:** Use localStorage OR keep state minimal
+
+```javascript
+// For simple UI state, useState is fine (resets on nav is acceptable)
+const [collapsedSections, setCollapsedSections] = useState({});
+
+// For persistent state, use localStorage
+const [collapsed, setCollapsed] = useState(() => {
+  const saved = localStorage.getItem('navCollapsed');
+  return saved ? JSON.parse(saved) : {};
+});
+
+useEffect(() => {
+  localStorage.setItem('navCollapsed', JSON.stringify(collapsed));
+}, [collapsed]);
+```
+
+---
+
+## FORMULA 12: Import Path Issues
+
+**Problem:** Module not found errors
+
+**Cause:** Wrong relative path depths
+
+**Fix:** Count directory levels carefully
+
+```javascript
+// From store/src/templates/deep-dive/dd-render.js
+import { renderBreadcrumb } from '../../render.js';     // Up 2 levels to src/
+import { formatPrice } from '../../shared/utils.js';    // Up 2, then into shared/
+
+// From store/src/templates/portfolioBooking.js
+import { renderBreadcrumb } from '../render.js';        // Up 1 level to src/
+import { renderRelatedProducts } from '../shared/related-products.js';
+
+// From store/src/render.js
+import { state } from './state.js';                     // Same directory
+```
+
+---
+
+## FORMULA 13: Invisible Characters in Files
+
+**Problem:** edit_block fails with "100% similarity but not exact match"
+
+**Cause:** Hidden characters (BOM, CRLF, zero-width spaces)
+
+**Fix:** Append new CSS instead of replacing, let cascade handle it
+
+```bash
+# Instead of trying to replace problematic text:
+# 1. Read the file to understand current state
+# 2. Append new styles at the end (CSS cascade will apply last rule)
+# 3. Use !important if needed for specificity
+```
+
+---
+
+## FORMULA 14: Template-Specific Code Not Running
+
+**Problem:** Handler code doesn't execute for specific template
+
+**Cause:** Template check uses wrong string comparison
+
+**Fix:** Verify exact template name strings
+
+```javascript
+// Template names (exact strings):
+'deep-dive'        // NOT 'deepDive' or 'DeepDive'
+'quick-decision'   // NOT 'quickDecision'
+'portfolio-booking'// NOT 'portfolioBooking'
+'visual-menu'      // NOT 'visualMenu'
+'event-landing'    // NOT 'eventLanding'
+
+// Correct check:
+if (product.template === 'portfolio-booking') {
+  initPortfolioBookingHandlers();
+}
+```
+
+---
+
+## FORMULA 15: Navigation Functions Not Available
+
+**Problem:** `window.showCollection is not a function`
+
+**Cause:** Global function not attached to window object
+
+**Fix:** Ensure functions are assigned to window in main.js
+
+```javascript
+// In main.js - Must use window assignment
+window.showCollection = function() {
+  setProductId(null);
+  render();
+};
+
+window.filterByCategory = function(categoryName) {
+  setProductId(null);
+  render();
+  setTimeout(() => {
+    const pill = document.querySelector(`.category-pill[data-category="${categoryName}"]`);
+    if (pill) pill.click();
+  }, 100);
+};
+
+window.viewRelatedProduct = function(productId) {
+  setProductId(productId);
+  render();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+```
+
+---
+
+## QUICK REFERENCE: File Locations
+
+| Component | File |
+|-----------|------|
+| Breadcrumb | `store/src/render.js` |
+| Product Nav | `store/src/render.js` |
+| Related Products | `store/src/shared/related-products.js` |
+| Footer | `store/src/render.js` |
+| Smart Sticky CTA | `store/src/main.js` |
+| Global Nav Functions | `store/src/main.js` |
+| Dashboard Nav | `dashboard/src/components/Layout.jsx` |
+| Store CSS | `store/src/styles/base.css` |
+| Footer CSS | `store/src/styles/footer.css` |
+| Dashboard CSS | `dashboard/src/styles/globals.css` |
