@@ -462,4 +462,196 @@ router.get('/abandoned/:storeId', async (req, res) => {
   }
 });
 
+// ===========================================
+// ABANDONED CHECKOUTS - DETAILED TRACKING
+// ===========================================
+
+// POST /pixel/abandon - Save abandoned checkout with full details
+router.post('/abandon', async (req, res) => {
+  try {
+    const { store_id, session_id, data = {} } = req.body;
+    
+    if (!store_id) return res.status(204).end();
+    
+    await pool.query(`
+      INSERT INTO abandoned_checkouts (
+        store_id, session_id, product_id, product_name, quantity, total_amount,
+        step_reached, customer_name, customer_phone, customer_location, delivery_area,
+        payment_method, utm_source, utm_medium, utm_campaign, device, time_spent
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+    `, [
+      store_id,
+      session_id || null,
+      data.product_id || null,
+      data.product_name || null,
+      data.quantity || 1,
+      data.total_amount || 0,
+      data.step_reached || 1,
+      data.customer_name || null,
+      data.customer_phone || null,
+      data.customer_location || null,
+      data.delivery_area || null,
+      data.payment_method || null,
+      data.utm_source || 'direct',
+      data.utm_medium || null,
+      data.utm_campaign || null,
+      data.device || null,
+      data.time_spent || 0
+    ]);
+    
+    res.status(204).end();
+  } catch (error) {
+    console.error('Save abandoned checkout error:', error);
+    res.status(204).end(); // Silent fail like analytics
+  }
+});
+
+// GET /pixel/abandoned/:storeId - Get detailed abandoned checkouts
+router.get('/abandoned/:storeId', async (req, res) => {
+  try {
+    const { storeId } = req.params;
+    const { period = 'week', limit = 50 } = req.query;
+    
+    let dateFilter;
+    switch (period) {
+      case 'today': dateFilter = `created_at >= CURRENT_DATE`; break;
+      case 'week': dateFilter = `created_at >= CURRENT_DATE - INTERVAL '7 days'`; break;
+      case 'month': dateFilter = `created_at >= CURRENT_DATE - INTERVAL '30 days'`; break;
+      default: dateFilter = `created_at >= CURRENT_DATE - INTERVAL '7 days'`;
+    }
+    
+    // Get detailed abandoned checkouts
+    const abandonedResult = await pool.query(`
+      SELECT * FROM abandoned_checkouts
+      WHERE store_id = $1 AND ${dateFilter}
+      ORDER BY created_at DESC
+      LIMIT $2
+    `, [storeId, parseInt(limit)]);
+    
+    // Get funnel breakdown (which step they abandoned at)
+    const funnelResult = await pool.query(`
+      SELECT 
+        step_reached,
+        COUNT(*) as count
+      FROM abandoned_checkouts
+      WHERE store_id = $1 AND ${dateFilter}
+      GROUP BY step_reached
+      ORDER BY step_reached
+    `, [storeId]);
+    
+    // Get total by source
+    const bySourceResult = await pool.query(`
+      SELECT 
+        utm_source,
+        COUNT(*) as count
+      FROM abandoned_checkouts
+      WHERE store_id = $1 AND ${dateFilter}
+      GROUP BY utm_source
+      ORDER BY count DESC
+    `, [storeId]);
+    
+    // Get recovery stats
+    const recoveryResult = await pool.query(`
+      SELECT 
+        COUNT(*) FILTER (WHERE recovered = true) as recovered,
+        COUNT(*) FILTER (WHERE contacted = true) as contacted,
+        COUNT(*) as total
+      FROM abandoned_checkouts
+      WHERE store_id = $1 AND ${dateFilter}
+    `, [storeId]);
+    
+    // Calculate anomalies
+    const totalAbandoned = abandonedResult.rows.length;
+    const funnel = {};
+    funnelResult.rows.forEach(r => { funnel[`step_${r.step_reached}`] = parseInt(r.count); });
+    
+    const anomalies = [];
+    
+    // Check for high Step 2 abandonment (form friction)
+    if (funnel.step_2 && totalAbandoned > 5) {
+      const step2Rate = (funnel.step_2 / totalAbandoned) * 100;
+      if (step2Rate > 50) {
+        anomalies.push({
+          type: 'warning',
+          title: 'Delivery Form Friction',
+          message: `${step2Rate.toFixed(0)}% abandon at delivery details. Consider simplifying.`
+        });
+      }
+    }
+    
+    // Check for high Step 3 abandonment (payment issues)
+    if (funnel.step_3 && totalAbandoned > 5) {
+      const step3Rate = (funnel.step_3 / totalAbandoned) * 100;
+      if (step3Rate > 40) {
+        anomalies.push({
+          type: 'error',
+          title: 'Payment Drop-off',
+          message: `${step3Rate.toFixed(0)}% abandon at payment. Check M-Pesa flow.`
+        });
+      }
+    }
+    
+    // Check for quick exits
+    const quickExits = abandonedResult.rows.filter(r => r.time_spent && r.time_spent < 30).length;
+    if (totalAbandoned > 5 && (quickExits / totalAbandoned) > 0.3) {
+      anomalies.push({
+        type: 'info',
+        title: 'Quick Exits',
+        message: `${((quickExits / totalAbandoned) * 100).toFixed(0)}% leave within 30 seconds.`
+      });
+    }
+    
+    res.json({
+      abandonments: abandonedResult.rows,
+      funnel: {
+        step_1: funnel.step_1 || 0,
+        step_2: funnel.step_2 || 0,
+        step_3: funnel.step_3 || 0
+      },
+      bySource: bySourceResult.rows,
+      recovery: recoveryResult.rows[0] || { recovered: 0, contacted: 0, total: 0 },
+      anomalies,
+      total: totalAbandoned
+    });
+  } catch (error) {
+    console.error('Get abandoned checkouts error:', error);
+    res.status(500).json({ error: 'Failed to fetch abandoned checkouts' });
+  }
+});
+
+// PUT /pixel/abandoned/:id/contact - Mark as contacted
+router.put('/abandoned/:id/contact', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { notes } = req.body;
+    
+    await pool.query(`
+      UPDATE abandoned_checkouts 
+      SET contacted = true, contacted_at = CURRENT_TIMESTAMP, notes = COALESCE($2, notes)
+      WHERE id = $1
+    `, [id, notes]);
+    
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update' });
+  }
+});
+
+// PUT /pixel/abandoned/:id/recover - Mark as recovered
+router.put('/abandoned/:id/recover', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    await pool.query(`
+      UPDATE abandoned_checkouts 
+      SET recovered = true, recovered_at = CURRENT_TIMESTAMP
+      WHERE id = $1
+    `, [id]);
+    
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update' });
+  }
+});
+
 export default router;
