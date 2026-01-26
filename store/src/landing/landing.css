@@ -1071,3 +1071,336 @@
     text-align: center;
   }
 }
+
+
+/* ===================
+   SCROLL ANIMATIONS
+   Premium slide-up effect
+   =================== */
+.jari-animate {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), 
+              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.jari-animate.jari-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.jari-animate-child {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), 
+              transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.jari-animate-child.jari-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Hero should be visible immediately */
+.jari-hero.jari-animate {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ===================
+   WHO IT'S FOR SECTION
+   Business types grid
+   =================== */
+.jari-who-section {
+  background: linear-gradient(180deg, #fff 0%, #f5f5f7 100%);
+  padding: 96px 24px;
+}
+
+.jari-business-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+  max-width: 1100px;
+  margin: 0 auto 48px;
+}
+
+.jari-business-card {
+  background: #fff;
+  border-radius: 24px;
+  padding: 32px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.jari-business-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
+}
+
+.jari-business-icon {
+  font-size: 40px;
+  margin-bottom: 16px;
+}
+
+.jari-business-card h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1d1d1f;
+  margin-bottom: 12px;
+}
+
+.jari-business-pain {
+  font-size: 15px;
+  color: #86868b;
+  font-style: italic;
+  margin-bottom: 20px;
+  padding-left: 16px;
+  border-left: 3px solid rgba(102, 126, 234, 0.3);
+}
+
+.jari-business-solve {
+  list-style: none;
+  margin-bottom: 20px;
+}
+
+.jari-business-solve li {
+  font-size: 14px;
+  color: #424245;
+  padding: 8px 0;
+  padding-left: 24px;
+  position: relative;
+}
+
+.jari-business-solve li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: #34c759;
+  font-weight: 700;
+}
+
+.jari-business-solve li strong {
+  color: #667eea;
+}
+
+.jari-business-template {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #667eea;
+  padding: 6px 12px;
+  background: rgba(102, 126, 234, 0.1);
+  border-radius: 980px;
+}
+
+/* Multi-business highlight box */
+.jari-multi-business {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.jari-multi-business-content {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
+  border: 1px solid rgba(102, 126, 234, 0.2);
+  border-radius: 24px;
+  padding: 40px;
+  text-align: center;
+}
+
+.jari-multi-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.jari-multi-business-content h3 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #1d1d1f;
+  margin-bottom: 12px;
+}
+
+.jari-multi-business-content p {
+  font-size: 16px;
+  color: #424245;
+  max-width: 600px;
+  margin: 0 auto 24px;
+  line-height: 1.6;
+}
+
+/* ===================
+   PRICING JOURNEY SECTION
+   Timeline style
+   =================== */
+.jari-pricing-journey {
+  background: #fff;
+  padding: 96px 24px;
+}
+
+.jari-journey-timeline {
+  max-width: 700px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.jari-journey-timeline::before {
+  content: '';
+  position: absolute;
+  left: 27px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+}
+
+.jari-journey-step {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 32px;
+  position: relative;
+}
+
+.jari-journey-step:last-child {
+  margin-bottom: 0;
+}
+
+.jari-journey-marker {
+  width: 56px;
+  height: 56px;
+  min-width: 56px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 700;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 4px 14px rgba(102, 126, 234, 0.35);
+}
+
+.jari-journey-content {
+  background: #f5f5f7;
+  border-radius: 20px;
+  padding: 24px 28px;
+  flex: 1;
+}
+
+.jari-journey-content h4 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1d1d1f;
+  margin-bottom: 8px;
+}
+
+.jari-journey-content p {
+  font-size: 15px;
+  color: #424245;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.jari-journey-content strong {
+  color: #1d1d1f;
+}
+
+@media (max-width: 600px) {
+  .jari-journey-timeline::before {
+    left: 23px;
+  }
+  
+  .jari-journey-marker {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    font-size: 18px;
+  }
+  
+  .jari-journey-step {
+    gap: 16px;
+  }
+  
+  .jari-journey-content {
+    padding: 20px;
+  }
+}
+
+/* ===================
+   MOBILE REFINEMENTS
+   =================== */
+@media (max-width: 768px) {
+  .jari-business-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .jari-multi-business-content {
+    padding: 32px 24px;
+  }
+  
+  .jari-who-section {
+    padding: 64px 16px;
+  }
+  
+  .jari-pricing-journey {
+    padding: 64px 16px;
+  }
+}
+
+/* ===================
+   MOBILE MENU ACTIVE STATE
+   =================== */
+.jari-mobile-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #1d1d1f;
+  padding: 8px;
+  transition: transform 0.3s ease;
+}
+
+@media (max-width: 768px) {
+  .jari-mobile-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.jari-mobile-menu {
+  display: none;
+  padding: 16px 24px 24px;
+  background: rgba(255, 255, 255, 0.98);
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+}
+
+.jari-mobile-menu.active {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 400px;
+  padding: 16px 24px 24px;
+}
+
+.jari-mobile-menu a {
+  color: #1d1d1f;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 500;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.jari-mobile-menu a:last-child {
+  border-bottom: none;
+}
+
+.jari-mobile-menu .jari-btn {
+  margin-top: 8px;
+  text-align: center;
+}
