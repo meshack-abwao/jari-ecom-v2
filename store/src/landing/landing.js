@@ -162,7 +162,7 @@ export function renderLandingPage() {
         
         <!-- Fashion & Boutique -->
         <div class="jari-business-card jari-animate-child">
-          <div class="jari-business-image" style="background-image: url('https://res.cloudinary.com/dmfrtzgkv/image/upload/v1769448472/virtual-photoshoot-6_vckzpk.png')">
+          <div class="jari-business-image" style="background-image: url('https://res.cloudinary.com/dmfrtzgkv/image/upload/v1769450282/virtual-photoshoot-4_ohqxtl.png')">
             <div class="jari-business-overlay">
               <h3>Fashion & Boutique</h3>
               <span class="jari-business-template">Quick Sell template</span>
