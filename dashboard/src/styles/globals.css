@@ -239,6 +239,56 @@ body {
   padding-top: 0;
 }
 
+/* ===== COLLAPSIBLE NAV SECTIONS ===== */
+.nav-section-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 12px 14px 6px;
+  margin-top: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  transition: color 0.2s;
+}
+
+.nav-section-toggle:first-child {
+  margin-top: 0;
+}
+
+.nav-section-toggle:hover {
+  color: var(--text-secondary);
+}
+
+.nav-section-chevron {
+  transition: transform 0.2s ease;
+}
+
+.nav-section-chevron.collapsed {
+  transform: rotate(-90deg);
+}
+
+.nav-section-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow: hidden;
+  max-height: 500px;
+  transition: max-height 0.25s ease, opacity 0.2s ease;
+}
+
+.nav-section-content.collapsed {
+  max-height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
 /* ===== FILTER BUTTONS ===== */
 .filter-btn {
   padding: 8px 16px;

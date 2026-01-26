@@ -4,7 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useTheme } from '../hooks/useTheme';
 import { settingsAPI, subscriptionsAPI, cardsAPI } from '../api/client';
 import { BRAND } from '../constants/brand';
-import { Home, Package, ShoppingCart, Settings, Zap, LogOut, Sun, Moon, Menu, X, User, Store, Crown, ArrowUpRight, LayoutGrid, Megaphone, Calendar, UtensilsCrossed, CreditCard, Phone, Edit2, Check, Clock, AlertCircle } from 'lucide-react';
+import { Home, Package, ShoppingCart, Settings, Zap, LogOut, Sun, Moon, Menu, X, User, Store, Crown, ArrowUpRight, LayoutGrid, Megaphone, Calendar, UtensilsCrossed, CreditCard, Phone, Edit2, Check, Clock, AlertCircle, ChevronDown } from 'lucide-react';
 
 export default function Layout() {
   const { user, logout } = useAuth();
@@ -13,6 +13,7 @@ export default function Layout() {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showAccountModal, setShowAccountModal] = useState(false);
+  const [collapsedSections, setCollapsedSections] = useState({});
   const [accountData, setAccountData] = useState({
     businessName: user?.business_name || '',
     instagramHandle: user?.instagram_handle || '',
@@ -368,40 +369,55 @@ export default function Layout() {
 
         <nav style={styles.nav}>
           {/* Main Section */}
-          <div className="nav-section-label">Main</div>
-          <NavLink to="/" end className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
-            <Home size={20} /><span>Overview</span>
-          </NavLink>
-          <NavLink to="/products" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
-            <Package size={20} /><span>My Store</span>
-          </NavLink>
+          <button className="nav-section-toggle" onClick={() => setCollapsedSections(s => ({...s, main: !s.main}))}>
+            <span>Main</span>
+            <ChevronDown size={14} className={`nav-section-chevron ${collapsedSections.main ? 'collapsed' : ''}`} />
+          </button>
+          <div className={`nav-section-content ${collapsedSections.main ? 'collapsed' : ''}`}>
+            <NavLink to="/" end className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
+              <Home size={20} /><span>Overview</span>
+            </NavLink>
+            <NavLink to="/products" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
+              <Package size={20} /><span>My Store</span>
+            </NavLink>
+          </div>
           
           {/* Orders Section */}
-          <div className="nav-section-label">Orders</div>
-          <NavLink to="/orders" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
-            <ShoppingCart size={20} /><span>Orders</span>
-          </NavLink>
-          <NavLink to="/food-orders" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
-            <UtensilsCrossed size={20} /><span>Food Orders</span>
-          </NavLink>
-          <NavLink to="/bookings" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
-            <Calendar size={20} /><span>Bookings</span>
-          </NavLink>
+          <button className="nav-section-toggle" onClick={() => setCollapsedSections(s => ({...s, orders: !s.orders}))}>
+            <span>Orders</span>
+            <ChevronDown size={14} className={`nav-section-chevron ${collapsedSections.orders ? 'collapsed' : ''}`} />
+          </button>
+          <div className={`nav-section-content ${collapsedSections.orders ? 'collapsed' : ''}`}>
+            <NavLink to="/orders" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
+              <ShoppingCart size={20} /><span>Orders</span>
+            </NavLink>
+            <NavLink to="/food-orders" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
+              <UtensilsCrossed size={20} /><span>Food Orders</span>
+            </NavLink>
+            <NavLink to="/bookings" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
+              <Calendar size={20} /><span>Bookings</span>
+            </NavLink>
+          </div>
           
           {/* Customize Section */}
-          <div className="nav-section-label">Customize</div>
-          <NavLink to="/ads" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
-            <Megaphone size={20} /><span>Marketing</span>
-          </NavLink>
-          <NavLink to="/templates" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
-            <LayoutGrid size={20} /><span>Store Design</span>
-          </NavLink>
-          <NavLink to="/add-ons" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
-            <Zap size={20} /><span>Features</span>
-          </NavLink>
-          <NavLink to="/settings" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
-            <Settings size={20} /><span>Settings</span>
-          </NavLink>
+          <button className="nav-section-toggle" onClick={() => setCollapsedSections(s => ({...s, customize: !s.customize}))}>
+            <span>Customize</span>
+            <ChevronDown size={14} className={`nav-section-chevron ${collapsedSections.customize ? 'collapsed' : ''}`} />
+          </button>
+          <div className={`nav-section-content ${collapsedSections.customize ? 'collapsed' : ''}`}>
+            <NavLink to="/ads" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
+              <Megaphone size={20} /><span>Marketing</span>
+            </NavLink>
+            <NavLink to="/templates" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
+              <LayoutGrid size={20} /><span>Store Design</span>
+            </NavLink>
+            <NavLink to="/add-ons" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
+              <Zap size={20} /><span>Features</span>
+            </NavLink>
+            <NavLink to="/settings" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
+              <Settings size={20} /><span>Settings</span>
+            </NavLink>
+          </div>
         </nav>
 
         {/* Theme Toggle - Bottom */}
