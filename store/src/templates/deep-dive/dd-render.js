@@ -10,6 +10,7 @@ import { renderGallery, renderStories, renderStoryViewer } from '../../shared/me
 import { renderTestimonials } from '../../shared/testimonials.js';
 import { renderProductPolicyLinks, renderProductPolicyModals } from '../../shared/policy-modals.js';
 import { renderShowcaseViewer } from './dd-showcase-viewer.js';
+import { renderBreadcrumb } from '../../render.js';
 
 /**
  * Render Deep Dive template (premium product page)
@@ -33,6 +34,7 @@ export function renderDeepDive(product) {
   const validShowcase = showcaseImages.filter(img => img.url);
   
   return `
+    ${renderBreadcrumb(product)}
     ${showBackButton ? '<button class="back-btn" id="backBtn">← Back to All Products</button>' : ''}
     <div class="product-container template-deep-dive">
       
