@@ -36,7 +36,6 @@ export function renderDeepDive(product) {
   
   return `
     ${renderBreadcrumb(product)}
-    ${showBackButton ? '<button class="back-btn" id="backBtn">← Back to All Products</button>' : ''}
     <div class="product-container template-deep-dive">
       
       <!-- STEP 1: DEFINE - Product Header (Title + Rating) -->

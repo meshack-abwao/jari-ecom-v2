@@ -31,7 +31,6 @@ export function renderQuickDecision(product) {
   
   return `
     ${renderBreadcrumb(product)}
-    ${showBackButton ? '<button class="back-btn" id="backBtn">← Back to All Products</button>' : ''}
     <div class="product-container">
       <div class="product-card">
         ${renderGallery(images)}

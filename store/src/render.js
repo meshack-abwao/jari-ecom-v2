@@ -8,6 +8,7 @@ import { renderEventLanding as renderEventLandingTemplate } from './templates/ev
 // ===========================================
 // BREADCRUMB NAVIGATION
 // Kalbach: Location breadcrumbs show position in hierarchy
+// Apple: Unified sticky pill with back button
 // ===========================================
 export function renderBreadcrumb(product = null) {
   const { store, products } = state;
@@ -24,23 +25,36 @@ export function renderBreadcrumb(product = null) {
   const categoryEmoji = categoryInfo?.emoji || '';
   
   return `
-    <nav class="store-breadcrumb" aria-label="Breadcrumb">
-      <a href="#" onclick="window.showCollection(); return false;">${storeName}</a>
-      <span class="breadcrumb-separator">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M9 18l6-6-6-6"/>
-        </svg>
-      </span>
-      ${category ? `
-        <a href="#" onclick="window.filterByCategory('${category}'); return false;">${categoryEmoji} ${category}</a>
-        <span class="breadcrumb-separator">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M9 18l6-6-6-6"/>
+    <div class="store-breadcrumb-wrapper">
+      <div class="store-breadcrumb-pill">
+        <!-- Back Button - Left -->
+        <button class="breadcrumb-back" onclick="window.showCollection()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M15 18l-6-6 6-6"/>
           </svg>
-        </span>
-      ` : ''}
-      <span class="breadcrumb-current">${productName}</span>
-    </nav>
+          <span>Back</span>
+        </button>
+        
+        <!-- Breadcrumb Trail - Right -->
+        <nav class="breadcrumb-trail" aria-label="Breadcrumb">
+          <a href="#" onclick="window.showCollection(); return false;">${storeName}</a>
+          <span class="breadcrumb-separator">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 18l6-6-6-6"/>
+            </svg>
+          </span>
+          ${category ? `
+            <a href="#" onclick="window.filterByCategory('${category}'); return false;">${categoryEmoji} ${category}</a>
+            <span class="breadcrumb-separator">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 18l6-6-6-6"/>
+              </svg>
+            </span>
+          ` : ''}
+          <span class="breadcrumb-current">${productName}</span>
+        </nav>
+      </div>
+    </div>
   `;
 }
 

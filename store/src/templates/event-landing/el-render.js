@@ -40,7 +40,6 @@ export function renderEventLanding(product) {
   
   return `
     ${renderBreadcrumb(product)}
-    ${showBackButton ? '<button class="back-btn" id="backBtn">← Back to All Events</button>' : ''}
     <div class="product-container">
       <div class="product-card">
         ${renderGallery(media.images || [])}

@@ -561,60 +561,127 @@ body {
     font-weight: var(--fw-medium);
 }
 
-/* Store Breadcrumb - Enhanced Navigation (Kalbach) */
-.store-breadcrumb {
+/* Store Breadcrumb - Unified Sticky Pill (Kalbach + Apple Design) */
+.store-breadcrumb-wrapper {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding: var(--space-md) var(--space-lg);
+    background: linear-gradient(to bottom, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.9) 100%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+.store-breadcrumb-pill {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-lg);
+    padding: var(--space-sm) var(--space-sm) var(--space-sm) var(--space-md);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    max-width: 100%;
+}
+
+/* Back Button - Left side */
+.breadcrumb-back {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-sm) var(--space-md);
+    background: var(--bg-gray);
+    border: none;
+    border-radius: var(--radius-full);
+    font-size: var(--fs-small);
+    font-weight: 500;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.breadcrumb-back:hover {
+    background: var(--text-primary);
+    color: white;
+}
+
+.breadcrumb-back svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* Breadcrumb Trail - Right side */
+.breadcrumb-trail {
     display: flex;
     align-items: center;
     gap: var(--space-sm);
-    padding: var(--space-md) var(--space-lg);
     font-size: var(--fs-small);
     color: var(--text-secondary);
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    position: sticky;
-    top: 0;
-    z-index: 10;
+    overflow: hidden;
 }
 
-.store-breadcrumb a {
+.breadcrumb-trail a {
     color: var(--text-secondary);
     text-decoration: none;
     transition: color 0.2s ease;
     white-space: nowrap;
 }
 
-.store-breadcrumb a:hover {
+.breadcrumb-trail a:hover {
     color: var(--text-primary);
 }
 
-.store-breadcrumb .breadcrumb-separator {
+.breadcrumb-separator {
     display: flex;
     align-items: center;
     color: var(--border);
-}
-
-.store-breadcrumb .breadcrumb-separator svg {
     flex-shrink: 0;
 }
 
-.store-breadcrumb .breadcrumb-current {
+.breadcrumb-separator svg {
+    width: 12px;
+    height: 12px;
+}
+
+.breadcrumb-current {
     color: var(--text-primary);
     font-weight: 500;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    max-width: 200px;
+    max-width: 180px;
 }
 
+/* Mobile Adjustments */
 @media (max-width: 480px) {
-    .store-breadcrumb {
+    .store-breadcrumb-wrapper {
         padding: var(--space-sm) var(--space-md);
+    }
+    
+    .store-breadcrumb-pill {
+        padding: var(--space-xs) var(--space-xs) var(--space-xs) var(--space-sm);
+        gap: var(--space-sm);
+    }
+    
+    .breadcrumb-back {
+        padding: var(--space-xs) var(--space-sm);
+        font-size: var(--fs-tiny);
+    }
+    
+    .breadcrumb-back span {
+        display: none;
+    }
+    
+    .breadcrumb-trail {
         font-size: var(--fs-tiny);
         gap: var(--space-xs);
     }
     
-    .store-breadcrumb .breadcrumb-current {
-        max-width: 120px;
+    .breadcrumb-current {
+        max-width: 100px;
     }
 }
 
@@ -5906,5 +5973,128 @@ textarea:focus-visible {
     
     .related-card-price {
         font-size: var(--fs-small);
+    }
+}
+
+
+/* ===========================================
+   RELATED PRODUCTS - REDESIGN V2
+   Premium overlay cards, centered layout
+   =========================================== */
+
+.related-products {
+    padding: var(--space-4xl) var(--space-lg) !important;
+    margin-top: var(--space-3xl);
+    border-top: 1px solid var(--border);
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.related-products-title {
+    text-align: center !important;
+    padding: 0 !important;
+    margin-bottom: var(--space-2xl) !important;
+}
+
+.related-products-scroll {
+    justify-content: center;
+    padding: 0 0 var(--space-lg) !important;
+}
+
+/* Premium Overlay Card Style */
+.related-card {
+    flex: 0 0 220px !important;
+    aspect-ratio: 3/4;
+    position: relative;
+    background: var(--bg-gray);
+}
+
+.related-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+.related-card-image {
+    position: absolute !important;
+    inset: 0;
+    aspect-ratio: unset !important;
+}
+
+.related-card:hover .related-card-image img {
+    transform: scale(1.08);
+}
+
+.related-card-placeholder {
+    font-size: 48px;
+    background: linear-gradient(135deg, var(--bg-gray) 0%, #e5e5e5 100%);
+}
+
+/* Gradient overlay */
+.related-card-content {
+    position: absolute !important;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: var(--space-4xl) var(--space-md) var(--space-md) !important;
+    background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.5) 50%, transparent 100%);
+}
+
+.related-card-name {
+    color: white !important;
+    font-size: var(--fs-body) !important;
+}
+
+.related-card-desc {
+    color: rgba(255,255,255,0.8) !important;
+}
+
+.related-card-meta-row {
+    color: rgba(255,255,255,0.7) !important;
+}
+
+.related-card-price {
+    color: white !important;
+    font-size: var(--fs-body) !important;
+    font-weight: 700 !important;
+}
+
+.related-card-cta {
+    color: rgba(255,255,255,0.9) !important;
+    padding: var(--space-xs) var(--space-sm);
+    background: rgba(255,255,255,0.15);
+    border-radius: var(--radius-full);
+    backdrop-filter: blur(4px);
+}
+
+.related-card:hover .related-card-cta {
+    background: rgba(255,255,255,0.25);
+}
+
+/* Template variations */
+.related-card-premium { flex: 0 0 240px !important; }
+.related-card-food { flex: 0 0 200px !important; aspect-ratio: 1; }
+.related-card-service { flex: 0 0 230px !important; aspect-ratio: 4/5; }
+.related-card-quick { flex: 0 0 180px !important; }
+
+/* Mobile */
+@media (max-width: 480px) {
+    .related-products {
+        padding: var(--space-3xl) var(--space-md) !important;
+    }
+    
+    .related-products-scroll {
+        justify-content: flex-start;
+    }
+    
+    .related-card {
+        flex: 0 0 160px !important;
+    }
+    
+    .related-card-premium,
+    .related-card-food,
+    .related-card-service,
+    .related-card-quick {
+        flex: 0 0 160px !important;
     }
 }

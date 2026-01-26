@@ -25,7 +25,6 @@ export function renderPortfolioBookingTemplate(product) {
 
   return `
     ${renderBreadcrumb(product)}
-    ${showBackButton ? '<button class="pbk-back-btn" id="backBtn">← Back to Services</button>' : ''}
     
     <div class="pbk-container">
       <!-- ==========================================

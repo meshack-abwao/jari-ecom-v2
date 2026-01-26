@@ -43,9 +43,6 @@ export function renderVisualMenu(product) {
   
   return `
     ${renderBreadcrumb(product)}
-    ${showBackButton ? `
-    <button class="back-btn" id="backBtn">← Back to Menu</button>
-    ` : ''}
     <div class="product-container template-menu">
       <div class="product-card food-card">
         ${renderMenuGallery(media.images || [])}
