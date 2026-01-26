@@ -4,6 +4,7 @@
 // CSS prefix: pbk-
 // ===========================================
 import { state } from '../state.js';
+import { renderBreadcrumb } from '../render.js';
 
 export function renderPortfolioBookingTemplate(product) {
   const { products, store } = state;
@@ -22,6 +23,7 @@ export function renderPortfolioBookingTemplate(product) {
     : null;
 
   return `
+    ${renderBreadcrumb(product)}
     ${showBackButton ? '<button class="pbk-back-btn" id="backBtn">← Back to Services</button>' : ''}
     
     <div class="pbk-container">
