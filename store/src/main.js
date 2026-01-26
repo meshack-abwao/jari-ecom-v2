@@ -125,8 +125,9 @@ function render() {
 // ===========================================
 function renderCatalogView() {
   app.innerHTML = `
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     ${renderHeader()}
-    <main class="main">
+    <main class="main" id="main-content">
       ${renderProductsGrid(state.products)}
     </main>
     ${renderFooter()}
@@ -240,8 +241,9 @@ function renderProductView(product) {
   pixel.productView(product.id, product.data?.name || 'Unknown');
   
   app.innerHTML = `
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     ${renderHeader()}
-    <main class="main">
+    <main class="main" id="main-content">
       ${renderSingleProduct(product)}
     </main>
     ${renderFooter()}
