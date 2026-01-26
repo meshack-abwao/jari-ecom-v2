@@ -782,6 +782,28 @@ window.navigateShowcase = function(direction) {
 };
 
 // ===========================================
+// GLOBAL FUNCTIONS FOR BREADCRUMB NAVIGATION
+// ===========================================
+window.showCollection = function() {
+  setProductId(null);
+  render();
+};
+
+window.filterByCategory = function(categoryName) {
+  // First go back to collection view
+  setProductId(null);
+  render();
+  
+  // Then trigger the category filter (after DOM updates)
+  setTimeout(() => {
+    const categoryPill = document.querySelector(`.category-pill[data-category="${categoryName}"]`);
+    if (categoryPill) {
+      categoryPill.click();
+    }
+  }, 100);
+};
+
+// ===========================================
 // GLOBAL FUNCTIONS FOR DEEP DIVE TEMPLATE
 // ===========================================
 window.shareProduct = async function() {
