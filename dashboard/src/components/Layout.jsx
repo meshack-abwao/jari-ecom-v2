@@ -383,7 +383,7 @@ export default function Layout() {
             <Calendar size={20} /><span>Bookings</span>
           </NavLink>
           <NavLink to="/ads" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
-            <Megaphone size={20} /><span>Ads</span>
+            <Megaphone size={20} /><span>Marketing</span>
           </NavLink>
           <NavLink to="/templates" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
             <LayoutGrid size={20} /><span>Templates</span>
