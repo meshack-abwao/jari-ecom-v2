@@ -9,13 +9,13 @@ import { auth } from '../middleware/auth.js';
 
 const router = express.Router();
 
-// Template definitions with pricing
+// Template definitions with pricing (matches dashboard + pricing doc)
 const TEMPLATES = {
-  'quick-decision': { name: 'Quick Decision', price: 500, description: 'Fast impulse buys' },
-  'visual-menu': { name: 'Visual Menu', price: 750, description: 'Restaurants and food' },
-  'portfolio-booking': { name: 'Portfolio + Booking', price: 1000, description: 'Service providers' },
-  'deep-dive': { name: 'Deep Dive', price: 1000, description: 'High-ticket items' },
-  'event-landing': { name: 'Event Landing', price: 750, description: 'Events and workshops' }
+  'quick-decision': { name: 'Quick Decision', price: 500, description: 'Simple products, impulse buys' },
+  'visual-menu': { name: 'Visual Menu', price: 600, description: 'Restaurants and food businesses' },
+  'portfolio-booking': { name: 'Portfolio + Booking', price: 800, description: 'Service providers with packages' },
+  'deep-dive': { name: 'Deep Dive', price: 800, description: 'High-ticket items needing specs' },
+  'event-landing': { name: 'Event Landing', price: 1000, description: 'Events, workshops, courses' }
 };
 
 // ============================================================================

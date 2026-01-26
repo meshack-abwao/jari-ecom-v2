@@ -10,14 +10,14 @@ import ImageUploader from '../components/ImageUploader';
 const TEMPLATES = {
   'quick-decision': {
     name: 'Quick Decision',
-    price: 250,
-    description: 'Perfect for single products or impulse buys',
+    price: 500,
+    description: 'Perfect for simple products or impulse buys',
     icon: '⚡',
     fields: ['basic', 'gallery', 'stories', 'testimonials']
   },
   'portfolio-booking': {
     name: 'Portfolio + Booking',
-    price: 500,
+    price: 800,
     description: 'For service providers with packages',
     icon: '📋',
     fields: ['basic', 'gallery', 'stories', 'showcase', 'packages', 'testimonials']
@@ -38,7 +38,7 @@ const TEMPLATES = {
   },
   'event-landing': {
     name: 'Event Landing',
-    price: 700,
+    price: 1000,
     description: 'For events, workshops, courses',
     icon: '🎪',
     fields: ['basic', 'gallery', 'eventDetails', 'tickets', 'testimonials']
@@ -779,14 +779,22 @@ export default function ProductsPage() {
                       onClick={() => setSelectedTemplate(key)}
                       style={{
                         ...styles.templateCard,
-                        border: selectedTemplate === key ? '2px solid var(--accent-color)' : '1px solid var(--border-color)',
-                        background: selectedTemplate === key ? 'var(--accent-light)' : 'var(--bg-tertiary)',
+                        border: selectedTemplate === key 
+                          ? '2px solid var(--accent-color)' 
+                          : '1px solid rgba(255, 255, 255, 0.1)',
+                        background: selectedTemplate === key 
+                          ? 'rgba(139, 92, 246, 0.15)' 
+                          : 'rgba(255, 255, 255, 0.04)',
+                        boxShadow: selectedTemplate === key 
+                          ? '0 4px 20px rgba(139, 92, 246, 0.25)' 
+                          : 'none',
+                        transform: selectedTemplate === key ? 'scale(1.02)' : 'scale(1)',
                       }}
                     >
                       <div style={styles.templateIcon}>{config.icon}</div>
                       <div style={styles.templateInfo}>
                         <span style={styles.templateName}>{config.name}</span>
-                        <span style={styles.templatePrice}>KES {config.price}</span>
+                        <span style={styles.templatePrice}>KES {config.price.toLocaleString()}</span>
                       </div>
                     </div>
                   ))}
@@ -1873,14 +1881,14 @@ const styles = {
   label: { fontSize: '11px', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' },
   hint: { fontSize: '12px', color: 'var(--text-muted)', marginBottom: '8px' },
   
-  templateSection: { padding: '16px', background: 'var(--bg-tertiary)', borderRadius: '12px', marginBottom: '8px' },
-  templateGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '8px', marginTop: '10px' },
-  templateCard: { padding: '12px', borderRadius: '10px', cursor: 'pointer', transition: 'all 0.2s', textAlign: 'center' },
-  templateIcon: { fontSize: '24px', marginBottom: '6px' },
-  templateInfo: { display: 'flex', flexDirection: 'column', gap: '2px' },
-  templateName: { fontSize: '12px', fontWeight: '600', color: 'var(--text-primary)' },
-  templatePrice: { fontSize: '10px', fontWeight: '600', color: 'var(--accent-color)' },
-  templateDesc: { fontSize: '12px', color: 'var(--text-muted)', marginTop: '10px', textAlign: 'center' },
+  templateSection: { padding: '20px', background: 'rgba(255, 255, 255, 0.03)', backdropFilter: 'blur(20px)', borderRadius: '16px', marginBottom: '12px', border: '1px solid rgba(255, 255, 255, 0.08)' },
+  templateGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '12px', marginTop: '12px' },
+  templateCard: { padding: '16px 12px', borderRadius: '14px', cursor: 'pointer', transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)', textAlign: 'center', background: 'rgba(255, 255, 255, 0.04)', backdropFilter: 'blur(10px)' },
+  templateIcon: { fontSize: '28px', marginBottom: '10px', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' },
+  templateInfo: { display: 'flex', flexDirection: 'column', gap: '4px' },
+  templateName: { fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)', letterSpacing: '-0.01em' },
+  templatePrice: { fontSize: '12px', fontWeight: '700', color: 'var(--accent-color)' },
+  templateDesc: { fontSize: '13px', color: 'var(--text-muted)', marginTop: '14px', textAlign: 'center', lineHeight: '1.4' },
   
   section: { border: '1px solid var(--border-color)', borderRadius: '12px', overflow: 'hidden' },
   sectionHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 16px', background: 'var(--bg-tertiary)', cursor: 'pointer', fontSize: '14px', fontWeight: '600', color: 'var(--text-primary)' },
