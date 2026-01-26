@@ -6098,3 +6098,76 @@ textarea:focus-visible {
         flex: 0 0 160px !important;
     }
 }
+
+
+/* ===========================================
+   PRODUCT NAVIGATION (Prev/Next)
+   Apple pill design, matches breadcrumb
+   =========================================== */
+
+.product-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-md);
+    padding: var(--space-lg) var(--space-lg);
+    margin-bottom: var(--space-lg);
+}
+
+.product-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-sm) var(--space-md);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    font-size: var(--fs-small);
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.product-nav-btn:not(.disabled):hover {
+    background: var(--text-primary);
+    color: white;
+    border-color: var(--text-primary);
+    transform: translateY(-1px);
+}
+
+.product-nav-btn.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.product-nav-btn svg {
+    flex-shrink: 0;
+}
+
+.product-nav-counter {
+    font-size: var(--fs-small);
+    font-weight: 500;
+    color: var(--text-secondary);
+    padding: var(--space-xs) var(--space-sm);
+    background: var(--bg-gray);
+    border-radius: var(--radius-full);
+    min-width: 60px;
+    text-align: center;
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+    .product-nav {
+        padding: var(--space-md);
+        gap: var(--space-sm);
+    }
+    
+    .product-nav-btn span {
+        display: none;
+    }
+    
+    .product-nav-btn {
+        padding: var(--space-sm);
+    }
+}
