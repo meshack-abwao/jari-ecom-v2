@@ -143,9 +143,9 @@ function renderRelatedCard(product, config) {
           ? `<img src="${imageUrl}" alt="${name}" loading="lazy">`
           : `<div class="related-card-placeholder">📦</div>`
         }
+        <h4 class="related-card-name">${name}</h4>
       </div>
       <div class="related-card-content">
-        <h4 class="related-card-name">${name}</h4>
         ${descSnippet}
         ${metaHTML ? `<div class="related-card-meta-row">${metaHTML}</div>` : ''}
         <div class="related-card-footer">
