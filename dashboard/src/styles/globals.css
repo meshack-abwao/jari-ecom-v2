@@ -223,6 +223,22 @@ body {
   opacity: 1;
 }
 
+/* ===== NAV SECTION LABELS ===== */
+.nav-section-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  padding: 16px 14px 6px;
+  margin-top: 4px;
+}
+
+.nav-section-label:first-child {
+  margin-top: 0;
+  padding-top: 0;
+}
+
 /* ===== FILTER BUTTONS ===== */
 .filter-btn {
   padding: 8px 16px;
