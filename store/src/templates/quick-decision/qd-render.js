@@ -10,6 +10,7 @@ import { renderGallery, renderStories, renderStoryViewer } from '../../shared/me
 import { renderTestimonials } from '../../shared/testimonials.js';
 import { renderProductPolicyLinks, renderProductPolicyModals } from '../../shared/policy-modals.js';
 import { renderQuantitySection } from '../../shared/quantity-controls.js';
+import { renderBreadcrumb } from '../../render.js';
 
 /**
  * Main render function for Quick Decision template
@@ -28,6 +29,7 @@ export function renderQuickDecision(product) {
   const showBackButton = products.length > 1;
   
   return `
+    ${renderBreadcrumb(product)}
     ${showBackButton ? '<button class="back-btn" id="backBtn">← Back to All Products</button>' : ''}
     <div class="product-container">
       <div class="product-card">
