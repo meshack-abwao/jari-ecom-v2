@@ -367,12 +367,17 @@ export default function Layout() {
         </div>
 
         <nav style={styles.nav}>
+          {/* Main Section */}
+          <div className="nav-section-label">Main</div>
           <NavLink to="/" end className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
             <Home size={20} /><span>Overview</span>
           </NavLink>
           <NavLink to="/products" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
             <Package size={20} /><span>My Store</span>
           </NavLink>
+          
+          {/* Orders Section */}
+          <div className="nav-section-label">Orders</div>
           <NavLink to="/orders" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
             <ShoppingCart size={20} /><span>Orders</span>
           </NavLink>
@@ -382,6 +387,9 @@ export default function Layout() {
           <NavLink to="/bookings" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
             <Calendar size={20} /><span>Bookings</span>
           </NavLink>
+          
+          {/* Customize Section */}
+          <div className="nav-section-label">Customize</div>
           <NavLink to="/ads" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
             <Megaphone size={20} /><span>Marketing</span>
           </NavLink>
