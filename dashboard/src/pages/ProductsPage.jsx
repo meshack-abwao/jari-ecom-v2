@@ -321,13 +321,6 @@ export default function ProductsPage() {
     }
   };
 
-  const handleUnlockTemplate = async () => {
-    if (!templateToUnlock) return;
-    
-    const phoneNumber = window.unlockPhoneNumber;
-    if (!phoneNumber || phoneNumber.length < 10) {
-      alert('Please enter a valid M-Pesa phone number');
-      return;
   // Payment coming soon - no fake success
   const handleUnlockTemplate = async () => {
     if (!templateToUnlock) return;
