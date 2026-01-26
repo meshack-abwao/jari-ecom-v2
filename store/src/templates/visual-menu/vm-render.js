@@ -43,7 +43,6 @@ export function renderVisualMenu(product) {
   
   return `
     ${renderBreadcrumb(product)}
-    ${renderProductNav(product)}
     <div class="product-container template-menu">
       <div class="product-card food-card">
         ${renderMenuGallery(media.images || [])}
@@ -86,6 +85,9 @@ export function renderVisualMenu(product) {
       
       <!-- Related Menu Items (Kalbach: Associative Nav) -->
       ${renderRelatedProducts(product, 'visual-menu')}
+      
+      <!-- Product Navigation (Bottom) -->
+      ${renderProductNav(product)}
       
       <!-- Sticky CTA - PBK Style (Stacked mobile, inline desktop) -->
       <div class="vm-sticky-cta">

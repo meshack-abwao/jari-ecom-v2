@@ -9,6 +9,7 @@ import { renderGallery, renderStories, renderStoryViewer } from '../../shared/me
 import { renderTestimonials } from '../../shared/testimonials.js';
 import { renderProductPolicyLinks, renderProductPolicyModals } from '../../shared/policy-modals.js';
 import { renderBreadcrumb, renderProductNav } from '../../render.js';
+import { renderRelatedProducts } from '../../shared/related-products.js';
 
 /**
  * Render Event Landing template
@@ -40,7 +41,6 @@ export function renderEventLanding(product) {
   
   return `
     ${renderBreadcrumb(product)}
-    ${renderProductNav(product)}
     <div class="product-container">
       <div class="product-card">
         ${renderGallery(media.images || [])}
@@ -61,6 +61,13 @@ export function renderEventLanding(product) {
           ${tickets.length > 0 ? renderTicketsSection(tickets) : renderSimplePrice(data.price)}
           
           ${testimonials.length > 0 ? renderTestimonials(testimonials) : ''}
+          
+          <!-- Related Events -->
+          ${renderRelatedProducts(product, 'event-landing')}
+          
+          <!-- Product Navigation (Bottom) -->
+          ${renderProductNav(product)}
+          
           ${renderProductPolicyLinks(policies)}
         </div>
       </div>

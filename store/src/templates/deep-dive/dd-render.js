@@ -36,7 +36,6 @@ export function renderDeepDive(product) {
   
   return `
     ${renderBreadcrumb(product)}
-    ${renderProductNav(product)}
     <div class="product-container template-deep-dive">
       
       <!-- STEP 1: DEFINE - Product Header (Title + Rating) -->
@@ -102,6 +101,9 @@ export function renderDeepDive(product) {
       
       <!-- STEP 11: EXPLORE - Related Products (Kalbach: Associative Nav) -->
       ${renderRelatedProducts(product, 'deep-dive')}
+      
+      <!-- STEP 12: Product Navigation (Bottom) -->
+      ${renderProductNav(product)}
       
       ${renderProductPolicyLinks(policies)}
     </div>

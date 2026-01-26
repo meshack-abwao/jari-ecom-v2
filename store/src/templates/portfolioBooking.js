@@ -25,7 +25,6 @@ export function renderPortfolioBookingTemplate(product) {
 
   return `
     ${renderBreadcrumb(product)}
-    ${renderProductNav(product)}
     
     <div class="pbk-container">
       <!-- ==========================================
@@ -116,7 +115,10 @@ export function renderPortfolioBookingTemplate(product) {
       <!-- 10. RELATED SERVICES - (Kalbach: Associative Nav) -->
       ${renderRelatedProducts(product, 'portfolio-booking')}
 
-      <!-- 11. BOOKING NOTE - Final reassurance -->
+      <!-- 11. Product Navigation (Bottom) -->
+      ${renderProductNav(product)}
+
+      <!-- 12. BOOKING NOTE - Final reassurance -->
       ${data.bookingNote ? `<p class="pbk-note">ℹ️ ${data.bookingNote}</p>` : ''}
     </div>
 

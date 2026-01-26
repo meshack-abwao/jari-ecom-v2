@@ -31,7 +31,6 @@ export function renderQuickDecision(product) {
   
   return `
     ${renderBreadcrumb(product)}
-    ${renderProductNav(product)}
     <div class="product-container">
       <div class="product-card">
         ${renderGallery(images)}
@@ -73,6 +72,9 @@ export function renderQuickDecision(product) {
       
       <!-- Related Products (Kalbach: Associative Nav) -->
       ${renderRelatedProducts(product, 'quick-decision')}
+      
+      <!-- Product Navigation (Bottom) -->
+      ${renderProductNav(product)}
     </div>
     
     ${renderStoryViewer(stories)}
