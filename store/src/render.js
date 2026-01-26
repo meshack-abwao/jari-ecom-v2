@@ -59,6 +59,49 @@ export function renderBreadcrumb(product = null) {
 }
 
 // ===========================================
+// PRODUCT NAVIGATION (Prev/Next)
+// Kalbach: Sequential navigation for browsing
+// ===========================================
+export function renderProductNav(product = null) {
+  const { products } = state;
+  
+  // Need at least 2 products for navigation
+  if (!product || products.length <= 1) return '';
+  
+  const currentIndex = products.findIndex(p => p.id === product.id);
+  if (currentIndex === -1) return '';
+  
+  const prevProduct = currentIndex > 0 ? products[currentIndex - 1] : null;
+  const nextProduct = currentIndex < products.length - 1 ? products[currentIndex + 1] : null;
+  const total = products.length;
+  const current = currentIndex + 1;
+  
+  return `
+    <div class="product-nav">
+      <button class="product-nav-btn ${!prevProduct ? 'disabled' : ''}" 
+              onclick="${prevProduct ? `window.viewRelatedProduct('${prevProduct.id}')` : ''}"
+              ${!prevProduct ? 'disabled' : ''}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M15 18l-6-6 6-6"/>
+        </svg>
+        <span>Prev</span>
+      </button>
+      
+      <span class="product-nav-counter">${current} of ${total}</span>
+      
+      <button class="product-nav-btn ${!nextProduct ? 'disabled' : ''}" 
+              onclick="${nextProduct ? `window.viewRelatedProduct('${nextProduct.id}')` : ''}"
+              ${!nextProduct ? 'disabled' : ''}>
+        <span>Next</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 18l6-6-6-6"/>
+        </svg>
+      </button>
+    </div>
+  `;
+}
+
+// ===========================================
 // HEADER
 // ===========================================
 export function renderHeader() {
