@@ -10,29 +10,16 @@ import { auth } from '../middleware/auth.js';
 const router = Router();
 
 // ===========================================
-// PRICING CONFIGURATION
+// PRICING CONFIGURATION (v2.0 - No Setup Fee)
 // ===========================================
-
-// Setup fee (one-time, non-refundable)
-const SETUP_FEE = {
-  full: 5000,        // Full payment
-  split: 2500,       // 50% split (pay in 2 months)
-  includes: ['Account creation', 'Theme unlock', 'Optional onboarding call']
-};
 
 // Subscription pricing
 const SUBSCRIPTION_PLANS = {
   base: { 
     name: 'Base Plan', 
     price: 1200, 
-    features: ['3 product cards', 'Basic analytics', 'Email support', 'Shareable store link', 'Order management']
+    features: ['3 product cards', '1 free theme', 'Basic analytics', 'Shareable store link', 'Order management']
   }
-};
-
-// Trial configuration
-const TRIAL_CONFIG = {
-  days: 7,  // 1 week free trial
-  skipSetup: true  // Can skip setup fee and try first
 };
 
 // Add-on pricing
@@ -43,34 +30,19 @@ const ADDONS = {
   priority_support: { name: 'Priority Support', price: 500, description: 'Fast response, dedicated assistance' }
 };
 
-// Payment options for new merchants
-const PAYMENT_OPTIONS = {
-  option_a: {
-    name: 'Full Setup',
-    description: 'Pay setup fee upfront',
-    setupFee: 5000,
-    firstMonth: 1200,
-    total: 6200,
-    setupRemaining: 0
-  },
-  option_b: {
-    name: 'Split Setup (50%)',
-    description: 'Split setup fee over 2 months',
-    setupFee: 2500,  // First half
-    firstMonth: 1200,
-    total: 3700,     // First payment
-    setupRemaining: 2500,  // Paid in month 2
-    month2Total: 3700  // 2500 + 1200
-  },
-  option_c: {
-    name: 'Free Trial',
-    description: '1-week free trial, no payment required',
-    trialDays: 7,
-    setupFee: 0,
-    firstMonth: 0,
-    total: 0,
-    note: 'Setup fee required after trial to continue'
-  }
+// Card bundles (one-time purchase)
+const CARD_BUNDLES = {
+  starter: { name: 'Starter Pack', cards: 4, price: 350, pricePerCard: 87 },
+  growth: { name: 'Growth Pack', cards: 7, price: 550, pricePerCard: 79 },
+  pro: { name: 'Pro Pack', cards: 12, price: 850, pricePerCard: 71 }
+};
+
+// Card tier monthly fees (for >15 cards)
+const CARD_TIERS = {
+  tier1: { range: '1-15', fee: 0 },
+  tier2: { range: '16-30', fee: 200 },
+  tier3: { range: '31-60', fee: 500 },
+  enterprise: { range: '60+', fee: null, note: 'Contact us' }
 };
 
 // ============================================================================

@@ -9,11 +9,12 @@ import { auth } from '../middleware/auth.js';
 
 const router = express.Router();
 
-// Card bundle pricing
+// Card bundle pricing (v2.0 - matches pricing doc)
+// Note: "cards" = additional cards added to the 3 included
 const CARD_BUNDLES = {
-  starter: { cards: 10, price: 350, name: 'Starter Pack' },
-  growth: { cards: 25, price: 550, name: 'Growth Pack' },
-  pro: { cards: 50, price: 850, name: 'Pro Pack' }
+  starter: { cards: 4, totalCards: 7, price: 350, pricePerCard: 87, name: 'Starter Pack' },
+  growth: { cards: 7, totalCards: 10, price: 550, pricePerCard: 79, name: 'Growth Pack' },
+  pro: { cards: 12, totalCards: 15, price: 850, pricePerCard: 71, name: 'Pro Pack' }
 };
 
 // ============================================================================
@@ -107,8 +108,11 @@ router.get('/bundles', auth, async (req, res) => {
     res.json({
       bundles: Object.entries(CARD_BUNDLES).map(([id, bundle]) => ({
         id,
-        ...bundle,
-        pricePerCard: Math.round(bundle.price / bundle.cards)
+        name: bundle.name,
+        cards: bundle.cards,
+        totalCards: bundle.totalCards,
+        price: bundle.price,
+        pricePerCard: bundle.pricePerCard
       }))
     });
   } catch (error) {

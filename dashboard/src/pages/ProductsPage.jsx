@@ -5,43 +5,50 @@ import { Plus, Edit, Trash2, X, Eye, EyeOff, ExternalLink, Tag, ChevronDown, Che
 import ImageUploader from '../components/ImageUploader';
 
 // ===========================================
-// TEMPLATE DEFINITIONS
+// TEMPLATE DEFINITIONS (v2.0 - matches pricing doc)
 // ===========================================
 const TEMPLATES = {
   'quick-decision': {
-    name: 'Quick Decision',
+    name: 'Quick Sell',
     price: 500,
-    description: 'Perfect for simple products or impulse buys',
+    description: 'Simple products, impulse buys',
     icon: '⚡',
     fields: ['basic', 'gallery', 'stories', 'testimonials']
-  },
-  'portfolio-booking': {
-    name: 'Portfolio + Booking',
-    price: 800,
-    description: 'For service providers with packages',
-    icon: '📋',
-    fields: ['basic', 'gallery', 'stories', 'showcase', 'packages', 'testimonials']
   },
   'visual-menu': {
     name: 'Visual Menu',
     price: 600,
-    description: 'For restaurants and food businesses',
+    description: 'Food, bakery, restaurants',
     icon: '🍽️',
     fields: ['basic', 'gallery', 'stories', 'dietary', 'addons', 'testimonials']
   },
   'deep-dive': {
     name: 'Deep Dive',
     price: 800,
-    description: 'For high-ticket items needing specs',
+    description: 'Premium, complex products',
     icon: '🔍',
     fields: ['basic', 'gallery', 'stories', 'specifications', 'whatsIncluded', 'showcase', 'warranty', 'testimonials']
   },
+  'portfolio-booking': {
+    name: 'Services',
+    price: 800,
+    description: 'Coaching, consulting, freelance',
+    icon: '📋',
+    fields: ['basic', 'gallery', 'stories', 'showcase', 'packages', 'testimonials']
+  },
   'event-landing': {
-    name: 'Event Landing',
+    name: 'Events/Booking',
     price: 1000,
-    description: 'For events, workshops, courses',
+    description: 'Classes, appointments, tickets',
     icon: '🎪',
     fields: ['basic', 'gallery', 'eventDetails', 'tickets', 'testimonials']
+  },
+  'catalog': {
+    name: 'Catalog',
+    price: 400,
+    description: 'Browse-only, WhatsApp inquiry',
+    icon: '📖',
+    fields: ['basic', 'gallery', 'stories', 'testimonials']
   },
 };
 
