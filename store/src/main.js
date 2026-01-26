@@ -804,6 +804,16 @@ window.filterByCategory = function(categoryName) {
 };
 
 // ===========================================
+// GLOBAL FUNCTIONS FOR RELATED PRODUCTS
+// ===========================================
+window.viewRelatedProduct = function(productId) {
+  setProductId(productId);
+  render();
+  // Scroll to top smoothly
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+// ===========================================
 // GLOBAL FUNCTIONS FOR DEEP DIVE TEMPLATE
 // ===========================================
 window.shareProduct = async function() {
