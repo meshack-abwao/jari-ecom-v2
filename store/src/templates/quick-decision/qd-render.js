@@ -10,7 +10,7 @@ import { renderGallery, renderStories, renderStoryViewer } from '../../shared/me
 import { renderTestimonials } from '../../shared/testimonials.js';
 import { renderProductPolicyLinks, renderProductPolicyModals } from '../../shared/policy-modals.js';
 import { renderQuantitySection } from '../../shared/quantity-controls.js';
-import { renderBreadcrumb } from '../../render.js';
+import { renderBreadcrumb, renderProductNav } from '../../render.js';
 import { renderRelatedProducts } from '../../shared/related-products.js';
 
 /**
@@ -31,6 +31,7 @@ export function renderQuickDecision(product) {
   
   return `
     ${renderBreadcrumb(product)}
+    ${renderProductNav(product)}
     <div class="product-container">
       <div class="product-card">
         ${renderGallery(images)}

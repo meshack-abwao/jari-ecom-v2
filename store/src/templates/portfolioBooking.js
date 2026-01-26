@@ -4,7 +4,7 @@
 // CSS prefix: pbk-
 // ===========================================
 import { state } from '../state.js';
-import { renderBreadcrumb } from '../render.js';
+import { renderBreadcrumb, renderProductNav } from '../render.js';
 import { renderRelatedProducts } from '../shared/related-products.js';
 
 export function renderPortfolioBookingTemplate(product) {
@@ -25,6 +25,7 @@ export function renderPortfolioBookingTemplate(product) {
 
   return `
     ${renderBreadcrumb(product)}
+    ${renderProductNav(product)}
     
     <div class="pbk-container">
       <!-- ==========================================

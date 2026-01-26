@@ -10,7 +10,7 @@ import { renderGallery, renderStories, renderStoryViewer } from '../../shared/me
 import { renderTestimonials } from '../../shared/testimonials.js';
 import { renderProductPolicyLinks, renderProductPolicyModals } from '../../shared/policy-modals.js';
 import { renderShowcaseViewer } from './dd-showcase-viewer.js';
-import { renderBreadcrumb } from '../../render.js';
+import { renderBreadcrumb, renderProductNav } from '../../render.js';
 import { renderRelatedProducts } from '../../shared/related-products.js';
 
 /**
@@ -36,6 +36,7 @@ export function renderDeepDive(product) {
   
   return `
     ${renderBreadcrumb(product)}
+    ${renderProductNav(product)}
     <div class="product-container template-deep-dive">
       
       <!-- STEP 1: DEFINE - Product Header (Title + Rating) -->

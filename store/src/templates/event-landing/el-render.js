@@ -8,7 +8,7 @@ import { state } from '../../state.js';
 import { renderGallery, renderStories, renderStoryViewer } from '../../shared/media-components.js';
 import { renderTestimonials } from '../../shared/testimonials.js';
 import { renderProductPolicyLinks, renderProductPolicyModals } from '../../shared/policy-modals.js';
-import { renderBreadcrumb } from '../../render.js';
+import { renderBreadcrumb, renderProductNav } from '../../render.js';
 
 /**
  * Render Event Landing template
@@ -40,6 +40,7 @@ export function renderEventLanding(product) {
   
   return `
     ${renderBreadcrumb(product)}
+    ${renderProductNav(product)}
     <div class="product-container">
       <div class="product-card">
         ${renderGallery(media.images || [])}
