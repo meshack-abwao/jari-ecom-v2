@@ -5,6 +5,7 @@
 // ===========================================
 import { state } from '../state.js';
 import { renderBreadcrumb } from '../render.js';
+import { renderRelatedProducts } from '../shared/related-products.js';
 
 export function renderPortfolioBookingTemplate(product) {
   const { products, store } = state;
@@ -112,7 +113,10 @@ export function renderPortfolioBookingTemplate(product) {
       <!-- 9. STORIES - "See more examples" (Bonus content - last) -->
       ${media.stories?.length > 0 ? renderPbkStories(media.stories, data.storyTitle) : ''}
 
-      <!-- 10. BOOKING NOTE - Final reassurance -->
+      <!-- 10. RELATED SERVICES - (Kalbach: Associative Nav) -->
+      ${renderRelatedProducts(product, 'portfolio-booking')}
+
+      <!-- 11. BOOKING NOTE - Final reassurance -->
       ${data.bookingNote ? `<p class="pbk-note">ℹ️ ${data.bookingNote}</p>` : ''}
     </div>
 
