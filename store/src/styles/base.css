@@ -575,13 +575,13 @@ body {
 .store-breadcrumb-pill {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     gap: var(--space-lg);
-    padding: var(--space-sm) var(--space-sm) var(--space-sm) var(--space-md);
-    background: var(--surface);
-    border: 1px solid var(--border);
+    padding: var(--space-xs);
+    background: transparent;
+    border: none;
     border-radius: var(--radius-full);
-    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    box-shadow: none;
     max-width: 100%;
 }
 
@@ -590,7 +590,7 @@ body {
     display: flex;
     align-items: center;
     gap: var(--space-xs);
-    padding: var(--space-sm) var(--space-md);
+    padding: var(--space-sm) var(--space-lg);
     background: var(--bg-gray);
     border: none;
     border-radius: var(--radius-full);
