@@ -4,10 +4,16 @@ import Step1_BusinessType from './signup/Step1_BusinessType';
 import Step2_TemplatePreview from './signup/Step2_TemplatePreview';
 import Step3_BasicInfo from './signup/Step3_BasicInfo';
 import Step4_PlanSelector from './signup/Step4_PlanSelector';
-import Step5_VerificationTier from './signup/Step5_VerificationTier';
-import Step6_Payment from './signup/Step6_Payment';
-import Step7_Success from './signup/Step7_Success';
+import Step5_Payment from './signup/Step5_Payment';
+import Step6_Success from './signup/Step6_Success';
 import { BRAND } from '../constants/brand';
+
+// ========================================
+// SIGNUP WIZARD - Premium Apple-Inspired Design
+// Following Why Fonts Matter + Grid Principles
+// ========================================
+
+const TOTAL_STEPS = 6;
 
 export default function SignupWizard() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -22,7 +28,7 @@ export default function SignupWizard() {
     phone: '',
     password: '',
     selectedAddons: [],
-    verificationTier: 'BASIC',
+    verificationTier: 'BASIC', // Default, can upgrade in dashboard later
     token: '',
     storeId: '',
     slug: '',
@@ -35,30 +41,36 @@ export default function SignupWizard() {
   // Scroll to top smoothly whenever step changes
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    
-    // Trigger transition animation
     setIsTransitioning(true);
     const timer = setTimeout(() => setIsTransitioning(false), 50);
     return () => clearTimeout(timer);
   }, [currentStep]);
 
-  const nextStep = () => setCurrentStep(prev => Math.min(prev + 1, 7));
+  const nextStep = () => setCurrentStep(prev => Math.min(prev + 1, TOTAL_STEPS));
   const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 1));
   const updateData = (newData) => setSignupData(prev => ({ ...prev, ...newData }));
   const goToDashboard = () => navigate('/');
 
-  const progress = (currentStep / 7) * 100;
+  const progress = (currentStep / TOTAL_STEPS) * 100;
 
-  // Dynamic titles based on step
+  // Dynamic titles based on step - JTBD focused messaging
   const getTitles = () => {
     switch (currentStep) {
-      case 1: return null; // No title for Step 1 (JTBD has its own header)
-      case 2: return null; // Auto-skips
-      case 3: return { title: "Let's create your account", subtitle: "Quick and easy—takes less than 2 minutes" };
-      case 4: return { title: "Choose your plan", subtitle: "Start free, upgrade anytime" };
-      case 5: return { title: "Build customer trust", subtitle: "Higher trust = more sales" };
-      case 6: return { title: "Complete your setup", subtitle: "Activate M-Pesa payments and start selling" };
-      case 7: return null; // Success has its own layout
+      case 1: return null; // Step 1 has its own header
+      case 2: return null; // Template preview auto-skips
+      case 3: return { 
+        title: "Let's set up your store", 
+        subtitle: "Quick and easy—takes less than 2 minutes" 
+      };
+      case 4: return { 
+        title: "Choose what works for you", 
+        subtitle: "Start with the essentials, add more as you grow" 
+      };
+      case 5: return { 
+        title: "Almost there", 
+        subtitle: "Complete your setup and start selling" 
+      };
+      case 6: return null; // Success has its own layout
       default: return { title: "", subtitle: "" };
     }
   };
@@ -67,21 +79,23 @@ export default function SignupWizard() {
 
   return (
     <div style={styles.container}>
-      {/* Minimal sticky header - Only for steps 2-7 */}
-      {currentStep > 1 && currentStep < 7 && (
+      {/* Glassmorphic sticky header - matching landing page */}
+      {currentStep > 1 && currentStep < TOTAL_STEPS && (
         <header style={styles.header}>
           <div style={styles.headerContent}>
             <a href="https://jarisolutionsecom.store" style={styles.logoLink}>
-              <img src={BRAND.LOGO_URL} alt="Jari" style={styles.logo} />
+              <img src={BRAND.LOGO_URL} alt="Jari" style={styles.logoImg} />
+              <div style={styles.logoSeparator}></div>
+              <span style={styles.logoText}>Jari<span style={styles.logoAccent}>.Ecom</span></span>
             </a>
             
             <div style={styles.headerRight}>
-              <span style={styles.stepText}>Step {currentStep} of 7</span>
-              <a href="/login" style={styles.loginLink}>Sign in</a>
+              <span style={styles.stepIndicator}>Step {currentStep} of {TOTAL_STEPS}</span>
+              <a href="/login" style={styles.signInLink}>Already have an account?</a>
             </div>
           </div>
           
-          {/* Thin progress bar */}
+          {/* Gradient progress bar */}
           <div style={styles.progressBar}>
             <div style={{
               ...styles.progressFill,
@@ -91,14 +105,14 @@ export default function SignupWizard() {
         </header>
       )}
 
-      {/* Main content - No nested containers */}
+      {/* Main content with slide animation */}
       <main style={{
         ...styles.main,
         opacity: isTransitioning ? 0 : 1,
-        transform: isTransitioning ? 'translateY(20px)' : 'translateY(0)',
-        transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+        transform: isTransitioning ? 'translateY(24px)' : 'translateY(0)',
+        transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
       }}>
-        {/* Contextual title (for steps 3-6) */}
+        {/* Contextual title section */}
         {titles && (
           <div style={styles.titleSection}>
             <h1 style={styles.mainTitle}>{titles.title}</h1>
@@ -106,7 +120,7 @@ export default function SignupWizard() {
           </div>
         )}
 
-        {/* Step content - Direct rendering, no wrapper */}
+        {/* Step 1: Business Type Selection */}
         {currentStep === 1 && (
           <Step1_BusinessType 
             data={signupData} 
@@ -115,6 +129,7 @@ export default function SignupWizard() {
           />
         )}
         
+        {/* Step 2: Template Preview (auto-skips) */}
         {currentStep === 2 && (
           <Step2_TemplatePreview 
             data={signupData} 
@@ -122,6 +137,7 @@ export default function SignupWizard() {
           />
         )}
         
+        {/* Step 3: Basic Info (Name, Email, Phone, Password) */}
         {currentStep === 3 && (
           <Step3_BasicInfo 
             data={signupData} 
@@ -131,6 +147,7 @@ export default function SignupWizard() {
           />
         )}
         
+        {/* Step 4: Plan & Add-ons Selection */}
         {currentStep === 4 && (
           <Step4_PlanSelector 
             data={signupData} 
@@ -140,8 +157,9 @@ export default function SignupWizard() {
           />
         )}
         
+        {/* Step 5: Payment (Setup Fee) */}
         {currentStep === 5 && (
-          <Step5_VerificationTier 
+          <Step5_Payment 
             data={signupData} 
             updateData={updateData} 
             nextStep={nextStep} 
@@ -149,17 +167,9 @@ export default function SignupWizard() {
           />
         )}
         
+        {/* Step 6: Success */}
         {currentStep === 6 && (
-          <Step6_Payment 
-            data={signupData} 
-            updateData={updateData} 
-            nextStep={nextStep} 
-            prevStep={prevStep} 
-          />
-        )}
-        
-        {currentStep === 7 && (
-          <Step7_Success 
+          <Step6_Success 
             data={signupData} 
             goToDashboard={goToDashboard} 
           />
@@ -169,24 +179,32 @@ export default function SignupWizard() {
   );
 }
 
+// ========================================
+// STYLES - Premium Design System
+// Based on Why Fonts Matter + Grid Principles
+// ========================================
 const styles = {
   container: {
     minHeight: '100vh',
     background: '#f5f5f7',
+    fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, sans-serif',
+    WebkitFontSmoothing: 'antialiased',
+    MozOsxFontSmoothing: 'grayscale',
   },
 
-  // Minimal sticky header
+  // Glassmorphic header - matches landing page
   header: {
     position: 'sticky',
     top: 0,
     zIndex: 100,
-    background: 'rgba(255, 255, 255, 0.8)',
+    background: 'rgba(255, 255, 255, 0.72)',
     backdropFilter: 'saturate(180%) blur(20px)',
-    borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
+    WebkitBackdropFilter: 'saturate(180%) blur(20px)',
+    borderBottom: '1px solid rgba(0, 0, 0, 0.06)',
   },
 
   headerContent: {
-    maxWidth: '1400px',
+    maxWidth: '1120px',
     margin: '0 auto',
     padding: '16px 24px',
     display: 'flex',
@@ -197,12 +215,33 @@ const styles = {
   logoLink: {
     display: 'flex',
     alignItems: 'center',
+    gap: '12px',
     textDecoration: 'none',
   },
 
-  logo: {
-    height: '40px',
+  logoImg: {
+    height: '36px',
     width: 'auto',
+  },
+
+  logoSeparator: {
+    width: '1px',
+    height: '24px',
+    background: 'rgba(0, 0, 0, 0.1)',
+  },
+
+  logoText: {
+    fontSize: '20px',
+    fontWeight: 600,
+    color: '#1d1d1f',
+    letterSpacing: '-0.02em',
+  },
+
+  logoAccent: {
+    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    backgroundClip: 'text',
   },
 
   headerRight: {
@@ -211,43 +250,45 @@ const styles = {
     gap: '24px',
   },
 
-  stepText: {
+  stepIndicator: {
     fontSize: '13px',
     color: '#86868b',
     fontWeight: 500,
+    letterSpacing: '0.01em',
   },
 
-  loginLink: {
+  signInLink: {
     fontSize: '14px',
     color: '#667eea',
     textDecoration: 'none',
     fontWeight: 500,
+    transition: 'color 0.2s ease',
   },
 
-  // Thin gradient progress bar
+  // Gradient progress bar
   progressBar: {
     height: '3px',
-    background: 'rgba(0, 0, 0, 0.06)',
+    background: 'rgba(0, 0, 0, 0.04)',
     overflow: 'hidden',
   },
 
   progressFill: {
     height: '100%',
     background: 'linear-gradient(90deg, #667eea, #764ba2)',
-    transition: 'width 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+    transition: 'width 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
   },
 
-  // Main content area - No padding on Step 1
+  // Main content
   main: {
     width: '100%',
-    paddingTop: '0',
+    paddingBottom: '64px',
   },
 
-  // Title section (Steps 3-6 only)
+  // Title section - Premium typography
   titleSection: {
     textAlign: 'center',
     padding: '64px 24px 48px',
-    maxWidth: '800px',
+    maxWidth: '680px',
     margin: '0 auto',
   },
 
@@ -255,15 +296,16 @@ const styles = {
     fontSize: 'clamp(32px, 5vw, 48px)',
     fontWeight: 700,
     color: '#1d1d1f',
-    marginBottom: '12px',
-    letterSpacing: '-0.02em',
+    marginBottom: '16px',
+    letterSpacing: '-0.03em',
     lineHeight: 1.1,
   },
 
   mainSubtitle: {
-    fontSize: 'clamp(16px, 3vw, 18px)',
+    fontSize: 'clamp(16px, 2.5vw, 19px)',
     color: '#86868b',
     margin: 0,
     lineHeight: 1.5,
+    fontWeight: 400,
   },
 };
