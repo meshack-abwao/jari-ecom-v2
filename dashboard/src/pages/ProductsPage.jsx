@@ -1894,9 +1894,9 @@ const styles = {
   cardBalanceBox: { display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 14px', background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: '10px', fontSize: '13px', fontWeight: '500', color: 'var(--text-secondary)' },
   buyCardsBtn: { marginLeft: '8px', padding: '4px 10px', background: 'var(--accent-color)', border: 'none', borderRadius: '6px', fontSize: '11px', fontWeight: '600', color: '#fff', cursor: 'pointer' },
   
-  // Template Selector Styles (Phase C2)
-  templateSelector: { display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' },
-  templateSelect: { flex: 1, padding: '6px 10px', fontSize: '12px', border: '1px solid var(--border-color)', borderRadius: '6px', background: 'var(--bg-secondary)', color: 'var(--text-primary)', cursor: 'pointer' },
+  // Template Selector Styles (Phase C2) - Product Card Dropdown
+  templateSelector: { display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', padding: '8px 12px', background: 'rgba(255, 255, 255, 0.03)', backdropFilter: 'blur(10px)', borderRadius: '10px', border: '1px solid rgba(255, 255, 255, 0.08)' },
+  templateSelect: { flex: 1, padding: '8px 12px', fontSize: '13px', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '8px', background: 'rgba(0, 0, 0, 0.3)', color: 'var(--text-primary)', cursor: 'pointer', fontWeight: '500', appearance: 'none', backgroundImage: 'url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%23888\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3e%3cpolyline points=\'6 9 12 15 18 9\'%3e%3c/polyline%3e%3c/svg%3e")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center', backgroundSize: '16px', paddingRight: '36px' },
   
   modalOverlay: { position: 'fixed', inset: 0, background: 'rgba(0, 0, 0, 0.7)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', zIndex: 1000, padding: '20px', overflowY: 'auto' },
   modal: { width: '100%', maxWidth: '700px', padding: '32px', margin: '20px 0' },
