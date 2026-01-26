@@ -289,7 +289,7 @@ function renderDeepDiveCTA(price) {
   const formattedPrice = formatPrice(price);
   
   return `
-    <div class="deep-dive-cta">
+    <div class="deep-dive-cta dd-sticky-cta">
       <div class="cta-glass">
         <div class="cta-qty-section">
           <div class="cta-qty-controls">

@@ -279,6 +279,9 @@ function renderProductView(product) {
     initQuickDecisionHandlers(product);
   }
   
+  // Init smart sticky CTA for all templates
+  initSmartStickyCTA();
+  
   initCheckout();
 }
 
@@ -814,6 +817,36 @@ window.viewRelatedProduct = function(productId) {
   // Scroll to top smoothly
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
+
+// ===========================================
+// SMART STICKY CTA - Graceful footer avoidance
+// Applies to all templates with sticky CTAs
+// ===========================================
+function initSmartStickyCTA() {
+  const stickyCTA = document.querySelector('.sticky-cta, .pbk-sticky-cta, .vm-sticky-cta, .dd-sticky-cta');
+  const footer = document.querySelector('.store-footer-enhanced, .store-footer, footer');
+  
+  if (!stickyCTA || !footer) return;
+  
+  const handleScroll = () => {
+    const footerRect = footer.getBoundingClientRect();
+    const windowHeight = window.innerHeight;
+    const bottomOffset = 24; // CSS variable --space-lg equivalent
+    
+    if (footerRect.top < windowHeight) {
+      const footerVisibleHeight = windowHeight - footerRect.top;
+      const newBottom = footerVisibleHeight + bottomOffset;
+      stickyCTA.style.bottom = `${newBottom}px`;
+      stickyCTA.style.transition = 'bottom 0.15s ease';
+    } else {
+      stickyCTA.style.bottom = '';
+      stickyCTA.style.transition = '';
+    }
+  };
+  
+  window.addEventListener('scroll', handleScroll, { passive: true });
+  handleScroll();
+}
 
 // ===========================================
 // GLOBAL FUNCTIONS FOR DEEP DIVE TEMPLATE
