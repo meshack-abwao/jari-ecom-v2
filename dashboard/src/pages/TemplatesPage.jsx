@@ -231,7 +231,8 @@ export default function TemplatesPage() {
   const [templateToUnlock, setTemplateToUnlock] = useState(null);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [showExplainer, setShowExplainer] = useState(false);
-  const [expandedTemplate, setExpandedTemplate] = useState(null);
+  const [showTemplateModal, setShowTemplateModal] = useState(false);
+  const [viewingTemplate, setViewingTemplate] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -254,13 +255,10 @@ export default function TemplatesPage() {
     return template?.unlocked || false;
   };
 
+  // Click on card opens modal with full details
   const handleSelectTemplate = (template) => {
-    if (expandedTemplate === template.slug) {
-      setExpandedTemplate(null);
-    } else {
-      setExpandedTemplate(template.slug);
-    }
-    setSelectedTemplate(template.slug);
+    setViewingTemplate(template);
+    setShowTemplateModal(true);
   };
 
   const handleUnlockClick = (e, template) => {
@@ -269,41 +267,24 @@ export default function TemplatesPage() {
     setShowUnlockModal(true);
   };
 
+  // Payment coming soon - no fake success
   const handleUnlockTemplate = async () => {
     if (!templateToUnlock) return;
     
-    if (!phoneNumber || phoneNumber.length < 10) {
-      alert('Please enter a valid M-Pesa phone number');
-      return;
-    }
+    alert('🚧 Payment Coming Soon!\n\nM-Pesa and IntaSend integration is being configured. Template purchases will be available shortly.\n\nContact support for early access.');
     
-    try {
-      alert(`📱 M-Pesa payment request sent to ${phoneNumber}.\n\nPlease check your phone and enter your PIN to complete payment of KES ${templateToUnlock.price}.`);
-      
-      const demoPaymentRef = `MPESA-TEMPLATE-${Date.now()}`;
-      await templatesAPI.unlock(templateToUnlock.slug, demoPaymentRef);
-      
-      await loadTemplates();
-      
-      setShowUnlockModal(false);
-      setTemplateToUnlock(null);
-      setPhoneNumber('');
-      alert(`✅ ${templateToUnlock.name} template unlocked!`);
-    } catch (error) {
-      console.error('Failed to unlock template:', error);
-      alert('Failed to unlock template. Please try again.');
-    }
+    setShowUnlockModal(false);
+    setTemplateToUnlock(null);
+    setPhoneNumber('');
   };
 
-  const handleUseTemplate = () => {
-    if (selectedTemplate) {
-      if (!isUnlocked(selectedTemplate)) {
-        const template = TEMPLATES.find(t => t.slug === selectedTemplate);
-        handleUnlockClick({ stopPropagation: () => {} }, template);
-        return;
-      }
-      navigate(`/products?template=${selectedTemplate}`);
+  const handleUseTemplate = (template) => {
+    if (!isUnlocked(template.slug)) {
+      handleUnlockClick({ stopPropagation: () => {} }, template);
+      return;
     }
+    navigate(`/products?template=${template.slug}`);
+    setShowTemplateModal(false);
   };
 
   return (
@@ -349,18 +330,13 @@ export default function TemplatesPage() {
       <div style={styles.grid}>
         {TEMPLATES.map((template) => {
           const unlocked = isUnlocked(template.slug);
-          const isExpanded = expandedTemplate === template.slug;
           
           return (
             <div
               key={template.slug}
               onClick={() => handleSelectTemplate(template)}
               className="glass-card"
-              style={{
-                ...styles.card,
-                borderColor: selectedTemplate === template.slug ? template.color : 'transparent',
-                background: selectedTemplate === template.slug ? `${template.color}10` : 'var(--card-bg)',
-              }}
+              style={styles.card}
             >
               {/* Lock/Unlock Badge */}
               <div style={{
@@ -384,108 +360,137 @@ export default function TemplatesPage() {
               <h3 style={styles.cardTitle}>{template.name}</h3>
               <p style={styles.cardSubtitle}>{template.subtitle}</p>
               
-              {/* Customer Job (JTBD) */}
+              {/* Customer Job (JTBD) - Brief */}
               <div style={styles.jobSection}>
-                <div style={styles.jobLabel}>🎯 Customer's Job</div>
                 <p style={styles.jobText}>"{template.customerJob}"</p>
               </div>
               
-              {/* Checkout Style */}
-              <div style={styles.checkoutStyle}>
-                <strong>Checkout:</strong> {template.checkoutStyle}
+              {/* Best For Tags - Preview */}
+              <div style={styles.bestForPreview}>
+                {template.bestFor.slice(0, 3).map((item, idx) => (
+                  <span key={idx} style={styles.miniTag}>{item}</span>
+                ))}
+                {template.bestFor.length > 3 && <span style={styles.moreTag}>+{template.bestFor.length - 3}</span>}
               </div>
               
-              {/* Expanded Details */}
-              {isExpanded && (
-                <div style={styles.expandedSection}>
-                  {/* Desired Outcomes (ODI) */}
-                  <div style={styles.outcomesSection}>
-                    <h4 style={styles.sectionTitle}>📊 What Customers Want (Outcomes)</h4>
-                    <ul style={styles.outcomesList}>
-                      {template.desiredOutcomes.map((outcome, idx) => (
-                        <li key={idx} style={styles.outcomeItem}>
-                          <Check size={14} style={{ color: template.color, flexShrink: 0 }} />
-                          <span>{outcome}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  
-                  {/* Features */}
-                  <div style={styles.featuresSection}>
-                    <h4 style={styles.sectionTitle}>✨ Features Included</h4>
-                    <div style={styles.featuresList}>
-                      {template.features.map((feature, idx) => (
-                        <div key={idx} style={styles.featureChip}>
-                          {feature}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  
-                  {/* Best For */}
-                  <div style={styles.bestForSection}>
-                    <h4 style={styles.sectionTitle}>👥 Best For</h4>
-                    <div style={styles.bestForTags}>
-                      {template.bestFor.map((item, idx) => (
-                        <span key={idx} style={{ ...styles.bestForTag, borderColor: template.color }}>
-                          {item}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                  
-                  {/* Examples */}
-                  <div style={styles.examplesSection}>
-                    <strong>Examples:</strong> {template.examples}
-                  </div>
-                </div>
-              )}
-              
-              {/* Action Buttons */}
-              <div style={styles.cardActions}>
-                {!unlocked ? (
-                  <button 
-                    onClick={(e) => handleUnlockClick(e, template)} 
-                    className="btn btn-primary"
-                    style={{ flex: 1 }}
-                  >
-                    <Lock size={16} /> Unlock for KES {template.price.toLocaleString()}
-                  </button>
-                ) : (
-                  <button 
-                    onClick={(e) => { e.stopPropagation(); navigate(`/products?template=${template.slug}`); }}
-                    className="btn btn-primary"
-                    style={{ flex: 1 }}
-                  >
-                    <ChevronRight size={16} /> Use Template
-                  </button>
-                )}
-              </div>
-              
-              <div style={styles.expandHint}>
-                {isExpanded ? 'Click to collapse' : 'Click for details'}
+              <div style={styles.tapHint}>
+                Tap for details →
               </div>
             </div>
           );
         })}
       </div>
 
-      {/* Floating Action */}
-      {selectedTemplate && (
-        <div style={styles.floatingAction}>
-          <div style={styles.floatingContent}>
-            <p style={styles.floatingText}>
-              {TEMPLATES.find(t => t.slug === selectedTemplate)?.name} selected
-            </p>
-            <button onClick={handleUseTemplate} className="btn btn-primary" style={styles.useBtn}>
-              {isUnlocked(selectedTemplate) ? 'Use Template' : 'Unlock & Use'} <ChevronRight size={18} />
-            </button>
+      {/* Template Details Modal */}
+      {showTemplateModal && viewingTemplate && (
+        <div style={styles.modalOverlay} onClick={() => setShowTemplateModal(false)}>
+          <div style={{ ...styles.modal, maxWidth: '550px' }} className="glass-card" onClick={e => e.stopPropagation()}>
+            <div style={styles.modalHeader}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ ...styles.iconBox, background: `${viewingTemplate.color}20`, color: viewingTemplate.color }}>
+                  {viewingTemplate.icon}
+                </div>
+                <div>
+                  <h2 style={{ fontSize: '20px', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '2px' }}>{viewingTemplate.name}</h2>
+                  <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>{viewingTemplate.subtitle}</p>
+                </div>
+              </div>
+              <button onClick={() => setShowTemplateModal(false)} style={styles.closeBtn}><X size={24} /></button>
+            </div>
+            
+            {/* Price & Status */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', padding: '16px', background: 'var(--bg-tertiary)', borderRadius: '12px' }}>
+              <div>
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '4px' }}>One-time unlock</div>
+                <div style={{ fontSize: '28px', fontWeight: '700', color: 'var(--accent-color)' }}>KES {viewingTemplate.price.toLocaleString()}</div>
+              </div>
+              <div style={{
+                padding: '6px 12px',
+                borderRadius: '8px',
+                fontSize: '13px',
+                fontWeight: '600',
+                background: isUnlocked(viewingTemplate.slug) ? 'rgba(34, 197, 94, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                color: isUnlocked(viewingTemplate.slug) ? '#22c55e' : '#ef4444'
+              }}>
+                {isUnlocked(viewingTemplate.slug) ? '✓ Unlocked' : '🔒 Locked'}
+              </div>
+            </div>
+            
+            {/* Customer Job */}
+            <div style={{ marginBottom: '20px' }}>
+              <h4 style={styles.detailSectionTitle}>🎯 Customer's Job</h4>
+              <p style={{ fontSize: '15px', color: 'var(--text-secondary)', fontStyle: 'italic', lineHeight: '1.5' }}>"{viewingTemplate.customerJob}"</p>
+            </div>
+            
+            {/* Desired Outcomes */}
+            <div style={{ marginBottom: '20px' }}>
+              <h4 style={styles.detailSectionTitle}>📊 What Customers Want</h4>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                {viewingTemplate.desiredOutcomes.map((outcome, idx) => (
+                  <li key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '14px', color: 'var(--text-secondary)', padding: '6px 0' }}>
+                    <Check size={16} style={{ color: viewingTemplate.color, flexShrink: 0, marginTop: '2px' }} />
+                    <span>{outcome}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            
+            {/* Features */}
+            <div style={{ marginBottom: '20px' }}>
+              <h4 style={styles.detailSectionTitle}>✨ Features Included</h4>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                {viewingTemplate.features.map((feature, idx) => (
+                  <span key={idx} style={{ padding: '6px 12px', background: 'var(--bg-secondary)', borderRadius: '8px', fontSize: '13px', color: 'var(--text-secondary)' }}>{feature}</span>
+                ))}
+              </div>
+            </div>
+            
+            {/* Best For */}
+            <div style={{ marginBottom: '20px' }}>
+              <h4 style={styles.detailSectionTitle}>👥 Best For</h4>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                {viewingTemplate.bestFor.map((item, idx) => (
+                  <span key={idx} style={{ padding: '6px 12px', border: `1px solid ${viewingTemplate.color}`, borderRadius: '8px', fontSize: '13px', color: 'var(--text-secondary)' }}>{item}</span>
+                ))}
+              </div>
+            </div>
+            
+            {/* Checkout Style */}
+            <div style={{ marginBottom: '24px', padding: '12px 16px', background: `${viewingTemplate.color}15`, borderRadius: '10px', borderLeft: `3px solid ${viewingTemplate.color}` }}>
+              <strong style={{ fontSize: '13px', color: 'var(--text-primary)' }}>Checkout Flow:</strong>
+              <span style={{ fontSize: '13px', color: 'var(--text-secondary)', marginLeft: '8px' }}>{viewingTemplate.checkoutStyle}</span>
+            </div>
+            
+            {/* Examples */}
+            <div style={{ marginBottom: '24px', fontSize: '13px', color: 'var(--text-muted)' }}>
+              <strong>Example businesses:</strong> {viewingTemplate.examples}
+            </div>
+            
+            {/* Action Buttons */}
+            <div style={{ display: 'flex', gap: '12px' }}>
+              {!isUnlocked(viewingTemplate.slug) ? (
+                <button 
+                  onClick={(e) => { setShowTemplateModal(false); handleUnlockClick(e, viewingTemplate); }} 
+                  className="btn btn-primary"
+                  style={{ flex: 1, padding: '14px' }}
+                >
+                  <Lock size={16} /> Unlock for KES {viewingTemplate.price.toLocaleString()}
+                </button>
+              ) : (
+                <button 
+                  onClick={() => handleUseTemplate(viewingTemplate)}
+                  className="btn btn-primary"
+                  style={{ flex: 1, padding: '14px' }}
+                >
+                  <ChevronRight size={16} /> Use This Template
+                </button>
+              )}
+            </div>
           </div>
         </div>
       )}
 
-      {/* Unlock Modal */}
+      {/* Unlock Modal - Payment Coming Soon */}
       {showUnlockModal && templateToUnlock && (
         <div style={styles.modalOverlay} onClick={() => setShowUnlockModal(false)}>
           <div style={styles.modal} className="glass-card" onClick={e => e.stopPropagation()}>
@@ -509,36 +514,30 @@ export default function TemplatesPage() {
               <h3 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '8px', color: 'var(--text-primary)' }}>
                 {templateToUnlock.name}
               </h3>
-              <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginBottom: '24px' }}>
+              <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginBottom: '16px' }}>
                 {templateToUnlock.subtitle}
               </p>
-              <div style={{ fontSize: '32px', fontWeight: '700', color: 'var(--accent-color)', marginBottom: '24px' }}>
+              <div style={{ fontSize: '32px', fontWeight: '700', color: 'var(--accent-color)', marginBottom: '16px' }}>
                 KES {templateToUnlock.price.toLocaleString()}
               </div>
               
-              <div style={{ textAlign: 'left', marginBottom: '20px' }}>
-                <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-muted)', display: 'block', marginBottom: '8px' }}>
-                  M-PESA PHONE NUMBER
-                </label>
-                <input
-                  type="tel"
-                  placeholder="e.g. 0712345678"
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
-                  className="dashboard-input"
-                  style={{ width: '100%', padding: '14px', fontSize: '16px', textAlign: 'center' }}
-                />
+              {/* Coming Soon Notice */}
+              <div style={{ padding: '20px', background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '12px', marginBottom: '20px' }}>
+                <div style={{ fontSize: '24px', marginBottom: '8px' }}>🚧</div>
+                <h4 style={{ fontSize: '16px', fontWeight: '600', color: '#f59e0b', marginBottom: '8px' }}>Payment Coming Soon</h4>
+                <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
+                  M-Pesa and IntaSend integration is being configured. Template purchases will be available shortly.
+                </p>
               </div>
               
               <button 
-                onClick={handleUnlockTemplate} 
-                className="btn btn-primary" 
-                style={{ width: '100%', padding: '14px', fontSize: '16px' }}
+                onClick={() => setShowUnlockModal(false)} 
+                style={{ width: '100%', padding: '14px', fontSize: '16px', background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: '12px', color: 'var(--text-primary)', fontWeight: '600', cursor: 'pointer' }}
               >
-                Pay KES {templateToUnlock.price.toLocaleString()} via M-Pesa
+                Got it
               </button>
               <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '12px' }}>
-                One-time payment. Use on unlimited products.
+                Contact support for early access
               </p>
             </div>
           </div>
@@ -649,37 +648,18 @@ const styles = {
   priceTag: { padding: '6px 12px', background: 'var(--accent-light)', borderRadius: '8px', fontSize: '13px', fontWeight: '700', color: 'var(--accent-color)' },
   
   cardTitle: { fontSize: '20px', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '4px' },
-  cardSubtitle: { fontSize: '13px', color: 'var(--text-muted)', marginBottom: '16px' },
+  cardSubtitle: { fontSize: '13px', color: 'var(--text-muted)', marginBottom: '12px' },
   
   jobSection: { padding: '12px', background: 'var(--bg-tertiary)', borderRadius: '10px', marginBottom: '12px' },
-  jobLabel: { fontSize: '11px', fontWeight: '600', color: 'var(--text-muted)', marginBottom: '6px' },
-  jobText: { fontSize: '14px', color: 'var(--text-secondary)', fontStyle: 'italic', lineHeight: '1.4' },
+  jobText: { fontSize: '13px', color: 'var(--text-secondary)', fontStyle: 'italic', lineHeight: '1.4', margin: 0 },
   
-  checkoutStyle: { fontSize: '12px', color: 'var(--text-muted)', marginBottom: '16px', padding: '8px 12px', background: 'rgba(139, 92, 246, 0.1)', borderRadius: '6px' },
+  bestForPreview: { display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '12px' },
+  miniTag: { padding: '4px 8px', background: 'var(--bg-secondary)', borderRadius: '4px', fontSize: '11px', color: 'var(--text-muted)' },
+  moreTag: { padding: '4px 8px', background: 'var(--accent-light)', borderRadius: '4px', fontSize: '11px', color: 'var(--accent-color)', fontWeight: '600' },
   
-  expandedSection: { marginTop: '16px', paddingTop: '16px', borderTop: '1px solid var(--border-color)' },
-  outcomesSection: { marginBottom: '16px' },
-  sectionTitle: { fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '10px' },
-  outcomesList: { listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '8px' },
-  outcomeItem: { display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '13px', color: 'var(--text-secondary)' },
+  tapHint: { textAlign: 'center', fontSize: '12px', color: 'var(--text-muted)', marginTop: '8px' },
   
-  featuresSection: { marginBottom: '16px' },
-  featuresList: { display: 'flex', flexWrap: 'wrap', gap: '8px' },
-  featureChip: { padding: '4px 10px', background: 'var(--bg-secondary)', borderRadius: '6px', fontSize: '12px', color: 'var(--text-secondary)' },
-  
-  bestForSection: { marginBottom: '16px' },
-  bestForTags: { display: 'flex', flexWrap: 'wrap', gap: '8px' },
-  bestForTag: { padding: '4px 10px', border: '1px solid', borderRadius: '6px', fontSize: '12px', color: 'var(--text-secondary)' },
-  
-  examplesSection: { fontSize: '12px', color: 'var(--text-muted)', padding: '10px 12px', background: 'var(--bg-tertiary)', borderRadius: '8px' },
-  
-  cardActions: { display: 'flex', gap: '10px', marginTop: '16px' },
-  expandHint: { textAlign: 'center', fontSize: '11px', color: 'var(--text-muted)', marginTop: '12px' },
-  
-  floatingAction: { position: 'fixed', bottom: '24px', left: '50%', transform: 'translateX(-50%)', zIndex: 100 },
-  floatingContent: { display: 'flex', alignItems: 'center', gap: '16px', padding: '16px 24px', background: 'var(--card-bg)', border: '1px solid var(--border-color)', borderRadius: '16px', backdropFilter: 'blur(20px)', boxShadow: '0 8px 32px rgba(0,0,0,0.3)' },
-  floatingText: { fontSize: '14px', fontWeight: '500', color: 'var(--text-secondary)' },
-  useBtn: { display: 'flex', alignItems: 'center', gap: '6px' },
+  detailSectionTitle: { fontSize: '14px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '10px' },
   
   modalOverlay: { position: 'fixed', inset: 0, background: 'rgba(0, 0, 0, 0.7)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px' },
   modal: { width: '100%', maxWidth: '450px', padding: '32px', maxHeight: '90vh', overflowY: 'auto' },

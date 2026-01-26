@@ -262,36 +262,15 @@ export default function ProductsPage() {
     setShowCardPaymentModal(true);
   };
 
+  // Payment coming soon - no fake success
   const handleCardPurchase = async () => {
     if (!selectedBundle) return;
     
-    if (!cardPaymentPhone || cardPaymentPhone.length < 10) {
-      alert('Please enter a valid M-Pesa phone number');
-      return;
-    }
+    alert('🚧 Payment Coming Soon!\n\nM-Pesa and IntaSend integration is being configured. Card purchases will be available shortly.\n\nContact support for early access.');
     
-    try {
-      // TODO: Integrate with actual M-Pesa STK Push
-      alert(`📱 M-Pesa payment request sent to ${cardPaymentPhone}.\n\nPlease check your phone and enter your PIN to complete payment of KES ${selectedBundle.price}.`);
-      
-      // Demo mode: Simulate successful purchase
-      const demoPaymentRef = `MPESA-CARDS-${Date.now()}`;
-      
-      await cardsAPI.purchase(selectedBundle.id, demoPaymentRef);
-      
-      // Refresh card balance
-      await loadCardBalance();
-      
-      setShowCardPaymentModal(false);
-      setShowBuyCardsModal(false);
-      setSelectedBundle(null);
-      setCardPaymentPhone('');
-      
-      alert(`✅ ${selectedBundle.name} purchased! +${selectedBundle.cards} cards added to your balance.`);
-    } catch (error) {
-      console.error('Failed to purchase cards:', error);
-      alert('Failed to complete purchase. Please try again.');
-    }
+    setShowCardPaymentModal(false);
+    setSelectedBundle(null);
+    setCardPaymentPhone('');
   };
 
   const handleAddProductClick = async () => {
@@ -349,29 +328,15 @@ export default function ProductsPage() {
     if (!phoneNumber || phoneNumber.length < 10) {
       alert('Please enter a valid M-Pesa phone number');
       return;
-    }
+  // Payment coming soon - no fake success
+  const handleUnlockTemplate = async () => {
+    if (!templateToUnlock) return;
     
-    try {
-      // TODO: Integrate with actual M-Pesa STK Push
-      // For now, simulate payment pending
-      alert(`📱 M-Pesa payment request sent to ${phoneNumber}.\n\nPlease check your phone and enter your PIN to complete payment of KES ${templateToUnlock.price}.`);
-      
-      // Demo mode: Generate a mock payment reference
-      const demoPaymentRef = `MPESA-${Date.now()}`;
-      
-      await templatesAPI.unlock(templateToUnlock.id, demoPaymentRef);
-      
-      // Refresh templates list
-      await loadAvailableTemplates();
-      
-      setShowUnlockModal(false);
-      setTemplateToUnlock(null);
-      window.unlockPhoneNumber = '';
-      alert(`✅ ${templateToUnlock.name} template unlocked!`);
-    } catch (error) {
-      console.error('Failed to unlock template:', error);
-      alert('Failed to unlock template. Please try again.');
-    }
+    alert('🚧 Payment Coming Soon!\n\nM-Pesa and IntaSend integration is being configured. Template purchases will be available shortly.\n\nContact support for early access.');
+    
+    setShowUnlockModal(false);
+    setTemplateToUnlock(null);
+    window.unlockPhoneNumber = '';
   };
 
   // ===========================================
@@ -1952,12 +1917,12 @@ export default function ProductsPage() {
         </div>
       )}
 
-      {/* Card Purchase Payment Modal - Beautiful pay card */}
+      {/* Card Purchase Payment Modal - Coming Soon */}
       {showCardPaymentModal && selectedBundle && (
         <div style={{ ...styles.modalOverlay, zIndex: 2100 }} onClick={() => { setShowCardPaymentModal(false); setSelectedBundle(null); }}>
           <div style={{ ...styles.modal, maxWidth: '420px' }} className="glass-card" onClick={e => e.stopPropagation()}>
             <div style={styles.modalHeader}>
-              <h2 style={styles.modalTitle}>Complete Purchase</h2>
+              <h2 style={styles.modalTitle}>Purchase Cards</h2>
               <button onClick={() => { setShowCardPaymentModal(false); setSelectedBundle(null); }} style={styles.closeBtn}><X size={24} /></button>
             </div>
             
@@ -1988,38 +1953,24 @@ export default function ProductsPage() {
                 </div>
               </div>
               
-              {/* M-Pesa Payment Input */}
-              <div style={{ textAlign: 'left', marginBottom: '20px' }}>
-                <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-muted)', display: 'block', marginBottom: '8px' }}>
-                  M-PESA PHONE NUMBER
-                </label>
-                <input
-                  type="tel"
-                  placeholder="e.g. 0712345678"
-                  value={cardPaymentPhone}
-                  onChange={(e) => setCardPaymentPhone(e.target.value)}
-                  className="dashboard-input"
-                  style={{ width: '100%', padding: '14px', fontSize: '16px', textAlign: 'center', letterSpacing: '1px' }}
-                />
-                <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '8px' }}>
-                  You'll receive an M-Pesa prompt on this number
+              {/* Coming Soon Notice */}
+              <div style={{ padding: '20px', background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '12px', marginBottom: '20px' }}>
+                <div style={{ fontSize: '24px', marginBottom: '8px' }}>🚧</div>
+                <h4 style={{ fontSize: '16px', fontWeight: '600', color: '#f59e0b', marginBottom: '8px' }}>Payment Coming Soon</h4>
+                <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
+                  M-Pesa and IntaSend integration is being configured. Card purchases will be available shortly.
                 </p>
               </div>
               
               <button 
-                onClick={handleCardPurchase} 
-                className="btn btn-primary" 
-                style={{ width: '100%', padding: '16px', fontSize: '16px', fontWeight: '600' }}
+                onClick={() => { setShowCardPaymentModal(false); setSelectedBundle(null); }} 
+                style={{ width: '100%', padding: '14px', fontSize: '16px', background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: '12px', color: 'var(--text-primary)', fontWeight: '600', cursor: 'pointer' }}
               >
-                Pay KES {selectedBundle.price.toLocaleString()} via M-Pesa
+                Got it
               </button>
-              
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginTop: '16px' }}>
-                <span style={{ fontSize: '20px' }}>📱</span>
-                <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                  Secure payment via Safaricom M-Pesa
-                </p>
-              </div>
+              <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '12px' }}>
+                Contact support for early access
+              </p>
             </div>
           </div>
         </div>

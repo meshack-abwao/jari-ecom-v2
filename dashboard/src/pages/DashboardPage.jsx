@@ -195,42 +195,37 @@ export default function DashboardPage() {
 
   return (
     <div className="fade-in">
-      {/* Subscription Status Banner (Phase D) */}
-      {subscription && (subscription.status === 'trial' || subscription.status === 'expired') && (
-        <div style={{
-          ...styles.subscriptionBanner,
-          background: subscription.status === 'expired' 
-            ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' 
-            : 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
-        }}>
-          <div style={styles.subscriptionBannerContent}>
-            {subscription.status === 'expired' ? (
-              <AlertCircle size={20} />
-            ) : (
-              <CreditCard size={20} />
-            )}
-            <span>
-              {subscription.status === 'expired' 
-                ? 'Your trial has expired. Subscribe to continue using all features.'
-                : `Trial: ${subscription.daysRemaining} days remaining`
-              }
-            </span>
-          </div>
-          <button 
-            onClick={() => navigate('/subscription')} 
-            style={styles.subscriptionBannerBtn}
-          >
-            {subscription.status === 'expired' ? 'Subscribe Now' : 'View Plans'}
-          </button>
-        </div>
-      )}
-
       <div style={styles.header}>
         <div>
           <h1 style={styles.title}>Overview</h1>
           <p style={styles.subtitle}>Your store performance at a glance</p>
         </div>
         <div style={styles.headerActions}>
+          {/* Small Railway-style Trial Badge */}
+          {subscription && (subscription.status === 'trial' || subscription.status === 'expired') && (
+            <div 
+              onClick={() => navigate('/subscription')} 
+              style={{
+                ...styles.trialBadge,
+                background: subscription.status === 'expired' ? 'rgba(239, 68, 68, 0.15)' : 'rgba(245, 158, 11, 0.15)',
+                borderColor: subscription.status === 'expired' ? 'rgba(239, 68, 68, 0.3)' : 'rgba(245, 158, 11, 0.3)',
+                color: subscription.status === 'expired' ? '#ef4444' : '#f59e0b'
+              }}
+            >
+              <div style={{
+                width: '6px',
+                height: '6px',
+                borderRadius: '50%',
+                background: subscription.status === 'expired' ? '#ef4444' : '#f59e0b'
+              }} />
+              <span>
+                {subscription.status === 'expired' 
+                  ? 'Expired'
+                  : `${subscription.daysRemaining}d trial`
+                }
+              </span>
+            </div>
+          )}
           {storeUrl && (
             <button onClick={viewStore} className="btn btn-primary" style={styles.viewStoreBtn}>
               <ExternalLink size={18} />
@@ -594,10 +589,19 @@ const styles = {
   spinner: { width: '40px', height: '40px', border: '3px solid var(--border-color)', borderTopColor: 'var(--accent-color)', borderRadius: '50%', animation: 'spin 1s linear infinite' },
   loadingText: { marginTop: '16px', color: 'var(--text-muted)' },
   
-  // Subscription Banner (Phase D)
-  subscriptionBanner: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 20px', borderRadius: '12px', marginBottom: '20px', color: '#fff' },
-  subscriptionBannerContent: { display: 'flex', alignItems: 'center', gap: '10px', fontSize: '14px', fontWeight: '500' },
-  subscriptionBannerBtn: { padding: '8px 16px', background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.3)', borderRadius: '8px', color: '#fff', fontSize: '13px', fontWeight: '600', cursor: 'pointer' },
+  // Small Railway-style trial badge
+  trialBadge: { 
+    display: 'flex', 
+    alignItems: 'center', 
+    gap: '6px', 
+    padding: '6px 12px', 
+    borderRadius: '20px', 
+    fontSize: '12px', 
+    fontWeight: '600', 
+    cursor: 'pointer',
+    border: '1px solid',
+    transition: 'all 0.2s'
+  },
   
   header: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px', flexWrap: 'wrap', gap: '16px' },
   title: { fontSize: '34px', fontWeight: '700', marginBottom: '6px', color: 'var(--text-primary)', letterSpacing: '-0.025em' },
