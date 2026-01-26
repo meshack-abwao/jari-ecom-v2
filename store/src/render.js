@@ -26,10 +26,10 @@ export function renderBreadcrumb(product = null) {
   
   return `
     <div class="store-breadcrumb-wrapper">
-      <div class="store-breadcrumb-pill">
+      <div class="store-breadcrumb-pill" role="navigation" aria-label="Store navigation">
         <!-- Back Button - Left -->
-        <button class="breadcrumb-back" onclick="window.showCollection()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <button class="breadcrumb-back" onclick="window.showCollection()" aria-label="Back to all products">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <path d="M15 18l-6-6 6-6"/>
           </svg>
           <span>Back</span>
@@ -77,27 +77,29 @@ export function renderProductNav(product = null) {
   const current = currentIndex + 1;
   
   return `
-    <div class="product-nav">
+    <nav class="product-nav" aria-label="Product navigation">
       <button class="product-nav-btn ${!prevProduct ? 'disabled' : ''}" 
               onclick="${prevProduct ? `window.viewRelatedProduct('${prevProduct.id}')` : ''}"
-              ${!prevProduct ? 'disabled' : ''}>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              ${!prevProduct ? 'disabled aria-disabled="true"' : ''}
+              aria-label="Previous product${prevProduct ? ': ' + (prevProduct.data?.name || '') : ''}">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
           <path d="M15 18l-6-6 6-6"/>
         </svg>
         <span>Prev</span>
       </button>
       
-      <span class="product-nav-counter">${current} of ${total}</span>
+      <span class="product-nav-counter" aria-live="polite">${current} of ${total}</span>
       
       <button class="product-nav-btn ${!nextProduct ? 'disabled' : ''}" 
               onclick="${nextProduct ? `window.viewRelatedProduct('${nextProduct.id}')` : ''}"
-              ${!nextProduct ? 'disabled' : ''}>
+              ${!nextProduct ? 'disabled aria-disabled="true"' : ''}
+              aria-label="Next product${nextProduct ? ': ' + (nextProduct.data?.name || '') : ''}">
         <span>Next</span>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
           <path d="M9 18l6-6-6-6"/>
         </svg>
       </button>
-    </div>
+    </nav>
   `;
 }
 
