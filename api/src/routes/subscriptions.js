@@ -10,8 +10,39 @@ import { auth } from '../middleware/auth.js';
 const router = Router();
 
 // ===========================================
-// PRICING CONFIGURATION (v2.0 - No Setup Fee)
+// PRICING CONFIGURATION (v2.1 - With Setup Fee)
 // ===========================================
+
+// Grandfathering cutoff - accounts before this date get free access
+const GRANDFATHER_CUTOFF = new Date('2026-01-26T00:00:00Z');
+
+// Setup fee (one-time, non-refundable)
+const SETUP_FEE = {
+  full: 5000,
+  split: 2500,  // 50% split (pay in 2 months)
+  includes: ['Account creation', 'Theme unlock', 'Optional onboarding call']
+};
+
+// Payment options for new merchants
+const PAYMENT_OPTIONS = {
+  option_a: {
+    name: 'Full Setup',
+    description: 'Pay setup fee upfront',
+    setupFee: 5000,
+    firstMonth: 1200,
+    total: 6200,
+    setupRemaining: 0
+  },
+  option_b: {
+    name: 'Split Setup (50%)',
+    description: 'Split setup fee over 2 months',
+    setupFee: 2500,
+    firstMonth: 1200,
+    total: 3700,
+    setupRemaining: 2500,
+    month2Total: 3700
+  }
+};
 
 // Subscription pricing
 const SUBSCRIPTION_PLANS = {

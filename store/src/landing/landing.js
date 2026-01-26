@@ -123,13 +123,39 @@ export function renderLandingPage() {
       <div class="jari-section-header">
         <span class="jari-section-tag">💰 Simple Pricing</span>
         <h2>Start Small, Scale As You Grow</h2>
-        <p style="color: #666; max-width: 600px; margin: 0 auto;">No hidden fees. No setup costs. Pay only for what you need.</p>
+        <p style="color: #666; max-width: 600px; margin: 0 auto;">No hidden fees. Pay only for what you need.</p>
       </div>
       
       <div class="jari-pricing-grid">
+        <!-- Setup Fee Card -->
+        <div class="jari-pricing-card jari-pricing-setup">
+          <div class="jari-pricing-header">
+            <h3>Setup Fee</h3>
+            <div class="jari-pricing-amount">
+              <span class="jari-price-currency">KES</span>
+              <span class="jari-price-value">5,000</span>
+              <span class="jari-price-period">one-time</span>
+            </div>
+          </div>
+          <ul class="jari-pricing-features">
+            <li>✅ Account creation</li>
+            <li>✅ Theme unlock (your business type)</li>
+            <li>✅ Optional onboarding call</li>
+          </ul>
+          <div class="jari-pricing-options">
+            <p class="jari-pricing-option-title">Flexible Payment:</p>
+            <div class="jari-pricing-option">
+              <strong>Full:</strong> KES 5,000 upfront
+            </div>
+            <div class="jari-pricing-option jari-pricing-option-highlight">
+              <strong>Split 50%:</strong> KES 2,500 × 2 months
+            </div>
+          </div>
+        </div>
+        
         <!-- Monthly Card (Featured) -->
         <div class="jari-pricing-card jari-pricing-monthly jari-pricing-featured">
-          <div class="jari-pricing-badge">Start Here</div>
+          <div class="jari-pricing-badge">Most Popular</div>
           <div class="jari-pricing-header">
             <h3>Monthly</h3>
             <div class="jari-pricing-amount">
@@ -175,36 +201,10 @@ export function renderLandingPage() {
             </li>
           </ul>
         </div>
-        
-        <!-- Cards & Themes Card -->
-        <div class="jari-pricing-card jari-pricing-setup">
-          <div class="jari-pricing-header">
-            <h3>Cards & Themes</h3>
-            <p class="jari-pricing-subtitle">One-time purchases</p>
-          </div>
-          <ul class="jari-pricing-addons-list">
-            <li>
-              <span class="jari-addon-name">Starter Pack (+4 cards)</span>
-              <span class="jari-addon-price">KES 350</span>
-            </li>
-            <li>
-              <span class="jari-addon-name">Growth Pack (+7 cards)</span>
-              <span class="jari-addon-price">KES 550</span>
-            </li>
-            <li>
-              <span class="jari-addon-name">Pro Pack (+12 cards)</span>
-              <span class="jari-addon-price">KES 850</span>
-            </li>
-          </ul>
-          <div class="jari-pricing-options" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1);">
-            <p style="font-size: 12px; color: #888; margin-bottom: 8px;">Themes: KES 400-1,000 each</p>
-            <p style="font-size: 11px; color: #666;">First theme FREE with signup!</p>
-          </div>
-        </div>
       </div>
       
       <p class="jari-pricing-note">
-        💡 <strong>Example:</strong> Base + M-Pesa = KES 1,500/month | Full Stack = KES 2,280/month
+        💡 <strong>First month:</strong> Setup (KES 5,000) + Monthly (KES 1,200) = KES 6,200 | <strong>Split option:</strong> KES 3,700 × 2 months
       </p>
     </div>
   </section>

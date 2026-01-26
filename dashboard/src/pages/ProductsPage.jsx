@@ -305,9 +305,19 @@ export default function ProductsPage() {
   const handleUnlockTemplate = async () => {
     if (!templateToUnlock) return;
     
+    const phoneNumber = window.unlockPhoneNumber;
+    if (!phoneNumber || phoneNumber.length < 10) {
+      alert('Please enter a valid M-Pesa phone number');
+      return;
+    }
+    
     try {
+      // TODO: Integrate with actual M-Pesa STK Push
+      // For now, simulate payment pending
+      alert(`📱 M-Pesa payment request sent to ${phoneNumber}.\n\nPlease check your phone and enter your PIN to complete payment of KES ${templateToUnlock.price}.`);
+      
       // Demo mode: Generate a mock payment reference
-      const demoPaymentRef = `DEMO-${Date.now()}`;
+      const demoPaymentRef = `MPESA-${Date.now()}`;
       
       await templatesAPI.unlock(templateToUnlock.id, demoPaymentRef);
       
@@ -316,6 +326,7 @@ export default function ProductsPage() {
       
       setShowUnlockModal(false);
       setTemplateToUnlock(null);
+      window.unlockPhoneNumber = '';
       alert(`✅ ${templateToUnlock.name} template unlocked!`);
     } catch (error) {
       console.error('Failed to unlock template:', error);
@@ -729,37 +740,6 @@ export default function ProductsPage() {
             <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '16px', textAlign: 'center' }}>
               Cards are added to your current balance. Never expires.
             </p>
-          </div>
-        </div>
-      )}
-
-      {/* Unlock Template Modal (Phase C2) */}
-      {showUnlockModal && templateToUnlock && (
-        <div style={styles.modalOverlay} onClick={() => setShowUnlockModal(false)}>
-          <div style={{ ...styles.modal, maxWidth: '420px' }} className="glass-card" onClick={e => e.stopPropagation()}>
-            <div style={styles.modalHeader}>
-              <h2 style={styles.modalTitle}>Unlock Template</h2>
-              <button onClick={() => setShowUnlockModal(false)} style={styles.closeBtn}><X size={24} /></button>
-            </div>
-            
-            <div style={{ textAlign: 'center', padding: '20px 0' }}>
-              <div style={{ fontSize: '48px', marginBottom: '16px' }}>🔓</div>
-              <h3 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '8px', color: 'var(--text-primary)' }}>
-                {templateToUnlock.name}
-              </h3>
-              <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginBottom: '24px' }}>
-                {templateToUnlock.description}
-              </p>
-              <div style={{ fontSize: '32px', fontWeight: '700', color: 'var(--accent-color)', marginBottom: '24px' }}>
-                KES {templateToUnlock.price}
-              </div>
-              <button onClick={handleUnlockTemplate} className="btn btn-primary" style={{ width: '100%', padding: '14px' }}>
-                Unlock Template (Demo)
-              </button>
-              <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '12px' }}>
-                One-time payment. Use on unlimited products.
-              </p>
-            </div>
           </div>
         </div>
       )}
@@ -1878,6 +1858,56 @@ export default function ProductsPage() {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Unlock Template Modal - MUST be LAST for z-index to work over other modals */}
+      {showUnlockModal && templateToUnlock && (
+        <div style={{ ...styles.modalOverlay, zIndex: 2000 }} onClick={() => setShowUnlockModal(false)}>
+          <div style={{ ...styles.modal, maxWidth: '450px' }} className="glass-card" onClick={e => e.stopPropagation()}>
+            <div style={styles.modalHeader}>
+              <h2 style={styles.modalTitle}>Unlock Template</h2>
+              <button onClick={() => setShowUnlockModal(false)} style={styles.closeBtn}><X size={24} /></button>
+            </div>
+            
+            <div style={{ textAlign: 'center', padding: '20px 0' }}>
+              <div style={{ fontSize: '48px', marginBottom: '16px' }}>{templateToUnlock.icon || '🔓'}</div>
+              <h3 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '8px', color: 'var(--text-primary)' }}>
+                {templateToUnlock.name}
+              </h3>
+              <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginBottom: '24px' }}>
+                {templateToUnlock.description}
+              </p>
+              <div style={{ fontSize: '32px', fontWeight: '700', color: 'var(--accent-color)', marginBottom: '24px' }}>
+                KES {(templateToUnlock.price || 0).toLocaleString()}
+              </div>
+              
+              {/* M-Pesa Payment Input */}
+              <div style={{ textAlign: 'left', marginBottom: '20px' }}>
+                <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-muted)', display: 'block', marginBottom: '8px' }}>
+                  M-PESA PHONE NUMBER
+                </label>
+                <input
+                  type="tel"
+                  placeholder="e.g. 0712345678"
+                  className="dashboard-input"
+                  style={{ width: '100%', padding: '14px', fontSize: '16px', textAlign: 'center' }}
+                  onChange={(e) => window.unlockPhoneNumber = e.target.value}
+                />
+              </div>
+              
+              <button 
+                onClick={handleUnlockTemplate} 
+                className="btn btn-primary" 
+                style={{ width: '100%', padding: '14px', fontSize: '16px' }}
+              >
+                Pay KES {(templateToUnlock.price || 0).toLocaleString()} via M-Pesa
+              </button>
+              <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '12px' }}>
+                One-time payment. Use on unlimited products.
+              </p>
+            </div>
+          </div>
         </div>
       )}
     </div>

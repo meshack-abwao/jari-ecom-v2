@@ -11,6 +11,24 @@ Every merchant is different. Jari pricing adapts to YOUR business size, needs, a
 
 ---
 
+## SETUP FEE (One-Time)
+
+### KES 5,000 – Non-Refundable
+
+**Includes:**
+- ✅ Account creation
+- ✅ Theme unlock (based on your business type)
+- ✅ Optional onboarding call
+
+### Payment Options:
+
+| Option | First Payment | Second Month | Notes |
+|--------|--------------|--------------|-------|
+| **Full Payment** | KES 6,200 | KES 1,200 | Setup (5,000) + Month 1 (1,200) |
+| **Split 50%** | KES 3,700 | KES 3,700 | Half setup (2,500) + Month 1 (1,200) each |
+
+---
+
 ## SUBSCRIPTION (Monthly)
 
 ### Base Platform: KES 1,200/month

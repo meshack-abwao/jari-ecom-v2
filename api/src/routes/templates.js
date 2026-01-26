@@ -19,6 +19,9 @@ const TEMPLATES = {
   'catalog': { name: 'Catalog', price: 400, description: 'Browse-only, WhatsApp inquiry', checkoutStyle: 'No direct checkout' }
 };
 
+// Grandfathering cutoff - accounts before this date get ALL templates free
+const GRANDFATHER_CUTOFF = new Date('2026-01-26T00:00:00Z');
+
 // ============================================================================
 // GET /api/templates/available - Get available templates for store
 // ============================================================================
@@ -26,9 +29,9 @@ router.get('/available', auth, async (req, res) => {
   try {
     const userId = req.user.userId;
     
-    // Get store with unlocked_themes
+    // Get store with unlocked_themes and created_at
     const storeResult = await db.query(
-      `SELECT id, business_type, unlocked_themes FROM stores WHERE user_id = $1`,
+      `SELECT id, business_type, unlocked_themes, created_at FROM stores WHERE user_id = $1`,
       [userId]
     );
     
@@ -39,28 +42,42 @@ router.get('/available', auth, async (req, res) => {
     const store = storeResult.rows[0];
     const unlockedThemes = store.unlocked_themes || [];
     const businessType = store.business_type;
+    const storeCreatedAt = new Date(store.created_at);
+    
+    // Check if store is grandfathered (created before cutoff)
+    const isGrandfatheredAccount = storeCreatedAt < GRANDFATHER_CUTOFF;
     
     // First template is free based on business type
     const defaultTemplate = getDefaultTemplate(businessType);
     
-    // Get all templates currently in use by this store's products (grandfathered)
+    // Get all templates currently in use by this store's products
     const productsResult = await db.query(
       `SELECT DISTINCT template FROM products WHERE store_id = $1 AND template IS NOT NULL`,
       [store.id]
     );
-    const grandfatheredTemplates = productsResult.rows.map(r => r.template);
+    const usedTemplates = productsResult.rows.map(r => r.template);
     
     // Build template list with unlock status
-    // Template is unlocked if: explicitly unlocked, default for business, OR grandfathered
+    // Template is unlocked if:
+    // 1. Account is grandfathered (created before Jan 26, 2026) - ALL templates free
+    // 2. Explicitly purchased/unlocked
+    // 3. Default for business type
+    // 4. Currently in use by a product (preserve existing)
     const templates = Object.entries(TEMPLATES).map(([id, template]) => ({
       id,
       ...template,
-      unlocked: unlockedThemes.includes(id) || id === defaultTemplate || grandfatheredTemplates.includes(id),
+      unlocked: isGrandfatheredAccount || unlockedThemes.includes(id) || id === defaultTemplate || usedTemplates.includes(id),
       isDefault: id === defaultTemplate,
-      isGrandfathered: grandfatheredTemplates.includes(id) && !unlockedThemes.includes(id) && id !== defaultTemplate
+      isGrandfathered: isGrandfatheredAccount,
+      requiresPayment: !isGrandfatheredAccount && !unlockedThemes.includes(id) && id !== defaultTemplate && !usedTemplates.includes(id)
     }));
     
-    res.json({ templates, defaultTemplate });
+    res.json({ 
+      templates, 
+      defaultTemplate,
+      isGrandfatheredAccount,
+      accountCreatedAt: store.created_at
+    });
   } catch (error) {
     console.error('Error getting templates:', error);
     res.status(500).json({ error: 'Failed to get templates' });
