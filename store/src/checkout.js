@@ -7,6 +7,58 @@ let mpesaCode = '';
 let paymentConfirmed = false;
 
 // ===========================================
+// ABANDONED CHECKOUT TRACKING
+// ===========================================
+let currentCheckoutStep = 0;
+let checkoutStartTime = null;
+let checkoutPartialData = {};
+let checkoutCompleted = false;
+
+function resetCheckoutTracking() {
+  currentCheckoutStep = 0;
+  checkoutStartTime = null;
+  checkoutPartialData = {};
+  checkoutCompleted = false;
+}
+
+function capturePartialData() {
+  // Capture any data user has entered so far
+  const nameEl = document.getElementById('customerName');
+  const phoneEl = document.getElementById('customerPhone');
+  const locationEl = document.getElementById('customerLocation');
+  const areaEl = document.getElementById('deliveryArea');
+  
+  if (nameEl?.value) checkoutPartialData.customer_name = nameEl.value;
+  if (phoneEl?.value) checkoutPartialData.customer_phone = phoneEl.value;
+  if (locationEl?.value) checkoutPartialData.customer_location = locationEl.value;
+  if (areaEl?.value) checkoutPartialData.delivery_area = areaEl.value;
+  if (selectedPaymentMethod) checkoutPartialData.payment_method = selectedPaymentMethod;
+}
+
+function trackCheckoutAbandon() {
+  if (currentCheckoutStep === 0 || checkoutCompleted) return;
+  
+  capturePartialData();
+  
+  const timeSpent = checkoutStartTime ? Math.floor((Date.now() - checkoutStartTime) / 1000) : 0;
+  
+  pixel.trackAbandon({
+    step_reached: currentCheckoutStep,
+    time_spent: timeSpent,
+    ...checkoutPartialData
+  });
+  
+  resetCheckoutTracking();
+}
+
+// Track when user leaves page
+window.addEventListener('beforeunload', () => {
+  if (currentCheckoutStep > 0 && !checkoutCompleted) {
+    trackCheckoutAbandon();
+  }
+});
+
+// ===========================================
 // CHECKOUT MODAL HTML - JTBD Optimized (3 Steps)
 // Apple Design System + Trust Architecture
 // ===========================================
@@ -361,6 +413,19 @@ export function openCheckout() {
   // Track checkout start
   pixel.checkoutStart(total);
   
+  // Initialize abandoned checkout tracking
+  resetCheckoutTracking();
+  currentCheckoutStep = 1;
+  checkoutStartTime = Date.now();
+  checkoutPartialData = {
+    product_id: currentProduct.id,
+    product_name: data.name || 'Product',
+    quantity: vmQuantity,
+    total_amount: total,
+    utm_source: pixel.getUTMSource(),
+    device: pixel.getDevice()
+  };
+  
   // Update Step 1 - Product card with image
   const thumbEl = document.getElementById('checkoutProductThumb');
   if (thumbEl && media.images?.[0]) {
@@ -424,6 +489,11 @@ export function openCheckout() {
 // CLOSE CHECKOUT
 // ===========================================
 function closeCheckout() {
+  // Track abandonment if checkout was not completed
+  if (currentCheckoutStep > 0 && !checkoutCompleted) {
+    trackCheckoutAbandon();
+  }
+  
   document.getElementById('checkoutModal')?.classList.remove('active');
   document.body.style.overflow = '';
   
@@ -431,6 +501,7 @@ function closeCheckout() {
     document.getElementById('customerForm')?.reset();
     goToStep('step1');
     updateProgress(1);
+    resetCheckoutTracking();
   }, 300);
 }
 
@@ -442,6 +513,13 @@ function goToStep(stepId) {
     step.classList.remove('active');
   });
   document.getElementById(stepId)?.classList.add('active');
+  
+  // Track step progression for abandonment analysis
+  const stepNum = parseInt(stepId.replace('step', ''));
+  if (stepNum && stepNum > currentCheckoutStep) {
+    currentCheckoutStep = stepNum;
+    capturePartialData();
+  }
 }
 
 function validateAndGoToStep3() {
@@ -680,6 +758,9 @@ async function handleCompleteOrder() {
       : await createOrder(store.slug, orderData);
     
     if (result.success) {
+      // Mark checkout as completed (prevents abandon tracking)
+      checkoutCompleted = true;
+      
       pixel.purchase(result.order_number, total, currentProduct.id);
       
       document.getElementById('orderNumber').textContent = result.order_number;

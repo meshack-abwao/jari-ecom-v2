@@ -442,6 +442,49 @@ function trackBookingConfirmed(bookingId, serviceName, total = 0, currency = 'KE
   console.log('📅 Booking tracked:', { bookingId, serviceName, total });
 }
 
+/**
+ * Track checkout abandonment with full details
+ */
+function trackAbandon(data) {
+  const store = state.store;
+  if (!store?.id) return;
+  
+  const payload = {
+    store_id: store.id,
+    session_id: SESSION_ID,
+    data: {
+      ...data,
+      utm_source: getUTMParams().source,
+      utm_medium: getUTMParams().medium,
+      utm_campaign: getUTMParams().campaign,
+      device: getDevice()
+    }
+  };
+  
+  const endpoint = `${getApiUrl()}/pixel/abandon`;
+  
+  // Use sendBeacon to ensure it fires even on page unload
+  if (navigator.sendBeacon) {
+    navigator.sendBeacon(endpoint, JSON.stringify(payload));
+  } else {
+    fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      keepalive: true
+    }).catch(() => {});
+  }
+  
+  console.log('🚫 Checkout abandoned:', data);
+}
+
+/**
+ * Get UTM source for external use
+ */
+function getUTMSource() {
+  return getUTMParams().source;
+}
+
 // ===========================================
 // INITIALIZATION
 // ===========================================
@@ -477,6 +520,11 @@ export const pixel = {
   checkoutStart: trackCheckoutStart,
   purchase: trackPurchase,
   bookingConfirmed: trackBookingConfirmed,
+  trackAbandon: trackAbandon,
+  
+  // Helpers
+  getUTMSource: getUTMSource,
+  getDevice: getDevice,
   
   // Low-level access
   track,
