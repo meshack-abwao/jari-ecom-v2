@@ -1106,10 +1106,25 @@
   transform: translateY(0);
 }
 
-/* Hero should be visible immediately */
-.jari-hero.jari-animate {
-  opacity: 1;
-  transform: translateY(0);
+/* ===================
+   HERO ANIMATIONS
+   Staggered Apple-style entrance
+   =================== */
+@keyframes heroSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.jari-hero-animate {
+  opacity: 0;
+  animation: heroSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: calc(var(--delay, 0) * 0.12s);
 }
 
 /* ===================

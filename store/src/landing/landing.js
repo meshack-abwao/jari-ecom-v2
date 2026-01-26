@@ -52,16 +52,16 @@ export function renderLandingPage() {
   </header>
 
   <!-- HERO - JTBD: The job is "Get paid for my products without the DM chaos" -->
-  <section class="jari-hero jari-animate">
-    <div class="jari-hero-badge">
+  <section class="jari-hero">
+    <div class="jari-hero-badge jari-hero-animate" style="--delay: 0">
       <span></span> Trusted by 100+ Kenyan sellers
     </div>
-    <h1>Your customers want to buy.<br><span class="highlight">Make it easy.</span></h1>
-    <p class="jari-hero-subtitle">
+    <h1 class="jari-hero-animate" style="--delay: 1">Your customers want to buy.<br><span class="highlight">Make it easy.</span></h1>
+    <p class="jari-hero-subtitle jari-hero-animate" style="--delay: 2">
       Stop losing sales in DMs. Give your Instagram and WhatsApp customers 
       a professional checkout with M-Pesa—they pay instantly, you ship.
     </p>
-    <div class="jari-hero-cta">
+    <div class="jari-hero-cta jari-hero-animate" style="--delay: 3">
       <a href="${SIGNUP_URL}" class="jari-btn jari-btn-primary jari-btn-large">
         Create your store
       </a>
@@ -70,7 +70,7 @@ export function renderLandingPage() {
       </a>
     </div>
     
-    <div class="jari-hero-stats">
+    <div class="jari-hero-stats jari-hero-animate" style="--delay: 4">
       <div class="jari-stat">
         <span class="jari-stat-number">10 min</span>
         <span class="jari-stat-label">Setup</span>
