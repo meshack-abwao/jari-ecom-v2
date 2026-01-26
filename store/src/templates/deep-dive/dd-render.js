@@ -303,10 +303,10 @@ function renderDeepDiveCTA(price) {
           <span class="cta-price-value" id="ctaTotalPrice">${formattedPrice}</span>
         </div>
         <button class="cta-add-btn" id="buyBtn" data-price="${price || 0}">
-          Add to Cart
+          Get This Now
           <svg class="cta-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M22 2L11 13"></path>
-            <path d="M22 2L15 22L11 13L2 9L22 2Z"></path>
+            <path d="M5 12h14"></path>
+            <path d="M12 5l7 7-7 7"></path>
           </svg>
         </button>
       </div>
