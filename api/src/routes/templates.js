@@ -42,12 +42,21 @@ router.get('/available', auth, async (req, res) => {
     // First template is free based on business type
     const defaultTemplate = getDefaultTemplate(businessType);
     
+    // Get all templates currently in use by this store's products (grandfathered)
+    const productsResult = await db.query(
+      `SELECT DISTINCT template FROM products WHERE store_id = $1 AND template IS NOT NULL`,
+      [store.id]
+    );
+    const grandfatheredTemplates = productsResult.rows.map(r => r.template);
+    
     // Build template list with unlock status
+    // Template is unlocked if: explicitly unlocked, default for business, OR grandfathered
     const templates = Object.entries(TEMPLATES).map(([id, template]) => ({
       id,
       ...template,
-      unlocked: unlockedThemes.includes(id) || id === defaultTemplate,
-      isDefault: id === defaultTemplate
+      unlocked: unlockedThemes.includes(id) || id === defaultTemplate || grandfatheredTemplates.includes(id),
+      isDefault: id === defaultTemplate,
+      isGrandfathered: grandfatheredTemplates.includes(id) && !unlockedThemes.includes(id) && id !== defaultTemplate
     }));
     
     res.json({ templates, defaultTemplate });
@@ -144,24 +153,33 @@ router.put('/assign/:productId', auth, async (req, res) => {
     const unlockedThemes = store.unlocked_themes || [];
     const defaultTemplate = getDefaultTemplate(store.business_type);
     
-    // Check if template is unlocked
-    if (!unlockedThemes.includes(templateId) && templateId !== defaultTemplate) {
+    // Get current product template (for grandfathering)
+    const productResult = await db.query(
+      `SELECT id, template FROM products WHERE id = $1 AND store_id = $2`,
+      [productId, store.id]
+    );
+    
+    if (productResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+    
+    const currentTemplate = productResult.rows[0].template;
+    
+    // Check if template is accessible:
+    // 1. It's in unlocked_themes
+    // 2. It's the default template for business type
+    // 3. It's the CURRENT template (grandfathering - don't lock users out of existing assignments)
+    const isUnlocked = unlockedThemes.includes(templateId);
+    const isDefault = templateId === defaultTemplate;
+    const isCurrentTemplate = templateId === currentTemplate;
+    
+    if (!isUnlocked && !isDefault && !isCurrentTemplate) {
       return res.status(403).json({ 
         error: 'Template not unlocked',
         requiresUnlock: true,
         templateId,
         price: TEMPLATES[templateId].price
       });
-    }
-    
-    // Verify product belongs to store
-    const productResult = await db.query(
-      `SELECT id FROM products WHERE id = $1 AND store_id = $2`,
-      [productId, store.id]
-    );
-    
-    if (productResult.rows.length === 0) {
-      return res.status(404).json({ error: 'Product not found' });
     }
     
     // Update product template

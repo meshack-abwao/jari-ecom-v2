@@ -769,35 +769,64 @@ export default function ProductsPage() {
             </div>
 
             <form onSubmit={handleSubmit} style={styles.form}>
-              {/* Template Selector */}
+              {/* Template Selector - Shows locked state for unowned templates */}
               <div style={styles.templateSection}>
                 <label style={styles.label}>SELECT TEMPLATE</label>
                 <div style={styles.templateGrid}>
-                  {Object.entries(TEMPLATES).map(([key, config]) => (
-                    <div
-                      key={key}
-                      onClick={() => setSelectedTemplate(key)}
-                      style={{
-                        ...styles.templateCard,
-                        border: selectedTemplate === key 
-                          ? '2px solid var(--accent-color)' 
-                          : '1px solid rgba(255, 255, 255, 0.1)',
-                        background: selectedTemplate === key 
-                          ? 'rgba(139, 92, 246, 0.15)' 
-                          : 'rgba(255, 255, 255, 0.04)',
-                        boxShadow: selectedTemplate === key 
-                          ? '0 4px 20px rgba(139, 92, 246, 0.25)' 
-                          : 'none',
-                        transform: selectedTemplate === key ? 'scale(1.02)' : 'scale(1)',
-                      }}
-                    >
-                      <div style={styles.templateIcon}>{config.icon}</div>
-                      <div style={styles.templateInfo}>
-                        <span style={styles.templateName}>{config.name}</span>
-                        <span style={styles.templatePrice}>KES {config.price.toLocaleString()}</span>
+                  {Object.entries(TEMPLATES).map(([key, config]) => {
+                    // Check if template is available:
+                    // 1. It's the currently selected template (grandfathered)
+                    // 2. It's in the store's unlocked templates list
+                    const isCurrentTemplate = editingProduct?.template === key || selectedTemplate === key;
+                    const isUnlocked = availableTemplates.find(t => t.id === key)?.unlocked;
+                    const isAvailable = isCurrentTemplate || isUnlocked;
+                    
+                    return (
+                      <div
+                        key={key}
+                        onClick={() => {
+                          if (isAvailable) {
+                            setSelectedTemplate(key);
+                          } else {
+                            // Show unlock modal for locked templates
+                            setTemplateToUnlock({ id: key, ...config });
+                            setShowUnlockModal(true);
+                          }
+                        }}
+                        style={{
+                          ...styles.templateCard,
+                          border: selectedTemplate === key 
+                            ? '2px solid var(--accent-color)' 
+                            : '1px solid rgba(255, 255, 255, 0.1)',
+                          background: selectedTemplate === key 
+                            ? 'rgba(139, 92, 246, 0.15)' 
+                            : !isAvailable
+                              ? 'rgba(255, 255, 255, 0.02)'
+                              : 'rgba(255, 255, 255, 0.04)',
+                          boxShadow: selectedTemplate === key 
+                            ? '0 4px 20px rgba(139, 92, 246, 0.25)' 
+                            : 'none',
+                          transform: selectedTemplate === key ? 'scale(1.02)' : 'scale(1)',
+                          opacity: isAvailable ? 1 : 0.6,
+                          cursor: isAvailable ? 'pointer' : 'pointer',
+                        }}
+                      >
+                        <div style={styles.templateIcon}>
+                          {!isAvailable && <span style={{ position: 'absolute', top: '8px', right: '8px', fontSize: '14px' }}>🔒</span>}
+                          {config.icon}
+                        </div>
+                        <div style={styles.templateInfo}>
+                          <span style={styles.templateName}>{config.name}</span>
+                          <span style={{
+                            ...styles.templatePrice,
+                            color: isAvailable ? 'var(--accent-color)' : '#888'
+                          }}>
+                            {isAvailable ? (isCurrentTemplate && !isUnlocked ? '✓ Active' : '✓ Unlocked') : `KES ${config.price.toLocaleString()}`}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
                 <p style={styles.templateDesc}>{templateConfig?.description}</p>
               </div>
@@ -1883,7 +1912,7 @@ const styles = {
   
   templateSection: { padding: '20px', background: 'rgba(255, 255, 255, 0.03)', backdropFilter: 'blur(20px)', borderRadius: '16px', marginBottom: '12px', border: '1px solid rgba(255, 255, 255, 0.08)' },
   templateGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '12px', marginTop: '12px' },
-  templateCard: { padding: '16px 12px', borderRadius: '14px', cursor: 'pointer', transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)', textAlign: 'center', background: 'rgba(255, 255, 255, 0.04)', backdropFilter: 'blur(10px)' },
+  templateCard: { padding: '16px 12px', borderRadius: '14px', cursor: 'pointer', transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)', textAlign: 'center', background: 'rgba(255, 255, 255, 0.04)', backdropFilter: 'blur(10px)', position: 'relative' },
   templateIcon: { fontSize: '28px', marginBottom: '10px', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' },
   templateInfo: { display: 'flex', flexDirection: 'column', gap: '4px' },
   templateName: { fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)', letterSpacing: '-0.01em' },
