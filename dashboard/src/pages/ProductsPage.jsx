@@ -146,6 +146,9 @@ export default function ProductsPage() {
   const [cardBalance, setCardBalance] = useState({ cardLimit: 3, cardsUsed: 0, cardsRemaining: 3, canAddProduct: true });
   const [showBuyCardsModal, setShowBuyCardsModal] = useState(false);
   const [cardBundles, setCardBundles] = useState([]);
+  const [selectedBundle, setSelectedBundle] = useState(null);
+  const [showCardPaymentModal, setShowCardPaymentModal] = useState(false);
+  const [cardPaymentPhone, setCardPaymentPhone] = useState('');
   
   // Template management state (Phase C2)
   const [availableTemplates, setAvailableTemplates] = useState([]);
@@ -252,6 +255,43 @@ export default function ProductsPage() {
   const handleBuyCards = () => {
     loadCardBundles();
     setShowBuyCardsModal(true);
+  };
+
+  const handleSelectBundle = (bundle) => {
+    setSelectedBundle(bundle);
+    setShowCardPaymentModal(true);
+  };
+
+  const handleCardPurchase = async () => {
+    if (!selectedBundle) return;
+    
+    if (!cardPaymentPhone || cardPaymentPhone.length < 10) {
+      alert('Please enter a valid M-Pesa phone number');
+      return;
+    }
+    
+    try {
+      // TODO: Integrate with actual M-Pesa STK Push
+      alert(`📱 M-Pesa payment request sent to ${cardPaymentPhone}.\n\nPlease check your phone and enter your PIN to complete payment of KES ${selectedBundle.price}.`);
+      
+      // Demo mode: Simulate successful purchase
+      const demoPaymentRef = `MPESA-CARDS-${Date.now()}`;
+      
+      await cardsAPI.purchase(selectedBundle.id, demoPaymentRef);
+      
+      // Refresh card balance
+      await loadCardBalance();
+      
+      setShowCardPaymentModal(false);
+      setShowBuyCardsModal(false);
+      setSelectedBundle(null);
+      setCardPaymentPhone('');
+      
+      alert(`✅ ${selectedBundle.name} purchased! +${selectedBundle.cards} cards added to your balance.`);
+    } catch (error) {
+      console.error('Failed to purchase cards:', error);
+      alert('Failed to complete purchase. Please try again.');
+    }
   };
 
   const handleAddProductClick = async () => {
@@ -719,6 +759,7 @@ export default function ProductsPage() {
                   border: '1px solid var(--border-color)', cursor: 'pointer',
                   transition: 'all 0.2s'
                 }}
+                onClick={() => handleSelectBundle(bundle)}
                 onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--accent-color)'}
                 onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border-color)'}
                 >
@@ -730,7 +771,7 @@ export default function ProductsPage() {
                       {bundle.cards} cards • KES {bundle.pricePerCard}/card
                     </div>
                   </div>
-                  <button className="btn btn-primary" style={{ padding: '10px 20px' }}>
+                  <button className="btn btn-primary" style={{ padding: '10px 20px' }} onClick={(e) => { e.stopPropagation(); handleSelectBundle(bundle); }}>
                     KES {bundle.price}
                   </button>
                 </div>
@@ -1906,6 +1947,79 @@ export default function ProductsPage() {
               <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '12px' }}>
                 One-time payment. Use on unlimited products.
               </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Card Purchase Payment Modal - Beautiful pay card */}
+      {showCardPaymentModal && selectedBundle && (
+        <div style={{ ...styles.modalOverlay, zIndex: 2100 }} onClick={() => { setShowCardPaymentModal(false); setSelectedBundle(null); }}>
+          <div style={{ ...styles.modal, maxWidth: '420px' }} className="glass-card" onClick={e => e.stopPropagation()}>
+            <div style={styles.modalHeader}>
+              <h2 style={styles.modalTitle}>Complete Purchase</h2>
+              <button onClick={() => { setShowCardPaymentModal(false); setSelectedBundle(null); }} style={styles.closeBtn}><X size={24} /></button>
+            </div>
+            
+            <div style={{ textAlign: 'center', padding: '20px 0' }}>
+              {/* Bundle Info Card */}
+              <div style={{ 
+                background: 'linear-gradient(135deg, var(--accent-color) 0%, #7c3aed 100%)', 
+                borderRadius: '16px', 
+                padding: '24px', 
+                marginBottom: '24px',
+                color: '#fff'
+              }}>
+                <div style={{ fontSize: '14px', opacity: 0.9, marginBottom: '8px' }}>You're purchasing</div>
+                <div style={{ fontSize: '28px', fontWeight: '700', marginBottom: '8px' }}>
+                  {selectedBundle.name}
+                </div>
+                <div style={{ fontSize: '16px', opacity: 0.9 }}>
+                  +{selectedBundle.cards} product cards
+                </div>
+                <div style={{ 
+                  marginTop: '16px', 
+                  paddingTop: '16px', 
+                  borderTop: '1px solid rgba(255,255,255,0.2)',
+                  fontSize: '32px',
+                  fontWeight: '700'
+                }}>
+                  KES {selectedBundle.price.toLocaleString()}
+                </div>
+              </div>
+              
+              {/* M-Pesa Payment Input */}
+              <div style={{ textAlign: 'left', marginBottom: '20px' }}>
+                <label style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-muted)', display: 'block', marginBottom: '8px' }}>
+                  M-PESA PHONE NUMBER
+                </label>
+                <input
+                  type="tel"
+                  placeholder="e.g. 0712345678"
+                  value={cardPaymentPhone}
+                  onChange={(e) => setCardPaymentPhone(e.target.value)}
+                  className="dashboard-input"
+                  style={{ width: '100%', padding: '14px', fontSize: '16px', textAlign: 'center', letterSpacing: '1px' }}
+                />
+                <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '8px' }}>
+                  You'll receive an M-Pesa prompt on this number
+                </p>
+              </div>
+              
+              <button 
+                onClick={handleCardPurchase} 
+                className="btn btn-primary" 
+                style={{ width: '100%', padding: '16px', fontSize: '16px', fontWeight: '600' }}
+              >
+                Pay KES {selectedBundle.price.toLocaleString()} via M-Pesa
+              </button>
+              
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginTop: '16px' }}>
+                <span style={{ fontSize: '20px' }}>📱</span>
+                <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                  Secure payment via Safaricom M-Pesa
+                </p>
+              </div>
             </div>
           </div>
         </div>
