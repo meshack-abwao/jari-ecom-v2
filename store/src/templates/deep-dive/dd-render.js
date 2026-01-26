@@ -11,6 +11,7 @@ import { renderTestimonials } from '../../shared/testimonials.js';
 import { renderProductPolicyLinks, renderProductPolicyModals } from '../../shared/policy-modals.js';
 import { renderShowcaseViewer } from './dd-showcase-viewer.js';
 import { renderBreadcrumb } from '../../render.js';
+import { renderRelatedProducts } from '../../shared/related-products.js';
 
 /**
  * Render Deep Dive template (premium product page)
@@ -98,6 +99,9 @@ export function renderDeepDive(product) {
           ${renderTestimonials(testimonials)}
         </div>
       ` : ''}
+      
+      <!-- STEP 11: EXPLORE - Related Products (Kalbach: Associative Nav) -->
+      ${renderRelatedProducts(product, 'deep-dive')}
       
       ${renderProductPolicyLinks(policies)}
     </div>
