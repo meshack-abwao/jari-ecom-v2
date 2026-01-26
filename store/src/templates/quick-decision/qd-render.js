@@ -11,6 +11,7 @@ import { renderTestimonials } from '../../shared/testimonials.js';
 import { renderProductPolicyLinks, renderProductPolicyModals } from '../../shared/policy-modals.js';
 import { renderQuantitySection } from '../../shared/quantity-controls.js';
 import { renderBreadcrumb } from '../../render.js';
+import { renderRelatedProducts } from '../../shared/related-products.js';
 
 /**
  * Main render function for Quick Decision template
@@ -69,6 +70,9 @@ export function renderQuickDecision(product) {
           ${renderProductPolicyLinks(policies)}
         </div>
       </div>
+      
+      <!-- Related Products (Kalbach: Associative Nav) -->
+      ${renderRelatedProducts(product, 'quick-decision')}
     </div>
     
     ${renderStoryViewer(stories)}
