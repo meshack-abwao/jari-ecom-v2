@@ -90,32 +90,40 @@ export function renderLandingPage() {
   <section class="jari-problem-section jari-animate">
     <div class="jari-container">
       <div class="jari-section-header">
-        <span class="jari-section-tag">😤 Sound familiar?</span>
+        <span class="jari-section-tag">Sound familiar?</span>
         <h2>The DM trap</h2>
         <p>You're great at what you sell. But selling through DMs is exhausting.</p>
       </div>
       
       <div class="jari-problems-grid">
         <div class="jari-problem-card jari-animate-child">
-          <div class="jari-problem-icon">📱</div>
+          <svg class="jari-problem-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+          </svg>
           <h3>"Send me pics"</h3>
           <p>Hours spent sending photos one by one, explaining the same thing, only for them to ghost.</p>
         </div>
         
         <div class="jari-problem-card jari-animate-child">
-          <div class="jari-problem-icon">💸</div>
+          <svg class="jari-problem-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
           <h3>"I'll pay tomorrow"</h3>
           <p>You hold items, they disappear. No commitment. No M-Pesa ping. Just wasted time.</p>
         </div>
         
         <div class="jari-problem-card jari-animate-child">
-          <div class="jari-problem-icon">😴</div>
+          <svg class="jari-problem-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+          </svg>
           <h3>Missed at 3am</h3>
           <p>Serious buyers message late. By morning, they bought from someone who replied faster.</p>
         </div>
         
         <div class="jari-problem-card jari-animate-child">
-          <div class="jari-problem-icon">📝</div>
+          <svg class="jari-problem-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+          </svg>
           <h3>"What did they order?"</h3>
           <p>Scrolling through 50 chats to find one order. No records. No system. Just chaos.</p>
         </div>
@@ -123,11 +131,11 @@ export function renderLandingPage() {
     </div>
   </section>
 
-  <!-- WHO IT'S FOR - Business Types Journey Section -->
+  <!-- WHO IT'S FOR - Business Types with Image Cards -->
   <section class="jari-who-section jari-animate" id="jari-who-its-for">
     <div class="jari-container">
       <div class="jari-section-header">
-        <span class="jari-section-tag">🎯 Perfect for you</span>
+        <span class="jari-section-tag">Perfect for you</span>
         <h2>One platform, endless possibilities</h2>
         <p>Whether you bake cakes AND teach classes, or cut hair AND sell products—manage everything in one place.</p>
       </div>
@@ -135,92 +143,124 @@ export function renderLandingPage() {
       <div class="jari-business-grid">
         <!-- Food & Bakery -->
         <div class="jari-business-card jari-animate-child">
-          <div class="jari-business-icon">🍰</div>
-          <h3>Bakers & Food Business</h3>
-          <p class="jari-business-pain">"I spend more time on WhatsApp than baking."</p>
-          <ul class="jari-business-solve">
-            <li>Visual menu with mouth-watering photos</li>
-            <li>Customers order & pay before you start</li>
-            <li>No more "I'll pick up but didn't pay"</li>
-            <li><strong>Bonus:</strong> Sell baking classes too!</li>
-          </ul>
-          <span class="jari-business-template">→ Visual Menu template</span>
+          <div class="jari-business-image" style="background-image: url('https://res.cloudinary.com/dmfrtzgkv/image/upload/v1769448873/cake_itfnhz.png')">
+            <div class="jari-business-overlay">
+              <h3>Bakers & Food Business</h3>
+              <span class="jari-business-template">Visual Menu template</span>
+            </div>
+          </div>
+          <div class="jari-business-content">
+            <p class="jari-business-pain">"I spend more time on WhatsApp than baking."</p>
+            <ul class="jari-business-solve">
+              <li>Visual menu with mouth-watering photos</li>
+              <li>Customers order & pay before you start</li>
+              <li>No more "I'll pick up but didn't pay"</li>
+              <li><strong>Bonus:</strong> Sell baking classes too!</li>
+            </ul>
+          </div>
         </div>
         
         <!-- Fashion & Boutique -->
         <div class="jari-business-card jari-animate-child">
-          <div class="jari-business-icon">👗</div>
-          <h3>Fashion & Boutique</h3>
-          <p class="jari-business-pain">"Sending size charts 20 times a day is killing me."</p>
-          <ul class="jari-business-solve">
-            <li>Professional product pages with all details</li>
-            <li>Size guides, colors, variants—all visible</li>
-            <li>Customers browse 24/7, you sleep</li>
-            <li><strong>Bonus:</strong> Personal styling sessions too!</li>
-          </ul>
-          <span class="jari-business-template">→ Quick Sell template</span>
+          <div class="jari-business-image" style="background-image: url('https://res.cloudinary.com/dmfrtzgkv/image/upload/v1769448472/virtual-photoshoot-6_vckzpk.png')">
+            <div class="jari-business-overlay">
+              <h3>Fashion & Boutique</h3>
+              <span class="jari-business-template">Quick Sell template</span>
+            </div>
+          </div>
+          <div class="jari-business-content">
+            <p class="jari-business-pain">"Sending size charts 20 times a day is killing me."</p>
+            <ul class="jari-business-solve">
+              <li>Professional product pages with all details</li>
+              <li>Size guides, colors, variants—all visible</li>
+              <li>Customers browse 24/7, you sleep</li>
+              <li><strong>Bonus:</strong> Personal styling sessions too!</li>
+            </ul>
+          </div>
         </div>
         
         <!-- Beauty & Salon -->
         <div class="jari-business-card jari-animate-child">
-          <div class="jari-business-icon">💅</div>
-          <h3>Beauty & Hair Salon</h3>
-          <p class="jari-business-pain">"No-shows are ruining my schedule and income."</p>
-          <ul class="jari-business-solve">
-            <li>Booking calendar with deposits</li>
-            <li>Clients pay to confirm—no more ghosts</li>
-            <li>Sell your products alongside services</li>
-            <li><strong>Bonus:</strong> Gift cards & packages!</li>
-          </ul>
-          <span class="jari-business-template">→ Booking template</span>
+          <div class="jari-business-image" style="background-image: url('https://res.cloudinary.com/dmfrtzgkv/image/upload/v1769448592/benyamin-bohlouli-LGXN4OSQSa4-unsplash_1_cgzlc1.jpg')">
+            <div class="jari-business-overlay">
+              <h3>Beauty & Hair Salon</h3>
+              <span class="jari-business-template">Booking template</span>
+            </div>
+          </div>
+          <div class="jari-business-content">
+            <p class="jari-business-pain">"No-shows are ruining my schedule and income."</p>
+            <ul class="jari-business-solve">
+              <li>Booking calendar with deposits</li>
+              <li>Clients pay to confirm—no more ghosts</li>
+              <li>Sell your products alongside services</li>
+              <li><strong>Bonus:</strong> Gift cards & packages!</li>
+            </ul>
+          </div>
         </div>
         
         <!-- Coaches & Consultants -->
         <div class="jari-business-card jari-animate-child">
-          <div class="jari-business-icon">🎓</div>
-          <h3>Coaches & Trainers</h3>
-          <p class="jari-business-pain">"Chasing payment before every session is awkward."</p>
-          <ul class="jari-business-solve">
-            <li>Sell courses, sessions, packages</li>
-            <li>Clients book AND pay upfront</li>
-            <li>Offer 1-on-1 AND group sessions</li>
-            <li><strong>Bonus:</strong> Sell digital products too!</li>
-          </ul>
-          <span class="jari-business-template">→ Booking template</span>
+          <div class="jari-business-image" style="background-image: url('https://res.cloudinary.com/dmfrtzgkv/image/upload/v1769448458/virtual-photoshoot-2_nj1y6v.png')">
+            <div class="jari-business-overlay">
+              <h3>Coaches & Trainers</h3>
+              <span class="jari-business-template">Booking template</span>
+            </div>
+          </div>
+          <div class="jari-business-content">
+            <p class="jari-business-pain">"Chasing payment before every session is awkward."</p>
+            <ul class="jari-business-solve">
+              <li>Sell courses, sessions, packages</li>
+              <li>Clients book AND pay upfront</li>
+              <li>Offer 1-on-1 AND group sessions</li>
+              <li><strong>Bonus:</strong> Sell digital products too!</li>
+            </ul>
+          </div>
         </div>
         
         <!-- Electronics & Tech -->
         <div class="jari-business-card jari-animate-child">
-          <div class="jari-business-icon">📱</div>
-          <h3>Electronics & Gadgets</h3>
-          <p class="jari-business-pain">"Customers want specs, warranty info, comparisons."</p>
-          <ul class="jari-business-solve">
-            <li>Detailed product pages with specs</li>
-            <li>Show warranty, features, what's included</li>
-            <li>Build trust before they buy</li>
-            <li><strong>Bonus:</strong> Repair booking services!</li>
-          </ul>
-          <span class="jari-business-template">→ Deep Dive template</span>
+          <div class="jari-business-image" style="background-image: url('https://res.cloudinary.com/dmfrtzgkv/image/upload/v1769448456/amanz-7mMvHZePkT8-unsplash_vtrdjm.jpg')">
+            <div class="jari-business-overlay">
+              <h3>Electronics & Gadgets</h3>
+              <span class="jari-business-template">Deep Dive template</span>
+            </div>
+          </div>
+          <div class="jari-business-content">
+            <p class="jari-business-pain">"Customers want specs, warranty info, comparisons."</p>
+            <ul class="jari-business-solve">
+              <li>Detailed product pages with specs</li>
+              <li>Show warranty, features, what's included</li>
+              <li>Build trust before they buy</li>
+              <li><strong>Bonus:</strong> Repair booking services!</li>
+            </ul>
+          </div>
         </div>
         
         <!-- Restaurants & Cafes -->
         <div class="jari-business-card jari-animate-child">
-          <div class="jari-business-icon">🍽️</div>
-          <h3>Restaurants & Cafes</h3>
-          <p class="jari-business-pain">"Order-taking on WhatsApp during rush hour is chaos."</p>
-          <ul class="jari-business-solve">
-            <li>Digital menu customers browse themselves</li>
-            <li>Orders come in organized with details</li>
-            <li>Table reservations with deposits</li>
-            <li><strong>Bonus:</strong> Catering packages!</li>
-          </ul>
-          <span class="jari-business-template">→ Visual Menu template</span>
+          <div class="jari-business-image" style="background-image: url('https://res.cloudinary.com/dmfrtzgkv/image/upload/v1769448618/luisa-brimble-aFzg83dvnAI-unsplash_pfrvra.jpg')">
+            <div class="jari-business-overlay">
+              <h3>Restaurants & Cafes</h3>
+              <span class="jari-business-template">Visual Menu template</span>
+            </div>
+          </div>
+          <div class="jari-business-content">
+            <p class="jari-business-pain">"Order-taking on WhatsApp during rush hour is chaos."</p>
+            <ul class="jari-business-solve">
+              <li>Digital menu customers browse themselves</li>
+              <li>Orders come in organized with details</li>
+              <li>Table reservations with deposits</li>
+              <li><strong>Bonus:</strong> Catering packages!</li>
+            </ul>
+          </div>
         </div>
       </div>
       
       <div class="jari-multi-business jari-animate">
         <div class="jari-multi-business-content">
-          <div class="jari-multi-icon">🔄</div>
+          <svg class="jari-multi-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+          </svg>
           <h3>Run multiple businesses? No problem.</h3>
           <p>One dashboard. Multiple offerings. A baker who teaches classes. A hairdresser who sells products. A coach who offers courses AND 1-on-1 sessions. We handle it all.</p>
           <a href="${SIGNUP_URL}" class="jari-btn jari-btn-primary">See how it works</a>
@@ -233,44 +273,56 @@ export function renderLandingPage() {
   <section class="jari-features-section jari-animate" id="jari-features">
     <div class="jari-container">
       <div class="jari-section-header">
-        <span class="jari-section-tag">✨ The solution</span>
+        <span class="jari-section-tag">The solution</span>
         <h2>Everything you need to sell professionally</h2>
         <p>Tools that used to cost millions—now accessible to every Kenyan entrepreneur.</p>
       </div>
       
       <div class="jari-features-grid">
         <div class="jari-feature-card jari-animate-child">
-          <div class="jari-feature-icon">💳</div>
+          <svg class="jari-feature-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+          </svg>
           <h3>M-Pesa STK Push</h3>
           <p>Customer taps "Pay", gets the M-Pesa prompt, done. No screenshots. No "send to till". Money lands automatically.</p>
         </div>
         
         <div class="jari-feature-card jari-animate-child">
-          <div class="jari-feature-icon">🎨</div>
+          <svg class="jari-feature-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/>
+          </svg>
           <h3>Templates that convert</h3>
           <p>Designed for different businesses: Quick checkout for impulse buys, Deep Dive for premium items, Visual Menu for food.</p>
         </div>
         
         <div class="jari-feature-card jari-animate-child">
-          <div class="jari-feature-icon">🔗</div>
+          <svg class="jari-feature-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+          </svg>
           <h3>One link, everywhere</h3>
           <p>Drop it in your Instagram bio, WhatsApp status, anywhere. Customers see everything, pay instantly—24/7, while you sleep.</p>
         </div>
         
         <div class="jari-feature-card jari-animate-child">
-          <div class="jari-feature-icon">📊</div>
+          <svg class="jari-feature-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+          </svg>
           <h3>Know your numbers</h3>
           <p>See every order, track what's selling, understand your customers. Real business intelligence, not guesswork.</p>
         </div>
         
         <div class="jari-feature-card jari-animate-child">
-          <div class="jari-feature-icon">📱</div>
+          <svg class="jari-feature-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+          </svg>
           <h3>WhatsApp integration</h3>
           <p>Instant order alerts. Auto-replies when you're busy. Never miss a sale because you couldn't respond fast enough.</p>
         </div>
         
         <div class="jari-feature-card jari-animate-child">
-          <div class="jari-feature-icon">📈</div>
+          <svg class="jari-feature-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+          </svg>
           <h3>Grows with you</h3>
           <p>Start with 3 products, scale to hundreds. Add features as you need them. Your store evolves with your business.</p>
         </div>
@@ -282,7 +334,7 @@ export function renderLandingPage() {
   <section class="jari-how-section jari-animate" id="jari-how-it-works">
     <div class="jari-container">
       <div class="jari-section-header">
-        <span class="jari-section-tag">🚀 Simple setup</span>
+        <span class="jari-section-tag">Simple setup</span>
         <h2>Selling in 3 steps</h2>
         <p>From zero to taking orders in under 10 minutes</p>
       </div>
@@ -313,7 +365,7 @@ export function renderLandingPage() {
   <section class="jari-pricing-journey jari-animate">
     <div class="jari-container">
       <div class="jari-section-header">
-        <span class="jari-section-tag">💡 How it works</span>
+        <span class="jari-section-tag">How it works</span>
         <h2>Pricing that makes sense</h2>
         <p>Start small, grow big. Only pay for what you actually use.</p>
       </div>
@@ -358,7 +410,7 @@ export function renderLandingPage() {
   <section class="jari-pricing-section jari-animate" id="jari-pricing">
     <div class="jari-container">
       <div class="jari-section-header">
-        <span class="jari-section-tag">💰 Transparent pricing</span>
+        <span class="jari-section-tag">Transparent pricing</span>
         <h2>Simple. Affordable. No surprises.</h2>
         <p>Pay for what you use. Scale when you're ready.</p>
       </div>
@@ -382,12 +434,12 @@ export function renderLandingPage() {
           </ul>
           
           <div class="jari-pricing-setup-included">
-            <h4>🚀 One-time setup: <span class="jari-setup-price">KES 5,000</span></h4>
+            <h4>One-time setup: <span class="jari-setup-price">KES 5,000</span></h4>
             <p>Account creation, theme unlock, optional onboarding call</p>
             <div class="jari-setup-options">
               <div class="jari-setup-option"><strong>Pay upfront:</strong> KES 5,000 once</div>
               <div class="jari-setup-option"><strong>Split it:</strong> KES 2,500 × 2 months</div>
-              <div class="jari-setup-option jari-setup-highlight">🎁 <strong>Try first:</strong> 1 week free trial</div>
+              <div class="jari-setup-option jari-setup-highlight"><strong>Try first:</strong> 1 week free trial</div>
             </div>
           </div>
           
@@ -426,13 +478,13 @@ export function renderLandingPage() {
       
       <div class="jari-pricing-extras">
         <div class="jari-extras-header">
-          <h3>🛒 One-time purchases</h3>
+          <h3>One-time purchases</h3>
           <p>Buy once, keep forever. Expand when you're ready.</p>
         </div>
         
         <div class="jari-extras-grid">
           <div class="jari-extras-card jari-animate-child">
-            <h4>📦 Product Cards</h4>
+            <h4>Product Cards</h4>
             <p>Slots for your products. Buy more as you grow.</p>
             <div class="jari-extras-table">
               <div class="jari-extras-row">
@@ -459,7 +511,7 @@ export function renderLandingPage() {
           </div>
           
           <div class="jari-extras-card jari-animate-child">
-            <h4>🎨 Templates</h4>
+            <h4>Templates</h4>
             <p>Checkout styles optimized for your business type.</p>
             <div class="jari-extras-table">
               <div class="jari-extras-row">
@@ -498,7 +550,7 @@ export function renderLandingPage() {
   <section class="jari-testimonials-section jari-animate">
     <div class="jari-container">
       <div class="jari-section-header">
-        <span class="jari-section-tag">⭐ Success stories</span>
+        <span class="jari-section-tag">Success stories</span>
         <h2>Sellers who made the switch</h2>
         <p>Real results from real Kenyan entrepreneurs</p>
       </div>

@@ -406,8 +406,10 @@
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
 }
 
-.jari-problem-icon {
-  font-size: 32px;
+.jari-problem-svg {
+  width: 40px;
+  height: 40px;
+  color: #667eea;
   margin-bottom: 16px;
 }
 
@@ -452,8 +454,10 @@
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
 }
 
-.jari-feature-icon {
-  font-size: 48px;
+.jari-feature-svg {
+  width: 48px;
+  height: 48px;
+  color: #667eea;
   margin-bottom: 20px;
 }
 
@@ -1109,7 +1113,7 @@
 
 /* ===================
    WHO IT'S FOR SECTION
-   Business types grid
+   Business types with image cards
    =================== */
 .jari-who-section {
   background: linear-gradient(180deg, #fff 0%, #f5f5f7 100%);
@@ -1118,7 +1122,7 @@
 
 .jari-business-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
   gap: 24px;
   max-width: 1100px;
   margin: 0 auto 48px;
@@ -1127,71 +1131,119 @@
 .jari-business-card {
   background: #fff;
   border-radius: 24px;
-  padding: 32px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
+              box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .jari-business-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
+  transform: translateY(-8px);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.12);
 }
 
-.jari-business-icon {
-  font-size: 40px;
-  margin-bottom: 16px;
+.jari-business-card:hover .jari-business-image {
+  transform: scale(1.05);
 }
 
-.jari-business-card h3 {
-  font-size: 20px;
+.jari-business-card:hover .jari-business-overlay {
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.85) 100%);
+}
+
+/* Image with overlay - like collection pages */
+.jari-business-image {
+  position: relative;
+  height: 200px;
+  background-size: cover;
+  background-position: center;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.jari-business-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 30%, rgba(0, 0, 0, 0.75) 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 24px;
+  transition: background 0.4s ease;
+}
+
+.jari-business-overlay h3 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 8px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.jari-business-template {
+  display: inline-block;
+  font-size: 12px;
   font-weight: 600;
-  color: #1d1d1f;
-  margin-bottom: 12px;
+  color: #fff;
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border-radius: 980px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  width: fit-content;
+}
+
+/* Content below image */
+.jari-business-content {
+  padding: 24px;
 }
 
 .jari-business-pain {
   font-size: 15px;
   color: #86868b;
   font-style: italic;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   padding-left: 16px;
-  border-left: 3px solid rgba(102, 126, 234, 0.3);
+  border-left: 3px solid rgba(102, 126, 234, 0.4);
 }
 
 .jari-business-solve {
   list-style: none;
-  margin-bottom: 20px;
+  margin: 0;
 }
 
 .jari-business-solve li {
   font-size: 14px;
   color: #424245;
-  padding: 8px 0;
+  padding: 6px 0;
   padding-left: 24px;
   position: relative;
 }
 
 .jari-business-solve li::before {
-  content: '✓';
+  content: '';
   position: absolute;
   left: 0;
-  color: #34c759;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50%;
+  opacity: 0.15;
+}
+
+.jari-business-solve li::after {
+  content: '✓';
+  position: absolute;
+  left: 3px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 10px;
+  color: #667eea;
   font-weight: 700;
 }
 
 .jari-business-solve li strong {
   color: #667eea;
-}
-
-.jari-business-template {
-  display: inline-block;
-  font-size: 13px;
-  font-weight: 600;
-  color: #667eea;
-  padding: 6px 12px;
-  background: rgba(102, 126, 234, 0.1);
-  border-radius: 980px;
 }
 
 /* Multi-business highlight box */
@@ -1204,13 +1256,15 @@
   background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
   border: 1px solid rgba(102, 126, 234, 0.2);
   border-radius: 24px;
-  padding: 40px;
+  padding: 48px 40px;
   text-align: center;
 }
 
-.jari-multi-icon {
-  font-size: 48px;
-  margin-bottom: 16px;
+.jari-multi-icon-svg {
+  width: 56px;
+  height: 56px;
+  color: #667eea;
+  margin-bottom: 20px;
 }
 
 .jari-multi-business-content h3 {
