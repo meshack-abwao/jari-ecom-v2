@@ -94,3 +94,184 @@
     background: var(--border);
     border-radius: 3px;
 }
+
+/* ===========================================
+   ENHANCED FOOTER - Apple Design Language
+   Kalbach: Utility navigation, task completion
+   =========================================== */
+
+.store-footer-enhanced {
+    margin-top: var(--space-4xl);
+    padding: var(--space-4xl) var(--space-lg);
+    background: var(--bg-gray);
+    border-top: 1px solid var(--border);
+}
+
+.footer-container {
+    max-width: 600px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-xl);
+}
+
+/* Back to Top Button */
+.footer-back-top {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-lg);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    font-size: var(--fs-small);
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.footer-back-top:hover {
+    background: var(--text-primary);
+    color: white;
+    border-color: var(--text-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.footer-back-top svg {
+    transition: transform 0.2s ease;
+}
+
+.footer-back-top:hover svg {
+    transform: translateY(-2px);
+}
+
+/* Store Brand */
+.footer-brand {
+    text-align: center;
+}
+
+.footer-store-name {
+    font-size: var(--fs-body-lg);
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
+}
+
+/* Contact Row - Pill Buttons */
+.footer-contact-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+}
+
+.footer-contact-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-sm) var(--space-md);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    font-size: var(--fs-small);
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.footer-contact-pill:hover {
+    background: var(--text-primary);
+    color: white;
+    border-color: var(--text-primary);
+    transform: translateY(-2px);
+}
+
+.footer-contact-pill svg {
+    flex-shrink: 0;
+}
+
+/* WhatsApp specific hover */
+.footer-contact-pill[aria-label="WhatsApp"]:hover {
+    background: #25D366;
+    border-color: #25D366;
+}
+
+/* Instagram specific hover */
+.footer-contact-pill[aria-label="Instagram"]:hover {
+    background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+    border-color: transparent;
+}
+
+/* Policy Links */
+.footer-policy-links {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+}
+
+.footer-policy-links .store-policy-link {
+    font-size: var(--fs-tiny);
+    color: var(--text-secondary);
+    background: none;
+    border: none;
+    padding: var(--space-xs);
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.footer-policy-links .store-policy-link:hover {
+    color: var(--text-primary);
+}
+
+/* Powered By */
+.footer-powered {
+    font-size: var(--fs-tiny);
+    color: var(--text-secondary);
+}
+
+.footer-powered a {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.footer-powered a:hover {
+    text-decoration: underline;
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+    .store-footer-enhanced {
+        padding: var(--space-3xl) var(--space-md);
+    }
+    
+    .footer-container {
+        gap: var(--space-lg);
+    }
+    
+    .footer-back-top span {
+        display: none;
+    }
+    
+    .footer-back-top {
+        padding: var(--space-sm);
+        border-radius: 50%;
+    }
+    
+    .footer-contact-pill span {
+        display: none;
+    }
+    
+    .footer-contact-pill {
+        padding: var(--space-sm);
+        border-radius: 50%;
+    }
+}
