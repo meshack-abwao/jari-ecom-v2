@@ -389,7 +389,7 @@ export default function Layout() {
             <LayoutGrid size={20} /><span>Store Design</span>
           </NavLink>
           <NavLink to="/add-ons" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
-            <Zap size={20} /><span>Add-Ons</span>
+            <Zap size={20} /><span>Features</span>
           </NavLink>
           <NavLink to="/settings" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
             <Settings size={20} /><span>Settings</span>
