@@ -371,7 +371,7 @@ export default function Layout() {
             <Home size={20} /><span>Overview</span>
           </NavLink>
           <NavLink to="/products" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
-            <Package size={20} /><span>My Products</span>
+            <Package size={20} /><span>My Store</span>
           </NavLink>
           <NavLink to="/orders" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
             <ShoppingCart size={20} /><span>Orders</span>
