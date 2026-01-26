@@ -386,7 +386,7 @@ export default function Layout() {
             <Megaphone size={20} /><span>Marketing</span>
           </NavLink>
           <NavLink to="/templates" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
-            <LayoutGrid size={20} /><span>Templates</span>
+            <LayoutGrid size={20} /><span>Store Design</span>
           </NavLink>
           <NavLink to="/add-ons" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
             <Zap size={20} /><span>Add-Ons</span>
