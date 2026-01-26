@@ -983,3 +983,192 @@
     padding: 24px;
   }
 }
+
+
+/* ===========================================
+   PRICING SECTION - New Design
+   =========================================== */
+
+.jari-pricing-section {
+  padding: 80px 24px;
+  background: linear-gradient(180deg, #f8f9fa 0%, #fff 100%);
+}
+
+.jari-pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  max-width: 1100px;
+  margin: 0 auto 32px;
+}
+
+.jari-pricing-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 32px 24px;
+  border: 1px solid #e5e7eb;
+  position: relative;
+}
+
+.jari-pricing-card.jari-pricing-featured {
+  border: 2px solid #FF6B35;
+  box-shadow: 0 8px 32px rgba(255, 107, 53, 0.15);
+  transform: scale(1.02);
+}
+
+.jari-pricing-badge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #FF6B35;
+  color: #fff;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.jari-pricing-header {
+  text-align: center;
+  margin-bottom: 24px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.jari-pricing-header h3 {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #1a1a1a;
+}
+
+.jari-pricing-subtitle {
+  color: #666;
+  font-size: 14px;
+  margin: 0;
+}
+
+.jari-pricing-amount {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 4px;
+}
+
+.jari-price-currency {
+  font-size: 16px;
+  font-weight: 500;
+  color: #666;
+}
+
+.jari-price-value {
+  font-size: 42px;
+  font-weight: 700;
+  color: #1a1a1a;
+  line-height: 1;
+}
+
+.jari-price-period {
+  font-size: 14px;
+  color: #666;
+}
+
+.jari-pricing-features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 24px;
+}
+
+.jari-pricing-features li {
+  padding: 8px 0;
+  font-size: 14px;
+  color: #444;
+}
+
+.jari-pricing-options {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 16px;
+}
+
+.jari-pricing-option-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+
+.jari-pricing-option {
+  font-size: 13px;
+  color: #444;
+  padding: 6px 0;
+}
+
+.jari-pricing-option-highlight {
+  background: #e8f5e9;
+  padding: 8px 12px;
+  border-radius: 8px;
+  margin-top: 8px;
+  color: #2e7d32;
+  font-weight: 500;
+}
+
+.jari-pricing-addons-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.jari-pricing-addons-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.jari-pricing-addons-list li:last-child {
+  border-bottom: none;
+}
+
+.jari-addon-name {
+  font-size: 14px;
+  color: #444;
+}
+
+.jari-addon-price {
+  font-size: 14px;
+  font-weight: 600;
+  color: #FF6B35;
+}
+
+.jari-btn-block {
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+
+.jari-pricing-note {
+  text-align: center;
+  font-size: 14px;
+  color: #666;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Pricing Responsive */
+@media (max-width: 900px) {
+  .jari-pricing-grid {
+    grid-template-columns: 1fr;
+    max-width: 400px;
+  }
+  
+  .jari-pricing-card.jari-pricing-featured {
+    transform: none;
+    order: -1;
+  }
+}

@@ -117,6 +117,102 @@ export function renderLandingPage() {
     </div>
   </section>
 
+  <!-- PRICING SECTION -->
+  <section class="jari-pricing-section" id="jari-pricing">
+    <div class="jari-container">
+      <div class="jari-section-header">
+        <span class="jari-section-tag">💰 Simple Pricing</span>
+        <h2>Start Small, Scale As You Grow</h2>
+        <p style="color: #666; max-width: 600px; margin: 0 auto;">No hidden fees. Pay only for what you need.</p>
+      </div>
+      
+      <div class="jari-pricing-grid">
+        <!-- Setup Fee Card -->
+        <div class="jari-pricing-card jari-pricing-setup">
+          <div class="jari-pricing-header">
+            <h3>Setup Fee</h3>
+            <div class="jari-pricing-amount">
+              <span class="jari-price-currency">KES</span>
+              <span class="jari-price-value">5,000</span>
+              <span class="jari-price-period">one-time</span>
+            </div>
+          </div>
+          <ul class="jari-pricing-features">
+            <li>✅ Account creation</li>
+            <li>✅ Theme unlock (based on your business)</li>
+            <li>✅ Optional onboarding call</li>
+            <li>✅ Lifetime access</li>
+          </ul>
+          <div class="jari-pricing-options">
+            <p class="jari-pricing-option-title">Flexible Payment:</p>
+            <div class="jari-pricing-option">
+              <strong>Option A:</strong> Pay KES 5,000 upfront
+            </div>
+            <div class="jari-pricing-option">
+              <strong>Option B:</strong> Split 50% – KES 2,500 + first month
+            </div>
+            <div class="jari-pricing-option jari-pricing-option-highlight">
+              <strong>Option C:</strong> 🎁 Try FREE for 1 week first!
+            </div>
+          </div>
+        </div>
+        
+        <!-- Monthly Card -->
+        <div class="jari-pricing-card jari-pricing-monthly jari-pricing-featured">
+          <div class="jari-pricing-badge">Most Popular</div>
+          <div class="jari-pricing-header">
+            <h3>Monthly</h3>
+            <div class="jari-pricing-amount">
+              <span class="jari-price-currency">KES</span>
+              <span class="jari-price-value">1,200</span>
+              <span class="jari-price-period">/month</span>
+            </div>
+          </div>
+          <ul class="jari-pricing-features">
+            <li>✅ 3 Product card slots</li>
+            <li>✅ Your own store link</li>
+            <li>✅ Basic analytics dashboard</li>
+            <li>✅ Order management</li>
+            <li>✅ Customer notifications</li>
+          </ul>
+          <a href="${SIGNUP_URL}" class="jari-btn jari-btn-primary jari-btn-block">
+            Start Free Trial →
+          </a>
+        </div>
+        
+        <!-- Add-ons Card -->
+        <div class="jari-pricing-card jari-pricing-addons">
+          <div class="jari-pricing-header">
+            <h3>Add-Ons</h3>
+            <p class="jari-pricing-subtitle">Stack what you need</p>
+          </div>
+          <ul class="jari-pricing-addons-list">
+            <li>
+              <span class="jari-addon-name">M-Pesa STK Push</span>
+              <span class="jari-addon-price">+KES 300/mo</span>
+            </li>
+            <li>
+              <span class="jari-addon-name">WhatsApp Auto-Reply</span>
+              <span class="jari-addon-price">+KES 80/mo</span>
+            </li>
+            <li>
+              <span class="jari-addon-name">Advanced Analytics</span>
+              <span class="jari-addon-price">+KES 200/mo</span>
+            </li>
+            <li>
+              <span class="jari-addon-name">Priority Support</span>
+              <span class="jari-addon-price">+KES 500/mo</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+      
+      <p class="jari-pricing-note">
+        💡 <strong>Example:</strong> Base + M-Pesa = KES 1,500/month | Full Stack = KES 2,280/month
+      </p>
+    </div>
+  </section>
+
   <!-- CTA: All main CTAs point to signup now -->
   <section class="jari-cta-section">
     <div class="jari-container">

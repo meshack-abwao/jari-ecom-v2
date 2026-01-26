@@ -9,21 +9,68 @@ import { auth } from '../middleware/auth.js';
 
 const router = Router();
 
+// ===========================================
+// PRICING CONFIGURATION
+// ===========================================
+
+// Setup fee (one-time, non-refundable)
+const SETUP_FEE = {
+  full: 5000,        // Full payment
+  split: 2500,       // 50% split (pay in 2 months)
+  includes: ['Account creation', 'Theme unlock', 'Optional onboarding call']
+};
+
 // Subscription pricing
 const SUBSCRIPTION_PLANS = {
   base: { 
     name: 'Base Plan', 
     price: 1200, 
-    features: ['3 product cards', 'Basic analytics', 'Email support']
+    features: ['3 product cards', 'Basic analytics', 'Email support', 'Shareable store link', 'Order management']
   }
+};
+
+// Trial configuration
+const TRIAL_CONFIG = {
+  days: 7,  // 1 week free trial
+  skipSetup: true  // Can skip setup fee and try first
 };
 
 // Add-on pricing
 const ADDONS = {
-  mpesa_stk: { name: 'M-Pesa STK Push', price: 300, description: 'Accept M-Pesa payments' },
-  whatsapp_auto: { name: 'WhatsApp Auto-Reply', price: 80, description: 'Auto-reply to customers' },
-  advanced_analytics: { name: 'Advanced Analytics', price: 200, description: 'Detailed insights' },
-  priority_support: { name: 'Priority Support', price: 500, description: '24/7 priority support' }
+  mpesa_stk: { name: 'M-Pesa STK Push', price: 300, description: 'Instant M-Pesa prompt, auto-confirmation' },
+  whatsapp_auto: { name: 'WhatsApp Auto-Reply', price: 80, description: '24/7 automated responses' },
+  advanced_analytics: { name: 'Advanced Analytics', price: 200, description: 'Traffic sources, conversion rates, insights' },
+  priority_support: { name: 'Priority Support', price: 500, description: 'Fast response, dedicated assistance' }
+};
+
+// Payment options for new merchants
+const PAYMENT_OPTIONS = {
+  option_a: {
+    name: 'Full Setup',
+    description: 'Pay setup fee upfront',
+    setupFee: 5000,
+    firstMonth: 1200,
+    total: 6200,
+    setupRemaining: 0
+  },
+  option_b: {
+    name: 'Split Setup (50%)',
+    description: 'Split setup fee over 2 months',
+    setupFee: 2500,  // First half
+    firstMonth: 1200,
+    total: 3700,     // First payment
+    setupRemaining: 2500,  // Paid in month 2
+    month2Total: 3700  // 2500 + 1200
+  },
+  option_c: {
+    name: 'Free Trial',
+    description: '1-week free trial, no payment required',
+    trialDays: 7,
+    setupFee: 0,
+    firstMonth: 0,
+    total: 0,
+    note: 'Setup fee required after trial to continue'
+  }
 };
 
 // ============================================================================
@@ -97,8 +144,11 @@ router.get('/', auth, async (req, res, next) => {
 // ============================================================================
 router.get('/pricing', async (req, res) => {
   res.json({
+    setupFee: SETUP_FEE,
     plans: SUBSCRIPTION_PLANS,
     addons: ADDONS,
+    trial: TRIAL_CONFIG,
+    paymentOptions: PAYMENT_OPTIONS,
     currency: 'KES'
   });
 });
