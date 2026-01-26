@@ -1,6 +1,6 @@
 // ===========================================
 // JARI.ECOM LANDING PAGE
-// Renders when no ?store= parameter is present
+// JTBD/ODI Optimized Messaging + Premium Design
 // ===========================================
 
 const LOGIN_URL = 'https://dashboard.jarisolutionsecom.store/login';
@@ -14,7 +14,7 @@ export function renderLandingPage() {
   
   <!-- TOP BANNER -->
   <div class="jari-top-banner">
-    🚀 Built for Kenyan Sellers • M-Pesa Integration • Start in 10 Minutes
+    🇰🇪 Built for Kenyan entrepreneurs · M-Pesa native · Launch in 10 minutes
   </div>
 
   <!-- HEADER -->
@@ -33,50 +33,49 @@ export function renderLandingPage() {
       </nav>
       
       <div class="jari-header-cta">
-        <a href="${LOGIN_URL}" class="jari-btn jari-btn-outline">Log In</a>
-        <a href="${SIGNUP_URL}" class="jari-btn jari-btn-primary">Start Your Store →</a>
+        <a href="${LOGIN_URL}" class="jari-btn jari-btn-outline">Sign in</a>
+        <a href="${SIGNUP_URL}" class="jari-btn jari-btn-primary">Get started</a>
       </div>
       
       <button class="jari-mobile-toggle" onclick="jariToggleMobile()">☰</button>
     </div>
     
-    <!-- Mobile Menu -->
     <div class="jari-mobile-menu" id="jariMobileMenu">
       <a href="#jari-features">Features</a>
       <a href="#jari-pricing">Pricing</a>
       <a href="#jari-how-it-works">How It Works</a>
-      <a href="${LOGIN_URL}">Log In</a>
-      <a href="${SIGNUP_URL}" class="jari-btn jari-btn-primary" style="margin-top: 16px;">Start Your Store →</a>
+      <a href="${LOGIN_URL}">Sign in</a>
+      <a href="${SIGNUP_URL}" class="jari-btn jari-btn-primary">Get started</a>
     </div>
   </header>
 
-  <!-- HERO -->
+  <!-- HERO - JTBD: The job is "Get paid for my products without the DM chaos" -->
   <section class="jari-hero">
     <div class="jari-hero-badge">
-      <span>●</span> Trusted by 100+ Kenyan Sellers
+      <span></span> Trusted by 100+ Kenyan sellers
     </div>
-    <h1>Stop Losing Sales in <span class="highlight">DMs</span></h1>
+    <h1>Your customers want to buy.<br><span class="highlight">Make it easy.</span></h1>
     <p class="jari-hero-subtitle">
-      Your Instagram & WhatsApp customers click one link, see your products beautifully, 
-      pay via M-Pesa instantly. You just fulfill orders.
+      Stop losing sales in DMs. Give your Instagram and WhatsApp customers 
+      a professional checkout with M-Pesa—they pay instantly, you ship.
     </p>
     <div class="jari-hero-cta">
       <a href="${SIGNUP_URL}" class="jari-btn jari-btn-primary jari-btn-large">
-        Start Your Store Now →
+        Create your store
       </a>
       <a href="${WHATSAPP_URL}" target="_blank" class="jari-btn jari-btn-outline jari-btn-large">
-        💬 Chat With Us
+        Talk to us
       </a>
     </div>
     
     <div class="jari-hero-stats">
       <div class="jari-stat">
         <span class="jari-stat-number">10 min</span>
-        <span class="jari-stat-label">Setup Time</span>
+        <span class="jari-stat-label">Setup</span>
       </div>
       <div class="jari-stat">
         <span class="jari-stat-number">KES 1,200</span>
-        <span class="jari-stat-label">Per Month</span>
+        <span class="jari-stat-label">Monthly</span>
       </div>
       <div class="jari-stat">
         <span class="jari-stat-number">M-Pesa</span>
@@ -85,86 +84,87 @@ export function renderLandingPage() {
     </div>
   </section>
 
-  <!-- PROBLEM SECTION -->
+  <!-- PROBLEM - Emotional triggers based on unmet outcomes -->
   <section class="jari-problem-section">
     <div class="jari-container">
       <div class="jari-section-header">
-        <span class="jari-section-tag">😤 Sound Familiar?</span>
-        <h2>The DM Nightmare</h2>
+        <span class="jari-section-tag">😤 Sound familiar?</span>
+        <h2>The DM trap</h2>
+        <p>You're great at what you sell. But selling through DMs is exhausting.</p>
       </div>
       
       <div class="jari-problems-grid">
         <div class="jari-problem-card">
           <div class="jari-problem-icon">📱</div>
           <h3>"Send me pics"</h3>
-          <p>You spend hours sending product photos one by one, only for them to ghost you.</p>
+          <p>Hours spent sending photos one by one, explaining the same thing, only for them to ghost.</p>
         </div>
         
         <div class="jari-problem-card">
           <div class="jari-problem-icon">💸</div>
-          <h3>"I'll pay later"</h3>
-          <p>Customers promise to pay, you hold items, they disappear. Time wasted.</p>
+          <h3>"I'll pay tomorrow"</h3>
+          <p>You hold items, they disappear. No commitment. No M-Pesa ping. Just wasted time.</p>
         </div>
         
         <div class="jari-problem-card">
           <div class="jari-problem-icon">😴</div>
-          <h3>Missed messages</h3>
-          <p>You wake up to 20 DMs asking the same questions. Half are already gone.</p>
+          <h3>Missed at 3am</h3>
+          <p>Serious buyers message late. By morning, they bought from someone who replied faster.</p>
         </div>
         
         <div class="jari-problem-card">
           <div class="jari-problem-icon">📝</div>
-          <h3>"Wait, what did they order?"</h3>
-          <p>Scrolling through 100 chats trying to find that one order detail.</p>
+          <h3>"What did they order?"</h3>
+          <p>Scrolling through 50 chats to find one order. No records. No system. Just chaos.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- FEATURES SECTION -->
+  <!-- FEATURES - Outcome-based, not feature-based -->
   <section class="jari-features-section" id="jari-features">
     <div class="jari-container">
       <div class="jari-section-header">
-        <span class="jari-section-tag">✨ The Solution</span>
-        <h2>Everything You Need to Sell Online</h2>
-        <p>Professional store, instant payments, zero tech skills required</p>
+        <span class="jari-section-tag">✨ The solution</span>
+        <h2>Everything you need to sell professionally</h2>
+        <p>Tools that used to cost millions—now accessible to every Kenyan entrepreneur.</p>
       </div>
       
       <div class="jari-features-grid">
         <div class="jari-feature-card">
           <div class="jari-feature-icon">💳</div>
           <h3>M-Pesa STK Push</h3>
-          <p>Customers tap "Pay", get M-Pesa prompt instantly. No manual confirmations. Money hits your account automatically.</p>
+          <p>Customer taps "Pay", gets the M-Pesa prompt, done. No screenshots. No "send to till". Money lands automatically.</p>
         </div>
         
         <div class="jari-feature-card">
           <div class="jari-feature-icon">🎨</div>
-          <h3>Beautiful Templates</h3>
-          <p>Quick Sell for fast buys. Visual Menu for food. Deep Dive for premium items. Pick what fits your business.</p>
+          <h3>Templates that convert</h3>
+          <p>Designed for different businesses: Quick checkout for impulse buys, Deep Dive for premium items, Visual Menu for food.</p>
         </div>
         
         <div class="jari-feature-card">
           <div class="jari-feature-icon">🔗</div>
-          <h3>One Link Does It All</h3>
-          <p>Share your store link on Instagram bio, WhatsApp status, anywhere. Customers see everything, buy instantly.</p>
+          <h3>One link, everywhere</h3>
+          <p>Drop it in your Instagram bio, WhatsApp status, anywhere. Customers see everything, pay instantly—24/7, while you sleep.</p>
         </div>
         
         <div class="jari-feature-card">
           <div class="jari-feature-icon">📊</div>
-          <h3>Simple Dashboard</h3>
-          <p>See all orders in one place. Track what's selling. Know exactly how your business is doing.</p>
+          <h3>Know your numbers</h3>
+          <p>See every order, track what's selling, understand your customers. Real business intelligence, not guesswork.</p>
         </div>
         
         <div class="jari-feature-card">
           <div class="jari-feature-icon">📱</div>
-          <h3>WhatsApp Notifications</h3>
-          <p>Get instant alerts when orders come in. Auto-reply to customer inquiries 24/7.</p>
+          <h3>WhatsApp integration</h3>
+          <p>Instant order alerts. Auto-replies when you're busy. Never miss a sale because you couldn't respond fast enough.</p>
         </div>
         
         <div class="jari-feature-card">
           <div class="jari-feature-icon">📈</div>
-          <h3>Built to Scale</h3>
-          <p>Start with 3 products. Grow to hundreds. Your store grows with your business.</p>
+          <h3>Grows with you</h3>
+          <p>Start with 3 products, scale to hundreds. Add features as you need them. Your store evolves with your business.</p>
         </div>
       </div>
     </div>
@@ -174,88 +174,86 @@ export function renderLandingPage() {
   <section class="jari-how-section" id="jari-how-it-works">
     <div class="jari-container">
       <div class="jari-section-header">
-        <span class="jari-section-tag">🚀 Simple Setup</span>
-        <h2>Start Selling in 3 Steps</h2>
+        <span class="jari-section-tag">🚀 Simple setup</span>
+        <h2>Selling in 3 steps</h2>
         <p>From zero to taking orders in under 10 minutes</p>
       </div>
       
       <div class="jari-steps-grid">
         <div class="jari-step-card">
           <div class="jari-step-number">1</div>
-          <h3>Create Your Store</h3>
-          <p>Sign up and pick your template. Add your logo, colors, and business details. Your store is ready in minutes.</p>
+          <h3>Create your store</h3>
+          <p>Pick your template, add your logo and colors. Your professional store is ready in minutes—no tech skills needed.</p>
         </div>
         
         <div class="jari-step-card">
           <div class="jari-step-number">2</div>
-          <h3>Add Your Products</h3>
-          <p>Upload photos, set prices, write descriptions. Each product gets a beautiful page that sells.</p>
+          <h3>Add your products</h3>
+          <p>Upload photos, set prices, write descriptions. Each product gets a beautiful page designed to convert browsers into buyers.</p>
         </div>
         
         <div class="jari-step-card">
           <div class="jari-step-number">3</div>
-          <h3>Share & Sell</h3>
-          <p>Post your link on Instagram, WhatsApp, Facebook. Customers click, buy, pay via M-Pesa. Done.</p>
+          <h3>Share and sell</h3>
+          <p>Post your link on Instagram, WhatsApp, Facebook. Customers click, browse, pay via M-Pesa. You just fulfill orders.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- PRICING SECTION - WITH SETUP FEE INCLUDED -->
+  <!-- PRICING - Clean, premium, setup fee inside -->
   <section class="jari-pricing-section" id="jari-pricing">
     <div class="jari-container">
       <div class="jari-section-header">
-        <span class="jari-section-tag">💰 Simple Pricing</span>
-        <h2>Pay Only For What You Need</h2>
-        <p>Start small, scale as you grow. No hidden fees.</p>
+        <span class="jari-section-tag">💰 Transparent pricing</span>
+        <h2>Simple. Affordable. No surprises.</h2>
+        <p>Pay for what you use. Scale when you're ready.</p>
       </div>
       
-      <!-- SUBSCRIPTION PRICING -->
       <div class="jari-pricing-main">
-        <div class="jari-pricing-card jari-pricing-featured">
+        <div class="jari-pricing-card">
           <div class="jari-pricing-badge">Most Popular</div>
           <h2>Monthly Subscription</h2>
           
           <div class="jari-pricing-amount">
             <div class="jari-price-main"><span>KES </span>1,200<span>/mo</span></div>
-            <div class="jari-price-period">Base Platform</div>
+            <div class="jari-price-period">Base platform</div>
           </div>
           
           <ul class="jari-pricing-features">
-            <li><span class="jari-check-icon">✓</span> 3 Product Cards included</li>
-            <li><span class="jari-check-icon">✓</span> 1 Theme (matched to your business)</li>
-            <li><span class="jari-check-icon">✓</span> Order Management Dashboard</li>
-            <li><span class="jari-check-icon">✓</span> Shareable Store Link</li>
-            <li><span class="jari-check-icon">✓</span> Basic Analytics</li>
+            <li><span class="jari-check-icon">✓</span> 3 product cards included</li>
+            <li><span class="jari-check-icon">✓</span> 1 theme (matched to your business)</li>
+            <li><span class="jari-check-icon">✓</span> Order management dashboard</li>
+            <li><span class="jari-check-icon">✓</span> Your own store link</li>
+            <li><span class="jari-check-icon">✓</span> Basic analytics</li>
           </ul>
           
-          <!-- SETUP FEE INCLUDED HERE -->
           <div class="jari-pricing-setup-included">
-            <h4>🚀 One-Time Setup: <span class="jari-setup-price">KES 5,000</span></h4>
-            <p>Includes account creation, theme unlock & optional onboarding call</p>
+            <h4>🚀 One-time setup: <span class="jari-setup-price">KES 5,000</span></h4>
+            <p>Account creation, theme unlock, optional onboarding call</p>
             <div class="jari-setup-options">
-              <div class="jari-setup-option"><strong>Option A:</strong> Pay full KES 5,000 upfront</div>
-              <div class="jari-setup-option"><strong>Option B:</strong> Split 50% – KES 2,500 + monthly</div>
-              <div class="jari-setup-option jari-setup-highlight">🎁 <strong>Option C:</strong> Try FREE for 1 week first!</div>
+              <div class="jari-setup-option"><strong>Pay upfront:</strong> KES 5,000 once</div>
+              <div class="jari-setup-option"><strong>Split it:</strong> KES 2,500 × 2 months</div>
+              <div class="jari-setup-option jari-setup-highlight">🎁 <strong>Try first:</strong> 1 week free trial</div>
             </div>
           </div>
           
           <div class="jari-pricing-addons">
-            <h4>Add What You Need:</h4>
+            <h4>Add what you need</h4>
             <div class="jari-addon-item">
               <span>M-Pesa STK Push</span>
               <span class="jari-addon-price">+KES 300/mo</span>
             </div>
             <div class="jari-addon-item">
-              <span>WhatsApp Auto-Reply</span>
+              <span>WhatsApp auto-reply</span>
               <span class="jari-addon-price">+KES 80/mo</span>
             </div>
             <div class="jari-addon-item">
-              <span>Advanced Analytics</span>
+              <span>Advanced analytics</span>
               <span class="jari-addon-price">+KES 200/mo</span>
             </div>
             <div class="jari-addon-item">
-              <span>Priority Support</span>
+              <span>Priority support</span>
               <span class="jari-addon-price">+KES 500/mo</span>
             </div>
           </div>
@@ -265,23 +263,21 @@ export function renderLandingPage() {
           </div>
           
           <div class="jari-pricing-cta">
-            <a href="${SIGNUP_URL}" class="jari-btn jari-btn-white jari-btn-large">
-              Start Your Store →
+            <a href="${SIGNUP_URL}" class="jari-btn jari-btn-primary jari-btn-large">
+              Start your store
             </a>
-            <p class="jari-pricing-note">First theme FREE • Cancel anytime</p>
+            <p class="jari-pricing-note">First theme free · Cancel anytime</p>
           </div>
         </div>
       </div>
       
-      <!-- ONE-TIME PURCHASES -->
       <div class="jari-pricing-extras">
         <div class="jari-extras-header">
-          <h3>🛒 One-Time Purchases</h3>
+          <h3>🛒 One-time purchases</h3>
           <p>Buy once, keep forever. Expand when you're ready.</p>
         </div>
         
         <div class="jari-extras-grid">
-          <!-- Product Cards -->
           <div class="jari-extras-card">
             <h4>📦 Product Cards</h4>
             <p>Slots for your products. Buy more as you grow.</p>
@@ -309,9 +305,8 @@ export function renderLandingPage() {
             </div>
           </div>
           
-          <!-- Themes -->
           <div class="jari-extras-card">
-            <h4>🎨 Themes</h4>
+            <h4>🎨 Templates</h4>
             <p>Checkout styles optimized for your business type.</p>
             <div class="jari-extras-table">
               <div class="jari-extras-row">
@@ -335,8 +330,8 @@ export function renderLandingPage() {
                 <span>KES 800</span>
               </div>
               <div class="jari-extras-row">
-                <span>Events/Booking</span>
-                <span>Classes & appointments</span>
+                <span>Booking</span>
+                <span>Services & appointments</span>
                 <span>KES 1,000</span>
               </div>
             </div>
@@ -350,44 +345,44 @@ export function renderLandingPage() {
   <section class="jari-testimonials-section">
     <div class="jari-container">
       <div class="jari-section-header">
-        <span class="jari-section-tag">⭐ Success Stories</span>
-        <h2>Sellers Love Jari.Ecom</h2>
+        <span class="jari-section-tag">⭐ Success stories</span>
+        <h2>Sellers who made the switch</h2>
         <p>Real results from real Kenyan entrepreneurs</p>
       </div>
       
       <div class="jari-testimonials-grid">
         <div class="jari-testimonial-card">
           <div class="jari-testimonial-stars">★★★★★</div>
-          <p class="jari-testimonial-text">"I was losing so many sales on Instagram. Now customers click my link, see a professional page, and pay via M-Pesa immediately. My sales doubled in the first month!"</p>
+          <p class="jari-testimonial-text">"I was losing so many sales on Instagram. Now customers click my link, see a professional page, and pay via M-Pesa immediately. My sales doubled in the first month."</p>
           <div class="jari-testimonial-author">
             <div class="jari-author-avatar">W</div>
             <div class="jari-author-info">
               <h4>Wanjiku M.</h4>
-              <p>Fashion Seller, Nairobi</p>
+              <p>Fashion · Nairobi</p>
             </div>
           </div>
         </div>
         
         <div class="jari-testimonial-card">
           <div class="jari-testimonial-stars">★★★★★</div>
-          <p class="jari-testimonial-text">"Finally, something built for Kenya! The M-Pesa checkout just works. No more chasing customers for payment confirmations. Orders come with all details ready."</p>
+          <p class="jari-testimonial-text">"Finally, something built for Kenya! The M-Pesa checkout just works. No more chasing customers for payment screenshots. Orders come in complete with all details."</p>
           <div class="jari-testimonial-author">
             <div class="jari-author-avatar">K</div>
             <div class="jari-author-info">
               <h4>Kevin O.</h4>
-              <p>Electronics, Mombasa</p>
+              <p>Electronics · Mombasa</p>
             </div>
           </div>
         </div>
         
         <div class="jari-testimonial-card">
           <div class="jari-testimonial-stars">★★★★★</div>
-          <p class="jari-testimonial-text">"I'm not tech-savvy at all, but I had my store up in one afternoon. The templates look amazing on phones. My customers keep saying my shop looks legit!"</p>
+          <p class="jari-testimonial-text">"I'm not tech-savvy at all, but I had my store up in one afternoon. My customers keep saying my shop looks so professional. Game changer."</p>
           <div class="jari-testimonial-author">
             <div class="jari-author-avatar">N</div>
             <div class="jari-author-info">
               <h4>Nancy K.</h4>
-              <p>Beauty Products, Kisumu</p>
+              <p>Beauty Products · Kisumu</p>
             </div>
           </div>
         </div>
@@ -398,31 +393,31 @@ export function renderLandingPage() {
   <!-- FINAL CTA -->
   <section class="jari-cta-section">
     <div class="jari-container">
-      <h2>Ready to Sell More?</h2>
-      <p>Join hundreds of Kenyan sellers who've transformed their business with Jari.Ecom. Your customers are waiting — give them an easy way to buy from you.</p>
+      <h2>Ready to sell like a pro?</h2>
+      <p>Join hundreds of Kenyan entrepreneurs who've upgraded from DM chaos to a real online store. Your customers are waiting.</p>
       
       <div class="jari-cta-buttons">
         <a href="${SIGNUP_URL}" class="jari-btn jari-btn-white jari-btn-large">
-          Start Your Store Now →
+          Start your store now
         </a>
         <a href="${WHATSAPP_URL}" target="_blank" class="jari-btn jari-btn-dark jari-btn-large">
-          💬 Chat With Us
+          Talk to us first
         </a>
       </div>
-      <p class="jari-cta-note">✓ 1-week FREE trial • ✓ 10-minute setup • ✓ Cancel anytime</p>
+      <p class="jari-cta-note">✓ 1-week free trial · ✓ 10-minute setup · ✓ Cancel anytime</p>
     </div>
   </section>
 
-  <!-- Footer -->
+  <!-- FOOTER -->
   <footer class="jari-footer">
     <div class="jari-container">
       <div class="jari-footer-content">
         <div class="jari-footer-brand">
           <div class="jari-logo">
-            <img src="${LOGO_URL}" alt="Jari" class="jari-logo-img" style="height: 32px;">
-            <span class="jari-logo-text" style="font-size: 18px;">Jari<span>.Ecom</span></span>
+            <img src="${LOGO_URL}" alt="Jari" class="jari-logo-img">
+            <span class="jari-logo-text">Jari<span>.Ecom</span></span>
           </div>
-          <p>Built for Kenyan entrepreneurs.<br>Escape the DM grind.</p>
+          <p>Built for Kenyan entrepreneurs.<br>Escape the DM trap. Sell professionally.</p>
         </div>
         
         <div class="jari-footer-links">
@@ -435,14 +430,14 @@ export function renderLandingPage() {
           
           <div>
             <h4>Support</h4>
-            <a href="${WHATSAPP_URL}" target="_blank">WhatsApp Us</a>
-            <a href="mailto:support@jari.co.ke">Email Support</a>
+            <a href="${WHATSAPP_URL}" target="_blank">WhatsApp</a>
+            <a href="mailto:support@jari.co.ke">Email</a>
           </div>
           
           <div>
             <h4>Legal</h4>
-            <a href="/privacy">Privacy Policy</a>
-            <a href="/terms">Terms of Service</a>
+            <a href="/privacy">Privacy</a>
+            <a href="/terms">Terms</a>
           </div>
         </div>
       </div>
@@ -463,9 +458,6 @@ export function renderLandingPage() {
   `;
 }
 
-// Handler initialization for landing page
 export function initLandingHandlers() {
-  // Mobile menu toggle is already handled via onclick in HTML
-  // No additional handlers needed for now
-  console.log('Landing page handlers initialized');
+  console.log('Landing page initialized');
 }

@@ -1,69 +1,105 @@
-/* ===========================================
-   JARI.ECOM LANDING PAGE STYLES
-   Apple/iPhone inspired aesthetic
-   =========================================== */
+/* =============================================
+   JARI.ECOM LANDING PAGE - PREMIUM APPLE-INSPIRED
+   Typography Psychology + JTBD/ODI Optimized
+   ============================================= */
 
-.jari-landing {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  line-height: 1.47;
-  color: #1d1d1f;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  
-  --primary: #667eea;
-  --primary-dark: #764ba2;
-  --accent: #f97316;
-  --accent-dark: #ea580c;
-  --dark: #1d1d1f;
-  --gray-900: #1d1d1f;
-  --gray-700: #424245;
-  --gray-500: #86868b;
-  --gray-300: #d2d2d7;
-  --gray-100: #f5f5f7;
-  --white: #ffffff;
-  --success: #34c759;
-  
-  --transition-smooth: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
-  --transition-spring: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
+/* ===================
+   RESET & BASE
+   =================== */
 .jari-landing * {
+  margin: 0;
+  padding: 0;
   box-sizing: border-box;
 }
 
+.jari-landing {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif;
+  background: #f5f5f7;
+  color: #1d1d1f;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ===================
+   TYPOGRAPHY SCALE
+   Based on 8px grid, perfect fourth (1.333) ratio
+   =================== */
+.jari-landing h1 {
+  font-size: clamp(40px, 8vw, 72px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+
+.jari-landing h2 {
+  font-size: clamp(32px, 5vw, 48px);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.jari-landing h3 {
+  font-size: clamp(20px, 3vw, 24px);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.jari-landing p {
+  font-size: clamp(16px, 2vw, 18px);
+  line-height: 1.6;
+  color: #424245;
+}
+
+/* ===================
+   LAYOUT SYSTEM
+   8px spacing grid
+   =================== */
 .jari-container {
-  max-width: 1200px;
+  max-width: 1120px;
   margin: 0 auto;
   padding: 0 24px;
 }
 
-/* === TOP BANNER === */
-.jari-top-banner {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-  color: var(--white);
-  padding: 14px 20px;
-  text-align: center;
-  font-size: 14px;
-  font-weight: 500;
-  letter-spacing: -0.01em;
+.jari-section {
+  padding: 96px 0;
 }
 
-/* === HEADER === */
+.jari-section-sm {
+  padding: 64px 0;
+}
+
+/* ===================
+   TOP BANNER - Subtle
+   =================== */
+.jari-top-banner {
+  background: linear-gradient(135deg, #1d1d1f 0%, #2d2d30 100%);
+  color: rgba(255, 255, 255, 0.9);
+  padding: 10px 24px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+/* ===================
+   HEADER - Glassmorphic
+   =================== */
 .jari-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
   background: rgba(255, 255, 255, 0.72);
   backdrop-filter: saturate(180%) blur(20px);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-  padding: 12px 0;
-  position: sticky;
-  top: 0;
-  z-index: 100;
 }
 
 .jari-header-content {
-  max-width: 1200px;
+  max-width: 1120px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 12px 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -82,20 +118,20 @@
 }
 
 .jari-logo-separator {
-  width: 2px;
-  height: 30px;
-  background: var(--gray-300);
+  width: 1px;
+  height: 24px;
+  background: rgba(0, 0, 0, 0.15);
 }
 
 .jari-logo-text {
-  font-size: 21px;
+  font-size: 18px;
   font-weight: 600;
-  color: var(--dark);
-  letter-spacing: -0.02em;
+  color: #1d1d1f;
+  letter-spacing: -0.01em;
 }
 
 .jari-logo-text span {
-  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -104,22 +140,18 @@
 .jari-nav {
   display: flex;
   gap: 32px;
-  align-items: center;
 }
 
 .jari-nav a {
-  color: var(--dark);
-  text-decoration: none;
-  font-weight: 400;
   font-size: 14px;
-  letter-spacing: -0.01em;
-  transition: var(--transition-smooth);
-  opacity: 0.8;
+  font-weight: 500;
+  color: #424245;
+  text-decoration: none;
+  transition: color 0.2s ease;
 }
 
 .jari-nav a:hover {
-  opacity: 1;
-  color: var(--primary);
+  color: #1d1d1f;
 }
 
 .jari-header-cta {
@@ -132,142 +164,158 @@
   display: none;
   background: none;
   border: none;
-  font-size: 28px;
+  font-size: 24px;
   cursor: pointer;
-  color: var(--dark);
+  color: #1d1d1f;
 }
 
 .jari-mobile-menu {
   display: none;
-  flex-direction: column;
-  padding: 20px 24px;
-  background: var(--white);
-  border-top: 1px solid var(--gray-300);
+  padding: 16px 24px 24px;
+  background: rgba(255, 255, 255, 0.98);
 }
 
 .jari-mobile-menu.active {
   display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .jari-mobile-menu a {
-  padding: 12px 0;
-  color: var(--dark);
+  color: #1d1d1f;
   text-decoration: none;
   font-size: 16px;
-  border-bottom: 1px solid var(--gray-100);
+  font-weight: 500;
 }
 
-/* === BUTTONS === */
+@media (max-width: 768px) {
+  .jari-nav,
+  .jari-header-cta {
+    display: none;
+  }
+  .jari-mobile-toggle {
+    display: block;
+  }
+}
+
+/* ===================
+   BUTTONS - Premium
+   =================== */
 .jari-btn {
-  padding: 12px 22px;
-  border-radius: 980px;
-  font-weight: 400;
-  font-size: 17px;
-  letter-spacing: -0.01em;
-  text-decoration: none;
-  transition: var(--transition-spring);
-  cursor: pointer;
-  border: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: 980px;
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
+  border: none;
+}
+
+.jari-btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(102, 126, 234, 0.35);
+}
+
+.jari-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.45);
 }
 
 .jari-btn-outline {
   background: transparent;
-  color: var(--primary);
-  border: none;
-  font-weight: 400;
+  color: #424245;
+  border: 1px solid rgba(0, 0, 0, 0.15);
 }
 
 .jari-btn-outline:hover {
-  opacity: 0.7;
-}
-
-.jari-btn-primary {
-  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
-  color: var(--white) !important;
-  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.25);
-}
-
-.jari-btn-primary:hover {
-  transform: scale(1.02);
-  box-shadow: 0 6px 20px rgba(249, 115, 22, 0.35);
-  color: var(--white) !important;
-}
-
-.jari-btn-white {
-  background: var(--white);
-  color: var(--primary) !important;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
-.jari-btn-white:hover {
-  transform: scale(1.02);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-}
-
-.jari-btn-dark {
-  background: var(--dark);
-  color: var(--white) !important;
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.25);
 }
 
 .jari-btn-large {
-  padding: 18px 32px;
+  padding: 16px 32px;
   font-size: 17px;
 }
 
-/* === HERO === */
+.jari-btn-white {
+  background: #fff;
+  color: #1d1d1f;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+}
+
+.jari-btn-white:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.jari-btn-dark {
+  background: #1d1d1f;
+  color: #fff;
+}
+
+.jari-btn-dark:hover {
+  background: #2d2d30;
+}
+
+/* ===================
+   HERO - Full Impact
+   =================== */
 .jari-hero {
-  background: linear-gradient(180deg, #fbfbfd 0%, var(--white) 100%);
-  padding: 80px 24px 100px;
+  padding: 80px 24px 96px;
   text-align: center;
+  background: linear-gradient(180deg, #f5f5f7 0%, #fff 100%);
 }
 
 .jari-hero-badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  background: rgba(102, 126, 234, 0.1);
+  gap: 8px;
   padding: 8px 16px;
+  background: rgba(102, 126, 234, 0.1);
   border-radius: 980px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
-  color: var(--primary);
-  margin-bottom: 20px;
-  letter-spacing: -0.01em;
+  color: #667eea;
+  margin-bottom: 24px;
 }
 
 .jari-hero-badge span {
-  color: var(--success);
+  width: 6px;
+  height: 6px;
+  background: #34c759;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
 }
 
 .jari-hero h1 {
-  font-size: 56px;
-  font-weight: 700;
-  color: var(--dark);
   max-width: 900px;
-  margin: 0 auto 20px;
-  line-height: 1.05;
-  letter-spacing: -0.03em;
+  margin: 0 auto 24px;
 }
 
 .jari-hero h1 .highlight {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 50%, #f093fb 100%);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .jari-hero-subtitle {
-  font-size: 21px;
-  color: var(--gray-500);
-  max-width: 600px;
+  max-width: 640px;
   margin: 0 auto 40px;
-  line-height: 1.47;
-  letter-spacing: -0.01em;
-  font-weight: 400;
+  font-size: clamp(18px, 3vw, 21px);
+  color: #86868b;
+  line-height: 1.5;
 }
 
 .jari-hero-cta {
@@ -275,13 +323,13 @@
   gap: 16px;
   justify-content: center;
   flex-wrap: wrap;
-  margin-bottom: 60px;
+  margin-bottom: 56px;
 }
 
 .jari-hero-stats {
   display: flex;
   justify-content: center;
-  gap: 60px;
+  gap: 48px;
   flex-wrap: wrap;
 }
 
@@ -293,204 +341,227 @@
   display: block;
   font-size: 28px;
   font-weight: 700;
-  color: var(--dark);
+  color: #1d1d1f;
   letter-spacing: -0.02em;
 }
 
 .jari-stat-label {
-  font-size: 14px;
-  color: var(--gray-500);
+  font-size: 13px;
+  color: #86868b;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
-/* === SECTION HEADERS === */
+/* ===================
+   PROBLEM SECTION - Emotional
+   =================== */
+.jari-problem-section {
+  background: #fff;
+  padding: 96px 24px;
+}
+
 .jari-section-header {
   text-align: center;
-  margin-bottom: 60px;
+  margin-bottom: 64px;
 }
 
 .jari-section-tag {
   display: inline-block;
-  background: rgba(102, 126, 234, 0.1);
-  color: var(--primary);
-  padding: 8px 16px;
-  border-radius: 980px;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
+  color: #667eea;
   margin-bottom: 16px;
+  letter-spacing: 0.02em;
 }
 
 .jari-section-header h2 {
-  font-size: 48px;
-  font-weight: 700;
-  color: var(--dark);
-  margin: 0 0 16px;
-  letter-spacing: -0.03em;
+  margin-bottom: 16px;
 }
 
 .jari-section-header p {
-  font-size: 21px;
-  color: var(--gray-500);
-  margin: 0;
-}
-
-/* === PROBLEM SECTION === */
-.jari-problem-section {
-  padding: 100px 24px;
-  background: var(--gray-100);
+  max-width: 600px;
+  margin: 0 auto;
+  color: #86868b;
 }
 
 .jari-problems-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 24px;
+  max-width: 1000px;
+  margin: 0 auto;
 }
 
 .jari-problem-card {
-  background: var(--white);
-  padding: 32px;
+  background: #f5f5f7;
   border-radius: 20px;
-  text-align: center;
+  padding: 32px 28px;
+  text-align: left;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.jari-problem-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
 }
 
 .jari-problem-icon {
-  font-size: 48px;
+  font-size: 32px;
   margin-bottom: 16px;
 }
 
 .jari-problem-card h3 {
-  font-size: 20px;
-  font-weight: 600;
-  margin: 0 0 12px;
-  color: var(--dark);
+  font-size: 18px;
+  margin-bottom: 8px;
+  color: #1d1d1f;
 }
 
 .jari-problem-card p {
-  font-size: 16px;
-  color: var(--gray-500);
-  margin: 0;
+  font-size: 15px;
+  color: #86868b;
   line-height: 1.5;
 }
 
-/* === FEATURES SECTION === */
+/* ===================
+   FEATURES SECTION
+   =================== */
 .jari-features-section {
-  padding: 100px 24px;
-  background: var(--white);
+  background: #f5f5f7;
+  padding: 96px 24px;
 }
 
 .jari-features-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 32px;
+  gap: 24px;
+  max-width: 1100px;
+  margin: 0 auto;
 }
 
 .jari-feature-card {
-  padding: 32px;
-  border-radius: 20px;
-  background: var(--gray-100);
-  transition: var(--transition-smooth);
+  background: #fff;
+  border-radius: 24px;
+  padding: 40px 32px;
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .jari-feature-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+  transform: translateY(-6px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
 }
 
 .jari-feature-icon {
-  font-size: 40px;
-  margin-bottom: 16px;
+  font-size: 48px;
+  margin-bottom: 20px;
 }
 
 .jari-feature-card h3 {
-  font-size: 20px;
-  font-weight: 600;
-  margin: 0 0 12px;
-  color: var(--dark);
+  margin-bottom: 12px;
+  color: #1d1d1f;
 }
 
 .jari-feature-card p {
-  font-size: 16px;
-  color: var(--gray-500);
-  margin: 0;
-  line-height: 1.5;
+  font-size: 15px;
+  color: #86868b;
+  line-height: 1.6;
 }
 
-/* === HOW IT WORKS === */
+/* ===================
+   HOW IT WORKS SECTION
+   =================== */
 .jari-how-section {
-  padding: 100px 24px;
-  background: var(--gray-100);
+  background: #fff;
+  padding: 96px 24px;
 }
 
 .jari-steps-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 32px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .jari-steps-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .jari-step-card {
-  background: var(--white);
-  padding: 40px 32px;
-  border-radius: 20px;
   text-align: center;
-  position: relative;
+  padding: 32px 24px;
 }
 
 .jari-step-number {
   width: 56px;
   height: 56px;
-  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--white);
   font-size: 24px;
   font-weight: 700;
   margin: 0 auto 24px;
 }
 
 .jari-step-card h3 {
-  font-size: 22px;
-  font-weight: 600;
-  margin: 0 0 12px;
-  color: var(--dark);
+  margin-bottom: 12px;
+  color: #1d1d1f;
 }
 
 .jari-step-card p {
-  font-size: 16px;
-  color: var(--gray-500);
-  margin: 0;
-  line-height: 1.5;
+  font-size: 15px;
+  color: #86868b;
+  line-height: 1.6;
 }
 
-/* === PRICING SECTION === */
+/* ===================
+   PRICING SECTION - Premium
+   =================== */
 .jari-pricing-section {
-  padding: 100px 24px;
-  background: linear-gradient(180deg, var(--white) 0%, var(--gray-100) 100%);
+  background: linear-gradient(180deg, #f5f5f7 0%, #fff 50%, #f5f5f7 100%);
+  padding: 96px 24px;
 }
 
 .jari-pricing-main {
-  max-width: 500px;
-  margin: 0 auto 60px;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 64px;
 }
 
 .jari-pricing-card {
-  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-  border-radius: 24px;
+  background: #fff;
+  border-radius: 28px;
   padding: 48px 40px;
-  color: var(--white);
-  text-align: center;
+  max-width: 520px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
   position: relative;
-  box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3);
+  overflow: hidden;
+}
+
+.jari-pricing-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
 }
 
 .jari-pricing-badge {
   position: absolute;
-  top: -12px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--accent);
-  color: var(--white);
-  padding: 6px 20px;
+  top: 20px;
+  right: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  padding: 6px 14px;
   border-radius: 980px;
   font-size: 12px;
   font-weight: 600;
@@ -501,7 +572,8 @@
 .jari-pricing-card h2 {
   font-size: 24px;
   font-weight: 600;
-  margin: 0 0 24px;
+  margin-bottom: 24px;
+  color: #1d1d1f;
 }
 
 .jari-pricing-amount {
@@ -511,696 +583,71 @@
 .jari-price-main {
   font-size: 56px;
   font-weight: 700;
+  color: #1d1d1f;
   letter-spacing: -0.03em;
+  line-height: 1;
 }
 
 .jari-price-main span {
-  font-size: 24px;
-  font-weight: 400;
-  opacity: 0.8;
+  font-size: 20px;
+  font-weight: 500;
+  color: #86868b;
 }
 
 .jari-price-period {
-  font-size: 16px;
-  opacity: 0.8;
+  font-size: 14px;
+  color: #86868b;
   margin-top: 4px;
 }
 
 .jari-pricing-features {
   list-style: none;
-  padding: 0;
-  margin: 0 0 32px;
-  text-align: left;
-}
-
-.jari-pricing-features li {
-  padding: 10px 0;
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-}
-
-.jari-check-icon {
-  color: var(--success);
-  font-weight: 700;
-}
-
-/* === PRICING ADD-ONS === */
-.jari-pricing-addons {
-  background: rgba(255,255,255,0.1);
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 24px;
-  text-align: left;
-}
-
-.jari-pricing-addons h4 {
-  font-size: 14px;
-  font-weight: 600;
-  margin: 0 0 12px;
-  opacity: 0.9;
-}
-
-.jari-addon-item {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 0;
-  font-size: 14px;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-}
-
-.jari-addon-item:last-child {
-  border-bottom: none;
-}
-
-.jari-addon-price {
-  font-weight: 600;
-}
-
-.jari-pricing-popular {
-  background: rgba(255,255,255,0.15);
-  border-radius: 12px;
-  padding: 12px 16px;
-  font-size: 15px;
-  margin-bottom: 24px;
-}
-
-.jari-pricing-cta {
-  margin-top: 24px;
-}
-
-.jari-pricing-note {
-  font-size: 13px;
-  opacity: 0.8;
-  margin-top: 12px;
-}
-
-/* === ONE-TIME PURCHASES === */
-.jari-pricing-extras {
-  max-width: 900px;
-  margin: 0 auto;
-}
-
-.jari-extras-header {
-  text-align: center;
   margin-bottom: 32px;
 }
 
-.jari-extras-header h3 {
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--dark);
-  margin: 0 0 8px;
-}
-
-.jari-extras-header p {
-  font-size: 16px;
-  color: var(--gray-500);
-  margin: 0;
-}
-
-.jari-extras-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 24px;
-}
-
-.jari-extras-card {
-  background: var(--white);
-  border-radius: 20px;
-  padding: 32px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-}
-
-.jari-extras-card h4 {
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--dark);
-  margin: 0 0 8px;
-}
-
-.jari-extras-card > p {
-  font-size: 14px;
-  color: var(--gray-500);
-  margin: 0 0 20px;
-}
-
-.jari-extras-table {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-
-.jari-extras-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr auto;
-  gap: 12px;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--gray-100);
-  font-size: 14px;
-  align-items: center;
-}
-
-.jari-extras-row:last-child {
-  border-bottom: none;
-}
-
-.jari-extras-row span:first-child {
-  font-weight: 500;
-  color: var(--dark);
-}
-
-.jari-extras-row span:nth-child(2) {
-  color: var(--gray-500);
-}
-
-.jari-extras-row span:last-child {
-  font-weight: 600;
-  color: var(--dark);
-  text-align: right;
-}
-
-.jari-free {
-  color: var(--success) !important;
-}
-
-/* === TESTIMONIALS === */
-.jari-testimonials-section {
-  padding: 100px 24px;
-  background: var(--white);
-}
-
-.jari-testimonials-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 24px;
-}
-
-.jari-testimonial-card {
-  background: var(--gray-100);
-  border-radius: 20px;
-  padding: 32px;
-}
-
-.jari-testimonial-stars {
-  color: #fbbf24;
-  font-size: 18px;
-  margin-bottom: 16px;
-}
-
-.jari-testimonial-text {
-  font-size: 16px;
-  line-height: 1.6;
-  color: var(--gray-700);
-  margin: 0 0 24px;
-  font-style: italic;
-}
-
-.jari-testimonial-author {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.jari-author-avatar {
-  width: 48px;
-  height: 48px;
-  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--white);
-  font-weight: 700;
-  font-size: 18px;
-}
-
-.jari-author-info h4 {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--dark);
-  margin: 0;
-}
-
-.jari-author-info p {
-  font-size: 14px;
-  color: var(--gray-500);
-  margin: 4px 0 0;
-}
-
-/* === FINAL CTA === */
-.jari-cta-section {
-  padding: 100px 24px;
-  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-  text-align: center;
-  color: var(--white);
-}
-
-.jari-cta-section h2 {
-  font-size: 48px;
-  font-weight: 700;
-  margin: 0 0 20px;
-  letter-spacing: -0.03em;
-}
-
-.jari-cta-section p {
-  font-size: 20px;
-  max-width: 600px;
-  margin: 0 auto 40px;
-  opacity: 0.9;
-  line-height: 1.5;
-}
-
-.jari-cta-buttons {
-  display: flex;
-  gap: 16px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-/* === FOOTER === */
-.jari-footer {
-  background: var(--dark);
-  color: var(--white);
-  padding: 60px 24px 30px;
-}
-
-.jari-footer-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 2fr repeat(3, 1fr);
-  gap: 40px;
-}
-
-.jari-footer-brand p {
-  font-size: 14px;
-  color: var(--gray-500);
-  margin: 0 0 20px;
-  max-width: 280px;
-}
-
-.jari-social-links {
-  display: flex;
-  gap: 12px;
-}
-
-.jari-social-link {
-  width: 40px;
-  height: 40px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-  font-size: 18px;
-  transition: var(--transition-smooth);
-}
-
-.jari-social-link:hover {
-  background: rgba(255,255,255,0.2);
-}
-
-.jari-footer-col h4 {
-  font-size: 14px;
-  font-weight: 600;
-  margin: 0 0 20px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.jari-footer-col ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.jari-footer-col li {
-  margin-bottom: 12px;
-}
-
-.jari-footer-col a {
-  color: var(--gray-500);
-  text-decoration: none;
-  font-size: 14px;
-  transition: var(--transition-smooth);
-}
-
-.jari-footer-col a:hover {
-  color: var(--white);
-}
-
-.jari-footer-col li:not(:has(a)) {
-  color: var(--gray-500);
-  font-size: 14px;
-}
-
-.jari-footer-bottom {
-  max-width: 1200px;
-  margin: 40px auto 0;
-  padding-top: 30px;
-  border-top: 1px solid rgba(255,255,255,0.1);
-  text-align: center;
-}
-
-.jari-footer-bottom p {
-  font-size: 14px;
-  color: var(--gray-500);
-  margin: 0;
-}
-
-/* === RESPONSIVE === */
-@media (max-width: 768px) {
-  .jari-nav,
-  .jari-header-cta {
-    display: none;
-  }
-  
-  .jari-mobile-toggle {
-    display: block;
-  }
-  
-  .jari-hero h1 {
-    font-size: 36px;
-  }
-  
-  .jari-hero-subtitle {
-    font-size: 18px;
-  }
-  
-  .jari-hero-stats {
-    gap: 30px;
-  }
-  
-  .jari-section-header h2 {
-    font-size: 32px;
-  }
-  
-  .jari-section-header p {
-    font-size: 18px;
-  }
-  
-  .jari-pricing-card {
-    padding: 40px 24px;
-  }
-  
-  .jari-price-main {
-    font-size: 42px;
-  }
-  
-  .jari-cta-section h2 {
-    font-size: 32px;
-  }
-  
-  .jari-cta-section p {
-    font-size: 17px;
-  }
-  
-  .jari-footer-content {
-    grid-template-columns: 1fr;
-    gap: 32px;
-  }
-  
-  .jari-extras-row {
-    grid-template-columns: 1fr;
-    gap: 4px;
-  }
-  
-  .jari-extras-row span:last-child {
-    text-align: left;
-  }
-}
-
-@media (max-width: 480px) {
-  .jari-hero {
-    padding: 60px 16px 80px;
-  }
-  
-  .jari-hero h1 {
-    font-size: 28px;
-  }
-  
-  .jari-btn-large {
-    padding: 16px 24px;
-    font-size: 15px;
-  }
-  
-  .jari-hero-cta {
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .jari-hero-cta .jari-btn {
-    width: 100%;
-    max-width: 300px;
-  }
-  
-  .jari-problem-section,
-  .jari-features-section,
-  .jari-how-section,
-  .jari-pricing-section,
-  .jari-testimonials-section,
-  .jari-cta-section {
-    padding: 60px 16px;
-  }
-  
-  .jari-section-header {
-    margin-bottom: 40px;
-  }
-  
-  .jari-section-header h2 {
-    font-size: 28px;
-  }
-  
-  .jari-pricing-extras {
-    padding: 0 8px;
-  }
-  
-  .jari-extras-card {
-    padding: 24px;
-  }
-}
-
-
-/* ===========================================
-   PRICING SECTION - New Design
-   =========================================== */
-
-.jari-pricing-section {
-  padding: 80px 24px;
-  background: linear-gradient(180deg, #f8f9fa 0%, #fff 100%);
-}
-
-.jari-pricing-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-  max-width: 1100px;
-  margin: 0 auto 32px;
-}
-
-.jari-pricing-card {
-  background: #fff;
-  border-radius: 16px;
-  padding: 32px 24px;
-  border: 1px solid #e5e7eb;
-  position: relative;
-}
-
-.jari-pricing-card.jari-pricing-featured {
-  border: 2px solid #FF6B35;
-  box-shadow: 0 8px 32px rgba(255, 107, 53, 0.15);
-  transform: scale(1.02);
-}
-
-.jari-pricing-badge {
-  position: absolute;
-  top: -12px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #FF6B35;
-  color: #fff;
-  padding: 6px 16px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-.jari-pricing-header {
-  text-align: center;
-  margin-bottom: 24px;
-  padding-bottom: 24px;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.jari-pricing-header h3 {
-  font-size: 20px;
-  font-weight: 600;
-  margin-bottom: 12px;
-  color: #1a1a1a;
-}
-
-.jari-pricing-subtitle {
-  color: #666;
-  font-size: 14px;
-  margin: 0;
-}
-
-.jari-pricing-amount {
-  display: flex;
-  align-items: baseline;
-  justify-content: center;
-  gap: 4px;
-}
-
-.jari-price-currency {
-  font-size: 16px;
-  font-weight: 500;
-  color: #666;
-}
-
-.jari-price-value {
-  font-size: 42px;
-  font-weight: 700;
-  color: #1a1a1a;
-  line-height: 1;
-}
-
-.jari-price-period {
-  font-size: 14px;
-  color: #666;
-}
-
-.jari-pricing-features {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 24px;
-}
-
 .jari-pricing-features li {
-  padding: 8px 0;
-  font-size: 14px;
-  color: #444;
-}
-
-.jari-pricing-options {
-  background: #f8f9fa;
-  border-radius: 12px;
-  padding: 16px;
-  margin-top: 16px;
-}
-
-.jari-pricing-option-title {
-  font-size: 12px;
-  font-weight: 600;
-  color: #666;
-  margin-bottom: 12px;
-  text-transform: uppercase;
-}
-
-.jari-pricing-option {
-  font-size: 13px;
-  color: #444;
-  padding: 6px 0;
-}
-
-.jari-pricing-option-highlight {
-  background: #e8f5e9;
-  padding: 8px 12px;
-  border-radius: 8px;
-  margin-top: 8px;
-  color: #2e7d32;
-  font-weight: 500;
-}
-
-.jari-pricing-addons-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.jari-pricing-addons-list li {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 0;
-  border-bottom: 1px solid #f0f0f0;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 0;
+  font-size: 15px;
+  color: #424245;
 }
 
-.jari-pricing-addons-list li:last-child {
-  border-bottom: none;
+.jari-check-icon {
+  color: #34c759;
+  font-weight: 700;
+  font-size: 16px;
 }
 
-.jari-addon-name {
-  font-size: 14px;
-  color: #444;
-}
-
-.jari-addon-price {
-  font-size: 14px;
-  font-weight: 600;
-  color: #FF6B35;
-}
-
-.jari-btn-block {
-  display: block;
-  width: 100%;
-  text-align: center;
-}
-
-.jari-pricing-note {
-  text-align: center;
-  font-size: 14px;
-  color: #666;
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-/* Pricing Responsive */
-@media (max-width: 900px) {
-  .jari-pricing-grid {
-    grid-template-columns: 1fr;
-    max-width: 400px;
-  }
-  
-  .jari-pricing-card.jari-pricing-featured {
-    transform: none;
-    order: -1;
-  }
-}
-
-
-/* =============================================
-   SETUP FEE INCLUDED IN PRICING CARD
-   ============================================= */
+/* Setup Fee Included */
 .jari-pricing-setup-included {
-  background: linear-gradient(135deg, #fff8e1 0%, #fff3cd 100%);
-  border: 1px solid #ffc107;
-  border-radius: 12px;
-  padding: 20px;
-  margin: 24px 0;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
+  border: 1px solid rgba(102, 126, 234, 0.2);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
 }
 
 .jari-pricing-setup-included h4 {
-  margin: 0 0 8px;
   font-size: 16px;
-  color: #333;
+  font-weight: 600;
+  color: #1d1d1f;
+  margin-bottom: 8px;
 }
 
-.jari-pricing-setup-included .jari-setup-price {
-  color: #ff6b35;
+.jari-setup-price {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   font-weight: 700;
-  font-size: 18px;
 }
 
 .jari-pricing-setup-included > p {
-  font-size: 13px;
-  color: #666;
-  margin: 0 0 16px;
+  font-size: 14px;
+  color: #86868b;
+  margin-bottom: 16px;
 }
 
 .jari-setup-options {
@@ -1210,69 +657,139 @@
 }
 
 .jari-setup-option {
-  font-size: 13px;
-  color: #444;
-  padding: 8px 12px;
+  font-size: 14px;
+  color: #424245;
+  padding: 10px 14px;
   background: rgba(255, 255, 255, 0.7);
-  border-radius: 8px;
+  border-radius: 10px;
 }
 
 .jari-setup-highlight {
-  background: #e8f5e9 !important;
-  color: #2e7d32 !important;
+  background: rgba(52, 199, 89, 0.15) !important;
+  color: #248a3d !important;
   font-weight: 600;
-  border: 1px solid #a5d6a7;
+  border: 1px solid rgba(52, 199, 89, 0.3);
 }
 
-/* =============================================
-   ONE-TIME PURCHASES SECTION
-   ============================================= */
+/* Add-ons in pricing */
+.jari-pricing-addons {
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  padding-top: 24px;
+  margin-bottom: 24px;
+}
+
+.jari-pricing-addons h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #86868b;
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.jari-addon-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  font-size: 14px;
+  color: #424245;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.jari-addon-item:last-child {
+  border-bottom: none;
+}
+
+.jari-addon-price {
+  font-weight: 600;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.jari-pricing-popular {
+  text-align: center;
+  padding: 16px;
+  background: #f5f5f7;
+  border-radius: 12px;
+  font-size: 14px;
+  color: #424245;
+  margin-bottom: 24px;
+}
+
+.jari-pricing-cta {
+  text-align: center;
+}
+
+.jari-pricing-cta .jari-btn {
+  width: 100%;
+  padding: 18px 32px;
+  font-size: 17px;
+}
+
+.jari-pricing-note {
+  margin-top: 16px;
+  font-size: 13px;
+  color: #86868b;
+}
+
+/* ===================
+   ONE-TIME PURCHASES
+   =================== */
 .jari-pricing-extras {
-  margin-top: 64px;
+  max-width: 900px;
+  margin: 0 auto;
 }
 
 .jari-extras-header {
   text-align: center;
-  margin-bottom: 32px;
+  margin-bottom: 40px;
 }
 
 .jari-extras-header h3 {
   font-size: 24px;
-  margin: 0 0 8px;
-  color: #222;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #1d1d1f;
 }
 
 .jari-extras-header p {
   font-size: 16px;
-  color: #666;
-  margin: 0;
+  color: #86868b;
 }
 
 .jari-extras-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 24px;
-  max-width: 900px;
-  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .jari-extras-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .jari-extras-card {
   background: #fff;
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border-radius: 20px;
+  padding: 32px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
 }
 
 .jari-extras-card h4 {
   font-size: 18px;
-  margin: 0 0 8px;
-  color: #222;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #1d1d1f;
 }
 
 .jari-extras-card > p {
   font-size: 14px;
-  color: #666;
-  margin: 0 0 16px;
+  color: #86868b;
+  margin-bottom: 20px;
 }
 
 .jari-extras-table {
@@ -1285,201 +802,272 @@
   display: grid;
   grid-template-columns: 1fr 1fr auto;
   gap: 12px;
-  padding: 10px 12px;
-  background: #f8f9fa;
-  border-radius: 8px;
-  font-size: 13px;
+  padding: 12px 16px;
+  background: #f5f5f7;
+  border-radius: 12px;
+  font-size: 14px;
   align-items: center;
 }
 
 .jari-extras-row span:first-child {
-  color: #333;
+  color: #1d1d1f;
   font-weight: 500;
 }
 
 .jari-extras-row span:nth-child(2) {
-  color: #666;
-  font-size: 12px;
+  color: #86868b;
+  font-size: 13px;
 }
 
 .jari-extras-row span:last-child {
   font-weight: 600;
-  color: #FF6B35;
+  color: #1d1d1f;
   text-align: right;
 }
 
 .jari-free {
-  color: #2e7d32 !important;
-  background: #e8f5e9;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 11px;
-}
-
-/* Pricing Main Card Styles */
-.jari-pricing-main {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 32px;
-}
-
-.jari-pricing-main .jari-pricing-card {
-  max-width: 480px;
-  width: 100%;
-  background: linear-gradient(135deg, #FF6B35 0%, #E85A2D 100%);
-  color: #fff;
-  padding: 40px 32px;
-  border-radius: 24px;
-  box-shadow: 0 20px 60px rgba(255, 107, 53, 0.3);
-}
-
-.jari-pricing-main .jari-pricing-badge {
-  background: rgba(255, 255, 255, 0.2);
-  color: #fff;
-  padding: 6px 16px;
-  border-radius: 20px;
+  color: #248a3d !important;
+  background: rgba(52, 199, 89, 0.15);
+  padding: 4px 10px;
+  border-radius: 6px;
   font-size: 12px;
   font-weight: 600;
-  display: inline-block;
+}
+
+
+/* ===================
+   TESTIMONIALS SECTION
+   =================== */
+.jari-testimonials-section {
+  background: #fff;
+  padding: 96px 24px;
+}
+
+.jari-testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.jari-testimonial-card {
+  background: #f5f5f7;
+  border-radius: 24px;
+  padding: 32px;
+  transition: transform 0.3s ease;
+}
+
+.jari-testimonial-card:hover {
+  transform: translateY(-4px);
+}
+
+.jari-testimonial-stars {
+  color: #ffc107;
+  font-size: 16px;
+  letter-spacing: 2px;
   margin-bottom: 16px;
 }
 
-.jari-pricing-main h2 {
-  margin: 0 0 24px;
-  font-size: 24px;
+.jari-testimonial-text {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #424245;
+  margin-bottom: 24px;
+  font-style: italic;
 }
 
-.jari-pricing-main .jari-pricing-amount {
+.jari-testimonial-author {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.jari-author-avatar {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.jari-author-info h4 {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1d1d1f;
+  margin-bottom: 2px;
+}
+
+.jari-author-info p {
+  font-size: 13px;
+  color: #86868b;
+}
+
+/* ===================
+   FINAL CTA SECTION
+   =================== */
+.jari-cta-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #1d1d1f 100%);
+  padding: 96px 24px;
+  text-align: center;
+}
+
+.jari-cta-section h2 {
+  color: #fff;
+  margin-bottom: 16px;
+}
+
+.jari-cta-section > .jari-container > p {
+  color: rgba(255, 255, 255, 0.8);
+  max-width: 640px;
+  margin: 0 auto 40px;
+  font-size: 18px;
+}
+
+.jari-cta-buttons {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
   margin-bottom: 24px;
 }
 
-.jari-pricing-main .jari-price-main {
-  font-size: 48px;
-  font-weight: 700;
-  line-height: 1;
-}
-
-.jari-pricing-main .jari-price-main span {
-  font-size: 20px;
-  opacity: 0.8;
-}
-
-.jari-pricing-main .jari-price-period {
+.jari-cta-note {
+  color: rgba(255, 255, 255, 0.7);
   font-size: 14px;
-  opacity: 0.8;
-  margin-top: 4px;
 }
 
-.jari-pricing-main .jari-pricing-features {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 24px;
+/* ===================
+   FOOTER
+   =================== */
+.jari-footer {
+  background: #1d1d1f;
+  padding: 64px 24px 32px;
 }
 
-.jari-pricing-main .jari-pricing-features li {
-  padding: 8px 0;
-  font-size: 15px;
-  color: rgba(255, 255, 255, 0.95);
-}
-
-.jari-pricing-main .jari-check-icon {
-  color: #90EE90;
-  margin-right: 8px;
-}
-
-.jari-pricing-main .jari-pricing-addons {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 16px;
-  margin: 24px 0;
-}
-
-.jari-pricing-main .jari-pricing-addons h4 {
-  margin: 0 0 12px;
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.9);
-}
-
-.jari-pricing-main .jari-addon-item {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 0;
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.85);
+.jari-footer-content {
+  display: grid;
+  grid-template-columns: 2fr 3fr;
+  gap: 64px;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding-bottom: 48px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.jari-pricing-main .jari-addon-item:last-child {
-  border-bottom: none;
-}
-
-.jari-pricing-main .jari-addon-price {
-  color: #fff;
-  font-weight: 600;
-}
-
-.jari-pricing-main .jari-pricing-popular {
-  text-align: center;
-  padding: 12px;
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 8px;
-  font-size: 14px;
-  margin: 16px 0;
-}
-
-.jari-pricing-main .jari-pricing-cta {
-  text-align: center;
-  margin-top: 24px;
-}
-
-.jari-pricing-main .jari-pricing-note {
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 13px;
-  margin-top: 12px;
-}
-
-.jari-btn-white {
-  background: #fff;
-  color: #FF6B35;
-  border: none;
-  padding: 16px 32px;
-  border-radius: 12px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-decoration: none;
-  display: inline-block;
-}
-
-.jari-btn-white:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-}
-
-/* Extras Responsive */
 @media (max-width: 768px) {
-  .jari-extras-grid {
+  .jari-footer-content {
     grid-template-columns: 1fr;
-    padding: 0 16px;
+    gap: 40px;
+  }
+}
+
+.jari-footer-brand .jari-logo {
+  margin-bottom: 16px;
+}
+
+.jari-footer-brand .jari-logo-img {
+  height: 32px;
+  filter: brightness(0) invert(1);
+}
+
+.jari-footer-brand .jari-logo-text {
+  color: #fff;
+  font-size: 16px;
+}
+
+.jari-footer-brand > p {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.jari-footer-links {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+}
+
+@media (max-width: 600px) {
+  .jari-footer-links {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.jari-footer-links h4 {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 16px;
+}
+
+.jari-footer-links a {
+  display: block;
+  color: rgba(255, 255, 255, 0.6);
+  text-decoration: none;
+  font-size: 14px;
+  padding: 6px 0;
+  transition: color 0.2s ease;
+}
+
+.jari-footer-links a:hover {
+  color: #fff;
+}
+
+.jari-footer-bottom {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding-top: 24px;
+  text-align: center;
+}
+
+.jari-footer-bottom p {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 13px;
+}
+
+/* ===================
+   RESPONSIVE REFINEMENTS
+   =================== */
+@media (max-width: 480px) {
+  .jari-hero {
+    padding: 48px 16px 64px;
+  }
+  
+  .jari-hero-stats {
+    gap: 24px;
+  }
+  
+  .jari-stat-number {
+    font-size: 24px;
+  }
+  
+  .jari-section {
+    padding: 64px 0;
+  }
+  
+  .jari-pricing-card {
+    padding: 32px 24px;
+  }
+  
+  .jari-price-main {
+    font-size: 44px;
   }
   
   .jari-extras-row {
     grid-template-columns: 1fr;
-    gap: 4px;
     text-align: center;
+    gap: 6px;
   }
   
   .jari-extras-row span:last-child {
     text-align: center;
-    margin-top: 4px;
-  }
-  
-  .jari-pricing-main .jari-pricing-card {
-    padding: 32px 24px;
-  }
-  
-  .jari-pricing-main .jari-price-main {
-    font-size: 40px;
   }
 }
