@@ -6,6 +6,45 @@ import { renderQuickDecision as renderQuickDecisionTemplate } from './templates/
 import { renderEventLanding as renderEventLandingTemplate } from './templates/event-landing/index.js';
 
 // ===========================================
+// BREADCRUMB NAVIGATION
+// Kalbach: Location breadcrumbs show position in hierarchy
+// ===========================================
+export function renderBreadcrumb(product = null) {
+  const { store, products } = state;
+  const storeName = store?.name || 'Store';
+  
+  // Don't show breadcrumb if only one product (no navigation needed)
+  if (!product || products.length <= 1) return '';
+  
+  const productName = product?.data?.name || 'Product';
+  const category = product?.data?.category || null;
+  
+  // Find category info if exists
+  const categoryInfo = category && store?.categories?.find(c => c.name === category);
+  const categoryEmoji = categoryInfo?.emoji || '';
+  
+  return `
+    <nav class="store-breadcrumb" aria-label="Breadcrumb">
+      <a href="#" onclick="window.showCollection(); return false;">${storeName}</a>
+      <span class="breadcrumb-separator">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 18l6-6-6-6"/>
+        </svg>
+      </span>
+      ${category ? `
+        <a href="#" onclick="window.filterByCategory('${category}'); return false;">${categoryEmoji} ${category}</a>
+        <span class="breadcrumb-separator">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 18l6-6-6-6"/>
+          </svg>
+        </span>
+      ` : ''}
+      <span class="breadcrumb-current">${productName}</span>
+    </nav>
+  `;
+}
+
+// ===========================================
 // HEADER
 // ===========================================
 export function renderHeader() {

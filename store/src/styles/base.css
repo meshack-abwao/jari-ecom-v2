@@ -561,6 +561,63 @@ body {
     font-weight: var(--fw-medium);
 }
 
+/* Store Breadcrumb - Enhanced Navigation (Kalbach) */
+.store-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-md) var(--space-lg);
+    font-size: var(--fs-small);
+    color: var(--text-secondary);
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.store-breadcrumb a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color 0.2s ease;
+    white-space: nowrap;
+}
+
+.store-breadcrumb a:hover {
+    color: var(--text-primary);
+}
+
+.store-breadcrumb .breadcrumb-separator {
+    display: flex;
+    align-items: center;
+    color: var(--border);
+}
+
+.store-breadcrumb .breadcrumb-separator svg {
+    flex-shrink: 0;
+}
+
+.store-breadcrumb .breadcrumb-current {
+    color: var(--text-primary);
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 200px;
+}
+
+@media (max-width: 480px) {
+    .store-breadcrumb {
+        padding: var(--space-sm) var(--space-md);
+        font-size: var(--fs-tiny);
+        gap: var(--space-xs);
+    }
+    
+    .store-breadcrumb .breadcrumb-current {
+        max-width: 120px;
+    }
+}
+
 .product-card {
     background: var(--surface);
     border-radius: var(--radius-lg);
