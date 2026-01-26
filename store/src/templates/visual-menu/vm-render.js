@@ -8,6 +8,7 @@ import { state } from '../../state.js';
 import { formatPrice } from '../../shared/utils.js';
 import { renderStories, renderStoryViewer } from '../../shared/media-components.js';
 import { renderProductPolicyLinks, renderProductPolicyModals } from '../../shared/policy-modals.js';
+import { renderBreadcrumb } from '../../render.js';
 
 // Dietary tag icons mapping
 const DIETARY_ICONS = {
@@ -40,6 +41,7 @@ export function renderVisualMenu(product) {
   const showBackButton = products.length > 1;
   
   return `
+    ${renderBreadcrumb(product)}
     ${showBackButton ? `
     <button class="back-btn" id="backBtn">← Back to Menu</button>
     ` : ''}
