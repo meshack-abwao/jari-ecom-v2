@@ -167,10 +167,10 @@ af44d2b Fix-DD-showcase-viewer-restore-body-overflow-on-close-freeze-bug
 
 ## NEXT SESSION PRIORITIES
 
-1. **Test in Production**: Verify abandoned checkouts appear in dashboard
-2. **Recovery Tracking**: Wire up the "Mark Recovered" button functionality
-3. **WhatsApp Templates**: Pre-fill better recovery messages
-4. **Notification System**: Alert store owner of new abandonments
+1. **Backend Subscription System**: Create `store_subscriptions` table to persist trial/paid status
+2. **M-Pesa Payment**: Integrate payment for subscription upgrade
+3. **Order-Based Tier Detection**: Auto-recommend tier based on monthly order count
+4. **WhatsApp Templates**: Pre-fill better recovery messages
 
 ---
 
@@ -213,3 +213,32 @@ If you have two routes with same path, the FIRST one wins. This caused a bug whe
 
 *Document created: January 27, 2026*
 *Session: Abandoned Checkout Feature Implementation*
+*Updated: January 27, 2026 - Added Freemium Paywall*
+
+---
+
+## FREEMIUM MODEL ADDED
+
+### Pricing Tiers (After 30-Day Free Trial)
+| Tier | Monthly Orders | Price |
+|------|----------------|-------|
+| Starter | 0-50 orders | KES 300/month |
+| Growth | 51-200 orders | KES 700/month |
+| Pro | 200+ orders | KES 1,500/month |
+
+### How It Works
+1. User clicks "Abandoned Checkouts" tab
+2. If no access → Paywall modal shows
+3. User starts 30-day free trial (stored in localStorage)
+4. After trial → Must subscribe to continue access
+5. Trial banner shows days remaining
+
+### Files Added/Modified
+- `dashboard/src/pages/AdsPage.jsx` - Paywall modal, trial logic, teaser card
+- `docs/FREEMIUM-MODEL.md` - Full pricing strategy documentation
+- `docs/DEBUG-FORMULAS.md` - Added 5 new formulas (16-20)
+
+### Current Limitation
+- Trial status stored in localStorage (resets if cleared)
+- Need backend `store_subscriptions` table for persistence
+- Payment integration not yet built
