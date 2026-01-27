@@ -1,7 +1,7 @@
 # DEBUG FORMULAS - Jari.Ecom V2
 ## Lessons Learned from Production Issues
 
-**Last Updated:** January 25, 2026
+**Last Updated:** January 27, 2026
 
 ---
 
@@ -681,3 +681,174 @@ window.viewRelatedProduct = function(productId) {
 | Store CSS | `store/src/styles/base.css` |
 | Footer CSS | `store/src/styles/footer.css` |
 | Dashboard CSS | `dashboard/src/styles/globals.css` |
+
+---
+
+## FORMULA 16: Duplicate Express Routes (NEW - Jan 27, 2026)
+
+**Problem:** API endpoint returns old/wrong response, new code not executing
+
+**Cause:** Two routes with same path - Express uses FIRST match
+
+**Example:**
+```javascript
+// Route A (line 299) - OLD CODE
+router.get('/abandoned/:storeId', async (req, res) => {
+  // Returns old format
+  res.json({ error: 'Failed to fetch abandoned data' });
+});
+
+// Route B (line 525) - NEW CODE (never reached!)
+router.get('/abandoned/:storeId', async (req, res) => {
+  // Returns new format with detailed data
+  res.json({ abandonments: [...], funnel: {...} });
+});
+```
+
+**Symptoms:**
+- New features don't work
+- Old error messages appear
+- Console shows correct URL being called
+- Backend logs don't show new debug messages
+
+**Fix:** Remove or comment out the old duplicate route
+
+**Prevention:**
+- Before adding new routes, search file for existing routes with same path
+- Use unique route names or version prefixes (`/v2/abandoned/:storeId`)
+
+---
+
+## FORMULA 17: sendBeacon Content-Type (NEW - Jan 27, 2026)
+
+**Problem:** Backend receives empty body from `sendBeacon()`
+
+**Cause:** sendBeacon sends as `text/plain`, not `application/json`
+
+**Fix - Backend must parse string:**
+```javascript
+// Express setup - add text parser
+app.use(express.text()); // For sendBeacon which sends as text/plain
+
+// In route handler
+let body = req.body;
+if (typeof body === 'string') {
+  try {
+    body = JSON.parse(body);
+  } catch (e) {
+    return res.status(400).json({ error: 'Invalid JSON' });
+  }
+}
+const { field1, field2 } = body;
+```
+
+**Frontend sendBeacon:**
+```javascript
+// sendBeacon always sends as text/plain
+navigator.sendBeacon(endpoint, JSON.stringify(payload));
+
+// Fallback with fetch uses proper JSON
+fetch(endpoint, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(payload),
+  keepalive: true
+});
+```
+
+---
+
+## FORMULA 18: UUID vs Slug Resolution (NEW - Jan 27, 2026)
+
+**Problem:** API works with UUID but fails with slug (or vice versa)
+
+**Cause:** Frontend sends slug, backend expects UUID (or vice versa)
+
+**Fix - Handle both in API:**
+```javascript
+router.get('/endpoint/:storeId', async (req, res) => {
+  const { storeId } = req.params;
+  let actualStoreId = storeId;
+  
+  // If it looks like a slug (not UUID format), resolve it
+  if (isNaN(storeId) && !storeId.includes('-')) {
+    const result = await db.query(
+      'SELECT id FROM stores WHERE slug = $1',
+      [storeId]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Store not found' });
+    }
+    actualStoreId = result.rows[0].id;
+  }
+  
+  // Now use actualStoreId (always UUID)
+  const data = await db.query(
+    'SELECT * FROM table WHERE store_id = $1::uuid',
+    [actualStoreId]
+  );
+});
+```
+
+**Detection Logic:**
+- Contains `-` → UUID (e.g., `7bb50c0a-d9a6-4e7c-a38c-5b5b2779c5d5`)
+- Is numeric → Legacy integer ID
+- Neither → Slug (e.g., `lanixkenya`)
+
+---
+
+## FORMULA 19: PostgreSQL UUID Casting (NEW - Jan 27, 2026)
+
+**Problem:** Query fails with type mismatch on UUID columns
+
+**Cause:** PostgreSQL strict typing - string not auto-cast to UUID
+
+**Fix - Explicit casting:**
+```sql
+-- ✅ CORRECT - Explicit UUID cast
+SELECT * FROM abandoned_checkouts WHERE store_id = $1::uuid
+
+-- ❌ MAY FAIL - No cast
+SELECT * FROM abandoned_checkouts WHERE store_id = $1
+```
+
+**When to use:**
+- Always cast when comparing UUID columns with string parameters
+- Especially important in dynamic queries with template literals
+
+---
+
+## FORMULA 20: Body Overflow for Modals (NEW - Jan 27, 2026)
+
+**Problem:** Page scroll doesn't restore after closing modal/gallery
+
+**Cause:** Modal sets `body.style.overflow = 'hidden'` but doesn't restore
+
+**Fix - Always restore in close handler:**
+```javascript
+function openModal() {
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';  // Prevent scroll
+}
+
+function closeModal() {
+  modal.style.display = 'none';
+  document.body.style.overflow = '';  // ✅ RESTORE scroll
+}
+
+// Also handle escape key and backdrop click
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && modal.style.display !== 'none') {
+    closeModal();  // This will restore overflow
+  }
+});
+```
+
+**Common Mistake:**
+```javascript
+// ❌ WRONG - Forgets to restore
+function closeModal() {
+  modal.style.display = 'none';
+  // Missing: document.body.style.overflow = '';
+}
+```

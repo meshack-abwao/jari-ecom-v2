@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { pixelAPI, settingsAPI } from '../api/client';
-import { TrendingUp, Users, Target, Copy, Check, ChevronDown, ChevronUp, Link2, Settings, AlertCircle, ShoppingCart, XCircle, CheckCircle, Download, Phone, MessageCircle, Eye } from 'lucide-react';
+import { TrendingUp, Users, Target, Copy, Check, ChevronDown, ChevronUp, Link2, Settings, AlertCircle, ShoppingCart, XCircle, CheckCircle, Download, Phone, MessageCircle, Eye, Lock, Zap, Star, X } from 'lucide-react';
 
 export default function AdsPage() {
   const [storeId, setStoreId] = useState(null);
@@ -17,6 +17,26 @@ export default function AdsPage() {
   
   // Active tab state
   const [activeTab, setActiveTab] = useState('overview');
+  
+  // Paywall state
+  const [showPaywall, setShowPaywall] = useState(false);
+  const [abandonedFeatureAccess, setAbandonedFeatureAccess] = useState(() => {
+    const stored = localStorage.getItem('abandoned_feature_access');
+    if (stored) {
+      const data = JSON.parse(stored);
+      // Check if trial is still valid (30 days)
+      if (data.trialStarted) {
+        const trialEnd = new Date(data.trialStarted);
+        trialEnd.setDate(trialEnd.getDate() + 30);
+        if (new Date() < trialEnd) {
+          return { ...data, status: 'trial', trialEndsAt: trialEnd };
+        }
+      }
+      if (data.status === 'paid') return data;
+    }
+    return { status: 'none' };
+  });
+  const [selectedTier, setSelectedTier] = useState('starter');
   
   // Abandoned checkouts state
   const [abandonedData, setAbandonedData] = useState({
@@ -101,6 +121,41 @@ export default function AdsPage() {
   const openWhatsApp = (phone, productName) => {
     const message = encodeURIComponent(`Hi! I noticed you were interested in "${productName}". Can I help you complete your order?`);
     window.open(`https://wa.me/${phone.replace(/\D/g, '')}?text=${message}`, '_blank');
+  };
+
+  // Handle tab click with paywall check
+  const handleTabClick = (key, isPremium) => {
+    if (isPremium && key === 'abandoned') {
+      // Check if user has access
+      if (abandonedFeatureAccess.status === 'none') {
+        setShowPaywall(true);
+        return;
+      }
+    }
+    setActiveTab(key);
+  };
+
+  // Start free trial
+  const startFreeTrial = () => {
+    const trialData = {
+      status: 'trial',
+      trialStarted: new Date().toISOString(),
+      tier: null
+    };
+    localStorage.setItem('abandoned_feature_access', JSON.stringify(trialData));
+    setAbandonedFeatureAccess({
+      ...trialData,
+      trialEndsAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+    });
+    setShowPaywall(false);
+    setActiveTab('abandoned');
+  };
+
+  // Get trial days remaining
+  const getTrialDaysRemaining = () => {
+    if (abandonedFeatureAccess.status !== 'trial' || !abandonedFeatureAccess.trialEndsAt) return 0;
+    const diff = new Date(abandonedFeatureAccess.trialEndsAt) - new Date();
+    return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
   };
 
   const loadData = async () => {
@@ -243,12 +298,12 @@ export default function AdsPage() {
       <div style={styles.tabNav}>
         {[
           { key: 'overview', label: 'Overview', icon: TrendingUp },
-          { key: 'abandoned', label: 'Abandoned Checkouts', icon: XCircle },
+          { key: 'abandoned', label: 'Abandoned Checkouts', icon: XCircle, premium: true },
           { key: 'utm', label: 'UTM Links', icon: Link2 },
-        ].map(({ key, label, icon: Icon }) => (
+        ].map(({ key, label, icon: Icon, premium }) => (
           <button
             key={key}
-            onClick={() => setActiveTab(key)}
+            onClick={() => handleTabClick(key, premium)}
             style={{
               ...styles.tabBtn,
               ...(activeTab === key ? styles.tabBtnActive : {})
@@ -256,6 +311,7 @@ export default function AdsPage() {
           >
             <Icon size={16} />
             {label}
+            {premium && abandonedFeatureAccess.status === 'none' && <Lock size={12} style={{ marginLeft: 4, opacity: 0.6 }} />}
           </button>
         ))}
       </div>
@@ -419,6 +475,56 @@ export default function AdsPage() {
           </div>
         )}
       </div>
+
+        {/* Abandoned Checkout Teaser Card */}
+        <div 
+          className="glass-card" 
+          style={{ 
+            padding: '20px', 
+            marginTop: '24px',
+            background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%)',
+            border: '1px solid rgba(239, 68, 68, 0.2)',
+            cursor: 'pointer'
+          }}
+          onClick={() => handleTabClick('abandoned', true)}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <div style={{ 
+                width: '48px', height: '48px', borderRadius: '12px', 
+                background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center'
+              }}>
+                <XCircle size={24} color="white" />
+              </div>
+              <div>
+                <h3 style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '4px' }}>
+                  {abandonedData.total || abandonedCheckouts} Abandoned Checkouts
+                </h3>
+                <p style={{ fontSize: '14px', color: 'var(--text-muted)' }}>
+                  Recover lost sales with WhatsApp follow-ups
+                </p>
+              </div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              {abandonedFeatureAccess.status === 'none' && (
+                <span style={{ 
+                  padding: '4px 10px', 
+                  background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)', 
+                  borderRadius: '6px', 
+                  fontSize: '11px', 
+                  fontWeight: '600', 
+                  color: 'white' 
+                }}>
+                  PRO
+                </span>
+              )}
+              <span style={{ color: 'var(--accent-color)', fontWeight: '600', fontSize: '14px' }}>
+                View Details →
+              </span>
+            </div>
+          </div>
+        </div>
         </>
       )}
 
@@ -780,6 +886,123 @@ export default function AdsPage() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Paywall Modal */}
+      {showPaywall && (
+        <div style={styles.modalOverlay} onClick={() => setShowPaywall(false)}>
+          <div style={{...styles.modal, maxWidth: '600px'}} className="glass-card" onClick={e => e.stopPropagation()}>
+            <button 
+              onClick={() => setShowPaywall(false)}
+              style={{ position: 'absolute', top: '16px', right: '16px', background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
+            >
+              <X size={20} />
+            </button>
+            
+            <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+              <div style={{ width: '60px', height: '60px', borderRadius: '16px', background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+                <Zap size={28} color="white" />
+              </div>
+              <h2 style={{ fontSize: '24px', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '8px' }}>
+                Unlock Abandoned Cart Recovery
+              </h2>
+              <p style={{ fontSize: '15px', color: 'var(--text-muted)', lineHeight: '1.6' }}>
+                {abandonedData.total > 0 
+                  ? `You had ${abandonedData.total} abandoned checkouts this period. Recover 10-15% of lost sales with WhatsApp follow-ups.`
+                  : 'See exactly where customers drop off and recover lost sales with WhatsApp follow-ups.'}
+              </p>
+            </div>
+
+            {/* Feature List */}
+            <div style={{ background: 'var(--bg-secondary)', borderRadius: '12px', padding: '16px', marginBottom: '24px' }}>
+              <p style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-muted)', marginBottom: '12px', textTransform: 'uppercase' }}>What you get:</p>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                {['Funnel visualization', 'Customer contact info', 'WhatsApp follow-up', 'CSV export', 'Smart insights', 'Recovery tracking'].map(feature => (
+                  <div key={feature} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: 'var(--text-secondary)' }}>
+                    <CheckCircle size={16} color="#22c55e" />
+                    {feature}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Pricing Tiers */}
+            <p style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-muted)', marginBottom: '12px', textTransform: 'uppercase' }}>After 30-day free trial:</p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '24px' }}>
+              {[
+                { key: 'starter', name: 'Starter', price: 300, orders: '0-50 orders/mo' },
+                { key: 'growth', name: 'Growth', price: 700, orders: '51-200 orders/mo' },
+                { key: 'pro', name: 'Pro', price: 1500, orders: '200+ orders/mo' }
+              ].map(tier => (
+                <div 
+                  key={tier.key}
+                  onClick={() => setSelectedTier(tier.key)}
+                  style={{
+                    padding: '16px',
+                    borderRadius: '12px',
+                    border: selectedTier === tier.key ? '2px solid var(--accent-color)' : '1px solid var(--border-color)',
+                    background: selectedTier === tier.key ? 'rgba(139, 92, 246, 0.08)' : 'var(--bg-secondary)',
+                    cursor: 'pointer',
+                    textAlign: 'center',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  <p style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '4px' }}>{tier.name}</p>
+                  <p style={{ fontSize: '20px', fontWeight: '700', color: 'var(--accent-color)', marginBottom: '4px' }}>KES {tier.price}</p>
+                  <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{tier.orders}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* CTA Button */}
+            <button 
+              onClick={startFreeTrial}
+              style={{
+                width: '100%',
+                padding: '16px',
+                background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)',
+                border: 'none',
+                borderRadius: '12px',
+                color: 'white',
+                fontSize: '16px',
+                fontWeight: '700',
+                cursor: 'pointer',
+                boxShadow: '0 4px 16px rgba(139, 92, 246, 0.3)'
+              }}
+            >
+              🎁 Start 30-Day Free Trial
+            </button>
+            <p style={{ textAlign: 'center', fontSize: '12px', color: 'var(--text-muted)', marginTop: '12px' }}>
+              No credit card required. Cancel anytime.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Trial Banner */}
+      {abandonedFeatureAccess.status === 'trial' && activeTab === 'abandoned' && (
+        <div style={{
+          position: 'fixed',
+          bottom: '20px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+          color: 'white',
+          padding: '12px 24px',
+          borderRadius: '12px',
+          fontSize: '14px',
+          fontWeight: '600',
+          boxShadow: '0 4px 20px rgba(245, 158, 11, 0.4)',
+          zIndex: 100,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px'
+        }}>
+          🎁 Free trial: {getTrialDaysRemaining()} days remaining
+          <button style={{ background: 'rgba(255,255,255,0.2)', border: 'none', padding: '6px 12px', borderRadius: '6px', color: 'white', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}>
+            Upgrade Now
+          </button>
         </div>
       )}
     </div>
