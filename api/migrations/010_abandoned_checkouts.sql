@@ -1,11 +1,10 @@
 -- Migration 010: Abandoned Checkouts Tracking
 -- Purpose: Store detailed data about abandoned checkouts for follow-up and analysis
 -- Date: January 27, 2026
-
--- Drop table if exists (to recreate with correct type)
-DROP TABLE IF EXISTS abandoned_checkouts;
+-- IMPORTANT: This migration is IDEMPOTENT - safe to run multiple times
 
 -- Create abandoned_checkouts table with UUID store_id to match stores table
+-- Using IF NOT EXISTS to prevent data loss on re-run
 CREATE TABLE IF NOT EXISTS abandoned_checkouts (
   id SERIAL PRIMARY KEY,
   store_id UUID NOT NULL,

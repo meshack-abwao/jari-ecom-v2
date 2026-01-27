@@ -334,6 +334,24 @@ export const complaintsAPI = {
 };
 
 // ===========================================
+// SUBSCRIPTIONS API
+// ===========================================
+export const subscriptionsAPI = {
+  // Check subscription status for a feature
+  getStatus: (feature) => api.get(`/subscriptions/status/${feature}`),
+  
+  // Start free trial
+  startTrial: (feature) => api.post('/subscriptions/start-trial', { feature }),
+  
+  // Get recommended tier based on order count
+  getRecommendedTier: (feature) => api.get(`/subscriptions/recommended-tier/${feature}`),
+  
+  // Subscribe to a feature
+  subscribe: (feature, tier, paymentRef) => 
+    api.post('/subscriptions/subscribe', { feature, tier, paymentRef }),
+};
+
+// ===========================================
 // LEGACY API (for backwards compatibility)
 // ===========================================
 export const legacyApi = {

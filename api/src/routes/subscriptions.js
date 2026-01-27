@@ -1,92 +1,29 @@
-// ============================================================================
-// SUBSCRIPTIONS API - Subscription Management
-// Phase D1: Pricing & Subscriptions
-// ============================================================================
-
-import { Router } from 'express';
+import express from 'express';
 import db from '../config/database.js';
 import { auth } from '../middleware/auth.js';
 
-const router = Router();
+const router = express.Router();
 
-// ===========================================
-// PRICING CONFIGURATION (v2.1 - With Setup Fee)
-// ===========================================
-
-// Grandfathering cutoff - accounts before this date get free access
-const GRANDFATHER_CUTOFF = new Date('2026-01-26T00:00:00Z');
-
-// Setup fee (one-time, non-refundable)
-const SETUP_FEE = {
-  full: 5000,
-  split: 2500,  // 50% split (pay in 2 months)
-  includes: ['Account creation', 'Theme unlock', 'Optional onboarding call']
-};
-
-// Payment options for new merchants
-const PAYMENT_OPTIONS = {
-  option_a: {
-    name: 'Full Setup',
-    description: 'Pay setup fee upfront',
-    setupFee: 5000,
-    firstMonth: 1200,
-    total: 6200,
-    setupRemaining: 0
-  },
-  option_b: {
-    name: 'Split Setup (50%)',
-    description: 'Split setup fee over 2 months',
-    setupFee: 2500,
-    firstMonth: 1200,
-    total: 3700,
-    setupRemaining: 2500,
-    month2Total: 3700
+// Pricing tiers configuration
+const PRICING_TIERS = {
+  abandoned_checkouts: {
+    starter: { price: 300, maxOrders: 50, name: 'Starter' },
+    growth: { price: 700, maxOrders: 200, name: 'Growth' },
+    pro: { price: 1500, maxOrders: Infinity, name: 'Pro' }
   }
 };
 
-// Subscription pricing
-const SUBSCRIPTION_PLANS = {
-  base: { 
-    name: 'Base Plan', 
-    price: 1200, 
-    features: ['3 product cards', '1 free theme', 'Basic analytics', 'Shareable store link', 'Order management']
-  }
-};
+const TRIAL_DAYS = 30;
 
-// Add-on pricing
-const ADDONS = {
-  mpesa_stk: { name: 'M-Pesa STK Push', price: 300, description: 'Instant M-Pesa prompt, auto-confirmation' },
-  whatsapp_auto: { name: 'WhatsApp Auto-Reply', price: 80, description: '24/7 automated responses' },
-  advanced_analytics: { name: 'Advanced Analytics', price: 200, description: 'Traffic sources, conversion rates, insights' },
-  priority_support: { name: 'Priority Support', price: 500, description: 'Fast response, dedicated assistance' }
-};
-
-// Card bundles (one-time purchase)
-const CARD_BUNDLES = {
-  starter: { name: 'Starter Pack', cards: 4, price: 350, pricePerCard: 87 },
-  growth: { name: 'Growth Pack', cards: 7, price: 550, pricePerCard: 79 },
-  pro: { name: 'Pro Pack', cards: 12, price: 850, pricePerCard: 71 }
-};
-
-// Card tier monthly fees (for >15 cards)
-const CARD_TIERS = {
-  tier1: { range: '1-15', fee: 0 },
-  tier2: { range: '16-30', fee: 200 },
-  tier3: { range: '31-60', fee: 500 },
-  enterprise: { range: '60+', fee: null, note: 'Contact us' }
-};
-
-// ============================================================================
-// GET /api/subscriptions - Get current subscription status
-// ============================================================================
-router.get('/', auth, async (req, res, next) => {
+// GET /subscriptions/status/:feature - Check subscription status
+router.get('/status/:feature', auth, async (req, res) => {
   try {
+    const { feature } = req.params;
     const userId = req.user.userId;
     
-    // Get store with subscription info
+    // Get user's store
     const storeResult = await db.query(
-      `SELECT id, subscription_status, subscription_expires, trial_ends_at, created_at 
-       FROM stores WHERE user_id = $1`,
+      'SELECT id FROM stores WHERE user_id = $1',
       [userId]
     );
     
@@ -94,79 +31,226 @@ router.get('/', auth, async (req, res, next) => {
       return res.status(404).json({ error: 'Store not found' });
     }
     
-    const store = storeResult.rows[0];
+    const storeId = storeResult.rows[0].id;
     
-    // Get active add-ons
-    const addonsResult = await db.query(
-      `SELECT addon_type, activated_at, expires_at FROM store_addons 
-       WHERE store_id = $1 AND (expires_at IS NULL OR expires_at > NOW())`,
-      [store.id]
+    // Check for existing subscription
+    const subResult = await db.query(
+      'SELECT * FROM store_subscriptions WHERE store_id = $1 AND feature = $2',
+      [storeId, feature]
     );
     
-    // Calculate subscription status
+    if (subResult.rows.length === 0) {
+      // No subscription exists
+      return res.json({
+        status: 'none',
+        canAccess: false,
+        trialAvailable: true
+      });
+    }
+    
+    const sub = subResult.rows[0];
     const now = new Date();
-    const trialEnds = store.trial_ends_at ? new Date(store.trial_ends_at) : null;
-    const subExpires = store.subscription_expires ? new Date(store.subscription_expires) : null;
     
-    let status = store.subscription_status || 'trial';
-    let daysRemaining = 0;
+    // Check trial status
+    if (sub.status === 'trial') {
+      const trialEnds = new Date(sub.trial_ends_at);
+      if (now < trialEnds) {
+        return res.json({
+          status: 'trial',
+          canAccess: true,
+          trialEndsAt: sub.trial_ends_at,
+          daysRemaining: Math.ceil((trialEnds - now) / (1000 * 60 * 60 * 24))
+        });
+      } else {
+        // Trial expired
+        await db.query(
+          'UPDATE store_subscriptions SET status = $1, updated_at = NOW() WHERE id = $2',
+          ['expired', sub.id]
+        );
+        return res.json({
+          status: 'expired',
+          canAccess: false,
+          trialAvailable: false
+        });
+      }
+    }
     
-    if (status === 'trial' && trialEnds) {
-      daysRemaining = Math.max(0, Math.ceil((trialEnds - now) / (1000 * 60 * 60 * 24)));
-      if (daysRemaining === 0) status = 'expired';
-    } else if (status === 'active' && subExpires) {
-      daysRemaining = Math.max(0, Math.ceil((subExpires - now) / (1000 * 60 * 60 * 24)));
-      if (daysRemaining === 0) status = 'expired';
+    // Check active subscription
+    if (sub.status === 'active') {
+      const expires = new Date(sub.expires_at);
+      if (now < expires) {
+        return res.json({
+          status: 'active',
+          canAccess: true,
+          tier: sub.tier,
+          expiresAt: sub.expires_at,
+          monthlyPrice: sub.monthly_price
+        });
+      } else {
+        // Subscription expired
+        await db.query(
+          'UPDATE store_subscriptions SET status = $1, updated_at = NOW() WHERE id = $2',
+          ['expired', sub.id]
+        );
+        return res.json({
+          status: 'expired',
+          canAccess: false,
+          tier: sub.tier
+        });
+      }
+    }
+    
+    // Expired or cancelled
+    return res.json({
+      status: sub.status,
+      canAccess: false,
+      tier: sub.tier
+    });
+    
+  } catch (error) {
+    console.error('Subscription status error:', error);
+    res.status(500).json({ error: 'Failed to check subscription status' });
+  }
+});
+
+// POST /subscriptions/start-trial - Start free trial
+router.post('/start-trial', auth, async (req, res) => {
+  try {
+    const { feature } = req.body;
+    const userId = req.user.userId;
+    
+    if (!feature) {
+      return res.status(400).json({ error: 'Feature is required' });
+    }
+    
+    // Get user's store
+    const storeResult = await db.query(
+      'SELECT id FROM stores WHERE user_id = $1',
+      [userId]
+    );
+    
+    if (storeResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Store not found' });
+    }
+    
+    const storeId = storeResult.rows[0].id;
+    
+    // Check if trial already used
+    const existingResult = await db.query(
+      'SELECT * FROM store_subscriptions WHERE store_id = $1 AND feature = $2',
+      [storeId, feature]
+    );
+    
+    if (existingResult.rows.length > 0) {
+      return res.status(400).json({ 
+        error: 'Trial already used for this feature',
+        status: existingResult.rows[0].status
+      });
+    }
+    
+    // Calculate trial end date
+    const trialEnds = new Date();
+    trialEnds.setDate(trialEnds.getDate() + TRIAL_DAYS);
+    
+    // Create trial subscription
+    const result = await db.query(`
+      INSERT INTO store_subscriptions (store_id, feature, status, trial_started_at, trial_ends_at)
+      VALUES ($1, $2, 'trial', NOW(), $3)
+      RETURNING *
+    `, [storeId, feature, trialEnds]);
+    
+    res.json({
+      success: true,
+      status: 'trial',
+      trialEndsAt: result.rows[0].trial_ends_at,
+      daysRemaining: TRIAL_DAYS
+    });
+    
+  } catch (error) {
+    console.error('Start trial error:', error);
+    res.status(500).json({ error: 'Failed to start trial' });
+  }
+});
+
+// GET /subscriptions/recommended-tier/:feature - Get recommended tier based on order count
+router.get('/recommended-tier/:feature', auth, async (req, res) => {
+  try {
+    const { feature } = req.params;
+    const userId = req.user.userId;
+    
+    // Get user's store
+    const storeResult = await db.query(
+      'SELECT id FROM stores WHERE user_id = $1',
+      [userId]
+    );
+    
+    if (storeResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Store not found' });
+    }
+    
+    const storeId = storeResult.rows[0].id;
+    
+    // Get last month's order count
+    const lastMonth = new Date();
+    lastMonth.setMonth(lastMonth.getMonth() - 1);
+    const monthStr = lastMonth.toISOString().slice(0, 7);
+    
+    const countResult = await db.query(
+      'SELECT order_count FROM store_order_counts WHERE store_id = $1 AND month = $2',
+      [storeId, monthStr]
+    );
+    
+    const orderCount = countResult.rows[0]?.order_count || 0;
+    
+    // Also count from orders table as backup
+    const ordersResult = await db.query(`
+      SELECT COUNT(*) as count FROM orders 
+      WHERE store_id = $1 
+      AND created_at >= NOW() - INTERVAL '30 days'
+    `, [storeId]);
+    
+    const recentOrders = parseInt(ordersResult.rows[0]?.count || 0);
+    const effectiveCount = Math.max(orderCount, recentOrders);
+    
+    // Determine recommended tier
+    const tiers = PRICING_TIERS[feature];
+    let recommendedTier = 'starter';
+    
+    if (effectiveCount > 200) {
+      recommendedTier = 'pro';
+    } else if (effectiveCount > 50) {
+      recommendedTier = 'growth';
     }
     
     res.json({
-      status,
-      plan: 'base',
-      daysRemaining,
-      trialEndsAt: store.trial_ends_at,
-      subscriptionExpires: store.subscription_expires,
-      activeAddons: addonsResult.rows.map(a => ({
-        type: a.addon_type,
-        ...ADDONS[a.addon_type],
-        activatedAt: a.activated_at,
-        expiresAt: a.expires_at
-      })),
-      availableAddons: Object.entries(ADDONS).map(([id, addon]) => ({
-        id,
-        ...addon,
-        active: addonsResult.rows.some(a => a.addon_type === id)
+      orderCount: effectiveCount,
+      recommendedTier,
+      tiers: Object.entries(tiers).map(([key, value]) => ({
+        key,
+        ...value,
+        recommended: key === recommendedTier
       }))
     });
-  } catch (err) {
-    next(err);
+    
+  } catch (error) {
+    console.error('Recommended tier error:', error);
+    res.status(500).json({ error: 'Failed to get recommended tier' });
   }
 });
 
-// ============================================================================
-// GET /api/subscriptions/pricing - Get all pricing info
-// ============================================================================
-router.get('/pricing', async (req, res) => {
-  res.json({
-    setupFee: SETUP_FEE,
-    plans: SUBSCRIPTION_PLANS,
-    addons: ADDONS,
-    trial: TRIAL_CONFIG,
-    paymentOptions: PAYMENT_OPTIONS,
-    currency: 'KES'
-  });
-});
-
-// ============================================================================
-// POST /api/subscriptions/activate - Activate subscription (after payment)
-// ============================================================================
-router.post('/activate', auth, async (req, res, next) => {
+// POST /subscriptions/subscribe - Subscribe to a feature (placeholder for M-Pesa integration)
+router.post('/subscribe', auth, async (req, res) => {
   try {
+    const { feature, tier, paymentRef } = req.body;
     const userId = req.user.userId;
-    const { paymentRef, months = 1 } = req.body;
     
-    // Get store
+    if (!feature || !tier) {
+      return res.status(400).json({ error: 'Feature and tier are required' });
+    }
+    
+    // Get user's store
     const storeResult = await db.query(
-      `SELECT id, subscription_status, subscription_expires FROM stores WHERE user_id = $1`,
+      'SELECT id FROM stores WHERE user_id = $1',
       [userId]
     );
     
@@ -174,119 +258,46 @@ router.post('/activate', auth, async (req, res, next) => {
       return res.status(404).json({ error: 'Store not found' });
     }
     
-    const store = storeResult.rows[0];
+    const storeId = storeResult.rows[0].id;
     
-    // Calculate new expiry date
-    const currentExpiry = store.subscription_expires ? new Date(store.subscription_expires) : new Date();
-    const baseDate = currentExpiry > new Date() ? currentExpiry : new Date();
-    const newExpiry = new Date(baseDate);
-    newExpiry.setMonth(newExpiry.getMonth() + months);
-    
-    // Update store subscription
-    await db.query(
-      `UPDATE stores SET 
-        subscription_status = 'active',
-        subscription_expires = $1
-       WHERE id = $2`,
-      [newExpiry, store.id]
-    );
-    
-    // Record payment
-    await db.query(
-      `INSERT INTO platform_payments 
-        (store_id, user_id, amount, type, item_id, item_name, status, completed_at)
-       VALUES ($1, $2, $3, 'subscription', 'base', 'Base Plan', 'completed', NOW())`,
-      [store.id, userId, SUBSCRIPTION_PLANS.base.price * months]
-    );
-    
-    res.json({
-      success: true,
-      status: 'active',
-      expiresAt: newExpiry,
-      message: `Subscription activated for ${months} month(s)!`
-    });
-  } catch (err) {
-    next(err);
-  }
-});
-
-// ============================================================================
-// POST /api/subscriptions/addon - Activate an add-on (after payment)
-// ============================================================================
-router.post('/addon', auth, async (req, res, next) => {
-  try {
-    const userId = req.user.userId;
-    const { addonId, paymentRef, months = 1 } = req.body;
-    
-    // Validate addon
-    const addon = ADDONS[addonId];
-    if (!addon) {
-      return res.status(400).json({ error: 'Invalid add-on' });
+    // Get tier pricing
+    const tierConfig = PRICING_TIERS[feature]?.[tier];
+    if (!tierConfig) {
+      return res.status(400).json({ error: 'Invalid feature or tier' });
     }
     
-    // Get store
-    const storeResult = await db.query(
-      `SELECT id FROM stores WHERE user_id = $1`,
-      [userId]
-    );
-    
-    if (storeResult.rows.length === 0) {
-      return res.status(404).json({ error: 'Store not found' });
-    }
-    
-    const store = storeResult.rows[0];
-    
-    // Calculate expiry
+    // Calculate expiry (1 month from now)
     const expiresAt = new Date();
-    expiresAt.setMonth(expiresAt.getMonth() + months);
+    expiresAt.setMonth(expiresAt.getMonth() + 1);
     
-    // Upsert addon
-    await db.query(
-      `INSERT INTO store_addons (store_id, addon_type, expires_at)
-       VALUES ($1, $2, $3)
-       ON CONFLICT (store_id, addon_type) 
-       DO UPDATE SET expires_at = GREATEST(store_addons.expires_at, $3)`,
-      [store.id, addonId, expiresAt]
-    );
-    
-    // Record payment
-    await db.query(
-      `INSERT INTO platform_payments 
-        (store_id, user_id, amount, type, item_id, item_name, status, completed_at)
-       VALUES ($1, $2, $3, 'addon', $4, $5, 'completed', NOW())`,
-      [store.id, userId, addon.price * months, addonId, addon.name]
-    );
+    // Create or update subscription
+    const result = await db.query(`
+      INSERT INTO store_subscriptions (
+        store_id, feature, tier, status, subscribed_at, expires_at, 
+        monthly_price, last_payment_at, last_payment_ref
+      )
+      VALUES ($1, $2, $3, 'active', NOW(), $4, $5, NOW(), $6)
+      ON CONFLICT (store_id, feature) 
+      DO UPDATE SET 
+        tier = $3,
+        status = 'active',
+        subscribed_at = COALESCE(store_subscriptions.subscribed_at, NOW()),
+        expires_at = $4,
+        monthly_price = $5,
+        last_payment_at = NOW(),
+        last_payment_ref = $6,
+        updated_at = NOW()
+      RETURNING *
+    `, [storeId, feature, tier, expiresAt, tierConfig.price, paymentRef || null]);
     
     res.json({
       success: true,
-      addonId,
-      addonName: addon.name,
-      expiresAt,
-      message: `${addon.name} activated for ${months} month(s)!`
+      subscription: result.rows[0]
     });
-  } catch (err) {
-    next(err);
-  }
-});
-
-// ============================================================================
-// GET /api/subscriptions/history - Get payment history
-// ============================================================================
-router.get('/history', auth, async (req, res, next) => {
-  try {
-    const userId = req.user.userId;
     
-    const result = await db.query(
-      `SELECT * FROM platform_payments 
-       WHERE user_id = $1 
-       ORDER BY created_at DESC 
-       LIMIT 50`,
-      [userId]
-    );
-    
-    res.json({ payments: result.rows });
-  } catch (err) {
-    next(err);
+  } catch (error) {
+    console.error('Subscribe error:', error);
+    res.status(500).json({ error: 'Failed to create subscription' });
   }
 });
 

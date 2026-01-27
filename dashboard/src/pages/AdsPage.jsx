@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { pixelAPI, settingsAPI } from '../api/client';
+import { pixelAPI, settingsAPI, subscriptionsAPI } from '../api/client';
 import { TrendingUp, Users, Target, Copy, Check, ChevronDown, ChevronUp, Link2, Settings, AlertCircle, ShoppingCart, XCircle, CheckCircle, Download, Phone, MessageCircle, Eye, Lock, Zap, Star, X } from 'lucide-react';
 
 export default function AdsPage() {
@@ -18,25 +18,11 @@ export default function AdsPage() {
   // Active tab state
   const [activeTab, setActiveTab] = useState('overview');
   
-  // Paywall state
+  // Paywall state - now fetched from backend
   const [showPaywall, setShowPaywall] = useState(false);
-  const [abandonedFeatureAccess, setAbandonedFeatureAccess] = useState(() => {
-    const stored = localStorage.getItem('abandoned_feature_access');
-    if (stored) {
-      const data = JSON.parse(stored);
-      // Check if trial is still valid (30 days)
-      if (data.trialStarted) {
-        const trialEnd = new Date(data.trialStarted);
-        trialEnd.setDate(trialEnd.getDate() + 30);
-        if (new Date() < trialEnd) {
-          return { ...data, status: 'trial', trialEndsAt: trialEnd };
-        }
-      }
-      if (data.status === 'paid') return data;
-    }
-    return { status: 'none' };
-  });
+  const [abandonedFeatureAccess, setAbandonedFeatureAccess] = useState({ status: 'loading' });
   const [selectedTier, setSelectedTier] = useState('starter');
+  const [startingTrial, setStartingTrial] = useState(false);
   
   // Abandoned checkouts state
   const [abandonedData, setAbandonedData] = useState({
@@ -127,7 +113,8 @@ export default function AdsPage() {
   const handleTabClick = (key, isPremium) => {
     if (isPremium && key === 'abandoned') {
       // Check if user has access
-      if (abandonedFeatureAccess.status === 'none') {
+      // Check if user has access (from backend canAccess flag)
+      if (!abandonedFeatureAccess.canAccess && abandonedFeatureAccess.status !== 'loading') {
         setShowPaywall(true);
         return;
       }
@@ -135,27 +122,50 @@ export default function AdsPage() {
     setActiveTab(key);
   };
 
-  // Start free trial
-  const startFreeTrial = () => {
-    const trialData = {
-      status: 'trial',
-      trialStarted: new Date().toISOString(),
-      tier: null
-    };
-    localStorage.setItem('abandoned_feature_access', JSON.stringify(trialData));
-    setAbandonedFeatureAccess({
-      ...trialData,
-      trialEndsAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-    });
-    setShowPaywall(false);
-    setActiveTab('abandoned');
+  // Start free trial - now uses backend API
+  const startFreeTrial = async () => {
+    setStartingTrial(true);
+    try {
+      const response = await subscriptionsAPI.startTrial('abandoned_checkouts');
+      if (response.data.success) {
+        setAbandonedFeatureAccess({
+          status: 'trial',
+          canAccess: true,
+          trialEndsAt: response.data.trialEndsAt,
+          daysRemaining: response.data.daysRemaining
+        });
+        setShowPaywall(false);
+        setActiveTab('abandoned');
+      }
+    } catch (error) {
+      console.error('Failed to start trial:', error);
+      // Fallback to allow access anyway (graceful degradation)
+      setAbandonedFeatureAccess({ status: 'trial', canAccess: true });
+      setShowPaywall(false);
+      setActiveTab('abandoned');
+    } finally {
+      setStartingTrial(false);
+    }
   };
 
   // Get trial days remaining
   const getTrialDaysRemaining = () => {
+    if (abandonedFeatureAccess.daysRemaining) return abandonedFeatureAccess.daysRemaining;
     if (abandonedFeatureAccess.status !== 'trial' || !abandonedFeatureAccess.trialEndsAt) return 0;
     const diff = new Date(abandonedFeatureAccess.trialEndsAt) - new Date();
     return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+  };
+
+  // Load subscription status from backend
+  const loadSubscriptionStatus = async () => {
+    try {
+      const response = await subscriptionsAPI.getStatus('abandoned_checkouts');
+      setAbandonedFeatureAccess(response.data);
+    } catch (error) {
+      console.error('Failed to load subscription status:', error);
+      // Fallback: allow access (graceful degradation for new users)
+      setAbandonedFeatureAccess({ status: 'none', canAccess: false, trialAvailable: true });
+    }
   };
 
   const loadData = async () => {
@@ -190,6 +200,10 @@ export default function AdsPage() {
         const baseUrl = import.meta.env.VITE_STORE_URL || 'https://jariecommstore.netlify.app';
         setStoreUrl(`${baseUrl}/?store=${slug}`);
       }
+      
+      // Load subscription status for abandoned checkouts feature
+      await loadSubscriptionStatus();
+      
     } catch (error) {
       console.error('Failed to load data:', error);
     } finally {
@@ -311,7 +325,7 @@ export default function AdsPage() {
           >
             <Icon size={16} />
             {label}
-            {premium && abandonedFeatureAccess.status === 'none' && <Lock size={12} style={{ marginLeft: 4, opacity: 0.6 }} />}
+            {premium && !abandonedFeatureAccess.canAccess && abandonedFeatureAccess.status !== 'loading' && <Lock size={12} style={{ marginLeft: 4, opacity: 0.6 }} />}
           </button>
         ))}
       </div>
@@ -507,7 +521,7 @@ export default function AdsPage() {
               </div>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              {abandonedFeatureAccess.status === 'none' && (
+              {!abandonedFeatureAccess.canAccess && abandonedFeatureAccess.status !== 'loading' && (
                 <span style={{ 
                   padding: '4px 10px', 
                   background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)', 
@@ -958,20 +972,21 @@ export default function AdsPage() {
             {/* CTA Button */}
             <button 
               onClick={startFreeTrial}
+              disabled={startingTrial}
               style={{
                 width: '100%',
                 padding: '16px',
-                background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)',
+                background: startingTrial ? 'var(--bg-secondary)' : 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)',
                 border: 'none',
                 borderRadius: '12px',
-                color: 'white',
+                color: startingTrial ? 'var(--text-muted)' : 'white',
                 fontSize: '16px',
                 fontWeight: '700',
-                cursor: 'pointer',
-                boxShadow: '0 4px 16px rgba(139, 92, 246, 0.3)'
+                cursor: startingTrial ? 'not-allowed' : 'pointer',
+                boxShadow: startingTrial ? 'none' : '0 4px 16px rgba(139, 92, 246, 0.3)'
               }}
             >
-              🎁 Start 30-Day Free Trial
+              {startingTrial ? 'Starting Trial...' : '🎁 Start 30-Day Free Trial'}
             </button>
             <p style={{ textAlign: 'center', fontSize: '12px', color: 'var(--text-muted)', marginTop: '12px' }}>
               No credit card required. Cancel anytime.

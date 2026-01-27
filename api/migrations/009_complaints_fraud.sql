@@ -1,16 +1,14 @@
 -- Migration 009: Complaints System
 -- Phase F: Security & Fraud Detection
 -- Created: January 26, 2026
--- FIXED: Handle partial table states with DROP and recreate
+-- IMPORTANT: This migration is IDEMPOTENT - safe to run multiple times
 
 -- ============================================================================
 -- CUSTOMER COMPLAINTS TABLE
 -- ============================================================================
 
--- Drop and recreate to ensure clean state (safe for new tables)
-DROP TABLE IF EXISTS complaints CASCADE;
-
-CREATE TABLE complaints (
+-- Using IF NOT EXISTS to prevent data loss on re-run
+CREATE TABLE IF NOT EXISTS complaints (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   
   -- References
@@ -46,18 +44,16 @@ CREATE TABLE complaints (
 );
 
 -- Indexes
-CREATE INDEX idx_complaints_store ON complaints(store_id);
-CREATE INDEX idx_complaints_status ON complaints(status);
-CREATE INDEX idx_complaints_token ON complaints(complaint_token);
-CREATE INDEX idx_complaints_order ON complaints(order_id);
+CREATE INDEX IF NOT EXISTS idx_complaints_store ON complaints(store_id);
+CREATE INDEX IF NOT EXISTS idx_complaints_status ON complaints(status);
+CREATE INDEX IF NOT EXISTS idx_complaints_token ON complaints(complaint_token);
+CREATE INDEX IF NOT EXISTS idx_complaints_order ON complaints(order_id);
 
 -- ============================================================================
 -- COMPLAINT METRICS (per store)
 -- ============================================================================
 
-DROP TABLE IF EXISTS complaint_metrics CASCADE;
-
-CREATE TABLE complaint_metrics (
+CREATE TABLE IF NOT EXISTS complaint_metrics (
   id SERIAL PRIMARY KEY,
   store_id UUID REFERENCES stores(id) ON DELETE CASCADE UNIQUE,
   
@@ -82,9 +78,7 @@ CREATE TABLE complaint_metrics (
 -- FRAUD ALERTS TABLE
 -- ============================================================================
 
-DROP TABLE IF EXISTS fraud_alerts CASCADE;
-
-CREATE TABLE fraud_alerts (
+CREATE TABLE IF NOT EXISTS fraud_alerts (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   store_id UUID REFERENCES stores(id) ON DELETE CASCADE,
   transaction_id VARCHAR(100),
@@ -109,17 +103,15 @@ CREATE TABLE fraud_alerts (
 );
 
 -- Indexes
-CREATE INDEX idx_fraud_alerts_store ON fraud_alerts(store_id);
-CREATE INDEX idx_fraud_alerts_risk ON fraud_alerts(risk_level);
-CREATE INDEX idx_fraud_alerts_resolved ON fraud_alerts(is_resolved);
+CREATE INDEX IF NOT EXISTS idx_fraud_alerts_store ON fraud_alerts(store_id);
+CREATE INDEX IF NOT EXISTS idx_fraud_alerts_risk ON fraud_alerts(risk_level);
+CREATE INDEX IF NOT EXISTS idx_fraud_alerts_resolved ON fraud_alerts(is_resolved);
 
 -- ============================================================================
 -- MERCHANT WATCHLIST
 -- ============================================================================
 
-DROP TABLE IF EXISTS merchant_watchlist CASCADE;
-
-CREATE TABLE merchant_watchlist (
+CREATE TABLE IF NOT EXISTS merchant_watchlist (
   id SERIAL PRIMARY KEY,
   store_id UUID REFERENCES stores(id) ON DELETE CASCADE UNIQUE,
   
