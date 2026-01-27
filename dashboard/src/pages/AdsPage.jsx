@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { pixelAPI, settingsAPI } from '../api/client';
-import { TrendingUp, Users, Target, Copy, Check, ChevronDown, ChevronUp, Link2, Settings, AlertCircle, ShoppingCart, XCircle, CheckCircle } from 'lucide-react';
+import { TrendingUp, Users, Target, Copy, Check, ChevronDown, ChevronUp, Link2, Settings, AlertCircle, ShoppingCart, XCircle, CheckCircle, Download, Phone, MessageCircle, Eye } from 'lucide-react';
 
 export default function AdsPage() {
   const [storeId, setStoreId] = useState(null);
@@ -14,6 +14,20 @@ export default function AdsPage() {
   const [showUtmSection, setShowUtmSection] = useState(false);
   const [showPixelModal, setShowPixelModal] = useState(false);
   const [customUtm, setCustomUtm] = useState({ source: '', medium: '', campaign: '' });
+  
+  // Active tab state
+  const [activeTab, setActiveTab] = useState('overview');
+  
+  // Abandoned checkouts state
+  const [abandonedData, setAbandonedData] = useState({
+    abandonments: [],
+    funnel: { step_1: 0, step_2: 0, step_3: 0 },
+    bySource: [],
+    recovery: { recovered: 0, contacted: 0, total: 0 },
+    anomalies: [],
+    total: 0
+  });
+  const [loadingAbandoned, setLoadingAbandoned] = useState(false);
   
   // Pixel configuration state
   const [pixels, setPixels] = useState({
@@ -31,8 +45,63 @@ export default function AdsPage() {
   useEffect(() => {
     if (storeId) {
       loadTraffic();
+      if (activeTab === 'abandoned') {
+        loadAbandoned();
+      }
     }
-  }, [timePeriod, storeId]);
+  }, [timePeriod, storeId, activeTab]);
+
+  const loadAbandoned = async () => {
+    if (!storeId) return;
+    setLoadingAbandoned(true);
+    try {
+      const res = await pixelAPI.getAbandoned(storeId, timePeriod);
+      setAbandonedData(res.data || {
+        abandonments: [],
+        funnel: { step_1: 0, step_2: 0, step_3: 0 },
+        bySource: [],
+        recovery: { recovered: 0, contacted: 0, total: 0 },
+        anomalies: [],
+        total: 0
+      });
+    } catch (error) {
+      console.error('Failed to load abandoned data:', error);
+    } finally {
+      setLoadingAbandoned(false);
+    }
+  };
+
+  const downloadAbandonedCSV = () => {
+    const headers = ['Date', 'Product', 'Quantity', 'Amount', 'Step', 'Name', 'Phone', 'Location', 'Source', 'Device', 'Time Spent'];
+    const rows = abandonedData.abandonments.map(a => [
+      new Date(a.created_at).toLocaleDateString(),
+      a.product_name || '-',
+      a.quantity || 1,
+      a.total_amount || 0,
+      `Step ${a.step_reached}`,
+      a.customer_name || '-',
+      a.customer_phone || '-',
+      a.customer_location || '-',
+      a.utm_source || 'direct',
+      a.device || '-',
+      `${a.time_spent || 0}s`
+    ]);
+    
+    const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `abandoned-checkouts-${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const openWhatsApp = (phone, productName) => {
+    const message = encodeURIComponent(`Hi! I noticed you were interested in "${productName}". Can I help you complete your order?`);
+    window.open(`https://wa.me/${phone.replace(/\D/g, '')}?text=${message}`, '_blank');
+  };
 
   const loadData = async () => {
     try {
@@ -160,7 +229,7 @@ export default function AdsPage() {
     <div className="fade-in">
       <div style={styles.header}>
         <div>
-          <h1 style={styles.title}>Ads Manager</h1>
+          <h1 style={styles.title}>Marketing</h1>
           <p style={styles.subtitle}>Track conversions and optimize your campaigns</p>
         </div>
         <button onClick={() => setShowPixelModal(true)} style={styles.pixelSetupBtn}>
@@ -168,6 +237,27 @@ export default function AdsPage() {
           {hasPixelsConfigured ? 'Pixel Settings' : 'Setup Pixels'}
           {hasPixelsConfigured && <span style={styles.pixelDot}></span>}
         </button>
+      </div>
+
+      {/* Tab Navigation */}
+      <div style={styles.tabNav}>
+        {[
+          { key: 'overview', label: 'Overview', icon: TrendingUp },
+          { key: 'abandoned', label: 'Abandoned Checkouts', icon: XCircle },
+          { key: 'utm', label: 'UTM Links', icon: Link2 },
+        ].map(({ key, label, icon: Icon }) => (
+          <button
+            key={key}
+            onClick={() => setActiveTab(key)}
+            style={{
+              ...styles.tabBtn,
+              ...(activeTab === key ? styles.tabBtnActive : {})
+            }}
+          >
+            <Icon size={16} />
+            {label}
+          </button>
+        ))}
       </div>
 
       {/* Pixel Status Banner */}
@@ -208,21 +298,24 @@ export default function AdsPage() {
         </div>
       </div>
 
-      {/* Stats Cards - Conversion Focused */}
-      <div style={styles.statsGrid}>
-        <div className="glass-card stat-card">
-          <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)' }}>
-            <Users size={22} />
-          </div>
-          <div>
-            <p className="stat-label">Total Visitors</p>
-            <p className="stat-value">{traffic.total?.toLocaleString() || 0}</p>
-          </div>
-        </div>
-        
-        <div className="glass-card stat-card">
-          <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)' }}>
-            <ShoppingCart size={22} />
+      {/* OVERVIEW TAB */}
+      {activeTab === 'overview' && (
+        <>
+          {/* Stats Cards - Conversion Focused */}
+          <div style={styles.statsGrid}>
+            <div className="glass-card stat-card">
+              <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)' }}>
+                <Users size={22} />
+              </div>
+              <div>
+                <p className="stat-label">Total Visitors</p>
+                <p className="stat-value">{traffic.total?.toLocaleString() || 0}</p>
+              </div>
+            </div>
+            
+            <div className="glass-card stat-card">
+              <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)' }}>
+                <ShoppingCart size={22} />
           </div>
           <div>
             <p className="stat-label">Checkouts Started</p>
@@ -326,8 +419,11 @@ export default function AdsPage() {
           </div>
         )}
       </div>
+        </>
+      )}
 
-      {/* UTM Links Generator */}
+      {/* UTM LINKS TAB */}
+      {activeTab === 'utm' && (
       <div className="glass-card" style={styles.section}>
         <div 
           style={styles.sectionHeaderClickable}
@@ -445,6 +541,135 @@ export default function AdsPage() {
           </>
         )}
       </div>
+      )}
+
+      {/* ABANDONED CHECKOUTS TAB */}
+      {activeTab === 'abandoned' && (
+        <div>
+          {/* Abandonment Funnel */}
+          <div style={styles.abandonedGrid}>
+            <div className="glass-card" style={styles.funnelCard}>
+              <h3 style={styles.cardTitle}>Where They Abandoned</h3>
+              <div style={styles.abandonFunnel}>
+                {[
+                  { step: 1, label: 'Review Order', color: '#06b6d4' },
+                  { step: 2, label: 'Delivery Details', color: '#f59e0b' },
+                  { step: 3, label: 'Payment', color: '#ef4444' }
+                ].map(({ step, label, color }) => {
+                  const count = abandonedData.funnel?.[`step_${step}`] || 0;
+                  const total = abandonedData.total || 1;
+                  const percentage = Math.round((count / total) * 100);
+                  return (
+                    <div key={step} style={styles.abandonStep}>
+                      <div style={styles.abandonStepHeader}>
+                        <span style={{ ...styles.abandonStepDot, background: color }}>{step}</span>
+                        <span style={styles.abandonStepLabel}>{label}</span>
+                      </div>
+                      <div style={styles.abandonBarContainer}>
+                        <div style={{ ...styles.abandonBar, width: `${percentage}%`, background: color }} />
+                      </div>
+                      <span style={styles.abandonCount}>{count} ({percentage}%)</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Anomaly Alerts */}
+            <div className="glass-card" style={styles.anomalyCard}>
+              <h3 style={styles.cardTitle}>⚠️ Insights & Alerts</h3>
+              {abandonedData.anomalies?.length > 0 ? (
+                <div style={styles.anomalyList}>
+                  {abandonedData.anomalies.map((anomaly, idx) => (
+                    <div key={idx} style={{
+                      ...styles.anomalyItem,
+                      borderLeftColor: anomaly.type === 'error' ? '#ef4444' : anomaly.type === 'warning' ? '#f59e0b' : '#06b6d4'
+                    }}>
+                      <p style={styles.anomalyTitle}>{anomaly.title}</p>
+                      <p style={styles.anomalyMsg}>{anomaly.message}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div style={styles.noAnomalies}>
+                  <CheckCircle size={24} style={{ color: '#22c55e' }} />
+                  <p>No issues detected</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Recent Abandoned Checkouts */}
+          <div className="glass-card" style={styles.section}>
+            <div style={styles.sectionHeader}>
+              <h2 style={styles.sectionTitle}>Recent Abandoned Checkouts</h2>
+              <button onClick={downloadAbandonedCSV} style={styles.downloadBtn}>
+                <Download size={16} />
+                Download CSV
+              </button>
+            </div>
+
+            {loadingAbandoned ? (
+              <div style={styles.loadingInline}>Loading...</div>
+            ) : abandonedData.abandonments?.length > 0 ? (
+              <div style={styles.abandonedTable}>
+                <div style={styles.tableHeader}>
+                  <span style={styles.thProduct}>Product</span>
+                  <span style={styles.thStep}>Step</span>
+                  <span style={styles.thData}>Data Captured</span>
+                  <span style={styles.thTime}>Time</span>
+                  <span style={styles.thSource}>Source</span>
+                  <span style={styles.thActions}>Actions</span>
+                </div>
+                {abandonedData.abandonments.slice(0, 20).map((item, idx) => (
+                  <div key={idx} style={styles.tableRow}>
+                    <span style={styles.tdProduct}>
+                      <strong>{item.product_name || '-'}</strong>
+                      <span style={styles.tdAmount}>KES {(item.total_amount || 0).toLocaleString()}</span>
+                    </span>
+                    <span style={{
+                      ...styles.tdStep,
+                      background: item.step_reached === 1 ? '#06b6d4' : item.step_reached === 2 ? '#f59e0b' : '#ef4444'
+                    }}>
+                      {item.step_reached}
+                    </span>
+                    <span style={styles.tdData}>
+                      {item.customer_name || item.customer_phone ? (
+                        <>
+                          {item.customer_name && <span>{item.customer_name}</span>}
+                          {item.customer_phone && <span style={styles.tdPhone}>{item.customer_phone}</span>}
+                          {item.customer_location && <span style={styles.tdLocation}>{item.customer_location}</span>}
+                        </>
+                      ) : (
+                        <span style={styles.tdNoData}>No data entered</span>
+                      )}
+                    </span>
+                    <span style={styles.tdTime}>{item.time_spent ? `${item.time_spent}s` : '-'}</span>
+                    <span style={styles.tdSource}>{item.utm_source || 'direct'}</span>
+                    <span style={styles.tdActions}>
+                      {item.customer_phone && (
+                        <button 
+                          onClick={() => openWhatsApp(item.customer_phone, item.product_name)}
+                          style={styles.actionBtn}
+                          title="Contact via WhatsApp"
+                        >
+                          <MessageCircle size={16} />
+                        </button>
+                      )}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div style={styles.emptyState}>
+                <XCircle size={32} style={{ color: '#9ca3af', marginBottom: 12 }} />
+                <p style={styles.emptyText}>No abandoned checkouts yet</p>
+                <p style={styles.emptyHint}>When customers start but don't complete checkout, they'll appear here</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Pixel Setup Modal */}
       {showPixelModal && (
@@ -686,4 +911,51 @@ const styles = {
   modalActions: { display: 'flex', gap: '12px', justifyContent: 'flex-end' },
   modalCancelBtn: { padding: '12px 24px', background: 'transparent', border: '1px solid var(--border-color)', borderRadius: '10px', color: 'var(--text-secondary)', fontSize: '14px', fontWeight: '600', cursor: 'pointer' },
   modalSaveBtn: { padding: '12px 24px', background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)', border: 'none', borderRadius: '10px', color: 'white', fontSize: '14px', fontWeight: '600', cursor: 'pointer', boxShadow: '0 4px 12px rgba(139, 92, 246, 0.3)' },
+  
+  // Tab Navigation
+  tabNav: { display: 'flex', gap: '8px', marginBottom: '24px', flexWrap: 'wrap' },
+  tabBtn: { display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: '10px', fontSize: '14px', fontWeight: '500', color: 'var(--text-secondary)', cursor: 'pointer', transition: 'all 0.2s' },
+  tabBtnActive: { background: 'var(--accent-color)', borderColor: 'var(--accent-color)', color: 'white' },
+  
+  // Abandoned Tab Styles
+  abandonedGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px', marginBottom: '24px' },
+  funnelCard: { padding: '20px' },
+  anomalyCard: { padding: '20px' },
+  cardTitle: { fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '16px' },
+  
+  abandonFunnel: { display: 'flex', flexDirection: 'column', gap: '16px' },
+  abandonStep: { display: 'flex', alignItems: 'center', gap: '12px' },
+  abandonStepHeader: { display: 'flex', alignItems: 'center', gap: '8px', minWidth: '140px' },
+  abandonStepDot: { width: '24px', height: '24px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '12px', fontWeight: '700' },
+  abandonStepLabel: { fontSize: '14px', color: 'var(--text-primary)' },
+  abandonBarContainer: { flex: 1, height: '8px', background: 'var(--bg-tertiary)', borderRadius: '4px', overflow: 'hidden' },
+  abandonBar: { height: '100%', borderRadius: '4px', transition: 'width 0.3s ease' },
+  abandonCount: { fontSize: '13px', color: 'var(--text-muted)', minWidth: '80px', textAlign: 'right' },
+  
+  anomalyList: { display: 'flex', flexDirection: 'column', gap: '12px' },
+  anomalyItem: { padding: '12px 16px', background: 'var(--bg-secondary)', borderRadius: '8px', borderLeft: '4px solid' },
+  anomalyTitle: { fontSize: '14px', fontWeight: '600', color: 'var(--text-primary)', margin: '0 0 4px 0' },
+  anomalyMsg: { fontSize: '13px', color: 'var(--text-muted)', margin: 0 },
+  noAnomalies: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', padding: '24px', color: 'var(--text-muted)', fontSize: '14px' },
+  
+  downloadBtn: { display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', background: 'var(--bg-tertiary)', border: '1px solid var(--border-color)', borderRadius: '8px', fontSize: '13px', fontWeight: '500', color: 'var(--text-secondary)', cursor: 'pointer' },
+  loadingInline: { padding: '40px', textAlign: 'center', color: 'var(--text-muted)' },
+  
+  abandonedTable: { display: 'flex', flexDirection: 'column', gap: '8px' },
+  tableHeader: { display: 'grid', gridTemplateColumns: '2fr 60px 2fr 60px 80px 60px', gap: '12px', padding: '12px 16px', background: 'var(--bg-secondary)', borderRadius: '8px', fontSize: '12px', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase' },
+  tableRow: { display: 'grid', gridTemplateColumns: '2fr 60px 2fr 60px 80px 60px', gap: '12px', padding: '14px 16px', background: 'var(--bg-secondary)', borderRadius: '8px', alignItems: 'center' },
+  
+  thProduct: {}, thStep: { textAlign: 'center' }, thData: {}, thTime: { textAlign: 'center' }, thSource: {}, thActions: { textAlign: 'center' },
+  
+  tdProduct: { display: 'flex', flexDirection: 'column', gap: '2px' },
+  tdAmount: { fontSize: '12px', color: 'var(--text-muted)' },
+  tdStep: { width: '28px', height: '28px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '12px', fontWeight: '700', margin: '0 auto' },
+  tdData: { display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '13px' },
+  tdPhone: { color: 'var(--text-muted)', fontSize: '12px' },
+  tdLocation: { color: 'var(--text-muted)', fontSize: '11px' },
+  tdNoData: { color: 'var(--text-muted)', fontStyle: 'italic', fontSize: '12px' },
+  tdTime: { fontSize: '13px', color: 'var(--text-secondary)', textAlign: 'center' },
+  tdSource: { fontSize: '13px', color: 'var(--text-secondary)' },
+  tdActions: { display: 'flex', justifyContent: 'center' },
+  actionBtn: { padding: '6px', background: 'rgba(37, 211, 102, 0.1)', border: 'none', borderRadius: '6px', color: '#25d366', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' },
 };
