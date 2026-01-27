@@ -529,11 +529,14 @@ router.get('/abandoned/:storeId', async (req, res) => {
     const { storeId } = req.params;
     const { period = 'week', limit = 50 } = req.query;
     
+    console.log('📊 GET abandoned - storeId param:', storeId, 'period:', period);
+    
     // Resolve store ID - could be numeric ID or UUID
     let actualStoreId = storeId;
     
     // If it looks like a slug (not a number or UUID), look it up
     if (isNaN(storeId) && !storeId.includes('-')) {
+      console.log('📊 Looking up slug:', storeId);
       const storeResult = await pool.query(
         'SELECT id FROM stores WHERE slug = $1',
         [storeId]
@@ -542,7 +545,10 @@ router.get('/abandoned/:storeId', async (req, res) => {
         return res.status(404).json({ error: 'Store not found' });
       }
       actualStoreId = storeResult.rows[0].id;
+      console.log('📊 Resolved to UUID:', actualStoreId);
     }
+    
+    console.log('📊 Querying with store_id:', actualStoreId);
     
     let dateFilter;
     switch (period) {
@@ -559,6 +565,8 @@ router.get('/abandoned/:storeId', async (req, res) => {
       ORDER BY created_at DESC
       LIMIT $2
     `, [actualStoreId, parseInt(limit)]);
+    
+    console.log('📊 Found', abandonedResult.rows.length, 'abandoned checkouts for store', actualStoreId);
     
     // Get funnel breakdown (which step they abandoned at)
     const funnelResult = await pool.query(`
