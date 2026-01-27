@@ -469,9 +469,25 @@ router.get('/abandoned/:storeId', async (req, res) => {
 // POST /pixel/abandon - Save abandoned checkout with full details
 router.post('/abandon', async (req, res) => {
   try {
-    const { store_id, session_id, data = {} } = req.body;
+    // Handle both JSON and text/plain (sendBeacon sends as text/plain)
+    let body = req.body;
+    if (typeof body === 'string') {
+      try {
+        body = JSON.parse(body);
+      } catch (e) {
+        console.error('Failed to parse abandon body:', e);
+        return res.status(204).end();
+      }
+    }
     
-    if (!store_id) return res.status(204).end();
+    const { store_id, session_id, data = {} } = body;
+    
+    console.log('📥 Abandon request received:', { store_id, session_id, data });
+    
+    if (!store_id) {
+      console.log('📥 No store_id, skipping');
+      return res.status(204).end();
+    }
     
     await pool.query(`
       INSERT INTO abandoned_checkouts (
@@ -499,9 +515,10 @@ router.post('/abandon', async (req, res) => {
       data.time_spent || 0
     ]);
     
+    console.log('✅ Abandon saved successfully');
     res.status(204).end();
   } catch (error) {
-    console.error('Save abandoned checkout error:', error);
+    console.error('❌ Save abandoned checkout error:', error.message, error.stack);
     res.status(204).end(); // Silent fail like analytics
   }
 });
