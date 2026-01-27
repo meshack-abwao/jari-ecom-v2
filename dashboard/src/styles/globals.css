@@ -281,6 +281,13 @@ body {
   overflow: hidden;
   max-height: 500px;
   transition: max-height 0.25s ease, opacity 0.2s ease;
+  padding-left: 12px;
+  margin-left: 8px;
+  border-left: 2px solid var(--border-color);
+}
+
+.nav-section-content .nav-link {
+  padding-left: 12px;
 }
 
 .nav-section-content.collapsed {

@@ -442,37 +442,50 @@ export default function AdsPage() {
                 top: '100%',
                 right: 0,
                 marginTop: '12px',
-                width: '320px',
-                padding: '20px',
-                background: 'rgba(30, 30, 40, 0.98)',
-                backdropFilter: 'blur(20px)',
-                borderRadius: '16px',
-                border: '1px solid rgba(255, 255, 255, 0.15)',
-                boxShadow: '0 25px 50px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255,255,255,0.1)',
+                width: '340px',
+                padding: '24px',
+                background: 'linear-gradient(145deg, rgba(20, 20, 30, 0.95) 0%, rgba(30, 25, 40, 0.98) 100%)',
+                backdropFilter: 'blur(24px)',
+                WebkitBackdropFilter: 'blur(24px)',
+                borderRadius: '20px',
+                border: '1px solid rgba(255, 255, 255, 0.12)',
+                boxShadow: '0 25px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(139, 92, 246, 0.1), inset 0 1px 0 rgba(255,255,255,0.1)',
                 zIndex: 9999
               }}
               onClick={(e) => e.stopPropagation()}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+              {/* Glow effect */}
+              <div style={{
+                position: 'absolute',
+                top: '-50%',
+                right: '-30%',
+                width: '200px',
+                height: '200px',
+                background: 'radial-gradient(circle, rgba(239, 68, 68, 0.15) 0%, transparent 70%)',
+                pointerEvents: 'none'
+              }} />
+              
+              <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '16px', position: 'relative' }}>
                 <div style={{ 
-                  width: '40px', height: '40px', borderRadius: '10px', 
+                  width: '48px', height: '48px', borderRadius: '14px', 
                   background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center'
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  boxShadow: '0 8px 24px rgba(239, 68, 68, 0.4)'
                 }}>
-                  <XCircle size={20} color="white" />
+                  <XCircle size={24} color="white" />
                 </div>
                 <div>
-                  <p style={{ fontSize: '18px', fontWeight: '700', color: 'white', margin: 0 }}>
+                  <p style={{ fontSize: '22px', fontWeight: '800', color: 'white', margin: 0, letterSpacing: '-0.02em' }}>
                     {abandonedCheckouts} Lost Sales
                   </p>
-                  <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)', margin: 0 }}>
+                  <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', margin: 0, fontWeight: '500' }}>
                     This {timePeriod}
                   </p>
                 </div>
               </div>
               
-              <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.8)', lineHeight: '1.5', marginBottom: '16px' }}>
-                Recover 10-15% of abandoned carts with personalized WhatsApp follow-ups. See who dropped off and why.
+              <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.7)', lineHeight: '1.6', marginBottom: '20px', position: 'relative' }}>
+                Recover <span style={{ color: '#22c55e', fontWeight: '600' }}>10-15%</span> of abandoned carts with personalized WhatsApp follow-ups. See exactly who dropped off and why.
               </p>
               
               <button
@@ -482,27 +495,38 @@ export default function AdsPage() {
                 }}
                 style={{
                   width: '100%',
-                  padding: '12px',
+                  padding: '14px',
                   background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)',
                   border: 'none',
-                  borderRadius: '10px',
+                  borderRadius: '12px',
                   color: 'white',
-                  fontSize: '14px',
-                  fontWeight: '600',
+                  fontSize: '15px',
+                  fontWeight: '700',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '8px'
+                  gap: '8px',
+                  boxShadow: '0 8px 24px rgba(139, 92, 246, 0.4)',
+                  transition: 'transform 0.2s, box-shadow 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.transform = 'translateY(-2px)';
+                  e.target.style.boxShadow = '0 12px 32px rgba(139, 92, 246, 0.5)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = '0 8px 24px rgba(139, 92, 246, 0.4)';
                 }}
               >
                 View Abandoned Checkouts
                 {!abandonedFeatureAccess.canAccess && abandonedFeatureAccess.status !== 'loading' && (
                   <span style={{ 
-                    padding: '2px 6px', 
+                    padding: '3px 8px', 
                     background: 'rgba(255,255,255,0.2)', 
-                    borderRadius: '4px', 
-                    fontSize: '10px' 
+                    borderRadius: '6px', 
+                    fontSize: '11px',
+                    fontWeight: '600'
                   }}>
                     PRO
                   </span>
@@ -1062,7 +1086,10 @@ export default function AdsPage() {
           gap: '12px'
         }}>
           🎁 Free trial: {getTrialDaysRemaining()} days remaining
-          <button style={{ background: 'rgba(255,255,255,0.2)', border: 'none', padding: '6px 12px', borderRadius: '6px', color: 'white', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}>
+          <button 
+            onClick={() => setShowPaywall(true)}
+            style={{ background: 'rgba(255,255,255,0.2)', border: 'none', padding: '6px 12px', borderRadius: '6px', color: 'white', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}
+          >
             Upgrade Now
           </button>
         </div>
