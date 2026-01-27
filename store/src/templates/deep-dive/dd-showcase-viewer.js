@@ -103,6 +103,7 @@ export function initShowcaseViewerHandlers(showcaseImages, showcaseVideo) {
     }
     
     viewer.classList.add('active');
+    document.body.style.overflow = 'hidden';  // Prevent background scroll
   }
   
   // Expose navigation function globally
@@ -116,6 +117,7 @@ export function initShowcaseViewerHandlers(showcaseImages, showcaseVideo) {
   // Expose close function globally
   window.closeShowcaseViewer = function() {
     viewer.classList.remove('active');
+    document.body.style.overflow = '';  // Restore scrolling
     if (video) {
       video.pause();
       video.src = '';
