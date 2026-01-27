@@ -512,6 +512,21 @@ router.get('/abandoned/:storeId', async (req, res) => {
     const { storeId } = req.params;
     const { period = 'week', limit = 50 } = req.query;
     
+    // Resolve store ID - could be numeric ID or UUID
+    let actualStoreId = storeId;
+    
+    // If it looks like a slug (not a number or UUID), look it up
+    if (isNaN(storeId) && !storeId.includes('-')) {
+      const storeResult = await pool.query(
+        'SELECT id FROM stores WHERE slug = $1',
+        [storeId]
+      );
+      if (storeResult.rows.length === 0) {
+        return res.status(404).json({ error: 'Store not found' });
+      }
+      actualStoreId = storeResult.rows[0].id;
+    }
+    
     let dateFilter;
     switch (period) {
       case 'today': dateFilter = `created_at >= CURRENT_DATE`; break;
@@ -526,7 +541,7 @@ router.get('/abandoned/:storeId', async (req, res) => {
       WHERE store_id = $1 AND ${dateFilter}
       ORDER BY created_at DESC
       LIMIT $2
-    `, [storeId, parseInt(limit)]);
+    `, [actualStoreId, parseInt(limit)]);
     
     // Get funnel breakdown (which step they abandoned at)
     const funnelResult = await pool.query(`
@@ -537,7 +552,7 @@ router.get('/abandoned/:storeId', async (req, res) => {
       WHERE store_id = $1 AND ${dateFilter}
       GROUP BY step_reached
       ORDER BY step_reached
-    `, [storeId]);
+    `, [actualStoreId]);
     
     // Get total by source
     const bySourceResult = await pool.query(`
@@ -548,7 +563,7 @@ router.get('/abandoned/:storeId', async (req, res) => {
       WHERE store_id = $1 AND ${dateFilter}
       GROUP BY utm_source
       ORDER BY count DESC
-    `, [storeId]);
+    `, [actualStoreId]);
     
     // Get recovery stats
     const recoveryResult = await pool.query(`
@@ -558,7 +573,7 @@ router.get('/abandoned/:storeId', async (req, res) => {
         COUNT(*) as total
       FROM abandoned_checkouts
       WHERE store_id = $1 AND ${dateFilter}
-    `, [storeId]);
+    `, [actualStoreId]);
     
     // Calculate anomalies
     const totalAbandoned = abandonedResult.rows.length;
