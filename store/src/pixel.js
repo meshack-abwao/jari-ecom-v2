@@ -447,7 +447,12 @@ function trackBookingConfirmed(bookingId, serviceName, total = 0, currency = 'KE
  */
 function trackAbandon(data) {
   const store = state.store;
-  if (!store?.id) return;
+  console.log('🚫 trackAbandon called:', { store_id: store?.id, data });
+  
+  if (!store?.id) {
+    console.log('🚫 trackAbandon: No store ID, aborting');
+    return;
+  }
   
   const payload = {
     store_id: store.id,
@@ -462,20 +467,22 @@ function trackAbandon(data) {
   };
   
   const endpoint = `${getApiUrl()}/pixel/abandon`;
+  console.log('🚫 Sending abandon to:', endpoint, payload);
   
   // Use sendBeacon to ensure it fires even on page unload
   if (navigator.sendBeacon) {
-    navigator.sendBeacon(endpoint, JSON.stringify(payload));
+    const sent = navigator.sendBeacon(endpoint, JSON.stringify(payload));
+    console.log('🚫 sendBeacon result:', sent);
   } else {
     fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
       keepalive: true
-    }).catch(() => {});
+    })
+    .then(res => console.log('🚫 fetch result:', res.status))
+    .catch(err => console.log('🚫 fetch error:', err));
   }
-  
-  console.log('🚫 Checkout abandoned:', data);
 }
 
 /**
