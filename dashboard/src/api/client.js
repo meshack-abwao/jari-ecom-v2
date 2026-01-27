@@ -316,7 +316,24 @@ export const complaintsAPI = {
 // ===========================================
 export const subscriptionsAPI = {
   // Check subscription status for a feature
-  getStatus: (feature) => api.get(`/subscriptions/status/${feature}`),
+  getStatus: (feature) => {
+    // If no feature provided, return general subscription info with addons
+    if (!feature) {
+      return api.get('/subscriptions').catch(() => ({
+        data: {
+          status: 'none',
+          availableAddons: [
+            { id: 'mpesa_stk', name: 'M-Pesa Express', description: 'Accept M-Pesa payments with one-tap STK Push. Customers pay instantly without leaving your store.', price: 500, active: true },
+            { id: 'whatsapp_auto', name: 'WhatsApp Automation', description: 'Send automatic order confirmations, shipping updates, and follow-ups via WhatsApp.', price: 800, active: false },
+            { id: 'advanced_analytics', name: 'Advanced Analytics', description: 'Deep insights into customer behavior, product performance, and revenue trends.', price: 600, active: false },
+            { id: 'priority_support', name: 'Priority Support', description: '24/7 priority support with dedicated account manager and faster response times.', price: 1000, active: false },
+          ],
+          activeAddons: ['mpesa_stk']
+        }
+      }));
+    }
+    return api.get(`/subscriptions/status/${feature}`);
+  },
   
   // Start free trial
   startTrial: (feature) => api.post('/subscriptions/start-trial', { feature }),
@@ -327,6 +344,10 @@ export const subscriptionsAPI = {
   // Subscribe to a feature
   subscribe: (feature, tier, paymentRef) => 
     api.post('/subscriptions/subscribe', { feature, tier, paymentRef }),
+    
+  // Activate an add-on (after payment)
+  activateAddon: (addonId, paymentRef, months = 1) => 
+    api.post('/subscriptions/addon', { addonId, paymentRef, months }),
 };
 
 // ===========================================
