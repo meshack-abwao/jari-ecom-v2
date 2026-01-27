@@ -852,3 +852,46 @@ function closeModal() {
   // Missing: document.body.style.overflow = '';
 }
 ```
+
+---
+
+## FORMULA 21: DROP TABLE in Migrations (CRITICAL - Jan 27, 2026)
+
+**Problem:** Production data disappears after every deployment
+
+**Cause:** Migration has `DROP TABLE IF EXISTS` which wipes data on every redeploy
+
+**Example Bad Migration:**
+```sql
+-- ❌ DANGER - This wipes data EVERY TIME Railway deploys!
+DROP TABLE IF EXISTS abandoned_checkouts;
+CREATE TABLE abandoned_checkouts (...);
+```
+
+**Fix - Make migrations IDEMPOTENT:**
+```sql
+-- ✅ SAFE - Only creates if doesn't exist
+CREATE TABLE IF NOT EXISTS abandoned_checkouts (...);
+CREATE INDEX IF NOT EXISTS idx_name ON table(column);
+```
+
+**Also implement migration tracking:**
+```javascript
+// Check if migration already ran
+const executed = await db.query('SELECT name FROM _migrations WHERE name = $1', [filename]);
+if (executed.rows.length > 0) {
+  console.log('Already executed, skipping');
+  return;
+}
+
+// Run migration then record it
+await db.query(sql);
+await db.query('INSERT INTO _migrations (name) VALUES ($1)', [filename]);
+```
+
+**Prevention Checklist:**
+1. ✅ NEVER use DROP TABLE in production migrations
+2. ✅ Always use IF NOT EXISTS for CREATE TABLE
+3. ✅ Always use IF NOT EXISTS for CREATE INDEX
+4. ✅ Implement migration tracking table (_migrations)
+5. ✅ Test migrations locally before pushing
