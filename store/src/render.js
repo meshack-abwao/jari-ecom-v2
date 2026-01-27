@@ -422,8 +422,6 @@ function renderStoreTestimonials() {
 export function renderSingleProduct(product) {
   const template = product.template || 'quick-decision';
   
-  console.log(`[Render] Loading template: ${template} for product:`, product.data?.name);
-  
   switch (template) {
     case 'portfolio-booking': return renderPortfolioBookingTemplate(product);
     case 'visual-menu': return renderVisualMenuTemplate(product);

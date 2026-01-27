@@ -36,21 +36,13 @@ function capturePartialData() {
 }
 
 function trackCheckoutAbandon() {
-  console.log('🚫 trackCheckoutAbandon called:', { currentCheckoutStep, checkoutCompleted });
   if (currentCheckoutStep === 0 || checkoutCompleted) {
-    console.log('🚫 trackCheckoutAbandon: skipping (step=0 or completed)');
     return;
   }
   
   capturePartialData();
   
   const timeSpent = checkoutStartTime ? Math.floor((Date.now() - checkoutStartTime) / 1000) : 0;
-  
-  console.log('🚫 Calling pixel.trackAbandon with:', {
-    step_reached: currentCheckoutStep,
-    time_spent: timeSpent,
-    ...checkoutPartialData
-  });
   
   pixel.trackAbandon({
     step_reached: currentCheckoutStep,

@@ -316,10 +316,7 @@ router.post('/abandon', async (req, res) => {
     
     const { store_id, session_id, data = {} } = body;
     
-    console.log('📥 Abandon request received:', { store_id, session_id, data });
-    
     if (!store_id) {
-      console.log('📥 No store_id, skipping');
       return res.status(204).end();
     }
     
@@ -349,10 +346,9 @@ router.post('/abandon', async (req, res) => {
       data.time_spent || 0
     ]);
     
-    console.log('✅ Abandon saved successfully');
     res.status(204).end();
   } catch (error) {
-    console.error('❌ Save abandoned checkout error:', error.message, error.stack);
+    console.error('Save abandoned checkout error:', error.message);
     res.status(204).end(); // Silent fail like analytics
   }
 });
@@ -363,14 +359,11 @@ router.get('/abandoned/:storeId', async (req, res) => {
     const { storeId } = req.params;
     const { period = 'week', limit = 50 } = req.query;
     
-    console.log('📊 GET abandoned - storeId param:', storeId, 'period:', period);
-    
     // Resolve store ID - could be numeric ID or UUID
     let actualStoreId = storeId;
     
     // If it looks like a slug (not a number or UUID), look it up
     if (isNaN(storeId) && !storeId.includes('-')) {
-      console.log('📊 Looking up slug:', storeId);
       const storeResult = await pool.query(
         'SELECT id FROM stores WHERE slug = $1',
         [storeId]
@@ -379,10 +372,7 @@ router.get('/abandoned/:storeId', async (req, res) => {
         return res.status(404).json({ error: 'Store not found' });
       }
       actualStoreId = storeResult.rows[0].id;
-      console.log('📊 Resolved to UUID:', actualStoreId);
     }
-    
-    console.log('📊 Querying with store_id:', actualStoreId);
     
     let dateFilter;
     switch (period) {
@@ -394,10 +384,7 @@ router.get('/abandoned/:storeId', async (req, res) => {
       default: dateFilter = `created_at >= CURRENT_DATE - INTERVAL '7 days'`;
     }
     
-    console.log('📊 Date filter:', dateFilter);
-    
     // Get detailed abandoned checkouts
-    console.log('📊 Running main query...');
     const abandonedResult = await pool.query(`
       SELECT * FROM abandoned_checkouts
       WHERE store_id = $1::uuid AND ${dateFilter}
@@ -405,10 +392,7 @@ router.get('/abandoned/:storeId', async (req, res) => {
       LIMIT $2
     `, [actualStoreId, parseInt(limit)]);
     
-    console.log('📊 Found', abandonedResult.rows.length, 'abandoned checkouts');
-    
     // Get funnel breakdown (which step they abandoned at)
-    console.log('📊 Running funnel query...');
     const funnelResult = await pool.query(`
       SELECT 
         step_reached,
@@ -419,10 +403,7 @@ router.get('/abandoned/:storeId', async (req, res) => {
       ORDER BY step_reached
     `, [actualStoreId]);
     
-    console.log('📊 Funnel result:', funnelResult.rows);
-    
     // Get total by source
-    console.log('📊 Running source query...');
     const bySourceResult = await pool.query(`
       SELECT 
         COALESCE(utm_source, 'direct') as utm_source,
@@ -433,10 +414,7 @@ router.get('/abandoned/:storeId', async (req, res) => {
       ORDER BY count DESC
     `, [actualStoreId]);
     
-    console.log('📊 Source result:', bySourceResult.rows);
-    
-    // Get recovery stats - simplified query
-    console.log('📊 Running recovery query...');
+    // Get recovery stats
     const recoveryResult = await pool.query(`
       SELECT 
         SUM(CASE WHEN recovered = true THEN 1 ELSE 0 END) as recovered,
@@ -445,8 +423,6 @@ router.get('/abandoned/:storeId', async (req, res) => {
       FROM abandoned_checkouts
       WHERE store_id = $1::uuid AND ${dateFilter}
     `, [actualStoreId]);
-    
-    console.log('📊 Recovery result:', recoveryResult.rows);
     
     // Calculate anomalies
     const totalAbandoned = abandonedResult.rows.length;
@@ -491,8 +467,6 @@ router.get('/abandoned/:storeId', async (req, res) => {
     
     const recovery = recoveryResult.rows[0] || { recovered: 0, contacted: 0, total: 0 };
     
-    console.log('📊 Sending response with', totalAbandoned, 'abandonments');
-    
     res.json({
       abandonments: abandonedResult.rows,
       funnel: {
@@ -510,9 +484,8 @@ router.get('/abandoned/:storeId', async (req, res) => {
       total: totalAbandoned
     });
   } catch (error) {
-    console.error('❌ Get abandoned checkouts error:', error.message);
-    console.error('❌ Stack:', error.stack);
-    res.status(500).json({ error: 'Failed to fetch abandoned checkouts', details: error.message });
+    console.error('Get abandoned checkouts error:', error.message);
+    res.status(500).json({ error: 'Failed to fetch abandoned checkouts' });
   }
 });
 

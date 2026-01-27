@@ -70,7 +70,6 @@ export function initPlatformPixels() {
   if (pixelsInitialized) return;
   
   const store = state.store;
-  console.log('🎯 Pixel init - store data:', { storeId: store?.id, config: store?.config });
   const pixels = store?.config?.pixels || {};
   
   // Initialize Meta Pixel
@@ -89,11 +88,6 @@ export function initPlatformPixels() {
   }
   
   pixelsInitialized = true;
-  console.log('🎯 Platform pixels initialized:', {
-    meta: !!pixels.meta_pixel_id,
-    tiktok: !!pixels.tiktok_pixel_id,
-    google: !!pixels.google_tag_id
-  });
 }
 
 /**
@@ -114,8 +108,6 @@ function initMetaPixel(pixelId) {
   
   window.fbq('init', pixelId);
   window.fbq('track', 'PageView');
-  
-  console.log('📘 Meta Pixel initialized:', pixelId);
 }
 
 /**
@@ -130,8 +122,6 @@ function initTikTokPixel(pixelId) {
     ttq.load(pixelId);
     ttq.page();
   }(window, document, 'ttq');
-  
-  console.log('🎵 TikTok Pixel initialized:', pixelId);
 }
 
 /**
@@ -395,8 +385,6 @@ function trackPurchase(orderId, total = 0, currency = 'KES', items = [], product
       quantity: 1
     }]
   });
-  
-  console.log('💰 Purchase tracked:', { orderId, total, currency });
 }
 
 /**
@@ -447,10 +435,8 @@ function trackBookingConfirmed(bookingId, serviceName, total = 0, currency = 'KE
  */
 function trackAbandon(data) {
   const store = state.store;
-  console.log('🚫 trackAbandon called:', { store_id: store?.id, data });
   
   if (!store?.id) {
-    console.log('🚫 trackAbandon: No store ID, aborting');
     return;
   }
   
@@ -467,21 +453,17 @@ function trackAbandon(data) {
   };
   
   const endpoint = `${getApiUrl()}/pixel/abandon`;
-  console.log('🚫 Sending abandon to:', endpoint, payload);
   
   // Use sendBeacon to ensure it fires even on page unload
   if (navigator.sendBeacon) {
-    const sent = navigator.sendBeacon(endpoint, JSON.stringify(payload));
-    console.log('🚫 sendBeacon result:', sent);
+    navigator.sendBeacon(endpoint, JSON.stringify(payload));
   } else {
     fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
       keepalive: true
-    })
-    .then(res => console.log('🚫 fetch result:', res.status))
-    .catch(err => console.log('🚫 fetch error:', err));
+    }).catch(() => {});
   }
 }
 
