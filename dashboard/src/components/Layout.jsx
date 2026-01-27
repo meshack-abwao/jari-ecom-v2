@@ -380,6 +380,9 @@ export default function Layout() {
             <NavLink to="/products" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
               <Package size={20} /><span>My Store</span>
             </NavLink>
+            <NavLink to="/ads" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
+              <Megaphone size={20} /><span>Marketing</span>
+            </NavLink>
           </div>
           
           {/* Orders Section */}
@@ -405,9 +408,6 @@ export default function Layout() {
             <ChevronDown size={14} className={`nav-section-chevron ${collapsedSections.customize ? 'collapsed' : ''}`} />
           </button>
           <div className={`nav-section-content ${collapsedSections.customize ? 'collapsed' : ''}`}>
-            <NavLink to="/ads" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
-              <Megaphone size={20} /><span>Marketing</span>
-            </NavLink>
             <NavLink to="/templates" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
               <LayoutGrid size={20} /><span>Store Design</span>
             </NavLink>
