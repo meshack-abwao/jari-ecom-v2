@@ -20,6 +20,7 @@ export default function AdsPage() {
   
   // Paywall state - now fetched from backend
   const [showPaywall, setShowPaywall] = useState(false);
+  const [showAbandonedPopup, setShowAbandonedPopup] = useState(false);
   const [abandonedFeatureAccess, setAbandonedFeatureAccess] = useState({ status: 'loading' });
   const [selectedTier, setSelectedTier] = useState('starter');
   const [startingTrial, setStartingTrial] = useState(false);
@@ -56,6 +57,17 @@ export default function AdsPage() {
       }
     }
   }, [timePeriod, storeId, activeTab]);
+
+  // Close popup when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (showAbandonedPopup && !e.target.closest('.abandoned-popup-container')) {
+        setShowAbandonedPopup(false);
+      }
+    };
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [showAbandonedPopup]);
 
   const loadAbandoned = async () => {
     if (!storeId) return;
@@ -404,7 +416,11 @@ export default function AdsPage() {
           </div>
         </div>
 
-        <div className="glass-card stat-card">
+        <div 
+          className="glass-card stat-card abandoned-popup-container" 
+          style={{ cursor: 'pointer', position: 'relative' }}
+          onClick={() => setShowAbandonedPopup(!showAbandonedPopup)}
+        >
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' }}>
             <XCircle size={22} />
           </div>
@@ -413,6 +429,83 @@ export default function AdsPage() {
             <p className="stat-value">{abandonedCheckouts.toLocaleString()}</p>
             <p className="stat-change" style={{ color: '#ef4444' }}>{abandonmentRate}%</p>
           </div>
+          
+          {/* Glassmorphic Popup */}
+          {showAbandonedPopup && (
+            <div 
+              style={{
+                position: 'absolute',
+                top: '100%',
+                right: 0,
+                marginTop: '12px',
+                width: '320px',
+                padding: '20px',
+                background: 'rgba(30, 30, 40, 0.95)',
+                backdropFilter: 'blur(20px)',
+                borderRadius: '16px',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                boxShadow: '0 20px 40px rgba(0, 0, 0, 0.4)',
+                zIndex: 100
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                <div style={{ 
+                  width: '40px', height: '40px', borderRadius: '10px', 
+                  background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center'
+                }}>
+                  <XCircle size={20} color="white" />
+                </div>
+                <div>
+                  <p style={{ fontSize: '18px', fontWeight: '700', color: 'white', margin: 0 }}>
+                    {abandonedCheckouts} Lost Sales
+                  </p>
+                  <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)', margin: 0 }}>
+                    This {timePeriod}
+                  </p>
+                </div>
+              </div>
+              
+              <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.8)', lineHeight: '1.5', marginBottom: '16px' }}>
+                Recover 10-15% of abandoned carts with personalized WhatsApp follow-ups. See who dropped off and why.
+              </p>
+              
+              <button
+                onClick={() => {
+                  setShowAbandonedPopup(false);
+                  handleTabClick('abandoned', true);
+                }}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)',
+                  border: 'none',
+                  borderRadius: '10px',
+                  color: 'white',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px'
+                }}
+              >
+                View Abandoned Checkouts
+                {!abandonedFeatureAccess.canAccess && abandonedFeatureAccess.status !== 'loading' && (
+                  <span style={{ 
+                    padding: '2px 6px', 
+                    background: 'rgba(255,255,255,0.2)', 
+                    borderRadius: '4px', 
+                    fontSize: '10px' 
+                  }}>
+                    PRO
+                  </span>
+                )}
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -489,56 +582,6 @@ export default function AdsPage() {
           </div>
         )}
       </div>
-
-        {/* Abandoned Checkout Teaser Card */}
-        <div 
-          className="glass-card" 
-          style={{ 
-            padding: '20px', 
-            marginTop: '24px',
-            background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%)',
-            border: '1px solid rgba(239, 68, 68, 0.2)',
-            cursor: 'pointer'
-          }}
-          onClick={() => handleTabClick('abandoned', true)}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <div style={{ 
-                width: '48px', height: '48px', borderRadius: '12px', 
-                background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center'
-              }}>
-                <XCircle size={24} color="white" />
-              </div>
-              <div>
-                <h3 style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '4px' }}>
-                  {abandonedData.total || abandonedCheckouts} Abandoned Checkouts
-                </h3>
-                <p style={{ fontSize: '14px', color: 'var(--text-muted)' }}>
-                  Recover lost sales with WhatsApp follow-ups
-                </p>
-              </div>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              {!abandonedFeatureAccess.canAccess && abandonedFeatureAccess.status !== 'loading' && (
-                <span style={{ 
-                  padding: '4px 10px', 
-                  background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)', 
-                  borderRadius: '6px', 
-                  fontSize: '11px', 
-                  fontWeight: '600', 
-                  color: 'white' 
-                }}>
-                  PRO
-                </span>
-              )}
-              <span style={{ color: 'var(--accent-color)', fontWeight: '600', fontSize: '14px' }}>
-                View Details →
-              </span>
-            </div>
-          </div>
-        </div>
         </>
       )}
 
