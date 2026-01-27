@@ -258,28 +258,6 @@ export const templatesAPI = {
 };
 
 // ===========================================
-// SUBSCRIPTIONS API (Phase D)
-// ===========================================
-export const subscriptionsAPI = {
-  // Get current subscription status
-  getStatus: () => api.get('/subscriptions'),
-  
-  // Get pricing info
-  getPricing: () => api.get('/subscriptions/pricing'),
-  
-  // Activate subscription (after payment)
-  activate: (paymentRef, months = 1) => 
-    api.post('/subscriptions/activate', { paymentRef, months }),
-  
-  // Activate an add-on (after payment)
-  activateAddon: (addonId, paymentRef, months = 1) => 
-    api.post('/subscriptions/addon', { addonId, paymentRef, months }),
-  
-  // Get payment history
-  getHistory: () => api.get('/subscriptions/history'),
-};
-
-// ===========================================
 // M-PESA PAYMENTS API
 // ===========================================
 export const mpesaAPI = {
