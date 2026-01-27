@@ -418,7 +418,11 @@ export default function AdsPage() {
 
         <div 
           className="glass-card stat-card abandoned-popup-container" 
-          style={{ cursor: 'pointer', position: 'relative' }}
+          style={{ 
+            cursor: 'pointer', 
+            position: 'relative',
+            zIndex: showAbandonedPopup ? 9999 : 1
+          }}
           onClick={() => setShowAbandonedPopup(!showAbandonedPopup)}
         >
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' }}>
@@ -440,12 +444,12 @@ export default function AdsPage() {
                 marginTop: '12px',
                 width: '320px',
                 padding: '20px',
-                background: 'rgba(30, 30, 40, 0.95)',
+                background: 'rgba(30, 30, 40, 0.98)',
                 backdropFilter: 'blur(20px)',
                 borderRadius: '16px',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                boxShadow: '0 20px 40px rgba(0, 0, 0, 0.4)',
-                zIndex: 100
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                boxShadow: '0 25px 50px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255,255,255,0.1)',
+                zIndex: 9999
               }}
               onClick={(e) => e.stopPropagation()}
             >
