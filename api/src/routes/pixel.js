@@ -561,7 +561,7 @@ router.get('/abandoned/:storeId', async (req, res) => {
     // Get detailed abandoned checkouts
     const abandonedResult = await pool.query(`
       SELECT * FROM abandoned_checkouts
-      WHERE store_id = $1 AND ${dateFilter}
+      WHERE store_id = $1::uuid AND ${dateFilter}
       ORDER BY created_at DESC
       LIMIT $2
     `, [actualStoreId, parseInt(limit)]);
@@ -574,7 +574,7 @@ router.get('/abandoned/:storeId', async (req, res) => {
         step_reached,
         COUNT(*) as count
       FROM abandoned_checkouts
-      WHERE store_id = $1 AND ${dateFilter}
+      WHERE store_id = $1::uuid AND ${dateFilter}
       GROUP BY step_reached
       ORDER BY step_reached
     `, [actualStoreId]);
@@ -585,7 +585,7 @@ router.get('/abandoned/:storeId', async (req, res) => {
         utm_source,
         COUNT(*) as count
       FROM abandoned_checkouts
-      WHERE store_id = $1 AND ${dateFilter}
+      WHERE store_id = $1::uuid AND ${dateFilter}
       GROUP BY utm_source
       ORDER BY count DESC
     `, [actualStoreId]);
@@ -597,7 +597,7 @@ router.get('/abandoned/:storeId', async (req, res) => {
         COUNT(*) FILTER (WHERE contacted = true) as contacted,
         COUNT(*) as total
       FROM abandoned_checkouts
-      WHERE store_id = $1 AND ${dateFilter}
+      WHERE store_id = $1::uuid AND ${dateFilter}
     `, [actualStoreId]);
     
     // Calculate anomalies
@@ -654,8 +654,9 @@ router.get('/abandoned/:storeId', async (req, res) => {
       total: totalAbandoned
     });
   } catch (error) {
-    console.error('Get abandoned checkouts error:', error);
-    res.status(500).json({ error: 'Failed to fetch abandoned checkouts' });
+    console.error('❌ Get abandoned checkouts error:', error.message);
+    console.error('❌ Stack:', error.stack);
+    res.status(500).json({ error: 'Failed to fetch abandoned checkouts', details: error.message });
   }
 });
 
