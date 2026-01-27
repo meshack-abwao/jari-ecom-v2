@@ -555,10 +555,15 @@ router.get('/abandoned/:storeId', async (req, res) => {
       case 'today': dateFilter = `created_at >= CURRENT_DATE`; break;
       case 'week': dateFilter = `created_at >= CURRENT_DATE - INTERVAL '7 days'`; break;
       case 'month': dateFilter = `created_at >= CURRENT_DATE - INTERVAL '30 days'`; break;
+      case 'quarter': dateFilter = `created_at >= CURRENT_DATE - INTERVAL '90 days'`; break;
+      case 'year': dateFilter = `created_at >= CURRENT_DATE - INTERVAL '365 days'`; break;
       default: dateFilter = `created_at >= CURRENT_DATE - INTERVAL '7 days'`;
     }
     
+    console.log('📊 Date filter:', dateFilter);
+    
     // Get detailed abandoned checkouts
+    console.log('📊 Running main query...');
     const abandonedResult = await pool.query(`
       SELECT * FROM abandoned_checkouts
       WHERE store_id = $1::uuid AND ${dateFilter}
@@ -566,9 +571,10 @@ router.get('/abandoned/:storeId', async (req, res) => {
       LIMIT $2
     `, [actualStoreId, parseInt(limit)]);
     
-    console.log('📊 Found', abandonedResult.rows.length, 'abandoned checkouts for store', actualStoreId);
+    console.log('📊 Found', abandonedResult.rows.length, 'abandoned checkouts');
     
     // Get funnel breakdown (which step they abandoned at)
+    console.log('📊 Running funnel query...');
     const funnelResult = await pool.query(`
       SELECT 
         step_reached,
@@ -579,10 +585,13 @@ router.get('/abandoned/:storeId', async (req, res) => {
       ORDER BY step_reached
     `, [actualStoreId]);
     
+    console.log('📊 Funnel result:', funnelResult.rows);
+    
     // Get total by source
+    console.log('📊 Running source query...');
     const bySourceResult = await pool.query(`
       SELECT 
-        utm_source,
+        COALESCE(utm_source, 'direct') as utm_source,
         COUNT(*) as count
       FROM abandoned_checkouts
       WHERE store_id = $1::uuid AND ${dateFilter}
@@ -590,15 +599,20 @@ router.get('/abandoned/:storeId', async (req, res) => {
       ORDER BY count DESC
     `, [actualStoreId]);
     
-    // Get recovery stats
+    console.log('📊 Source result:', bySourceResult.rows);
+    
+    // Get recovery stats - simplified query
+    console.log('📊 Running recovery query...');
     const recoveryResult = await pool.query(`
       SELECT 
-        COUNT(*) FILTER (WHERE recovered = true) as recovered,
-        COUNT(*) FILTER (WHERE contacted = true) as contacted,
+        SUM(CASE WHEN recovered = true THEN 1 ELSE 0 END) as recovered,
+        SUM(CASE WHEN contacted = true THEN 1 ELSE 0 END) as contacted,
         COUNT(*) as total
       FROM abandoned_checkouts
       WHERE store_id = $1::uuid AND ${dateFilter}
     `, [actualStoreId]);
+    
+    console.log('📊 Recovery result:', recoveryResult.rows);
     
     // Calculate anomalies
     const totalAbandoned = abandonedResult.rows.length;
@@ -641,6 +655,10 @@ router.get('/abandoned/:storeId', async (req, res) => {
       });
     }
     
+    const recovery = recoveryResult.rows[0] || { recovered: 0, contacted: 0, total: 0 };
+    
+    console.log('📊 Sending response with', totalAbandoned, 'abandonments');
+    
     res.json({
       abandonments: abandonedResult.rows,
       funnel: {
@@ -649,7 +667,11 @@ router.get('/abandoned/:storeId', async (req, res) => {
         step_3: funnel.step_3 || 0
       },
       bySource: bySourceResult.rows,
-      recovery: recoveryResult.rows[0] || { recovered: 0, contacted: 0, total: 0 },
+      recovery: {
+        recovered: parseInt(recovery.recovered) || 0,
+        contacted: parseInt(recovery.contacted) || 0,
+        total: parseInt(recovery.total) || 0
+      },
       anomalies,
       total: totalAbandoned
     });
