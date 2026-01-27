@@ -277,15 +277,17 @@ body {
 .nav-section-content {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
   overflow: hidden;
   max-height: 500px;
   transition: max-height 0.25s ease, opacity 0.2s ease;
-  padding-left: 16px;
+  padding-left: 12px;
+  margin-top: 2px;
 }
 
 .nav-section-content .nav-link {
   font-size: 14px;
+  padding: 10px 14px;
 }
 
 .nav-section-content.collapsed {

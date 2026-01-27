@@ -307,7 +307,40 @@ export default function AdsPage() {
   }
 
   return (
-    <div className="fade-in">
+    <div className="fade-in" style={{ position: 'relative', overflow: 'hidden' }}>
+      {/* Floating gradient background elements */}
+      <div style={{
+        position: 'absolute',
+        top: '10%',
+        right: '-5%',
+        width: '400px',
+        height: '400px',
+        background: 'radial-gradient(circle, rgba(139, 92, 246, 0.08) 0%, transparent 70%)',
+        pointerEvents: 'none',
+        zIndex: 0
+      }} />
+      <div style={{
+        position: 'absolute',
+        top: '40%',
+        left: '-10%',
+        width: '350px',
+        height: '350px',
+        background: 'radial-gradient(circle, rgba(6, 182, 212, 0.06) 0%, transparent 70%)',
+        pointerEvents: 'none',
+        zIndex: 0
+      }} />
+      <div style={{
+        position: 'absolute',
+        bottom: '10%',
+        right: '20%',
+        width: '300px',
+        height: '300px',
+        background: 'radial-gradient(circle, rgba(239, 68, 68, 0.05) 0%, transparent 70%)',
+        pointerEvents: 'none',
+        zIndex: 0
+      }} />
+      
+      <div style={{ position: 'relative', zIndex: 1 }}>
       <div style={styles.header}>
         <div>
           <h1 style={styles.title}>Marketing</h1>
@@ -383,8 +416,44 @@ export default function AdsPage() {
       {/* OVERVIEW TAB */}
       {activeTab === 'overview' && (
         <>
-          {/* Stats Cards - Conversion Focused */}
-          <div style={styles.statsGrid}>
+          {/* Stats Cards - Conversion Focused with floating gradients */}
+          <div style={{ position: 'relative' }}>
+            {/* Floating gradient accents */}
+            <div style={{
+              position: 'absolute',
+              top: '-30px',
+              right: '10%',
+              width: '180px',
+              height: '180px',
+              background: 'radial-gradient(circle, rgba(239, 68, 68, 0.12) 0%, transparent 70%)',
+              pointerEvents: 'none',
+              zIndex: 0,
+              filter: 'blur(20px)'
+            }} />
+            <div style={{
+              position: 'absolute',
+              top: '20%',
+              left: '5%',
+              width: '150px',
+              height: '150px',
+              background: 'radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%)',
+              pointerEvents: 'none',
+              zIndex: 0,
+              filter: 'blur(15px)'
+            }} />
+            <div style={{
+              position: 'absolute',
+              bottom: '-20px',
+              right: '30%',
+              width: '120px',
+              height: '120px',
+              background: 'radial-gradient(circle, rgba(34, 197, 94, 0.08) 0%, transparent 70%)',
+              pointerEvents: 'none',
+              zIndex: 0,
+              filter: 'blur(15px)'
+            }} />
+            
+          <div style={{ ...styles.statsGrid, position: 'relative', zIndex: 1 }}>
             <div className="glass-card stat-card">
               <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)' }}>
                 <Users size={22} />
@@ -535,6 +604,7 @@ export default function AdsPage() {
             </div>
           )}
         </div>
+      </div>
       </div>
 
       {/* Conversion Funnel */}
@@ -1094,6 +1164,7 @@ export default function AdsPage() {
           </button>
         </div>
       )}
+      </div>
     </div>
   );
 }
