@@ -2,10 +2,10 @@
 -- Purpose: Store detailed data about abandoned checkouts for follow-up and analysis
 -- Date: January 27, 2026
 
--- Create abandoned_checkouts table
+-- Create abandoned_checkouts table (no FK constraint to avoid migration issues)
 CREATE TABLE IF NOT EXISTS abandoned_checkouts (
   id SERIAL PRIMARY KEY,
-  store_id INTEGER NOT NULL REFERENCES stores(id) ON DELETE CASCADE,
+  store_id INTEGER NOT NULL,
   session_id VARCHAR(100),
   
   -- Product info
