@@ -142,8 +142,8 @@ export default function ProductsPage() {
     packages: false, dietary: false, addons: false, specifications: false, whatsIncluded: false, showcase: false, warranty: false, eventDetails: false, tickets: false, policies: false
   });
   
-  // Card balance state (Phase C)
-  const [cardBalance, setCardBalance] = useState({ cardLimit: 3, cardsUsed: 0, cardsRemaining: 3, canAddProduct: true });
+  // Card balance state (Phase C) - DISABLED: Allow unlimited products for testing
+  const [cardBalance, setCardBalance] = useState({ cardLimit: 999, cardsUsed: 0, cardsRemaining: 999, canAddProduct: true });
   const [showBuyCardsModal, setShowBuyCardsModal] = useState(false);
   const [cardBundles, setCardBundles] = useState([]);
   const [selectedBundle, setSelectedBundle] = useState(null);
@@ -274,11 +274,11 @@ export default function ProductsPage() {
   };
 
   const handleAddProductClick = async () => {
-    // Check card limit before opening modal
-    if (!cardBalance.canAddProduct) {
-      handleBuyCards();
-      return;
-    }
+    // DISABLED: Card limit check - allow unlimited products for testing
+    // if (!cardBalance.canAddProduct) {
+    //   handleBuyCards();
+    //   return;
+    // }
     setShowModal(true);
   };
 
@@ -338,12 +338,12 @@ export default function ProductsPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Block if creating new product and no cards remaining
-      if (!editingProduct && !cardBalance.canAddProduct) {
-        alert('❌ Product limit reached! Purchase more cards to add products.');
-        handleBuyCards();
-        return;
-      }
+      // DISABLED: Card limit check - allow unlimited products for testing
+      // if (!editingProduct && !cardBalance.canAddProduct) {
+      //   alert('❌ Product limit reached! Purchase more cards to add products.');
+      //   handleBuyCards();
+      //   return;
+      // }
       
       // Build V2 JSONB structure
       const productPayload = {
@@ -579,14 +579,14 @@ export default function ProductsPage() {
           <p style={styles.subtitle}>Manage your product catalog ({products.length} products)</p>
         </div>
         <div style={styles.headerActions}>
-          {/* Card Balance Display */}
-          <div style={styles.cardBalanceBox}>
+          {/* Card Balance Display - HIDDEN: Unlimited products for testing */}
+          {/* <div style={styles.cardBalanceBox}>
             <ShoppingBag size={16} />
             <span>{cardBalance.cardsRemaining}/{cardBalance.cardLimit} cards</span>
             {!cardBalance.canAddProduct && (
               <button onClick={handleBuyCards} style={styles.buyCardsBtn}>Buy More</button>
             )}
-          </div>
+          </div> */}
           <button onClick={() => setShowCategoryModal(true)} style={styles.categoryBtn}>
             <Tag size={18} /> Categories
           </button>

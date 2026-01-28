@@ -134,13 +134,15 @@ export function renderHeader() {
 function renderHeroCTAs(hero, store) {
   // Use store contact info for WhatsApp and Call
   const phone = store?.contact_phone;
-  const storeName = store?.name || 'this store';
+  const storeName = store?.name || 'Store';
   
   if (!phone) return '';
   
   // Clean phone number for links
   const cleanPhone = phone.replace(/\D/g, '');
-  const whatsappLink = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(`Hi! I'm interested in ${storeName}`)}`;
+  // JTBD: Help customer quickly inquire about products/services
+  const whatsappMessage = `Hi ${storeName}! 👋 I'm browsing your collection and would love to know more about your products. Can you help me find what I'm looking for?`;
+  const whatsappLink = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(whatsappMessage)}`;
   const callLink = `tel:${cleanPhone}`;
   
   return `
@@ -175,7 +177,9 @@ export function renderFooter() {
   
   // Clean phone for links
   const cleanPhone = phone ? phone.replace(/\D/g, '') : '';
-  const whatsappLink = cleanPhone ? `https://wa.me/${cleanPhone}` : '';
+  // JTBD: Quick contact for general inquiries
+  const footerWhatsappMsg = `Hi ${storeName}! 👋 I have a quick question about your products.`;
+  const whatsappLink = cleanPhone ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(footerWhatsappMsg)}` : '';
   const callLink = cleanPhone ? `tel:${cleanPhone}` : '';
   const instagramLink = instagram ? `https://instagram.com/${instagram.replace('@', '')}` : '';
   

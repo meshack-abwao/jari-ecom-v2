@@ -19,8 +19,11 @@ export function renderPortfolioBookingTemplate(product) {
     ? Math.min(...packages.map(p => parseInt(p.price || 0)))
     : parseInt(data.price || 0);
 
+  // JTBD: Customer wants to inquire about this specific service
+  const productName = data.name || 'your service';
+  const whatsappMessage = `Hi! 👋 I'm interested in "${productName}" and would like to inquire about availability and pricing. Can you help me?`;
   const whatsappLink = store?.contact_phone 
-    ? `https://wa.me/${store.contact_phone.replace(/\D/g, '')}?text=${encodeURIComponent(`Hi! I'm interested in ${data.name || 'your service'}`)}`
+    ? `https://wa.me/${store.contact_phone.replace(/\D/g, '')}?text=${encodeURIComponent(whatsappMessage)}`
     : null;
 
   return `
