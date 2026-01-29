@@ -17,8 +17,11 @@ const app = express();
 // 1. Compression (gzip) - 60-80% smaller responses
 app.use(compression());
 
-// 2. CORS
-app.use(cors({ origin: config.corsOrigins, credentials: true }));
+// 2. CORS - Allow all origins for custom domain support
+app.use(cors({ 
+  origin: true,  // Reflects the request origin, allowing any origin
+  credentials: true 
+}));
 
 // 3. Body parsing
 app.use(express.json());
