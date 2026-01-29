@@ -93,8 +93,8 @@ function normalizeDomain(domain) {
   // Remove trailing slashes and paths
   normalized = normalized.split('/')[0];
   
-  // Remove www. prefix (optional - we treat www and non-www as same)
-  // normalized = normalized.replace(/^www\./, '');
+  // Remove www. prefix - we treat www and non-www as same
+  normalized = normalized.replace(/^www\./, '');
   
   return normalized;
 }
