@@ -47,7 +47,8 @@ CREATE TABLE IF NOT EXISTS domain_verifications (
   verified_at TIMESTAMP,
   error_message TEXT,
   created_at TIMESTAMP DEFAULT NOW(),
-  CONSTRAINT valid_verification_status CHECK (status IN ('pending', 'verified', 'failed', 'expired'))
+  CONSTRAINT valid_verification_status CHECK (status IN ('pending', 'verified', 'failed', 'expired')),
+  CONSTRAINT unique_store_domain UNIQUE (store_id, domain)
 );
 
 -- ============================================

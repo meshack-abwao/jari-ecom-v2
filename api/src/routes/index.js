@@ -14,6 +14,7 @@ import cardsRoutes from './cards.js';
 import templatesRoutes from './templates.js';
 import subscriptionsRoutes from './subscriptions.js';
 import complaintsRoutes from './complaints.js';
+import domainsRoutes from './domains.js';
 
 export function setupRoutes(app) {
   // Health check
@@ -40,6 +41,10 @@ export function setupRoutes(app) {
   app.use('/api/templates', templatesRoutes);
   app.use('/api/subscriptions', subscriptionsRoutes);
   app.use('/api/complaints', complaintsRoutes);
+  app.use('/api/domains', domainsRoutes);
+  
+  // Public domain lookup (no auth required, no /api prefix)
+  app.use('/domain', domainsRoutes);
   
   // Public store routes (no /api prefix for cleaner URLs)
   app.use('/s', publicRoutes);
