@@ -895,3 +895,173 @@ await db.query('INSERT INTO _migrations (name) VALUES ($1)', [filename]);
 3. ✅ Always use IF NOT EXISTS for CREATE INDEX
 4. ✅ Implement migration tracking table (_migrations)
 5. ✅ Test migrations locally before pushing
+
+
+---
+
+## FORMULA 22: DNS Propagation Delays (Jan 29, 2026)
+
+**Problem:** Domain verification fails immediately after DNS setup
+
+**Cause:** DNS changes take time to propagate globally (can be up to 48 hours)
+
+**Symptoms:**
+- User adds DNS records correctly
+- Clicks "Verify" immediately
+- Verification fails with "TXT record not found"
+
+**Fix - Communicate Wait Time:**
+```javascript
+// Show clear messaging about propagation delay
+if (dnsErr.code === 'ENODATA' || dnsErr.code === 'ENOTFOUND') {
+  errorMessage = 'TXT record not found. Please add the DNS record and wait up to 48 hours for propagation.';
+}
+```
+
+**User-Facing Tips:**
+1. DNS propagation typically takes 15 minutes to 48 hours
+2. Recommend waiting at least 30 minutes before first verify attempt
+3. Provide "Check Again" button instead of failing hard
+4. Show last attempt time so users know when to retry
+
+**Debugging DNS:**
+```bash
+# Check if TXT record exists
+dig TXT _jari-verify.yourdomain.com
+
+# Or use nslookup
+nslookup -type=TXT _jari-verify.yourdomain.com
+```
+
+---
+
+## FORMULA 23: Domain Case Sensitivity (Jan 29, 2026)
+
+**Problem:** Custom domain lookup fails for mixed-case domains
+
+**Cause:** User enters "LanixKenya.com" but database has "lanixkenya.com"
+
+**Example Bug:**
+```javascript
+// ❌ WRONG - Case mismatch
+const domain = req.params.domain; // "LanixKenya.COM"
+const result = await db.query('SELECT * FROM stores WHERE custom_domain = $1', [domain]);
+// Returns 0 rows because database has lowercase
+```
+
+**Fix - Always normalize to lowercase:**
+```javascript
+// ✅ CORRECT - Normalize everything
+function normalizeDomain(domain) {
+  if (!domain) return null;
+  let normalized = domain.toLowerCase().trim();
+  normalized = normalized.replace(/^https?:\/\//, ''); // Remove protocol
+  normalized = normalized.split('/')[0]; // Remove path
+  return normalized;
+}
+
+// Use in all domain operations
+const domain = normalizeDomain(req.params.domain);
+const result = await db.query('SELECT * FROM stores WHERE custom_domain = $1', [domain]);
+```
+
+**Database Constraint (extra safety):**
+```sql
+-- Force lowercase in database
+ALTER TABLE stores 
+ADD CONSTRAINT valid_custom_domain 
+CHECK (custom_domain IS NULL OR custom_domain = LOWER(custom_domain));
+```
+
+---
+
+## FORMULA 24: Multi-Part TLD Detection (Jan 29, 2026)
+
+**Problem:** Root vs Subdomain detection fails for .co.ke, .co.uk domains
+
+**Cause:** Simple split('.').length check doesn't account for multi-part TLDs
+
+**Example Bug:**
+```javascript
+// ❌ WRONG - Treats lanixkenya.co.ke as subdomain (3 parts)
+function detectDomainType(domain) {
+  const parts = domain.split('.');
+  return parts.length > 2 ? 'subdomain' : 'root';
+}
+
+detectDomainType('lanixkenya.co.ke'); // Returns 'subdomain' - WRONG!
+detectDomainType('shop.lanixkenya.co.ke'); // Also returns 'subdomain' - At least this is right
+```
+
+**Fix - Account for multi-part TLDs:**
+```javascript
+// ✅ CORRECT
+function detectDomainType(domain) {
+  const parts = domain.split('.');
+  
+  // Common multi-part TLDs (add more as needed)
+  const multiPartTLDs = ['co.ke', 'co.uk', 'com.au', 'co.za', 'ac.ke', 'or.ke'];
+  
+  for (const tld of multiPartTLDs) {
+    if (domain.endsWith(`.${tld}`)) {
+      const withoutTLD = domain.slice(0, -(tld.length + 1));
+      return withoutTLD.includes('.') ? 'subdomain' : 'root';
+    }
+  }
+  
+  // Standard TLDs (.com, .net, etc.)
+  return parts.length > 2 ? 'subdomain' : 'root';
+}
+
+detectDomainType('lanixkenya.co.ke'); // Returns 'root' ✓
+detectDomainType('shop.lanixkenya.co.ke'); // Returns 'subdomain' ✓
+```
+
+---
+
+## FORMULA 25: Custom Domain Skip Logic (Jan 29, 2026)
+
+**Problem:** Custom domain lookup runs on main domain, causing unnecessary API calls
+
+**Cause:** Not checking if current hostname is a known main domain before lookup
+
+**Example Bug:**
+```javascript
+// ❌ WRONG - Tries to lookup 'jarisolutionsecom.store' as custom domain
+async function checkCustomDomain() {
+  const hostname = window.location.hostname;
+  const response = await fetch(`/domain/lookup/${hostname}`);
+  // Makes unnecessary API call for main domain
+}
+```
+
+**Fix - Skip known main domains:**
+```javascript
+// ✅ CORRECT
+const MAIN_DOMAINS = [
+  'localhost',
+  '127.0.0.1',
+  'jariecommstore.netlify.app',
+  'jarisolutionsecom.store',
+  'jari-store.netlify.app'
+];
+
+async function checkCustomDomain() {
+  const hostname = window.location.hostname.toLowerCase();
+  
+  // Skip if already have slug in URL params
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('store')) return;
+  
+  // Skip if on main domains
+  if (MAIN_DOMAINS.some(d => hostname === d || hostname.endsWith('.' + d))) {
+    return;
+  }
+  
+  // Only now do the lookup
+  const response = await fetch(`/domain/lookup/${hostname}`);
+  // ...
+}
+```
+
+---
