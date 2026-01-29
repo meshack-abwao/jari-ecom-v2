@@ -12,13 +12,33 @@ const router = Router();
 const NETLIFY_ACCESS_TOKEN = process.env.NETLIFY_ACCESS_TOKEN;
 const NETLIFY_SITE_ID = process.env.NETLIFY_SITE_ID;
 
+// Log on startup to verify credentials are loaded
+if (NETLIFY_ACCESS_TOKEN && NETLIFY_SITE_ID) {
+  console.log('✅ Netlify credentials loaded for auto-provisioning');
+} else {
+  console.warn('⚠️ Netlify credentials missing - auto-provisioning disabled');
+  console.warn('  NETLIFY_ACCESS_TOKEN:', NETLIFY_ACCESS_TOKEN ? 'SET' : 'MISSING');
+  console.warn('  NETLIFY_SITE_ID:', NETLIFY_SITE_ID ? 'SET' : 'MISSING');
+}
+
 // ============================================
 // HELPER FUNCTIONS
 // ============================================
 
 // Add domain to Netlify (auto-provisioning)
 async function addDomainToNetlify(domain) {
+  // Check if credentials are configured
+  if (!NETLIFY_ACCESS_TOKEN || !NETLIFY_SITE_ID) {
+    console.error('❌ Cannot add domain to Netlify: credentials not configured');
+    console.error('  NETLIFY_ACCESS_TOKEN:', NETLIFY_ACCESS_TOKEN ? 'SET' : 'MISSING');
+    console.error('  NETLIFY_SITE_ID:', NETLIFY_SITE_ID ? 'SET' : 'MISSING');
+    return { success: false, error: 'Netlify credentials not configured' };
+  }
+  
   try {
+    console.log(`🔄 Adding domain to Netlify: ${domain}`);
+    console.log(`  Site ID: ${NETLIFY_SITE_ID}`);
+    
     const response = await fetch(
       `https://api.netlify.com/api/v1/sites/${NETLIFY_SITE_ID}/domain_aliases`,
       {
@@ -31,11 +51,15 @@ async function addDomainToNetlify(domain) {
       }
     );
     
+    console.log(`  Netlify response status: ${response.status}`);
+    
     if (response.ok) {
       console.log(`✅ Domain added to Netlify: ${domain}`);
       return { success: true };
     } else {
       const error = await response.json();
+      console.log(`  Netlify error response:`, JSON.stringify(error));
+      
       // Domain might already exist - that's okay
       if (error.message?.includes('already exists') || error.code === 422) {
         console.log(`ℹ️ Domain already exists in Netlify: ${domain}`);
@@ -468,10 +492,18 @@ router.post('/verify', auth, async (req, res) => {
     }
     
     if (verified) {
-      // AUTO-PROVISION: Add domain to Netlify
+      // AUTO-PROVISION: Add domain to Netlify (both root and www for root domains)
       const netlifyResult = await addDomainToNetlify(store.custom_domain);
       if (!netlifyResult.success) {
         console.error('Warning: Failed to add domain to Netlify, but continuing with verification');
+      }
+      
+      // For root domains, also add www version
+      const domainType = detectDomainType(store.custom_domain);
+      if (domainType === 'root') {
+        const wwwDomain = `www.${store.custom_domain}`;
+        console.log(`Adding www variant: ${wwwDomain}`);
+        await addDomainToNetlify(wwwDomain);
       }
       
       // Update store as verified
@@ -602,8 +634,16 @@ router.post('/manual-verify', auth, async (req, res) => {
       return res.status(400).json({ error: 'No domain configured' });
     }
     
-    // AUTO-PROVISION: Add domain to Netlify
+    // AUTO-PROVISION: Add domain to Netlify (both root and www for root domains)
     const netlifyResult = await addDomainToNetlify(store.custom_domain);
+    
+    // For root domains, also add www version
+    const domainType = detectDomainType(store.custom_domain);
+    if (domainType === 'root') {
+      const wwwDomain = `www.${store.custom_domain}`;
+      console.log(`Adding www variant: ${wwwDomain}`);
+      await addDomainToNetlify(wwwDomain);
+    }
     
     // For beta: Allow manual verification
     // In production, this should be admin-only
