@@ -1,0 +1,179 @@
+const axios = require('axios');
+
+/**
+ * IntaSend Wallet-as-a-Service Integration
+ * Docs: https://developers.intasend.com/docs/wallets
+ */
+class IntaSendService {
+  constructor() {
+    this.isTest = process.env.INTASEND_TEST === 'true';
+    this.baseURL = process.env.INTASEND_BASE_URL || 'https://sandbox.intasend.com/api/v1';
+    this.secretKey = process.env.INTASEND_SECRET_KEY;
+    this.publishableKey = process.env.INTASEND_PUBLISHABLE_KEY;
+    
+    if (!this.secretKey || !this.publishableKey) {
+      console.warn('⚠️  IntaSend credentials not configured');
+    } else {
+      console.log(`✅ IntaSend initialized (${this.isTest ? 'TEST' : 'LIVE'} mode)`);
+    }
+  }
+  
+  /**
+   * Test connection to IntaSend API
+   * @returns {Promise<Object>} Connection status
+   */
+  async testConnection() {
+    try {
+      // Try to list wallets (simplest read-only operation)
+      const response = await axios.get(
+        `${this.baseURL}/wallets/`,
+        {
+          headers: {
+            'Authorization': `Bearer ${this.secretKey}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      
+      return {
+        success: true,
+        message: 'IntaSend connection successful',
+        mode: this.isTest ? 'TEST' : 'LIVE',
+        wallets_count: response.data.length,
+        wallets: response.data
+      };
+    } catch (error) {
+      console.error('IntaSend connection failed:', error.response?.data || error.message);
+      return {
+        success: false,
+        message: 'IntaSend connection failed',
+        error: error.response?.data || error.message
+      };
+    }
+  }
+  
+  /**
+   * Create a new working wallet for a merchant
+   * @param {string} storeId - Store UUID
+   * @param {string} storeName - Store name for label
+   * @returns {Promise<Object>} Wallet creation result
+   */
+  async createMerchantWallet(storeId, storeName) {
+    try {
+      const label = `JARI_${storeId.substring(0, 8)}`; // Unique short label
+      
+      const response = await axios.post(
+        `${this.baseURL}/wallets/`,
+        {
+          currency: 'KES',
+          label: label,
+          can_disburse: true, // Allow merchant to withdraw funds
+          wallet_type: 'WORKING' // Sub-account (not settlement)
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${this.secretKey}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      
+      console.log(`✅ Wallet created for ${storeName}:`, response.data.wallet_id);
+      
+      return {
+        success: true,
+        wallet_id: response.data.wallet_id,
+        label: response.data.label,
+        currency: response.data.currency,
+        balance: response.data.current_balance,
+        can_disburse: response.data.can_disburse
+      };
+    } catch (error) {
+      console.error('Wallet creation failed:', error.response?.data || error.message);
+      return {
+        success: false,
+        error: error.response?.data || error.message
+      };
+    }
+  }
+  
+  /**
+   * Get wallet balance and details
+   * @param {string} walletId - IntaSend wallet ID
+   * @returns {Promise<Object>} Wallet details
+   */
+  async getWalletBalance(walletId) {
+    try {
+      const response = await axios.get(
+        `${this.baseURL}/wallets/${walletId}/`,
+        {
+          headers: {
+            'Authorization': `Bearer ${this.secretKey}`
+          }
+        }
+      );
+      
+      return {
+        success: true,
+        wallet_id: response.data.wallet_id || response.data.id,
+        currency: response.data.currency,
+        current_balance: response.data.current_balance,
+        available_balance: response.data.available_balance,
+        wallet_type: response.data.wallet_type
+      };
+    } catch (error) {
+      console.error('Get wallet balance failed:', error.response?.data || error.message);
+      return {
+        success: false,
+        error: error.response?.data || error.message
+      };
+    }
+  }
+  
+  /**
+   * Initiate M-Pesa STK Push to merchant wallet
+   * @param {Object} params - Payment parameters
+   * @returns {Promise<Object>} Payment initiation result
+   */
+  async mpesaStkPush({ wallet_id, phone_number, email, amount, api_ref, narrative = 'Purchase' }) {
+    try {
+      const response = await axios.post(
+        `${this.baseURL}/payment/collection/`,
+        {
+          wallet_id: wallet_id, // Routes payment to merchant wallet
+          phone_number: phone_number,
+          email: email,
+          amount: amount,
+          currency: 'KES',
+          api_ref: api_ref,
+          narrative: narrative,
+          method: 'MPESA-STK-PUSH'
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${this.publishableKey}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      
+      console.log(`✅ STK Push initiated: ${api_ref}`);
+      
+      return {
+        success: true,
+        invoice_id: response.data.invoice.id,
+        state: response.data.invoice.state,
+        amount: response.data.invoice.value,
+        phone_number: response.data.invoice.account
+      };
+    } catch (error) {
+      console.error('STK Push failed:', error.response?.data || error.message);
+      return {
+        success: false,
+        error: error.response?.data || error.message
+      };
+    }
+  }
+}
+
+module.exports = new IntaSendService();
