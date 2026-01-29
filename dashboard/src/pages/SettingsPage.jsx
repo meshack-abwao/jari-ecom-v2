@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { settingsAPI } from '../api/client';
+import { settingsAPI, domainsAPI } from '../api/client';
 import { 
   Save, Check, Crown, Palette, Type, ChevronDown, ChevronUp, 
-  ExternalLink, Plus, Trash2, Image, FileText, Star, Globe, Wallet
+  ExternalLink, Plus, Trash2, Image, FileText, Star, Globe, Wallet,
+  Link2, CheckCircle, AlertCircle, Loader, Copy, RefreshCw
 } from 'lucide-react';
 import ImageUploader from '../components/ImageUploader';
 
@@ -46,12 +47,29 @@ export default function SettingsPage() {
   // Collapsible sections
   const [expandedSections, setExpandedSections] = useState({
     basic: true,
+    domain: false,
     payment: false,
     hero: false,
     testimonials: false,
     policies: false,
     theme: true,
   });
+
+  // Custom Domain State
+  const [domainSettings, setDomainSettings] = useState({
+    customDomain: '',
+    domainVerified: false,
+    domainSslStatus: 'pending',
+    domainType: 'subdomain',
+    domainAddedAt: null,
+    domainVerifiedAt: null,
+    verification: null,
+    dnsInstructions: null,
+  });
+  const [domainInput, setDomainInput] = useState('');
+  const [domainLoading, setDomainLoading] = useState(false);
+  const [domainError, setDomainError] = useState('');
+  const [domainSuccess, setDomainSuccess] = useState('');
 
   const [storeSettings, setStoreSettings] = useState({
     // Basic
@@ -87,7 +105,124 @@ export default function SettingsPage() {
     refundPolicy: '',
   });
 
-  useEffect(() => { loadSettings(); loadThemes(); }, []);
+  useEffect(() => { loadSettings(); loadThemes(); loadDomainSettings(); }, []);
+
+  // Load domain settings
+  const loadDomainSettings = async () => {
+    try {
+      const response = await domainsAPI.getSettings();
+      const data = response.data;
+      setDomainSettings({
+        customDomain: data.custom_domain || '',
+        domainVerified: data.domain_verified || false,
+        domainSslStatus: data.domain_ssl_status || 'pending',
+        domainType: data.domain_type || 'subdomain',
+        domainAddedAt: data.domain_added_at,
+        domainVerifiedAt: data.domain_verified_at,
+        verification: data.verification,
+        dnsInstructions: null,
+      });
+      if (data.custom_domain) {
+        setDomainInput(data.custom_domain);
+      }
+    } catch (err) {
+      console.log('Domain settings not available:', err.message);
+    }
+  };
+
+  // Setup domain
+  const handleDomainSetup = async () => {
+    if (!domainInput.trim()) {
+      setDomainError('Please enter a domain');
+      return;
+    }
+    
+    setDomainLoading(true);
+    setDomainError('');
+    setDomainSuccess('');
+    
+    try {
+      const response = await domainsAPI.setup(domainInput.trim());
+      const data = response.data;
+      
+      setDomainSettings(prev => ({
+        ...prev,
+        customDomain: data.domain,
+        domainType: data.domain_type,
+        domainVerified: false,
+        dnsInstructions: data.dns_instructions,
+        verification: { verification_token: data.verification_token },
+      }));
+      
+      setDomainSuccess('Domain added! Follow the DNS instructions below, then click Verify.');
+    } catch (err) {
+      setDomainError(err.response?.data?.error || 'Failed to setup domain');
+    } finally {
+      setDomainLoading(false);
+    }
+  };
+
+  // Verify domain
+  const handleDomainVerify = async () => {
+    setDomainLoading(true);
+    setDomainError('');
+    setDomainSuccess('');
+    
+    try {
+      const response = await domainsAPI.verify();
+      const data = response.data;
+      
+      if (data.verified || data.already_verified) {
+        setDomainSettings(prev => ({
+          ...prev,
+          domainVerified: true,
+          domainSslStatus: 'active',
+        }));
+        setDomainSuccess(data.message || 'Domain verified successfully!');
+      } else {
+        setDomainError(data.error || 'Verification failed. Check your DNS settings.');
+      }
+    } catch (err) {
+      setDomainError(err.response?.data?.error || 'Verification failed');
+    } finally {
+      setDomainLoading(false);
+    }
+  };
+
+  // Remove domain
+  const handleDomainRemove = async () => {
+    if (!confirm('Are you sure you want to remove your custom domain?')) return;
+    
+    setDomainLoading(true);
+    setDomainError('');
+    
+    try {
+      await domainsAPI.remove();
+      setDomainSettings({
+        customDomain: '',
+        domainVerified: false,
+        domainSslStatus: 'pending',
+        domainType: 'subdomain',
+        domainAddedAt: null,
+        domainVerifiedAt: null,
+        verification: null,
+        dnsInstructions: null,
+      });
+      setDomainInput('');
+      setDomainSuccess('Domain removed successfully');
+    } catch (err) {
+      setDomainError(err.response?.data?.error || 'Failed to remove domain');
+    } finally {
+      setDomainLoading(false);
+    }
+  };
+
+  // Copy to clipboard helper
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+    setDomainSuccess('Copied to clipboard!');
+    setTimeout(() => setDomainSuccess(''), 2000);
+  };
 
   const loadSettings = async () => {
     try {
@@ -335,6 +470,154 @@ export default function SettingsPage() {
                 />
                 <p style={styles.hint}>Used for hero WhatsApp & Call buttons. Include country code (e.g., +254)</p>
               </div>
+            </div>
+          )}
+        </div>
+
+        {/* ========== CUSTOM DOMAIN ========== */}
+        <div style={styles.card} className="glass-card">
+          <div style={styles.sectionHeader} onClick={() => toggleSection('domain')}>
+            <div style={styles.sectionTitle}>
+              <Link2 size={20} style={{ color: '#8b5cf6' }} />
+              <h3 style={styles.cardTitle}>Custom Domain</h3>
+              {domainSettings.domainVerified && (
+                <span style={{ marginLeft: '8px', padding: '2px 8px', background: 'rgba(16, 185, 129, 0.1)', color: '#10b981', borderRadius: '12px', fontSize: '11px', fontWeight: '600' }}>
+                  ACTIVE
+                </span>
+              )}
+            </div>
+            {expandedSections.domain ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+          </div>
+          
+          {expandedSections.domain && (
+            <div style={styles.sectionContent}>
+              <p style={{ ...styles.hint, marginBottom: '20px', padding: '12px', background: 'rgba(139, 92, 246, 0.1)', borderRadius: '8px', border: '1px solid rgba(139, 92, 246, 0.2)' }}>
+                🔗 Use your own domain (e.g., shop.yourdomain.com or yourdomain.com) instead of the default store link.
+              </p>
+
+              {/* Error/Success Messages */}
+              {domainError && (
+                <div style={{ padding: '12px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '8px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px', color: '#ef4444' }}>
+                  <AlertCircle size={18} />
+                  {domainError}
+                </div>
+              )}
+              {domainSuccess && (
+                <div style={{ padding: '12px', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: '8px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px', color: '#10b981' }}>
+                  <CheckCircle size={18} />
+                  {domainSuccess}
+                </div>
+              )}
+
+              {/* Current Domain Status */}
+              {domainSettings.customDomain && (
+                <div style={{ padding: '16px', background: domainSettings.domainVerified ? 'rgba(16, 185, 129, 0.05)' : 'rgba(245, 158, 11, 0.05)', border: `1px solid ${domainSettings.domainVerified ? 'rgba(16, 185, 129, 0.2)' : 'rgba(245, 158, 11, 0.2)'}`, borderRadius: '12px', marginBottom: '20px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <span style={{ fontWeight: '600' }}>{domainSettings.customDomain}</span>
+                    <span style={{ padding: '4px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: '600', background: domainSettings.domainVerified ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)', color: domainSettings.domainVerified ? '#10b981' : '#f59e0b' }}>
+                      {domainSettings.domainVerified ? '✓ Verified' : '⏳ Pending Verification'}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+                    Type: {domainSettings.domainType === 'root' ? 'Root Domain' : 'Subdomain'} • SSL: {domainSettings.domainSslStatus}
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+                    {!domainSettings.domainVerified && (
+                      <button type="button" onClick={handleDomainVerify} disabled={domainLoading} style={{ padding: '8px 16px', background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '13px', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        {domainLoading ? <Loader size={14} className="spin" /> : <RefreshCw size={14} />}
+                        Verify Now
+                      </button>
+                    )}
+                    <button type="button" onClick={handleDomainRemove} disabled={domainLoading} style={{ padding: '8px 16px', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '8px', cursor: 'pointer', fontSize: '13px', fontWeight: '500' }}>
+                      Remove Domain
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Domain Input */}
+              <div style={styles.formGroup}>
+                <label style={styles.label}>{domainSettings.customDomain ? 'CHANGE DOMAIN' : 'YOUR DOMAIN'}</label>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <input
+                    type="text"
+                    value={domainInput}
+                    onChange={(e) => setDomainInput(e.target.value.toLowerCase())}
+                    placeholder="shop.yourdomain.com or yourdomain.com"
+                    className="dashboard-input"
+                    style={{ flex: 1 }}
+                  />
+                  <button type="button" onClick={handleDomainSetup} disabled={domainLoading || !domainInput.trim()} style={{ padding: '12px 20px', background: domainInput.trim() ? 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)' : 'var(--bg-tertiary)', color: domainInput.trim() ? 'white' : 'var(--text-secondary)', border: 'none', borderRadius: '8px', cursor: domainInput.trim() ? 'pointer' : 'not-allowed', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    {domainLoading ? <Loader size={16} className="spin" /> : <Plus size={16} />}
+                    {domainSettings.customDomain ? 'Update' : 'Add Domain'}
+                  </button>
+                </div>
+                <p style={styles.hint}>Examples: shop.mybusiness.com (subdomain) or mybusiness.com (root domain)</p>
+              </div>
+
+              {/* DNS Instructions */}
+              {domainSettings.dnsInstructions && !domainSettings.domainVerified && (
+                <div style={{ marginTop: '20px', padding: '20px', background: 'var(--bg-secondary)', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                  <h4 style={{ margin: '0 0 16px 0', fontSize: '14px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    📋 DNS Setup Instructions
+                  </h4>
+                  
+                  <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '16px' }}>
+                    Add these records at your domain registrar (Namecheap, GoDaddy, Cloudflare, etc.):
+                  </p>
+
+                  {/* Verification TXT Record */}
+                  <div style={{ padding: '12px', background: 'rgba(245, 158, 11, 0.05)', border: '1px solid rgba(245, 158, 11, 0.2)', borderRadius: '8px', marginBottom: '12px' }}>
+                    <div style={{ fontSize: '12px', fontWeight: '600', marginBottom: '8px', color: '#f59e0b' }}>Step 1: Verification (TXT Record)</div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr auto', gap: '8px', alignItems: 'center', fontSize: '13px' }}>
+                      <span style={{ color: 'var(--text-secondary)' }}>Type:</span>
+                      <code style={{ padding: '4px 8px', background: 'var(--bg-tertiary)', borderRadius: '4px' }}>TXT</code>
+                      <span></span>
+                      <span style={{ color: 'var(--text-secondary)' }}>Name:</span>
+                      <code style={{ padding: '4px 8px', background: 'var(--bg-tertiary)', borderRadius: '4px' }}>_jari-verify</code>
+                      <button type="button" onClick={() => copyToClipboard('_jari-verify')} style={{ padding: '4px 8px', background: 'none', border: '1px solid var(--border)', borderRadius: '4px', cursor: 'pointer' }}><Copy size={14} /></button>
+                      <span style={{ color: 'var(--text-secondary)' }}>Value:</span>
+                      <code style={{ padding: '4px 8px', background: 'var(--bg-tertiary)', borderRadius: '4px', wordBreak: 'break-all', fontSize: '11px' }}>{domainSettings.verification?.verification_token}</code>
+                      <button type="button" onClick={() => copyToClipboard(domainSettings.verification?.verification_token)} style={{ padding: '4px 8px', background: 'none', border: '1px solid var(--border)', borderRadius: '4px', cursor: 'pointer' }}><Copy size={14} /></button>
+                    </div>
+                  </div>
+
+                  {/* Routing Records */}
+                  <div style={{ padding: '12px', background: 'rgba(16, 185, 129, 0.05)', border: '1px solid rgba(16, 185, 129, 0.2)', borderRadius: '8px' }}>
+                    <div style={{ fontSize: '12px', fontWeight: '600', marginBottom: '8px', color: '#10b981' }}>Step 2: Routing ({domainSettings.domainType === 'root' ? 'A Records' : 'CNAME Record'})</div>
+                    {domainSettings.dnsInstructions.routing?.map((record, idx) => (
+                      <div key={idx} style={{ display: 'grid', gridTemplateColumns: '80px 1fr auto', gap: '8px', alignItems: 'center', fontSize: '13px', marginBottom: idx < domainSettings.dnsInstructions.routing.length - 1 ? '8px' : 0 }}>
+                        <span style={{ color: 'var(--text-secondary)' }}>Type:</span>
+                        <code style={{ padding: '4px 8px', background: 'var(--bg-tertiary)', borderRadius: '4px' }}>{record.type}</code>
+                        <span></span>
+                        <span style={{ color: 'var(--text-secondary)' }}>Name:</span>
+                        <code style={{ padding: '4px 8px', background: 'var(--bg-tertiary)', borderRadius: '4px' }}>{record.name}</code>
+                        <button type="button" onClick={() => copyToClipboard(record.name)} style={{ padding: '4px 8px', background: 'none', border: '1px solid var(--border)', borderRadius: '4px', cursor: 'pointer' }}><Copy size={14} /></button>
+                        <span style={{ color: 'var(--text-secondary)' }}>Value:</span>
+                        <code style={{ padding: '4px 8px', background: 'var(--bg-tertiary)', borderRadius: '4px' }}>{record.value}</code>
+                        <button type="button" onClick={() => copyToClipboard(record.value)} style={{ padding: '4px 8px', background: 'none', border: '1px solid var(--border)', borderRadius: '4px', cursor: 'pointer' }}><Copy size={14} /></button>
+                      </div>
+                    ))}
+                  </div>
+
+                  <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '16px', padding: '8px', background: 'rgba(139, 92, 246, 0.05)', borderRadius: '6px' }}>
+                    ⏱️ DNS changes can take up to 48 hours to propagate. Click "Verify Now" once you've added the records.
+                  </p>
+                </div>
+              )}
+
+              {/* Pricing Note */}
+              {!domainSettings.customDomain && (
+                <div style={{ marginTop: '16px', padding: '12px', background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(124, 58, 237, 0.05) 100%)', borderRadius: '8px', border: '1px solid rgba(139, 92, 246, 0.2)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                    <Crown size={16} style={{ color: '#8b5cf6' }} />
+                    <span style={{ fontWeight: '600', fontSize: '13px' }}>Premium Feature</span>
+                  </div>
+                  <p style={{ fontSize: '12px', color: 'var(--text-secondary)', margin: 0 }}>
+                    Subdomain (shop.domain.com): KES 500/mo • Root Domain (domain.com): KES 1,000/mo
+                  </p>
+                </div>
+              )}
             </div>
           )}
         </div>
