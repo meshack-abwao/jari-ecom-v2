@@ -1,5 +1,5 @@
 import { fetchStore } from './api.js';
-import { state, setState, getSlug, getProductId, setProductId, setCustomDomainSlug } from './state.js';
+import { state, setState, getSlug, getProductId, setProductId, setCustomDomainSlug, getProductSlug } from './state.js';
 import { renderHeader, renderProductsGrid, renderSingleProduct, renderFooter, renderError } from './render.js';
 import { renderCheckoutModal, initCheckout, openCheckout } from './checkout.js';
 import { initPixel, pixel } from './pixel.js';
@@ -145,13 +145,20 @@ async function init() {
 // RENDER
 // ===========================================
 function render() {
-  const productId = getProductId();
+  const productIdOrSlug = getProductId();
   const { products } = state;
   
-  if (productId) {
-    const product = products.find(p => p.id === productId);
+  if (productIdOrSlug) {
+    // Find product by slug OR id (supports both old UUID links and new slug links)
+    const product = products.find(p => p.slug === productIdOrSlug || p.id === productIdOrSlug);
     if (product) {
       setState({ currentProduct: product, quantity: 1 });
+      
+      // If URL has UUID but product has slug, update URL to use slug (SEO improvement)
+      if (product.slug && productIdOrSlug === product.id) {
+        setProductId(product.slug);
+      }
+      
       renderProductView(product);
     } else {
       renderCatalogView();
@@ -184,8 +191,9 @@ function renderCatalogView() {
     card.addEventListener('click', (e) => {
       // Don't navigate if swiping on gallery
       if (e.target.closest('.card-gallery-dots')) return;
-      const id = card.dataset.productId;
-      setProductId(id);
+      // Use slug for SEO-friendly URLs, fallback to id
+      const slug = card.dataset.productSlug || card.dataset.productId;
+      setProductId(slug);
       render();
     });
   });

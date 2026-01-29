@@ -136,8 +136,11 @@ function renderRelatedCard(product, config) {
     if (tags) metaHTML += `<span class="related-card-tags">${tags}</span>`;
   }
   
+  // Use slug for SEO-friendly URLs, fallback to id
+  const productSlug = product.slug || product.id;
+  
   return `
-    <article class="related-card ${config.cardClass}" data-product-id="${product.id}" onclick="window.viewRelatedProduct('${product.id}')">
+    <article class="related-card ${config.cardClass}" data-product-id="${product.id}" data-product-slug="${product.slug || ''}" onclick="window.viewRelatedProduct('${productSlug}')">
       <div class="related-card-image">
         ${imageUrl 
           ? `<img src="${imageUrl}" alt="${name}" loading="lazy">`

@@ -32,12 +32,18 @@ export function getProductId() {
   return params.get('product');
 }
 
-export function setProductId(id) {
+// Set product in URL - prefers slug over UUID for SEO
+export function setProductId(idOrSlug) {
   const url = new URL(window.location);
-  if (id) {
-    url.searchParams.set('product', id);
+  if (idOrSlug) {
+    url.searchParams.set('product', idOrSlug);
   } else {
     url.searchParams.delete('product');
   }
   window.history.pushState({}, '', url);
+}
+
+// Get product slug from product object (fallback to id if no slug)
+export function getProductSlug(product) {
+  return product?.slug || product?.id;
 }

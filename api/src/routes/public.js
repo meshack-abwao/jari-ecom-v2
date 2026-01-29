@@ -25,9 +25,9 @@ router.get('/:slug', async (req, res, next) => {
     const config = store.config || {};
     const profile = store.profile || {};
     
-    // Get active products
+    // Get active products (include slug for SEO-friendly URLs)
     const productsResult = await db.query(
-      `SELECT id, template, data, media
+      `SELECT id, slug, template, data, media
        FROM products
        WHERE store_id = $1 AND status = 'active'
        ORDER BY sort_order, created_at DESC`,
@@ -121,18 +121,34 @@ router.get('/:slug', async (req, res, next) => {
   }
 });
 
-// Get single product (public)
-router.get('/:slug/products/:productId', async (req, res, next) => {
+// Get single product (public) - accepts UUID or slug
+router.get('/:slug/products/:productIdOrSlug', async (req, res, next) => {
   try {
-    const { slug, productId } = req.params;
+    const { slug, productIdOrSlug } = req.params;
     
-    const result = await db.query(
-      `SELECT p.id, p.template, p.data, p.media
-       FROM products p
-       JOIN stores s ON p.store_id = s.id
-       WHERE s.slug = $1 AND p.id = $2 AND p.status = 'active'`,
-      [slug, productId]
-    );
+    // Check if it's a UUID (contains hyphens in UUID format) or a slug
+    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(productIdOrSlug);
+    
+    let result;
+    if (isUUID) {
+      // Query by UUID
+      result = await db.query(
+        `SELECT p.id, p.slug, p.template, p.data, p.media
+         FROM products p
+         JOIN stores s ON p.store_id = s.id
+         WHERE s.slug = $1 AND p.id = $2 AND p.status = 'active'`,
+        [slug, productIdOrSlug]
+      );
+    } else {
+      // Query by product slug
+      result = await db.query(
+        `SELECT p.id, p.slug, p.template, p.data, p.media
+         FROM products p
+         JOIN stores s ON p.store_id = s.id
+         WHERE s.slug = $1 AND p.slug = $2 AND p.status = 'active'`,
+        [slug, productIdOrSlug]
+      );
+    }
     
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Product not found' });

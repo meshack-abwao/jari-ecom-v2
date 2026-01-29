@@ -76,10 +76,14 @@ export function renderProductNav(product = null) {
   const total = products.length;
   const current = currentIndex + 1;
   
+  // Use slug for SEO-friendly URLs, fallback to id
+  const prevSlug = prevProduct?.slug || prevProduct?.id;
+  const nextSlug = nextProduct?.slug || nextProduct?.id;
+  
   return `
     <nav class="product-nav" aria-label="Product navigation">
       <button class="product-nav-btn ${!prevProduct ? 'disabled' : ''}" 
-              onclick="${prevProduct ? `window.viewRelatedProduct('${prevProduct.id}')` : ''}"
+              onclick="${prevProduct ? `window.viewRelatedProduct('${prevSlug}')` : ''}"
               ${!prevProduct ? 'disabled aria-disabled="true"' : ''}
               aria-label="Previous product${prevProduct ? ': ' + (prevProduct.data?.name || '') : ''}">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -91,7 +95,7 @@ export function renderProductNav(product = null) {
       <span class="product-nav-counter" aria-live="polite">${current} of ${total}</span>
       
       <button class="product-nav-btn ${!nextProduct ? 'disabled' : ''}" 
-              onclick="${nextProduct ? `window.viewRelatedProduct('${nextProduct.id}')` : ''}"
+              onclick="${nextProduct ? `window.viewRelatedProduct('${nextSlug}')` : ''}"
               ${!nextProduct ? 'disabled aria-disabled="true"' : ''}
               aria-label="Next product${nextProduct ? ': ' + (nextProduct.data?.name || '') : ''}">
         <span>Next</span>
@@ -364,7 +368,7 @@ function renderProductCard(product) {
     : `<span class="currency">KES</span> <span class="amount">${parseInt(price).toLocaleString()}</span>`;
   
   return `
-    <div class="collection-card" data-product-id="${product.id}">
+    <div class="collection-card" data-product-id="${product.id}" data-product-slug="${product.slug || ''}">
       <div class="collection-image">
         ${galleryHTML}
         <div class="collection-overlay">
