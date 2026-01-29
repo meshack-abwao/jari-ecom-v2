@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { subscriptionsAPI, mpesaAPI } from '../api/client';
-import { Check, Zap, X, ChevronDown, ChevronUp, MessageCircle, CreditCard, BarChart3, Headphones, Loader } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { subscriptionsAPI, mpesaAPI, kycAPI } from '../api/client';
+import { Check, Zap, X, ChevronDown, ChevronUp, MessageCircle, CreditCard, BarChart3, Headphones, Loader, Shield, AlertCircle } from 'lucide-react';
 
 // Add-on icons mapping
 const getAddOnIcon = (id) => {
@@ -14,10 +15,13 @@ const getAddOnIcon = (id) => {
 };
 
 export default function AddOnsPage() {
+  const navigate = useNavigate();
   const [addOns, setAddOns] = useState([]);
   const [activeAddons, setActiveAddons] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCheckout, setShowCheckout] = useState(false);
+  const [showKycModal, setShowKycModal] = useState(false);
+  const [kycStatus, setKycStatus] = useState(null);
   const [selectedAddOn, setSelectedAddOn] = useState(null);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [processing, setProcessing] = useState(false);
@@ -44,15 +48,58 @@ export default function AddOnsPage() {
     }
   };
 
-  const handleActivate = (e, addOn) => {
+  const handleActivate = async (e, addOn) => {
     e.stopPropagation();
     if (addOn.active) {
       alert('This add-on is already active!');
       return;
     }
-    setSelectedAddOn(addOn);
-    setShowCheckout(true);
-    setPaymentStatus(null);
+    
+    // Check KYC status for M-Pesa STK addon
+    if (addOn.id === 'mpesa_stk') {
+      try {
+        const response = await kycAPI.getStatus();
+        const kyc = response.data;
+        setKycStatus(kyc);
+        
+        if (!kyc.exists || kyc.status === 'draft' || kyc.status === 'docs_uploaded') {
+          // KYC not submitted
+          setSelectedAddOn(addOn);
+          setShowKycModal(true);
+          return;
+        }
+        
+        if (kyc.status === 'submitted_to_intasend') {
+          // Under review
+          alert('Your KYC is under review. Please wait 3-7 business days for approval.');
+          return;
+        }
+        
+        if (kyc.status === 'rejected') {
+          // Rejected - prompt resubmission
+          setSelectedAddOn(addOn);
+          setShowKycModal(true);
+          return;
+        }
+        
+        if (kyc.status === 'approved') {
+          // Approved - proceed with activation
+          setSelectedAddOn(addOn);
+          setShowCheckout(true);
+          setPaymentStatus(null);
+          return;
+        }
+      } catch (error) {
+        console.error('Failed to check KYC status:', error);
+        alert('Failed to verify KYC status. Please try again.');
+        return;
+      }
+    } else {
+      // Non-M-Pesa addons - proceed normally
+      setSelectedAddOn(addOn);
+      setShowCheckout(true);
+      setPaymentStatus(null);
+    }
   };
 
   const handleCheckout = async (e) => {
@@ -152,6 +199,76 @@ export default function AddOnsPage() {
           <p style={styles.subtitle}>Boost your store with powerful features</p>
         </div>
       </div>
+
+      {/* KYC Required Modal */}
+      {showKycModal && selectedAddOn && (
+        <div style={styles.modalOverlay} onClick={() => setShowKycModal(false)}>
+          <div style={styles.modal} className="glass-card" onClick={(e) => e.stopPropagation()}>
+            <div style={styles.modalHeader}>
+              <h2 style={styles.modalTitle}>KYC Verification Required</h2>
+              <button onClick={() => setShowKycModal(false)} style={styles.closeBtn}><X size={24} /></button>
+            </div>
+            <div style={styles.modalContent}>
+              <div style={styles.kycIcon}>
+                <Shield size={48} />
+              </div>
+              
+              {kycStatus?.status === 'rejected' ? (
+                <>
+                  <h3 style={styles.kycTitle}>KYC Rejected</h3>
+                  <p style={styles.kycText}>
+                    Your KYC submission was rejected. Please review the feedback and resubmit your documents.
+                  </p>
+                  {kycStatus.rejection_reason && (
+                    <div style={styles.rejectionBox}>
+                      <AlertCircle size={18} />
+                      <p><strong>Reason:</strong> {kycStatus.rejection_reason}</p>
+                    </div>
+                  )}
+                  <button 
+                    onClick={() => { setShowKycModal(false); navigate('/kyc'); }}
+                    className="btn btn-primary"
+                    style={{ width: '100%', marginTop: '16px' }}
+                  >
+                    Resubmit KYC Documents
+                  </button>
+                </>
+              ) : (
+                <>
+                  <h3 style={styles.kycTitle}>Complete KYC to Activate M-Pesa STK Push</h3>
+                  <p style={styles.kycText}>
+                    To enable M-Pesa auto-checkout, you need to complete KYC verification. This is required by IntaSend (our payment partner) and takes 3-7 business days to process.
+                  </p>
+                  <div style={styles.kycBenefits}>
+                    <div style={styles.benefitItem}>
+                      <span style={styles.checkIcon}>✓</span>
+                      <span>One-tap M-Pesa payments for customers</span>
+                    </div>
+                    <div style={styles.benefitItem}>
+                      <span style={styles.checkIcon}>✓</span>
+                      <span>Automatic payment confirmation</span>
+                    </div>
+                    <div style={styles.benefitItem}>
+                      <span style={styles.checkIcon}>✓</span>
+                      <span>35% higher conversion rates</span>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => { setShowKycModal(false); navigate('/kyc'); }}
+                    className="btn btn-primary"
+                    style={{ width: '100%', marginTop: '16px' }}
+                  >
+                    Complete KYC Verification
+                  </button>
+                  <p style={styles.kycHint}>
+                    Already submitted? <a href="/kyc" style={{ color: 'var(--accent-color)' }}>Check status</a>
+                  </p>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Checkout Modal */}
       {showCheckout && selectedAddOn && (
@@ -348,4 +465,12 @@ const styles = {
   actions: { display: 'flex', gap: '12px', justifyContent: 'flex-end' },
   cancelBtn: { padding: '12px 24px', borderRadius: '10px', background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', color: 'var(--text-secondary)', fontWeight: '600', cursor: 'pointer' },
   demoBtn: { padding: '10px', background: 'transparent', border: '1px dashed var(--border-color)', borderRadius: '8px', color: 'var(--text-muted)', fontSize: '12px', cursor: 'pointer', marginTop: '8px' },
+  
+  // KYC Modal
+  kycIcon: { width: '80px', height: '80px', borderRadius: '50%', background: 'var(--accent-light)', color: 'var(--accent-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' },
+  kycTitle: { fontSize: '20px', fontWeight: '700', color: 'var(--text-primary)', textAlign: 'center', marginBottom: '12px' },
+  kycText: { fontSize: '14px', color: 'var(--text-muted)', textAlign: 'center', lineHeight: '1.6', marginBottom: '20px' },
+  kycBenefits: { display: 'flex', flexDirection: 'column', gap: '12px', padding: '16px', background: 'var(--bg-tertiary)', borderRadius: '12px', marginBottom: '8px' },
+  kycHint: { textAlign: 'center', fontSize: '13px', color: 'var(--text-muted)', marginTop: '12px' },
+  rejectionBox: { display: 'flex', gap: '12px', padding: '16px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '12px', color: '#ef4444', fontSize: '14px', marginBottom: '8px' },
 };
