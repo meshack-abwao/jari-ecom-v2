@@ -15,6 +15,7 @@ import templatesRoutes from './templates.js';
 import subscriptionsRoutes from './subscriptions.js';
 import complaintsRoutes from './complaints.js';
 import domainsRoutes from './domains.js';
+import intasendRoutes from './intasend.js';
 
 export function setupRoutes(app) {
   // Health check
@@ -42,6 +43,7 @@ export function setupRoutes(app) {
   app.use('/api/subscriptions', subscriptionsRoutes);
   app.use('/api/complaints', complaintsRoutes);
   app.use('/api/domains', domainsRoutes);
+  app.use('/api/intasend', intasendRoutes);
   
   // Public domain lookup (no auth required, no /api prefix)
   app.use('/domain', domainsRoutes);
