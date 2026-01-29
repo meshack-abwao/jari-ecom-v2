@@ -1116,3 +1116,92 @@ grep -r "netlify.app" store/src/ --include="*.js" | grep -v "config.js"
 ```
 
 ---
+
+---
+
+## FORMULA 27: CORS with Credentials (Jan 29, 2026) ⚠️ CRITICAL
+
+**Problem:** API requests blocked by CORS when using custom domains
+
+**Error Message:**
+```
+Access to fetch at 'https://api.example.com/...' from origin 'https://customdomain.com' 
+has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present
+```
+
+**Cause:** Using `origin: '*'` with `credentials: true` doesn't work in CORS
+
+**Example Bug:**
+```javascript
+// ❌ WRONG - '*' doesn't work with credentials
+app.use(cors({ 
+  origin: '*',           // This won't work!
+  credentials: true 
+}));
+
+// ❌ ALSO WRONG - Array doesn't include custom domains
+app.use(cors({ 
+  origin: ['https://known-domain.com'],  // What about lanixkenya.com?
+  credentials: true 
+}));
+```
+
+**Fix - Use `origin: true`:**
+```javascript
+// ✅ CORRECT - Reflects request origin, works with any domain
+app.use(cors({ 
+  origin: true,          // Reflects the requesting origin
+  credentials: true 
+}));
+```
+
+**Why `origin: true` works:**
+- It reflects the `Origin` header from the request back in `Access-Control-Allow-Origin`
+- This allows ANY domain to make requests while still supporting credentials
+- Perfect for platforms with user-added custom domains
+
+**When to use each approach:**
+| Scenario | CORS Config |
+|----------|-------------|
+| Known domains only | `origin: ['domain1.com', 'domain2.com']` |
+| Any domain, no credentials | `origin: '*'` |
+| Any domain WITH credentials | `origin: true` ✅ |
+
+---
+
+## FORMULA 28: WWW vs Non-WWW Domain Handling (Jan 29, 2026)
+
+**Problem:** Custom domain works for `example.com` but not `www.example.com`
+
+**Cause:** Database stores `example.com` but user visits `www.example.com`
+
+**Example Bug:**
+```javascript
+// Database has: custom_domain = 'lanixkenya.com'
+// User visits: www.lanixkenya.com
+// Lookup fails because 'www.lanixkenya.com' !== 'lanixkenya.com'
+```
+
+**Fix - Strip www. in normalization:**
+```javascript
+function normalizeDomain(domain) {
+  if (!domain) return null;
+  
+  let normalized = domain.toLowerCase().trim();
+  normalized = normalized.replace(/^https?:\/\//, '');  // Remove protocol
+  normalized = normalized.split('/')[0];                 // Remove path
+  normalized = normalized.replace(/^www\./, '');         // Strip www.
+  
+  return normalized;
+}
+
+// Now both resolve to 'lanixkenya.com':
+normalizeDomain('www.lanixkenya.com')  // → 'lanixkenya.com'
+normalizeDomain('lanixkenya.com')      // → 'lanixkenya.com'
+```
+
+**Also configure in Namecheap/DNS:**
+- Add CNAME for `www` pointing to main domain
+- Both www and non-www should resolve to same IP
+
+---
