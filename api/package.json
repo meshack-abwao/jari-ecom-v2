@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "africastalking": "^0.7.3",
-    "axios": "^1.13.2",
+    "axios": "^1.13.4",
     "bcryptjs": "^3.0.0",
     "cloudinary": "^2.9.0",
     "compression": "^1.7.4",
