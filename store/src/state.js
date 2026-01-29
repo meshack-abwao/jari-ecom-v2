@@ -9,14 +9,22 @@ export const state = {
   paymentMethod: null
 };
 
+// Store slug from custom domain lookup (cached)
+let customDomainSlug = null;
+
 export function setState(updates) {
   Object.assign(state, updates);
 }
 
+// Set slug from custom domain lookup
+export function setCustomDomainSlug(slug) {
+  customDomainSlug = slug;
+}
+
 export function getSlug() {
-  // Priority: URL param > Env variable > null (for landing page)
+  // Priority: URL param > Custom domain slug > Env variable > null (for landing page)
   const params = new URLSearchParams(window.location.search);
-  return params.get('store') || params.get('subdomain') || import.meta.env.VITE_STORE_SLUG || null;
+  return params.get('store') || params.get('subdomain') || customDomainSlug || import.meta.env.VITE_STORE_SLUG || null;
 }
 
 export function getProductId() {

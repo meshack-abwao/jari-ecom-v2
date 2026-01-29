@@ -1,5 +1,5 @@
 import { fetchStore } from './api.js';
-import { state, setState, getSlug, getProductId, setProductId } from './state.js';
+import { state, setState, getSlug, getProductId, setProductId, setCustomDomainSlug } from './state.js';
 import { renderHeader, renderProductsGrid, renderSingleProduct, renderFooter, renderError } from './render.js';
 import { renderCheckoutModal, initCheckout, openCheckout } from './checkout.js';
 import { initPixel, pixel } from './pixel.js';
@@ -35,6 +35,51 @@ function checkOrderTrackingRoute() {
 }
 
 // ===========================================
+// CUSTOM DOMAIN DETECTION
+// ===========================================
+const MAIN_DOMAINS = [
+  'localhost',
+  '127.0.0.1',
+  'jariecommstore.netlify.app',
+  'jarisolutionsecom.store',
+  'jari-store.netlify.app'
+];
+
+async function checkCustomDomain() {
+  const hostname = window.location.hostname.toLowerCase();
+  
+  // Skip if already have a slug in URL params
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('store') || params.get('subdomain')) {
+    return;
+  }
+  
+  // Skip if on main domains
+  if (MAIN_DOMAINS.some(d => hostname === d || hostname.endsWith('.' + d))) {
+    return;
+  }
+  
+  // This looks like a custom domain - try to look it up
+  try {
+    const apiUrl = import.meta.env.VITE_API_URL || 'https://jari-api-production.up.railway.app';
+    const response = await fetch(`${apiUrl}/domain/lookup/${encodeURIComponent(hostname)}`);
+    
+    if (response.ok) {
+      const data = await response.json();
+      if (data.slug) {
+        // Found! Set the slug in state
+        setCustomDomainSlug(data.slug);
+        console.log(`🔗 Custom domain detected: ${hostname} → ${data.slug}`);
+      }
+    } else {
+      console.log(`⚠️ Custom domain not found: ${hostname}`);
+    }
+  } catch (err) {
+    console.log(`⚠️ Failed to lookup custom domain: ${err.message}`);
+  }
+}
+
+// ===========================================
 // INIT
 // ===========================================
 async function init() {
@@ -51,6 +96,11 @@ async function init() {
     initOrderTracking(orderNumber);
     return;
   }
+  
+  // ===========================================
+  // CUSTOM DOMAIN DETECTION
+  // ===========================================
+  await checkCustomDomain();
   
   const slug = getSlug();
   
