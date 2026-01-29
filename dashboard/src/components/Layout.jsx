@@ -400,9 +400,6 @@ export default function Layout() {
             <NavLink to="/bookings" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
               <Calendar size={20} /><span>Bookings</span>
             </NavLink>
-            <NavLink to="/kyc" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
-              <Shield size={20} /><span>KYC (M-Pesa)</span>
-            </NavLink>
           </div>
           
           {/* Customize Section */}
@@ -416,6 +413,9 @@ export default function Layout() {
             </NavLink>
             <NavLink to="/add-ons" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
               <Zap size={20} /><span>Features</span>
+            </NavLink>
+            <NavLink to="/kyc" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
+              <Shield size={20} /><span>Payments (KYC)</span>
             </NavLink>
             <NavLink to="/settings" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
               <Settings size={20} /><span>Settings</span>
