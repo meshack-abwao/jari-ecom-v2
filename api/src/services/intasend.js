@@ -1,4 +1,4 @@
-const axios = require('axios');
+import axios from 'axios';
 
 /**
  * IntaSend Wallet-as-a-Service Integration
@@ -176,4 +176,4 @@ class IntaSendService {
   }
 }
 
-module.exports = new IntaSendService();
+export default new IntaSendService();

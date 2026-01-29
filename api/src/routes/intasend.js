@@ -1,6 +1,7 @@
-const express = require('express');
+import express from 'express';
+import intaSendService from '../services/intasend.js';
+
 const router = express.Router();
-const intaSendService = require('../services/intasend');
 
 /**
  * Test IntaSend connection
@@ -67,4 +68,4 @@ router.post('/test/create-wallet', async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;
