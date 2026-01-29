@@ -151,15 +151,20 @@ router.post('/submit', auth, async (req, res) => {
     
     const kycId = kycResult.rows[0].id;
     
-    // Log submission
-    await db.query(
-      `INSERT INTO kyc_submissions (kyc_id, submission_type, submitted_by, documents_submitted)
-       VALUES ($1, 'initial', $2, $3)`,
-      [kycId, req.user.email, JSON.stringify({
-        national_id_front, national_id_back, kra_pin_cert,
-        business_registration_cert, directors_list, board_resolution_letter
-      })]
-    );
+    // Log submission (optional - removed for now to prevent timeout)
+    try {
+      await db.query(
+        `INSERT INTO kyc_submissions (kyc_id, submission_type, submitted_by, documents_submitted)
+         VALUES ($1, 'initial', $2, $3)`,
+        [kycId, req.user.email || 'unknown', JSON.stringify({
+          national_id_front, national_id_back, kra_pin_cert,
+          business_registration_cert, directors_list, board_resolution_letter
+        })]
+      );
+    } catch (logError) {
+      console.error('KYC submission logging failed (non-critical):', logError);
+      // Continue anyway - logging is not critical
+    }
     
     res.json({
       success: true,
