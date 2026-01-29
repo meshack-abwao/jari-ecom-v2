@@ -240,26 +240,29 @@ export default function KYCPage() {
     );
   }
 
-  // Form view (draft, docs_uploaded, or rejected)
+  // Upload form
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-2">KYC Verification</h1>
-      <p className="text-gray-600 mb-6">
-        Complete KYC verification to activate M-Pesa STK Push auto-checkout.
-      </p>
+    <div className="fade-in" style={{ maxWidth: '900px', margin: '0 auto' }}>
+      <div style={styles.header}>
+        <div>
+          <h1 style={styles.title}>KYC Verification</h1>
+          <p style={styles.subtitle}>
+            Complete KYC verification to enable M-Pesa STK Push auto-checkout
+          </p>
+        </div>
+      </div>
       
       <StatusBanner />
-
-      <div className="bg-white rounded-lg shadow p-6 space-y-8">
-        
+      
+      <div style={styles.formContainer}>
         {/* Business Type Selection */}
-        <div>
-          <h2 className="text-xl font-semibold mb-4">Business Type</h2>
+        <div className="glass-card" style={styles.section}>
+          <h2 style={styles.sectionTitle}>Business Type</h2>
           <select
             name="business_type"
             value={formData.business_type}
             onChange={handleInputChange}
-            className="w-full p-3 border border-gray-300 rounded-lg"
+            className="dashboard-input"
           >
             <option value="sole_proprietor">Sole Proprietor</option>
             <option value="partnership">Partnership</option>
@@ -268,194 +271,221 @@ export default function KYCPage() {
         </div>
 
         {/* Personal KYC */}
-        <div>
-          <h2 className="text-xl font-semibold mb-4">Personal Identification</h2>
+        <div className="glass-card" style={styles.section}>
+          <h2 style={styles.sectionTitle}>Personal Identification</h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">National ID (Front) *</label>
+          <div style={styles.gridTwo}>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>NATIONAL ID (FRONT) *</label>
               <input
                 type="file"
                 accept="image/*,.pdf"
                 onChange={(e) => handleFileChange(e, 'national_id_front')}
-                className="w-full p-2 border border-gray-300 rounded"
+                className="dashboard-input"
                 disabled={uploading.national_id_front}
+                style={styles.fileInput}
               />
-              {uploading.national_id_front && <p className="text-sm text-blue-600 mt-1">Uploading...</p>}
-              {formData.national_id_front && <p className="text-sm text-green-600 mt-1">✓ Uploaded</p>}
+              {uploading.national_id_front && <p style={styles.uploadingText}>Uploading...</p>}
+              {formData.national_id_front && <p style={styles.successText}>✓ Uploaded</p>}
             </div>
             
-            <div>
-              <label className="block text-sm font-medium mb-2">National ID (Back) *</label>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>NATIONAL ID (BACK) *</label>
               <input
                 type="file"
                 accept="image/*,.pdf"
                 onChange={(e) => handleFileChange(e, 'national_id_back')}
-                className="w-full p-2 border border-gray-300 rounded"
+                className="dashboard-input"
                 disabled={uploading.national_id_back}
+                style={styles.fileInput}
               />
-              {uploading.national_id_back && <p className="text-sm text-blue-600 mt-1">Uploading...</p>}
-              {formData.national_id_back && <p className="text-sm text-green-600 mt-1">✓ Uploaded</p>}
+              {uploading.national_id_back && <p style={styles.uploadingText}>Uploading...</p>}
+              {formData.national_id_back && <p style={styles.successText}>✓ Uploaded</p>}
             </div>
           </div>
 
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-2">KRA PIN Certificate *</label>
+          <div style={styles.formGroup}>
+            <label style={styles.label}>KRA PIN CERTIFICATE *</label>
             <input
               type="file"
               accept="image/*,.pdf"
               onChange={(e) => handleFileChange(e, 'kra_pin_cert')}
-              className="w-full p-2 border border-gray-300 rounded"
+              className="dashboard-input"
               disabled={uploading.kra_pin_cert}
+              style={styles.fileInput}
             />
-            {uploading.kra_pin_cert && <p className="text-sm text-blue-600 mt-1">Uploading...</p>}
-            {formData.kra_pin_cert && <p className="text-sm text-green-600 mt-1">✓ Uploaded</p>}
+            {uploading.kra_pin_cert && <p style={styles.uploadingText}>Uploading...</p>}
+            {formData.kra_pin_cert && <p style={styles.successText}>✓ Uploaded</p>}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <input
-              type="text"
-              name="owner_full_name"
-              value={formData.owner_full_name}
-              onChange={handleInputChange}
-              placeholder="Full Name *"
-              className="p-3 border border-gray-300 rounded"
-            />
-            <input
-              type="text"
-              name="owner_id_number"
-              value={formData.owner_id_number}
-              onChange={handleInputChange}
-              placeholder="ID Number *"
-              className="p-3 border border-gray-300 rounded"
-            />
-            <input
-              type="text"
-              name="owner_kra_pin"
-              value={formData.owner_kra_pin}
-              onChange={handleInputChange}
-              placeholder="KRA PIN *"
-              className="p-3 border border-gray-300 rounded"
-            />
+          <div style={styles.gridThree}>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>FULL NAME *</label>
+              <input
+                type="text"
+                name="owner_full_name"
+                value={formData.owner_full_name}
+                onChange={handleInputChange}
+                placeholder="John Doe"
+                className="dashboard-input"
+              />
+            </div>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>ID NUMBER *</label>
+              <input
+                type="text"
+                name="owner_id_number"
+                value={formData.owner_id_number}
+                onChange={handleInputChange}
+                placeholder="12345678"
+                className="dashboard-input"
+              />
+            </div>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>KRA PIN *</label>
+              <input
+                type="text"
+                name="owner_kra_pin"
+                value={formData.owner_kra_pin}
+                onChange={handleInputChange}
+                placeholder="A001234567X"
+                className="dashboard-input"
+              />
+            </div>
           </div>
         </div>
 
         {/* Business Documents (Limited Company only) */}
         {formData.business_type === 'limited_company' && (
-          <div>
-            <h2 className="text-xl font-semibold mb-4">Business Documents</h2>
+          <div className="glass-card" style={styles.section}>
+            <h2 style={styles.sectionTitle}>Business Documents</h2>
             
-            <div className="mb-4">
+            <div style={styles.formGroup}>
+              <label style={styles.label}>REGISTERED BUSINESS NAME *</label>
               <input
                 type="text"
                 name="business_name"
                 value={formData.business_name}
                 onChange={handleInputChange}
-                placeholder="Registered Business Name *"
-                className="w-full p-3 border border-gray-300 rounded"
+                placeholder="Company Ltd"
+                className="dashboard-input"
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">Business Registration Certificate *</label>
+            <div style={styles.gridTwo}>
+              <div style={styles.formGroup}>
+                <label style={styles.label}>BUSINESS REGISTRATION CERT *</label>
                 <input
                   type="file"
                   accept="image/*,.pdf"
                   onChange={(e) => handleFileChange(e, 'business_registration_cert')}
-                  className="w-full p-2 border border-gray-300 rounded"
+                  className="dashboard-input"
                   disabled={uploading.business_registration_cert}
+                  style={styles.fileInput}
                 />
-                {uploading.business_registration_cert && <p className="text-sm text-blue-600 mt-1">Uploading...</p>}
-                {formData.business_registration_cert && <p className="text-sm text-green-600 mt-1">✓ Uploaded</p>}
+                {uploading.business_registration_cert && <p style={styles.uploadingText}>Uploading...</p>}
+                {formData.business_registration_cert && <p style={styles.successText}>✓ Uploaded</p>}
               </div>
               
-              <div>
-                <label className="block text-sm font-medium mb-2">Directors List *</label>
+              <div style={styles.formGroup}>
+                <label style={styles.label}>DIRECTORS LIST *</label>
                 <input
                   type="file"
                   accept="image/*,.pdf"
                   onChange={(e) => handleFileChange(e, 'directors_list')}
-                  className="w-full p-2 border border-gray-300 rounded"
+                  className="dashboard-input"
                   disabled={uploading.directors_list}
+                  style={styles.fileInput}
                 />
-                {uploading.directors_list && <p className="text-sm text-blue-600 mt-1">Uploading...</p>}
-                {formData.directors_list && <p className="text-sm text-green-600 mt-1">✓ Uploaded</p>}
+                {uploading.directors_list && <p style={styles.uploadingText}>Uploading...</p>}
+                {formData.directors_list && <p style={styles.successText}>✓ Uploaded</p>}
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium mb-2">Board Resolution Letter *</label>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>BOARD RESOLUTION LETTER *</label>
               <input
                 type="file"
                 accept=".pdf"
                 onChange={(e) => handleFileChange(e, 'board_resolution_letter')}
-                className="w-full p-2 border border-gray-300 rounded"
+                className="dashboard-input"
                 disabled={uploading.board_resolution_letter}
+                style={styles.fileInput}
               />
-              {uploading.board_resolution_letter && <p className="text-sm text-blue-600 mt-1">Uploading...</p>}
-              {formData.board_resolution_letter && <p className="text-sm text-green-600 mt-1">✓ Uploaded</p>}
-              <p className="text-sm text-gray-500 mt-1">
-                Download template: <a href="#" className="text-blue-600 hover:underline">Board Resolution Template</a>
+              {uploading.board_resolution_letter && <p style={styles.uploadingText}>Uploading...</p>}
+              {formData.board_resolution_letter && <p style={styles.successText}>✓ Uploaded</p>}
+              <p style={styles.hint}>
+                Download template: <a href="#" style={{ color: 'var(--accent-color)', textDecoration: 'none' }}>Board Resolution Template</a>
               </p>
             </div>
           </div>
         )}
 
         {/* Physical Address */}
-        <div>
-          <h2 className="text-xl font-semibold mb-4">Physical Address</h2>
+        <div className="glass-card" style={styles.section}>
+          <h2 style={styles.sectionTitle}>Physical Address</h2>
           
-          <div className="space-y-4">
+          <div style={styles.formGroup}>
+            <label style={styles.label}>STREET ADDRESS *</label>
             <input
               type="text"
               name="physical_address"
               value={formData.physical_address}
               onChange={handleInputChange}
-              placeholder="Street Address *"
-              className="w-full p-3 border border-gray-300 rounded"
+              placeholder="123 Main Street, Building Name"
+              className="dashboard-input"
             />
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          </div>
+          
+          <div style={styles.gridThree}>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>CITY/TOWN *</label>
               <input
                 type="text"
                 name="city"
                 value={formData.city}
                 onChange={handleInputChange}
-                placeholder="City/Town *"
-                className="p-3 border border-gray-300 rounded"
+                placeholder="Nairobi"
+                className="dashboard-input"
               />
-              
+            </div>
+            
+            <div style={styles.formGroup}>
+              <label style={styles.label}>COUNTY *</label>
               <select
                 name="county"
                 value={formData.county}
                 onChange={handleInputChange}
-                className="p-3 border border-gray-300 rounded"
+                className="dashboard-input"
               >
-                <option value="">Select County *</option>
+                <option value="">Select County</option>
                 {KENYA_COUNTIES.map(county => (
                   <option key={county} value={county}>{county}</option>
                 ))}
               </select>
-              
+            </div>
+            
+            <div style={styles.formGroup}>
+              <label style={styles.label}>POSTAL CODE</label>
               <input
                 type="text"
                 name="postal_code"
                 value={formData.postal_code}
                 onChange={handleInputChange}
-                placeholder="Postal Code"
-                className="p-3 border border-gray-300 rounded"
+                placeholder="00100"
+                className="dashboard-input"
               />
             </div>
           </div>
         </div>
 
         {/* Submit Button */}
-        <div className="flex justify-end pt-4 border-t">
+        <div style={styles.submitSection}>
           <button
             onClick={handleSubmit}
             disabled={submitting || Object.values(uploading).some(v => v)}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+            className="btn btn-primary"
+            style={styles.submitBtn}
           >
             {submitting ? 'Submitting...' : kycStatus?.status === 'rejected' ? 'Resubmit Documents' : 'Submit for Verification'}
           </button>
@@ -464,3 +494,22 @@ export default function KYCPage() {
     </div>
   );
 }
+
+const styles = {
+  header: { marginBottom: '32px' },
+  title: { fontSize: '34px', fontWeight: '700', marginBottom: '6px', color: 'var(--text-primary)', letterSpacing: '-0.025em' },
+  subtitle: { fontSize: '15px', color: 'var(--text-muted)' },
+  formContainer: { display: 'flex', flexDirection: 'column', gap: '20px' },
+  section: { padding: '24px' },
+  sectionTitle: { fontSize: '18px', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '20px' },
+  formGroup: { display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' },
+  label: { fontSize: '11px', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' },
+  fileInput: { cursor: 'pointer' },
+  uploadingText: { fontSize: '12px', color: 'var(--accent-color)', marginTop: '4px' },
+  successText: { fontSize: '12px', color: '#22c55e', marginTop: '4px', fontWeight: '600' },
+  hint: { fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' },
+  gridTwo: { display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px', '@media (max-width: 768px)': { gridTemplateColumns: '1fr' } },
+  gridThree: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', '@media (max-width: 768px)': { gridTemplateColumns: '1fr' } },
+  submitSection: { display: 'flex', justifyContent: 'flex-end', paddingTop: '8px' },
+  submitBtn: { padding: '14px 32px', fontSize: '15px', fontWeight: '600' },
+};
