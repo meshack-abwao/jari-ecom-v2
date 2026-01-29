@@ -1,6 +1,7 @@
-// Remove trailing slash if present
-// Production fallback ensures it works even if env var not set
-const API_URL = (import.meta.env.VITE_API_URL || 'https://jari-ecom-v2-production.up.railway.app').replace(/\/$/, '');
+import { API_URL } from './config.js';
+
+// API_URL is now imported from centralized config
+// NEVER hardcode URLs here - update config.js instead
 
 export async function fetchStore(slug) {
   const res = await fetch(`${API_URL}/s/${slug}`);

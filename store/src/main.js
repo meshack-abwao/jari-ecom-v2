@@ -9,6 +9,7 @@ import { initDeepDiveHandlers } from './templates/deep-dive/dd-handlers.js';
 import { initQuickDecisionHandlers } from './templates/quick-decision/qd-handlers.js';
 import { initOrderTracking } from './order-tracking.js';
 import { renderLandingPage, initLandingHandlers } from './landing/landing.js';
+import { API_URL, MAIN_DOMAINS } from './config.js';
 import './landing/landing.css'; // Import landing CSS so Vite bundles it
 import './booking/bookingHandlers.js'; // Auto-registers event listener
 
@@ -37,13 +38,7 @@ function checkOrderTrackingRoute() {
 // ===========================================
 // CUSTOM DOMAIN DETECTION
 // ===========================================
-const MAIN_DOMAINS = [
-  'localhost',
-  '127.0.0.1',
-  'jariecommstore.netlify.app',
-  'jarisolutionsecom.store',
-  'jari-store.netlify.app'
-];
+// MAIN_DOMAINS is now imported from config.js
 
 async function checkCustomDomain() {
   const hostname = window.location.hostname.toLowerCase();
@@ -61,8 +56,8 @@ async function checkCustomDomain() {
   
   // This looks like a custom domain - try to look it up
   try {
-    const apiUrl = import.meta.env.VITE_API_URL || 'https://jari-ecom-v2-production.up.railway.app';
-    const response = await fetch(`${apiUrl}/domain/lookup/${encodeURIComponent(hostname)}`);
+    // API_URL is imported from config.js - NEVER hardcode URLs!
+    const response = await fetch(`${API_URL}/domain/lookup/${encodeURIComponent(hostname)}`);
     
     if (response.ok) {
       const data = await response.json();

@@ -1065,3 +1065,54 @@ async function checkCustomDomain() {
 ```
 
 ---
+
+
+---
+
+## FORMULA 26: Hardcoded URLs (Jan 29, 2026) ⚠️ CRITICAL
+
+**Problem:** API URLs hardcoded in multiple files, leading to inconsistent/broken deployments
+
+**Cause:** Copy-pasting URLs instead of using centralized config
+
+**Example Bug (before):**
+```javascript
+// api.js
+const API_URL = 'https://jari-api-production.up.railway.app';
+
+// main.js (different file, different URL!)
+const apiUrl = 'https://jari-ecom-v2-production.up.railway.app';
+
+// checkout.js (yet another variation!)
+const API = 'https://jari-ecom-v2.railway.app';
+```
+
+**Fix - Centralized Config:**
+```javascript
+// store/src/config.js - SINGLE SOURCE OF TRUTH
+export const API_URL = (import.meta.env.VITE_API_URL || 'https://jari-ecom-v2-production.up.railway.app').replace(/\/$/, '');
+export const STORE_URL = (import.meta.env.VITE_STORE_URL || 'https://jarisolutionsecom.store').replace(/\/$/, '');
+export const DASHBOARD_URL = (import.meta.env.VITE_DASHBOARD_URL || 'https://jari-dashboard.netlify.app').replace(/\/$/, '');
+export const MAIN_DOMAINS = ['localhost', '127.0.0.1', 'jarisolutionsecom.store', ...];
+
+// In other files - IMPORT, never hardcode
+import { API_URL } from './config.js';
+```
+
+**Rules:**
+1. ✅ NEVER hardcode URLs in any file except config.js
+2. ✅ ALWAYS import from config.js
+3. ✅ When URL changes, update ONLY config.js
+4. ✅ Use environment variables for overrides
+5. ✅ Add trailing slash removal to prevent double-slash bugs
+
+**Search for violations:**
+```bash
+# Find hardcoded Railway URLs
+grep -r "railway.app" store/src/ --include="*.js" | grep -v "config.js"
+
+# Find hardcoded Netlify URLs
+grep -r "netlify.app" store/src/ --include="*.js" | grep -v "config.js"
+```
+
+---
