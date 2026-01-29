@@ -51,21 +51,31 @@ export default function KYCPage() {
   const uploadToCloudinary = async (file, field) => {
     setUploading(prev => ({ ...prev, [field]: true }));
     
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', 'jari_kyc'); // You'll need to create this preset
-    formData.append('folder', `jari/kyc`);
+    const uploadFormData = new FormData();
+    uploadFormData.append('file', file);
+    uploadFormData.append('upload_preset', 'jari_kyc');
+    uploadFormData.append('folder', `jari/kyc`);
 
     try {
       const response = await fetch(
         'https://api.cloudinary.com/v1_1/dmfrtzgkv/image/upload',
         {
           method: 'POST',
-          body: formData
+          body: uploadFormData
         }
       );
       
+      if (!response.ok) {
+        throw new Error(`Upload failed: ${response.status} ${response.statusText}`);
+      }
+      
       const data = await response.json();
+      
+      if (!data.secure_url) {
+        throw new Error('No URL returned from Cloudinary');
+      }
+      
+      console.log(`✅ Uploaded ${field}:`, data.secure_url);
       
       setFormData(prev => ({
         ...prev,
@@ -77,7 +87,7 @@ export default function KYCPage() {
     } catch (error) {
       console.error('Upload error:', error);
       setUploading(prev => ({ ...prev, [field]: false }));
-      alert('Upload failed. Please try again.');
+      alert(`Upload failed for ${field.replace(/_/g, ' ')}. Please try again. Error: ${error.message}`);
       return null;
     }
   };
@@ -105,16 +115,30 @@ export default function KYCPage() {
   const validateForm = () => {
     const { business_type } = formData;
     
+    // Check if any uploads are in progress
+    const uploadingFields = Object.entries(uploading).filter(([_, isUploading]) => isUploading);
+    if (uploadingFields.length > 0) {
+      alert('Please wait for uploads to complete before submitting.');
+      return false;
+    }
+    
     // Required for all
     const requiredPersonal = [
-      'national_id_front', 'national_id_back', 'kra_pin_cert',
-      'owner_full_name', 'owner_id_number', 'owner_kra_pin',
-      'physical_address', 'city', 'county'
+      { field: 'national_id_front', label: 'National ID (Front)' },
+      { field: 'national_id_back', label: 'National ID (Back)' },
+      { field: 'kra_pin_cert', label: 'KRA PIN Certificate' },
+      { field: 'owner_full_name', label: 'Full Name' },
+      { field: 'owner_id_number', label: 'ID Number' },
+      { field: 'owner_kra_pin', label: 'KRA PIN' },
+      { field: 'physical_address', label: 'Street Address' },
+      { field: 'city', label: 'City/Town' },
+      { field: 'county', label: 'County' }
     ];
     
-    for (const field of requiredPersonal) {
-      if (!formData[field]) {
-        alert(`Please fill in: ${field.replace(/_/g, ' ')}`);
+    for (const { field, label } of requiredPersonal) {
+      if (!formData[field] || formData[field].trim() === '') {
+        console.log('Missing field:', field, 'Value:', formData[field]);
+        alert(`Please fill in: ${label}`);
         return false;
       }
     }
@@ -122,18 +146,22 @@ export default function KYCPage() {
     // Required for limited companies
     if (business_type === 'limited_company') {
       const requiredBusiness = [
-        'business_registration_cert', 'business_name',
-        'directors_list', 'board_resolution_letter'
+        { field: 'business_registration_cert', label: 'Business Registration Certificate' },
+        { field: 'business_name', label: 'Business Name' },
+        { field: 'directors_list', label: 'Directors List' },
+        { field: 'board_resolution_letter', label: 'Board Resolution Letter' }
       ];
       
-      for (const field of requiredBusiness) {
-        if (!formData[field]) {
-          alert(`Please fill in: ${field.replace(/_/g, ' ')}`);
+      for (const { field, label } of requiredBusiness) {
+        if (!formData[field] || formData[field].trim() === '') {
+          console.log('Missing business field:', field, 'Value:', formData[field]);
+          alert(`Please fill in: ${label}`);
           return false;
         }
       }
     }
     
+    console.log('✅ Validation passed! FormData:', formData);
     return true;
   };
 
