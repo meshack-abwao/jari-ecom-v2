@@ -16,6 +16,7 @@ import AddOnsPage from './pages/AddOnsPage';
 import SubscriptionPage from './pages/SubscriptionPage';
 import AdsPage from './pages/AdsPage';
 import BookingsPage from './pages/BookingsPage';
+import KYCPage from './pages/KYCPage';
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -60,6 +61,7 @@ export default function App() {
               <Route path="orders" element={<OrdersPage />} />
               <Route path="food-orders" element={<FoodOrdersPage />} />
               <Route path="bookings" element={<BookingsPage />} />
+              <Route path="kyc" element={<KYCPage />} />
               <Route path="ads" element={<AdsPage />} />
               <Route path="add-ons" element={<AddOnsPage />} />
               <Route path="subscription" element={<SubscriptionPage />} />
