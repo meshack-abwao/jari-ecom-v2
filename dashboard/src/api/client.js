@@ -312,6 +312,29 @@ export const complaintsAPI = {
 };
 
 // ===========================================
+// DOMAINS API (Custom Domain Feature)
+// ===========================================
+export const domainsAPI = {
+  // Get current domain settings for user's store
+  getSettings: () => api.get('/domains/settings'),
+  
+  // Setup/add a custom domain
+  setup: (domain) => api.post('/domains/setup', { domain }),
+  
+  // Verify domain DNS records
+  verify: () => api.post('/domains/verify'),
+  
+  // Remove custom domain
+  remove: () => api.delete('/domains/remove'),
+  
+  // Manual verification (for support/beta)
+  manualVerify: () => api.post('/domains/manual-verify'),
+  
+  // Public: Lookup store by domain (no auth required)
+  lookup: (domain) => api.get(`/domain/lookup/${encodeURIComponent(domain)}`),
+};
+
+// ===========================================
 // SUBSCRIPTIONS API
 // ===========================================
 export const subscriptionsAPI = {
