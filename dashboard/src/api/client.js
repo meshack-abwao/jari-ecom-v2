@@ -374,6 +374,23 @@ export const subscriptionsAPI = {
 };
 
 // ===========================================
+// KYC API
+// ===========================================
+export const kycAPI = {
+  // Get KYC status
+  getStatus: () => api.get('/kyc/status'),
+  
+  // Submit KYC documents
+  submit: (data) => api.post('/kyc/submit', data),
+  
+  // Resubmit after rejection
+  resubmit: (data) => api.post('/kyc/resubmit', data),
+  
+  // Create support ticket
+  createSupportTicket: (data) => api.post('/kyc/support', data),
+};
+
+// ===========================================
 // LEGACY API (for backwards compatibility)
 // ===========================================
 export const legacyApi = {
