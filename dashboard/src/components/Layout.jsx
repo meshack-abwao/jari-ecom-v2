@@ -4,7 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useTheme } from '../hooks/useTheme';
 import { settingsAPI, subscriptionsAPI, cardsAPI } from '../api/client';
 import { BRAND } from '../constants/brand';
-import { Home, Package, ShoppingCart, Settings, Zap, LogOut, Sun, Moon, Menu, X, User, Store, Crown, ArrowUpRight, LayoutGrid, Megaphone, Calendar, UtensilsCrossed, CreditCard, Phone, Edit2, Check, Clock, AlertCircle, ChevronDown } from 'lucide-react';
+import { Home, Package, ShoppingCart, Settings, Zap, LogOut, Sun, Moon, Menu, X, User, Store, Crown, ArrowUpRight, LayoutGrid, Megaphone, Calendar, UtensilsCrossed, CreditCard, Phone, Edit2, Check, Clock, AlertCircle, ChevronDown, Shield } from 'lucide-react';
 
 export default function Layout() {
   const { user, logout } = useAuth();
@@ -399,6 +399,9 @@ export default function Layout() {
             </NavLink>
             <NavLink to="/bookings" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
               <Calendar size={20} /><span>Bookings</span>
+            </NavLink>
+            <NavLink to="/kyc" className={({ isActive }) => isActive ? 'nav-link active-nav' : 'nav-link'} onClick={closeMobileMenu}>
+              <Shield size={20} /><span>KYC (M-Pesa)</span>
             </NavLink>
           </div>
           
