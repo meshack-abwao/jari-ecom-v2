@@ -8,8 +8,9 @@ const router = Router();
 // ============================================
 // NETLIFY CONFIGURATION
 // ============================================
-const NETLIFY_ACCESS_TOKEN = process.env.NETLIFY_ACCESS_TOKEN || 'nfp_js9pV3BYWUzCWYGxQBuugJyp5AMqkNgB35d3';
-const NETLIFY_SITE_ID = process.env.NETLIFY_SITE_ID || 'cf6a58bd-1b7d-437a-a854-1a01c4f26fc9';
+// Set these in Railway environment variables for production
+const NETLIFY_ACCESS_TOKEN = process.env.NETLIFY_ACCESS_TOKEN;
+const NETLIFY_SITE_ID = process.env.NETLIFY_SITE_ID;
 
 // ============================================
 // HELPER FUNCTIONS
