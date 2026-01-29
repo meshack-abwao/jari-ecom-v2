@@ -126,7 +126,13 @@ function detectDomainType(domain) {
 // ============================================
 
 // Lookup store by custom domain (used by storefront)
+// This endpoint needs open CORS since custom domains can be anything
 router.get('/lookup/:domain', async (req, res) => {
+  // Allow CORS from any origin for this public endpoint
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  
   try {
     const domain = normalizeDomain(req.params.domain);
     
