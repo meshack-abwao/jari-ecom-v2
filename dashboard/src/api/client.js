@@ -342,18 +342,7 @@ export const subscriptionsAPI = {
   getStatus: (feature) => {
     // If no feature provided, return general subscription info with addons
     if (!feature) {
-      return api.get('/subscriptions').catch(() => ({
-        data: {
-          status: 'none',
-          availableAddons: [
-            { id: 'mpesa_stk', name: 'M-Pesa Express', description: 'Accept M-Pesa payments with one-tap STK Push. Customers pay instantly without leaving your store.', price: 500, active: true },
-            { id: 'whatsapp_auto', name: 'WhatsApp Automation', description: 'Send automatic order confirmations, shipping updates, and follow-ups via WhatsApp.', price: 800, active: false },
-            { id: 'advanced_analytics', name: 'Advanced Analytics', description: 'Deep insights into customer behavior, product performance, and revenue trends.', price: 600, active: false },
-            { id: 'priority_support', name: 'Priority Support', description: '24/7 priority support with dedicated account manager and faster response times.', price: 1000, active: false },
-          ],
-          activeAddons: ['mpesa_stk']
-        }
-      }));
+      return api.get('/subscriptions/addons');
     }
     return api.get(`/subscriptions/status/${feature}`);
   },
