@@ -50,7 +50,24 @@ router.get('/status', auth, async (req, res) => {
       rejected_at: kyc.rejected_at,
       rejection_reason: kyc.rejection_reason,
       resubmission_count: kyc.resubmission_count,
-      intasend_wallet_id: kyc.intasend_wallet_id
+      intasend_wallet_id: kyc.intasend_wallet_id,
+      kyc_data: {
+        business_type: kyc.business_type,
+        national_id_front: kyc.national_id_front,
+        national_id_back: kyc.national_id_back,
+        kra_pin_cert: kyc.kra_pin_cert,
+        owner_full_name: kyc.owner_full_name,
+        owner_id_number: kyc.owner_id_number,
+        owner_kra_pin: kyc.owner_kra_pin,
+        business_registration_cert: kyc.business_registration_cert,
+        business_name: kyc.business_name,
+        physical_address: kyc.physical_address,
+        city: kyc.city,
+        county: kyc.county,
+        postal_code: kyc.postal_code,
+        directors_list: kyc.directors_list,
+        board_resolution_letter: kyc.board_resolution_letter
+      }
     });
   } catch (error) {
     console.error('Get KYC status error:', error);

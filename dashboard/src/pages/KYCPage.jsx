@@ -40,7 +40,30 @@ export default function KYCPage() {
   const loadKYCStatus = async () => {
     try {
       const response = await kycAPI.getStatus();
-      setKycStatus(response.data);
+      const status = response.data;
+      setKycStatus(status);
+      
+      // Pre-populate form if KYC exists
+      if (status.exists && status.kyc_data) {
+        setFormData({
+          business_type: status.kyc_data.business_type || 'sole_proprietor',
+          national_id_front: status.kyc_data.national_id_front || '',
+          national_id_back: status.kyc_data.national_id_back || '',
+          kra_pin_cert: status.kyc_data.kra_pin_cert || '',
+          owner_full_name: status.kyc_data.owner_full_name || '',
+          owner_id_number: status.kyc_data.owner_id_number || '',
+          owner_kra_pin: status.kyc_data.owner_kra_pin || '',
+          business_registration_cert: status.kyc_data.business_registration_cert || '',
+          business_name: status.kyc_data.business_name || '',
+          physical_address: status.kyc_data.physical_address || '',
+          city: status.kyc_data.city || '',
+          county: status.kyc_data.county || '',
+          postal_code: status.kyc_data.postal_code || '',
+          directors_list: status.kyc_data.directors_list || '',
+          board_resolution_letter: status.kyc_data.board_resolution_letter || ''
+        });
+      }
+      
       setLoading(false);
     } catch (error) {
       console.error('Load KYC status error:', error);
