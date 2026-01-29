@@ -53,7 +53,7 @@ export default function KYCPage() {
     
     const uploadFormData = new FormData();
     uploadFormData.append('file', file);
-    uploadFormData.append('upload_preset', 'ml_default'); // Cloudinary default unsigned preset
+    uploadFormData.append('upload_preset', 'jari_kyc'); // Using our custom KYC preset
     uploadFormData.append('folder', `jari/kyc`);
 
     try {
