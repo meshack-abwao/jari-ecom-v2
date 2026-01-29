@@ -6,8 +6,75 @@ import { auth } from '../middleware/auth.js';
 const router = Router();
 
 // ============================================
+// NETLIFY CONFIGURATION
+// ============================================
+const NETLIFY_ACCESS_TOKEN = process.env.NETLIFY_ACCESS_TOKEN || 'nfp_js9pV3BYWUzCWYGxQBuugJyp5AMqkNgB35d3';
+const NETLIFY_SITE_ID = process.env.NETLIFY_SITE_ID || 'cf6a58bd-1b7d-437a-a854-1a01c4f26fc9';
+
+// ============================================
 // HELPER FUNCTIONS
 // ============================================
+
+// Add domain to Netlify (auto-provisioning)
+async function addDomainToNetlify(domain) {
+  try {
+    const response = await fetch(
+      `https://api.netlify.com/api/v1/sites/${NETLIFY_SITE_ID}/domain_aliases`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${NETLIFY_ACCESS_TOKEN}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ domain })
+      }
+    );
+    
+    if (response.ok) {
+      console.log(`✅ Domain added to Netlify: ${domain}`);
+      return { success: true };
+    } else {
+      const error = await response.json();
+      // Domain might already exist - that's okay
+      if (error.message?.includes('already exists') || error.code === 422) {
+        console.log(`ℹ️ Domain already exists in Netlify: ${domain}`);
+        return { success: true, alreadyExists: true };
+      }
+      console.error(`❌ Netlify error: ${JSON.stringify(error)}`);
+      return { success: false, error: error.message };
+    }
+  } catch (err) {
+    console.error(`❌ Failed to add domain to Netlify: ${err.message}`);
+    return { success: false, error: err.message };
+  }
+}
+
+// Remove domain from Netlify
+async function removeDomainFromNetlify(domain) {
+  try {
+    const response = await fetch(
+      `https://api.netlify.com/api/v1/sites/${NETLIFY_SITE_ID}/domain_aliases/${domain}`,
+      {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${NETLIFY_ACCESS_TOKEN}`
+        }
+      }
+    );
+    
+    if (response.ok || response.status === 404) {
+      console.log(`✅ Domain removed from Netlify: ${domain}`);
+      return { success: true };
+    } else {
+      const error = await response.json();
+      console.error(`❌ Netlify removal error: ${JSON.stringify(error)}`);
+      return { success: false, error: error.message };
+    }
+  } catch (err) {
+    console.error(`❌ Failed to remove domain from Netlify: ${err.message}`);
+    return { success: false, error: err.message };
+  }
+}
 
 // Generate verification token
 function generateVerificationToken() {
@@ -394,6 +461,12 @@ router.post('/verify', auth, async (req, res) => {
     }
     
     if (verified) {
+      // AUTO-PROVISION: Add domain to Netlify
+      const netlifyResult = await addDomainToNetlify(store.custom_domain);
+      if (!netlifyResult.success) {
+        console.error('Warning: Failed to add domain to Netlify, but continuing with verification');
+      }
+      
       // Update store as verified
       await db.query(
         `UPDATE stores SET 
@@ -416,6 +489,7 @@ router.post('/verify', auth, async (req, res) => {
         success: true,
         verified: true,
         domain: store.custom_domain,
+        netlifyProvisioned: netlifyResult.success,
         message: `🎉 Domain verified! Your store is now accessible at https://${store.custom_domain}`
       });
     } else {
@@ -463,6 +537,9 @@ router.delete('/remove', auth, async (req, res) => {
     if (!removedDomain) {
       return res.json({ success: true, message: 'No domain to remove' });
     }
+    
+    // Remove domain from Netlify
+    await removeDomainFromNetlify(removedDomain);
     
     // Clear domain from store
     await db.query(
@@ -518,6 +595,9 @@ router.post('/manual-verify', auth, async (req, res) => {
       return res.status(400).json({ error: 'No domain configured' });
     }
     
+    // AUTO-PROVISION: Add domain to Netlify
+    const netlifyResult = await addDomainToNetlify(store.custom_domain);
+    
     // For beta: Allow manual verification
     // In production, this should be admin-only
     await db.query(
@@ -539,6 +619,7 @@ router.post('/manual-verify', auth, async (req, res) => {
     res.json({
       success: true,
       domain: store.custom_domain,
+      netlifyProvisioned: netlifyResult.success,
       message: 'Domain manually verified'
     });
     
