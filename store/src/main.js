@@ -16,6 +16,30 @@ import './booking/bookingHandlers.js'; // Auto-registers event listener
 const app = document.getElementById('app');
 
 // ===========================================
+// FAVICON - Dynamic store avatar in browser tab
+// ===========================================
+const JARI_DEFAULT_FAVICON = 'https://res.cloudinary.com/dmfrtzgkv/image/upload/v1769389089/image_3_sjvgdg.svg';
+
+function setFavicon(url) {
+  // Remove existing favicons
+  const existingFavicons = document.querySelectorAll('link[rel="icon"], link[rel="shortcut icon"]');
+  existingFavicons.forEach(el => el.remove());
+  
+  // Create new favicon link
+  const link = document.createElement('link');
+  link.rel = 'icon';
+  link.type = url.endsWith('.svg') ? 'image/svg+xml' : 'image/png';
+  link.href = url;
+  document.head.appendChild(link);
+  
+  // Also add apple-touch-icon for iOS
+  const appleLink = document.createElement('link');
+  appleLink.rel = 'apple-touch-icon';
+  appleLink.href = url;
+  document.head.appendChild(appleLink);
+}
+
+// ===========================================
 // GALLERY STATE
 // ===========================================
 let currentImageIndex = 0;
@@ -103,6 +127,7 @@ async function init() {
   if (!slug) {
     // Render landing page (CSS already imported at top)
     document.title = 'Jari.Ecom - E-commerce Made Simple for Kenyan Sellers';
+    setFavicon(JARI_DEFAULT_FAVICON);
     app.innerHTML = renderLandingPage();
     initLandingHandlers();
     return;
@@ -124,6 +149,10 @@ async function init() {
     
     // Update page title
     document.title = data.store.name || 'Store';
+    
+    // Set favicon to store logo (or default Jari favicon)
+    const storeLogo = data.store.logo_url;
+    setFavicon(storeLogo || JARI_DEFAULT_FAVICON);
     
     // Apply theme colors to CSS variables
     if (data.theme?.colors) {
