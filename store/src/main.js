@@ -61,7 +61,7 @@ async function checkCustomDomain() {
   
   // This looks like a custom domain - try to look it up
   try {
-    const apiUrl = import.meta.env.VITE_API_URL || 'https://jari-api-production.up.railway.app';
+    const apiUrl = import.meta.env.VITE_API_URL || 'https://jari-ecom-v2-production.up.railway.app';
     const response = await fetch(`${apiUrl}/domain/lookup/${encodeURIComponent(hostname)}`);
     
     if (response.ok) {
