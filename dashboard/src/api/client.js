@@ -369,8 +369,11 @@ export const kycAPI = {
   // Get KYC status
   getStatus: () => api.get('/kyc/status'),
   
-  // Submit KYC documents
+  // Submit/Save KYC documents (status stays docs_uploaded)
   submit: (data) => api.post('/kyc/submit', data),
+  
+  // Submit for IntaSend review (changes status to submitted_to_intasend)
+  submitForReview: () => api.post('/kyc/submit-for-review'),
   
   // Resubmit after rejection
   resubmit: (data) => api.post('/kyc/resubmit', data),

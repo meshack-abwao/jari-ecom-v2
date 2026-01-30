@@ -195,6 +195,66 @@ router.post('/submit', auth, async (req, res) => {
 });
 
 /**
+ * Submit KYC for IntaSend review
+ * POST /api/kyc/submit-for-review
+ * Changes status from 'docs_uploaded' to 'submitted_to_intasend'
+ */
+router.post('/submit-for-review', auth, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    
+    // Get store_id
+    const storeResult = await db.query(
+      'SELECT id FROM stores WHERE user_id = $1',
+      [userId]
+    );
+    
+    if (storeResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Store not found' });
+    }
+    
+    const storeId = storeResult.rows[0].id;
+    
+    // Check if KYC exists and is in docs_uploaded status
+    const kycResult = await db.query(
+      'SELECT id, status FROM merchant_kyc WHERE store_id = $1',
+      [storeId]
+    );
+    
+    if (kycResult.rows.length === 0) {
+      return res.status(404).json({ error: 'No KYC record found. Please upload documents first.' });
+    }
+    
+    const kyc = kycResult.rows[0];
+    
+    if (kyc.status !== 'docs_uploaded') {
+      return res.status(400).json({ 
+        error: `Cannot submit from status '${kyc.status}'. Must be 'docs_uploaded'.` 
+      });
+    }
+    
+    // Update status to submitted_to_intasend
+    await db.query(
+      `UPDATE merchant_kyc SET
+        status = 'submitted_to_intasend',
+        submitted_at = NOW(),
+        updated_at = NOW()
+      WHERE id = $1`,
+      [kyc.id]
+    );
+    
+    res.json({
+      success: true,
+      status: 'submitted_to_intasend',
+      message: 'KYC submitted for IntaSend review'
+    });
+  } catch (error) {
+    console.error('Submit for review error:', error);
+    res.status(500).json({ error: 'Failed to submit for review' });
+  }
+});
+
+/**
  * Resubmit KYC (after rejection)
  * POST /api/kyc/resubmit
  */

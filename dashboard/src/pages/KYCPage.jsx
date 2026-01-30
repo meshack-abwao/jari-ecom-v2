@@ -195,11 +195,29 @@ export default function KYCPage() {
     
     try {
       await kycAPI.submit(formData);
-      alert('KYC documents submitted successfully! We will review and get back to you within 3-7 business days.');
+      alert('KYC documents saved successfully!');
       loadKYCStatus();
     } catch (error) {
       console.error('Submit KYC error:', error);
       alert('Failed to submit KYC. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleSubmitForReview = async () => {
+    if (!confirm('Submit your KYC documents for IntaSend review? This will take 3-7 business days.')) return;
+    
+    setSubmitting(true);
+    
+    try {
+      // Call new endpoint to change status
+      await kycAPI.submitForReview();
+      alert('KYC submitted for review! We will notify you once IntaSend approves (3-7 days).');
+      loadKYCStatus();
+    } catch (error) {
+      console.error('Submit for review error:', error);
+      alert('Failed to submit for review. Please try again.');
     } finally {
       setSubmitting(false);
     }
@@ -216,29 +234,100 @@ export default function KYCPage() {
     );
   }
 
-  // Status banner component
+  // Status banner component with progress
   const StatusBanner = () => {
     if (!kycStatus?.exists) return null;
     
     const statusConfig = {
-      draft: { bg: 'bg-gray-100', text: 'text-gray-800', icon: '📝', message: 'Draft - Complete your documents' },
-      docs_uploaded: { bg: 'bg-blue-100', text: 'text-blue-800', icon: '📄', message: 'Documents uploaded - Ready for submission' },
-      submitted_to_intasend: { bg: 'bg-yellow-100', text: 'text-yellow-800', icon: '⏳', message: 'Under review - Please wait 3-7 days' },
-      approved: { bg: 'bg-green-100', text: 'text-green-800', icon: '✅', message: 'Approved! M-Pesa STK Push is now active' },
-      rejected: { bg: 'bg-red-100', text: 'text-red-800', icon: '❌', message: 'Rejected - Please review and resubmit' }
+      draft: { 
+        bg: 'bg-gray-100', 
+        text: 'text-gray-800', 
+        icon: '📝', 
+        message: 'Draft - Complete your documents',
+        step: 1
+      },
+      docs_uploaded: { 
+        bg: 'bg-blue-100', 
+        text: 'text-blue-800', 
+        icon: '📄', 
+        message: 'Documents ready - Click "Submit for Review" below',
+        step: 2
+      },
+      submitted_to_intasend: { 
+        bg: 'bg-yellow-100', 
+        text: 'text-yellow-800', 
+        icon: '⏳', 
+        message: 'Under review by IntaSend - Please wait 3-7 business days',
+        step: 3
+      },
+      approved: { 
+        bg: 'bg-green-100', 
+        text: 'text-green-800', 
+        icon: '✅', 
+        message: 'Approved! M-Pesa STK Push is now active',
+        step: 4
+      },
+      rejected: { 
+        bg: 'bg-red-100', 
+        text: 'text-red-800', 
+        icon: '❌', 
+        message: 'Rejected - Please review and resubmit',
+        step: 2
+      }
     };
     
     const config = statusConfig[kycStatus.status] || statusConfig.draft;
     
     return (
-      <div className={`${config.bg} ${config.text} rounded-lg p-4 mb-6`}>
-        <div className="flex items-center">
-          <span className="text-2xl mr-3">{config.icon}</span>
-          <div className="flex-1">
-            <p className="font-semibold">{config.message}</p>
-            {kycStatus.status === 'rejected' && kycStatus.rejection_reason && (
-              <p className="text-sm mt-1">Reason: {kycStatus.rejection_reason}</p>
-            )}
+      <div>
+        {/* Progress Steps */}
+        <div style={{ marginBottom: '20px', display: 'flex', gap: '8px', alignItems: 'center', fontSize: '13px' }}>
+          <div style={{ 
+            padding: '6px 12px', 
+            borderRadius: '20px', 
+            background: config.step >= 1 ? 'var(--accent-color)' : '#e5e7eb',
+            color: config.step >= 1 ? 'white' : '#6b7280',
+            fontWeight: '600'
+          }}>1. Upload</div>
+          <div style={{ flex: 1, height: '2px', background: config.step >= 2 ? 'var(--accent-color)' : '#e5e7eb' }}></div>
+          <div style={{ 
+            padding: '6px 12px', 
+            borderRadius: '20px', 
+            background: config.step >= 2 ? 'var(--accent-color)' : '#e5e7eb',
+            color: config.step >= 2 ? 'white' : '#6b7280',
+            fontWeight: '600'
+          }}>2. Submit</div>
+          <div style={{ flex: 1, height: '2px', background: config.step >= 3 ? 'var(--accent-color)' : '#e5e7eb' }}></div>
+          <div style={{ 
+            padding: '6px 12px', 
+            borderRadius: '20px', 
+            background: config.step >= 3 ? 'var(--accent-color)' : '#e5e7eb',
+            color: config.step >= 3 ? 'white' : '#6b7280',
+            fontWeight: '600'
+          }}>3. Review</div>
+          <div style={{ flex: 1, height: '2px', background: config.step >= 4 ? 'var(--accent-color)' : '#e5e7eb' }}></div>
+          <div style={{ 
+            padding: '6px 12px', 
+            borderRadius: '20px', 
+            background: config.step >= 4 ? 'var(--accent-color)' : '#e5e7eb',
+            color: config.step >= 4 ? 'white' : '#6b7280',
+            fontWeight: '600'
+          }}>4. Approved</div>
+        </div>
+        
+        {/* Status Message */}
+        <div className={`${config.bg} ${config.text} rounded-lg p-4`}>
+          <div className="flex items-center">
+            <span className="text-2xl mr-3">{config.icon}</span>
+            <div className="flex-1">
+              <p className="font-semibold">{config.message}</p>
+              {kycStatus.status === 'rejected' && kycStatus.rejection_reason && (
+                <p className="text-sm mt-1">Reason: {kycStatus.rejection_reason}</p>
+              )}
+              {kycStatus.status === 'submitted_to_intasend' && kycStatus.submitted_at && (
+                <p className="text-sm mt-1">Submitted: {new Date(kycStatus.submitted_at).toLocaleDateString()}</p>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -532,14 +621,37 @@ export default function KYCPage() {
 
         {/* Submit Button */}
         <div style={styles.submitSection}>
-          <button
-            onClick={handleSubmit}
-            disabled={submitting || Object.values(uploading).some(v => v)}
-            className="btn btn-primary"
-            style={styles.submitBtn}
-          >
-            {submitting ? 'Submitting...' : kycStatus?.status === 'rejected' ? 'Resubmit Documents' : 'Submit for Verification'}
-          </button>
+          {kycStatus?.status === 'docs_uploaded' ? (
+            // Status: docs_uploaded → Show "Submit for Review" button
+            <div style={{ display: 'flex', gap: '12px', width: '100%', justifyContent: 'flex-end' }}>
+              <button
+                onClick={handleSubmit}
+                disabled={submitting || Object.values(uploading).some(v => v)}
+                className="btn"
+                style={{ ...styles.submitBtn, background: 'transparent', border: '1px solid var(--border-color)', color: 'var(--text-primary)' }}
+              >
+                Save Changes
+              </button>
+              <button
+                onClick={handleSubmitForReview}
+                disabled={submitting}
+                className="btn btn-primary"
+                style={styles.submitBtn}
+              >
+                {submitting ? 'Submitting...' : 'Submit for Review →'}
+              </button>
+            </div>
+          ) : (
+            // Status: draft or rejected → Show normal submit
+            <button
+              onClick={handleSubmit}
+              disabled={submitting || Object.values(uploading).some(v => v)}
+              className="btn btn-primary"
+              style={styles.submitBtn}
+            >
+              {submitting ? 'Saving...' : kycStatus?.status === 'rejected' ? 'Resubmit Documents' : 'Save Documents'}
+            </button>
+          )}
         </div>
       </div>
     </div>
