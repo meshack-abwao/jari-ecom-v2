@@ -432,7 +432,7 @@ router.post('/mock-approve', auth, async (req, res) => {
   try {
     const userId = req.user.userId;
     
-    console.log('🧪 Mock Approve Request:', { userId, testMode: process.env.INTASEND_TEST });
+    console.log('🧪 [MOCK APPROVE] Starting...', { userId });
     
     // Get store_id
     const storeResult = await db.query(
@@ -441,81 +441,76 @@ router.post('/mock-approve', auth, async (req, res) => {
     );
     
     if (storeResult.rows.length === 0) {
+      console.log('❌ [MOCK APPROVE] Store not found');
       return res.status(404).json({ error: 'Store not found' });
     }
     
     const store = storeResult.rows[0];
-    console.log('📦 Store found:', { storeId: store.id, storeName: store.name });
+    console.log('✅ [MOCK APPROVE] Store found:', { storeId: store.id, storeName: store.name });
     
-    // Check if KYC exists and is submitted
+    // Check if KYC exists
     const kycResult = await db.query(
       'SELECT id, status FROM merchant_kyc WHERE store_id = $1',
       [store.id]
     );
     
     if (kycResult.rows.length === 0) {
+      console.log('❌ [MOCK APPROVE] No KYC found');
       return res.status(404).json({ error: 'No KYC found. Please submit KYC documents first.' });
     }
     
     const kyc = kycResult.rows[0];
-    console.log('📋 KYC found:', { kycId: kyc.id, status: kyc.status });
+    console.log('✅ [MOCK APPROVE] KYC found:', { kycId: kyc.id, status: kyc.status });
     
     if (kyc.status === 'approved') {
-      return res.status(400).json({ error: 'KYC already approved' });
+      console.log('⚠️ [MOCK APPROVE] Already approved');
+      return res.json({
+        success: true,
+        message: '✅ KYC Already Approved',
+        wallet_id: kyc.intasend_wallet_id,
+        wallet_label: kyc.intasend_wallet_label,
+        note: 'KYC was already approved'
+      });
     }
     
     // Generate mock wallet ID (safe string manipulation)
     const storeIdShort = store.id.replace(/-/g, '').substring(0, 8);
-    const mockWalletId = `MOCK_WALLET_${storeIdShort}`;
+    const mockWalletId = `MOCK_${storeIdShort}`;
     const mockWalletLabel = `JARI_${store.name.replace(/[^a-zA-Z0-9]/g, '_')}_TEST`;
     
-    console.log('🏦 Mock wallet details:', { mockWalletId, mockWalletLabel });
+    console.log('🏦 [MOCK APPROVE] Generated wallet:', { mockWalletId, mockWalletLabel });
     
     // Update KYC status to approved with mock wallet
-    await db.query(
+    const updateResult = await db.query(
       `UPDATE merchant_kyc SET
         status = 'approved',
         intasend_wallet_id = $1,
         intasend_wallet_label = $2,
         approved_at = NOW(),
         updated_at = NOW()
-      WHERE id = $3`,
+      WHERE id = $3
+      RETURNING id, status, intasend_wallet_id`,
       [mockWalletId, mockWalletLabel, kyc.id]
     );
     
-    console.log('✅ KYC updated to approved');
-    
-    // Activate M-Pesa STK addon (check if table/column exists)
-    try {
-      await db.query(
-        `INSERT INTO store_addons (store_id, addon_type, activated_at)
-         VALUES ($1, 'mpesa_stk', NOW())
-         ON CONFLICT (store_id, addon_type) 
-         DO UPDATE SET activated_at = NOW()`,
-        [store.id]
-      );
-      console.log('✅ M-Pesa STK addon activated');
-    } catch (addonError) {
-      console.error('⚠️ Addon activation failed (non-critical):', addonError.message);
-      // Continue anyway - addon activation is optional
-    }
-    
-    console.log('✅ MOCK KYC APPROVED:', {
-      storeId: store.id,
-      storeName: store.name,
-      walletId: mockWalletId,
-      walletLabel: mockWalletLabel
-    });
+    console.log('✅ [MOCK APPROVE] KYC updated:', updateResult.rows[0]);
     
     res.json({
       success: true,
-      message: '🎉 KYC MOCK APPROVED! (Test Mode)',
+      message: '🎉 KYC MOCK APPROVED!',
       wallet_id: mockWalletId,
       wallet_label: mockWalletLabel,
-      note: 'This is a MOCK wallet for testing. Real payments will fail.'
+      note: 'This is a MOCK wallet for testing. M-Pesa payments will use sandbox.'
     });
+    
+    console.log('✅ [MOCK APPROVE] Success response sent');
+    
   } catch (error) {
-    console.error('❌ Mock approve KYC error:', error);
+    console.error('❌ [MOCK APPROVE] ERROR:', {
+      message: error.message,
+      stack: error.stack,
+      code: error.code
+    });
     res.status(500).json({ 
       error: 'Failed to mock approve KYC',
       details: error.message 
