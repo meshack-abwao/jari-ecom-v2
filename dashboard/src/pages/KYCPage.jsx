@@ -240,36 +240,36 @@ export default function KYCPage() {
     
     const statusConfig = {
       draft: { 
-        bg: 'bg-gray-100', 
-        text: 'text-gray-800', 
+        bg: '#f3f4f6', 
+        text: '#374151', 
         icon: '📝', 
         message: 'Draft - Complete your documents',
         step: 1
       },
       docs_uploaded: { 
-        bg: 'bg-blue-100', 
-        text: 'text-blue-800', 
+        bg: 'rgba(59, 130, 246, 0.1)', 
+        text: '#2563eb', 
         icon: '📄', 
         message: 'Documents ready - Click "Submit for Review" below',
         step: 2
       },
       submitted_to_intasend: { 
-        bg: 'bg-yellow-100', 
-        text: 'text-yellow-800', 
+        bg: 'rgba(245, 158, 11, 0.1)', 
+        text: '#d97706', 
         icon: '⏳', 
         message: 'Under review by IntaSend - Please wait 3-7 business days',
         step: 3
       },
       approved: { 
-        bg: 'bg-green-100', 
-        text: 'text-green-800', 
+        bg: 'rgba(34, 197, 94, 0.1)', 
+        text: '#16a34a', 
         icon: '✅', 
         message: 'Approved! M-Pesa STK Push is now active',
         step: 4
       },
       rejected: { 
-        bg: 'bg-red-100', 
-        text: 'text-red-800', 
+        bg: 'rgba(239, 68, 68, 0.1)', 
+        text: '#dc2626', 
         icon: '❌', 
         message: 'Rejected - Please review and resubmit',
         step: 2
@@ -283,49 +283,63 @@ export default function KYCPage() {
         {/* Progress Steps */}
         <div style={{ marginBottom: '20px', display: 'flex', gap: '8px', alignItems: 'center', fontSize: '13px' }}>
           <div style={{ 
-            padding: '6px 12px', 
-            borderRadius: '20px', 
-            background: config.step >= 1 ? 'var(--accent-color)' : '#e5e7eb',
-            color: config.step >= 1 ? 'white' : '#6b7280',
-            fontWeight: '600'
+            padding: '8px 16px', 
+            borderRadius: '24px', 
+            background: config.step >= 1 ? 'var(--accent-color)' : 'var(--surface-secondary)',
+            color: config.step >= 1 ? 'white' : 'var(--text-muted)',
+            fontWeight: '600',
+            fontSize: '12px',
+            transition: 'all 0.3s ease'
           }}>1. Upload</div>
-          <div style={{ flex: 1, height: '2px', background: config.step >= 2 ? 'var(--accent-color)' : '#e5e7eb' }}></div>
+          <div style={{ flex: 1, height: '2px', background: config.step >= 2 ? 'var(--accent-color)' : 'var(--border-color)', transition: 'all 0.3s ease' }}></div>
           <div style={{ 
-            padding: '6px 12px', 
-            borderRadius: '20px', 
-            background: config.step >= 2 ? 'var(--accent-color)' : '#e5e7eb',
-            color: config.step >= 2 ? 'white' : '#6b7280',
-            fontWeight: '600'
+            padding: '8px 16px', 
+            borderRadius: '24px', 
+            background: config.step >= 2 ? 'var(--accent-color)' : 'var(--surface-secondary)',
+            color: config.step >= 2 ? 'white' : 'var(--text-muted)',
+            fontWeight: '600',
+            fontSize: '12px',
+            transition: 'all 0.3s ease'
           }}>2. Submit</div>
-          <div style={{ flex: 1, height: '2px', background: config.step >= 3 ? 'var(--accent-color)' : '#e5e7eb' }}></div>
+          <div style={{ flex: 1, height: '2px', background: config.step >= 3 ? 'var(--accent-color)' : 'var(--border-color)', transition: 'all 0.3s ease' }}></div>
           <div style={{ 
-            padding: '6px 12px', 
-            borderRadius: '20px', 
-            background: config.step >= 3 ? 'var(--accent-color)' : '#e5e7eb',
-            color: config.step >= 3 ? 'white' : '#6b7280',
-            fontWeight: '600'
+            padding: '8px 16px', 
+            borderRadius: '24px', 
+            background: config.step >= 3 ? 'var(--accent-color)' : 'var(--surface-secondary)',
+            color: config.step >= 3 ? 'white' : 'var(--text-muted)',
+            fontWeight: '600',
+            fontSize: '12px',
+            transition: 'all 0.3s ease'
           }}>3. Review</div>
-          <div style={{ flex: 1, height: '2px', background: config.step >= 4 ? 'var(--accent-color)' : '#e5e7eb' }}></div>
+          <div style={{ flex: 1, height: '2px', background: config.step >= 4 ? 'var(--accent-color)' : 'var(--border-color)', transition: 'all 0.3s ease' }}></div>
           <div style={{ 
-            padding: '6px 12px', 
-            borderRadius: '20px', 
-            background: config.step >= 4 ? 'var(--accent-color)' : '#e5e7eb',
-            color: config.step >= 4 ? 'white' : '#6b7280',
-            fontWeight: '600'
+            padding: '8px 16px', 
+            borderRadius: '24px', 
+            background: config.step >= 4 ? 'var(--accent-color)' : 'var(--surface-secondary)',
+            color: config.step >= 4 ? 'white' : 'var(--text-muted)',
+            fontWeight: '600',
+            fontSize: '12px',
+            transition: 'all 0.3s ease'
           }}>4. Approved</div>
         </div>
         
         {/* Status Message */}
-        <div className={`${config.bg} ${config.text} rounded-lg p-4`}>
-          <div className="flex items-center">
-            <span className="text-2xl mr-3">{config.icon}</span>
-            <div className="flex-1">
-              <p className="font-semibold">{config.message}</p>
+        <div style={{ 
+          background: config.bg,
+          color: config.text,
+          borderRadius: '12px',
+          padding: '16px 20px',
+          border: `1px solid ${config.text}20`
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <span style={{ fontSize: '24px' }}>{config.icon}</span>
+            <div style={{ flex: 1 }}>
+              <p style={{ fontWeight: '600', fontSize: '14px', margin: 0 }}>{config.message}</p>
               {kycStatus.status === 'rejected' && kycStatus.rejection_reason && (
-                <p className="text-sm mt-1">Reason: {kycStatus.rejection_reason}</p>
+                <p style={{ fontSize: '13px', marginTop: '4px', margin: 0, opacity: 0.8 }}>Reason: {kycStatus.rejection_reason}</p>
               )}
               {kycStatus.status === 'submitted_to_intasend' && kycStatus.submitted_at && (
-                <p className="text-sm mt-1">Submitted: {new Date(kycStatus.submitted_at).toLocaleDateString()}</p>
+                <p style={{ fontSize: '12px', marginTop: '4px', margin: 0, opacity: 0.7 }}>Submitted: {new Date(kycStatus.submitted_at).toLocaleDateString()}</p>
               )}
             </div>
           </div>
@@ -337,20 +351,44 @@ export default function KYCPage() {
   // Approved view
   if (kycStatus?.status === 'approved') {
     return (
-      <div className="max-w-4xl mx-auto p-6">
-        <h1 className="text-3xl font-bold mb-6">KYC Verification</h1>
-        <StatusBanner />
+      <div className="fade-in" style={{ maxWidth: '900px', margin: '0 auto' }}>
+        <div style={styles.header}>
+          <h1 style={styles.title}>KYC Verification</h1>
+          <p style={styles.subtitle}>Your account is verified and active</p>
+        </div>
         
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="text-center py-12">
-            <div className="text-6xl mb-4">🎉</div>
-            <h2 className="text-2xl font-bold mb-2">KYC Approved!</h2>
-            <p className="text-gray-600 mb-6">
-              Your M-Pesa STK Push is now active. Customers can pay directly on your store.
-            </p>
-            <p className="text-sm text-gray-500">
-              Wallet ID: {kycStatus.intasend_wallet_id}
-            </p>
+        <div style={{ marginBottom: '32px' }}>
+          <StatusBanner />
+        </div>
+        
+        <div className="glass-card" style={{ padding: '48px 32px', textAlign: 'center' }}>
+          <div style={{ fontSize: '64px', marginBottom: '24px' }}>🎉</div>
+          <h2 style={{ fontSize: '24px', fontWeight: '700', marginBottom: '12px', color: 'var(--text-primary)' }}>KYC Approved!</h2>
+          <p style={{ fontSize: '15px', color: 'var(--text-muted)', marginBottom: '24px', lineHeight: '1.6' }}>
+            Your M-Pesa STK Push is now active. Customers can pay directly on your store.
+          </p>
+          
+          <div style={{ 
+            marginTop: '32px', 
+            paddingTop: '24px', 
+            borderTop: '1px solid var(--border-color)',
+            display: 'flex',
+            justifyContent: 'center',
+            gap: '32px',
+            fontSize: '13px'
+          }}>
+            {kycStatus.approved_at && (
+              <div>
+                <div style={{ color: 'var(--text-muted)', marginBottom: '4px', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Approved</div>
+                <div style={{ color: 'var(--text-primary)', fontWeight: '600' }}>{new Date(kycStatus.approved_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
+              </div>
+            )}
+            {kycStatus.intasend_wallet_id && (
+              <div>
+                <div style={{ color: 'var(--text-muted)', marginBottom: '4px', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Wallet ID</div>
+                <div style={{ color: 'var(--text-primary)', fontWeight: '600', fontFamily: 'monospace', fontSize: '12px' }}>{kycStatus.intasend_wallet_id}</div>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -360,21 +398,46 @@ export default function KYCPage() {
   // Under review view
   if (kycStatus?.status === 'submitted_to_intasend') {
     return (
-      <div className="max-w-4xl mx-auto p-6">
-        <h1 className="text-3xl font-bold mb-6">KYC Verification</h1>
-        <StatusBanner />
+      <div className="fade-in" style={{ maxWidth: '900px', margin: '0 auto' }}>
+        <div style={styles.header}>
+          <h1 style={styles.title}>KYC Verification</h1>
+          <p style={styles.subtitle}>Your application is being reviewed</p>
+        </div>
         
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="text-center py-12">
-            <div className="text-6xl mb-4">⏳</div>
-            <h2 className="text-2xl font-bold mb-2">Under Review</h2>
-            <p className="text-gray-600 mb-4">
-              Your documents are being reviewed by IntaSend.
-            </p>
-            <p className="text-sm text-gray-500">
-              This typically takes 3-7 business days. We'll notify you once approved.
-            </p>
-          </div>
+        <div style={{ marginBottom: '32px' }}>
+          <StatusBanner />
+        </div>
+        
+        <div className="glass-card" style={{ padding: '48px 32px', textAlign: 'center' }}>
+          <div style={{ fontSize: '64px', marginBottom: '24px' }}>⏳</div>
+          <h2 style={{ fontSize: '24px', fontWeight: '700', marginBottom: '12px', color: 'var(--text-primary)' }}>Under Review</h2>
+          <p style={{ fontSize: '15px', color: 'var(--text-muted)', marginBottom: '8px', lineHeight: '1.6' }}>
+            Your documents are being reviewed by IntaSend.
+          </p>
+          <p style={{ fontSize: '14px', color: 'var(--text-muted)', lineHeight: '1.6' }}>
+            This typically takes 3-7 business days. We'll notify you once approved.
+          </p>
+          
+          {kycStatus.submitted_at && (
+            <div style={{ 
+              marginTop: '32px', 
+              paddingTop: '24px', 
+              borderTop: '1px solid var(--border-color)',
+              display: 'flex',
+              justifyContent: 'center',
+              gap: '32px',
+              fontSize: '13px'
+            }}>
+              <div>
+                <div style={{ color: 'var(--text-muted)', marginBottom: '4px', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Submitted</div>
+                <div style={{ color: 'var(--text-primary)', fontWeight: '600' }}>{new Date(kycStatus.submitted_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
+              </div>
+              <div>
+                <div style={{ color: 'var(--text-muted)', marginBottom: '4px', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Status</div>
+                <div style={{ color: '#f59e0b', fontWeight: '600' }}>Under Review</div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     );
