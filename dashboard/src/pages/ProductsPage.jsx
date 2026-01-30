@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { productsAPI, settingsAPI, cardsAPI, templatesAPI } from '../api/client';
+import { productsAPI, settingsAPI, cardsAPI, templatesAPI, mpesaAPI } from '../api/client';
 import { Plus, Edit, Trash2, X, Eye, EyeOff, ExternalLink, Tag, ChevronDown, ChevronUp, ShoppingBag, AlertCircle, Layers } from 'lucide-react';
 import ImageUploader from '../components/ImageUploader';
 
@@ -262,15 +262,70 @@ export default function ProductsPage() {
     setShowCardPaymentModal(true);
   };
 
-  // Payment coming soon - no fake success
+  // REAL M-PESA PAYMENT FOR CARD BUNDLES
+  const [processing, setProcessing] = useState(false);
+  
   const handleCardPurchase = async () => {
-    if (!selectedBundle) return;
+    if (!selectedBundle || !cardPaymentPhone) {
+      alert('Please enter your M-Pesa phone number');
+      return;
+    }
     
-    alert('🚧 Payment Coming Soon!\n\nM-Pesa and IntaSend integration is being configured. Card purchases will be available shortly.\n\nContact support for early access.');
+    setProcessing(true);
     
-    setShowCardPaymentModal(false);
-    setSelectedBundle(null);
-    setCardPaymentPhone('');
+    try {
+      // Initiate STK Push
+      const response = await mpesaAPI.stkPush(
+        cardPaymentPhone,
+        selectedBundle.price,
+        'cards',
+        selectedBundle.id,
+        selectedBundle.name
+      );
+      
+      if (!response.data.success) {
+        alert('❌ Payment failed to initiate');
+        setProcessing(false);
+        return;
+      }
+      
+      alert(`📱 STK Push sent to ${cardPaymentPhone}! Enter your M-Pesa PIN.`);
+      
+      // Poll for payment status
+      const paymentId = response.data.paymentId;
+      const pollInterval = setInterval(async () => {
+        try {
+          const result = await mpesaAPI.getStatus(paymentId);
+          
+          if (result.data.status === 'completed') {
+            clearInterval(pollInterval);
+            alert('✅ Payment successful! Cards added to your balance.');
+            setShowCardPaymentModal(false);
+            setSelectedBundle(null);
+            setCardPaymentPhone('');
+            setProcessing(false);
+            loadCardBalance(); // Refresh card balance
+          } else if (result.data.status === 'failed') {
+            clearInterval(pollInterval);
+            alert('❌ Payment failed. Please try again.');
+            setProcessing(false);
+          }
+        } catch (pollError) {
+          console.error('Poll error:', pollError);
+        }
+      }, 3000); // Poll every 3 seconds
+      
+      // Stop polling after 60 seconds
+      setTimeout(() => {
+        clearInterval(pollInterval);
+        setProcessing(false);
+      }, 60000);
+      
+    } catch (error) {
+      console.error('Card purchase error:', error);
+      alert('❌ Payment failed. Please try again.');
+      setProcessing(false);
+    }
   };
 
   const handleAddProductClick = async () => {
@@ -321,15 +376,67 @@ export default function ProductsPage() {
     }
   };
 
-  // Payment coming soon - no fake success
+  // REAL M-PESA PAYMENT FOR TEMPLATE UNLOCKS
   const handleUnlockTemplate = async () => {
-    if (!templateToUnlock) return;
+    if (!templateToUnlock || !window.unlockPhoneNumber) {
+      alert('Please enter your M-Pesa phone number');
+      return;
+    }
     
-    alert('🚧 Payment Coming Soon!\n\nM-Pesa and IntaSend integration is being configured. Template purchases will be available shortly.\n\nContact support for early access.');
+    setProcessing(true);
     
-    setShowUnlockModal(false);
-    setTemplateToUnlock(null);
-    window.unlockPhoneNumber = '';
+    try {
+      // Initiate STK Push
+      const response = await mpesaAPI.stkPush(
+        window.unlockPhoneNumber,
+        templateToUnlock.price,
+        'template',
+        templateToUnlock.id,
+        templateToUnlock.name
+      );
+      
+      if (!response.data.success) {
+        alert('❌ Payment failed to initiate');
+        setProcessing(false);
+        return;
+      }
+      
+      alert(`📱 STK Push sent! Enter your M-Pesa PIN.`);
+      
+      // Poll for payment status
+      const paymentId = response.data.paymentId;
+      const pollInterval = setInterval(async () => {
+        try {
+          const result = await mpesaAPI.getStatus(paymentId);
+          
+          if (result.data.status === 'completed') {
+            clearInterval(pollInterval);
+            alert('✅ Template unlocked! You can now use it.');
+            setShowUnlockModal(false);
+            setTemplateToUnlock(null);
+            window.unlockPhoneNumber = '';
+            setProcessing(false);
+            loadAvailableTemplates(); // Refresh templates
+          } else if (result.data.status === 'failed') {
+            clearInterval(pollInterval);
+            alert('❌ Payment failed. Please try again.');
+            setProcessing(false);
+          }
+        } catch (pollError) {
+          console.error('Poll error:', pollError);
+        }
+      }, 3000);
+      
+      setTimeout(() => {
+        clearInterval(pollInterval);
+        setProcessing(false);
+      }, 60000);
+      
+    } catch (error) {
+      console.error('Template unlock error:', error);
+      alert('❌ Payment failed. Please try again.');
+      setProcessing(false);
+    }
   };
 
   // ===========================================
