@@ -434,9 +434,9 @@ router.post('/mock-approve', auth, async (req, res) => {
     
     console.log('🧪 [MOCK APPROVE] Starting...', { userId });
     
-    // Get store_id
+    // Get store_id and config
     const storeResult = await db.query(
-      'SELECT id, name FROM stores WHERE user_id = $1',
+      'SELECT id, config FROM stores WHERE user_id = $1',
       [userId]
     );
     
@@ -446,7 +446,8 @@ router.post('/mock-approve', auth, async (req, res) => {
     }
     
     const store = storeResult.rows[0];
-    console.log('✅ [MOCK APPROVE] Store found:', { storeId: store.id, storeName: store.name });
+    const storeName = store.config?.storeName || store.config?.name || 'Store';
+    console.log('✅ [MOCK APPROVE] Store found:', { storeId: store.id, storeName });
     
     // Check if KYC exists
     const kycResult = await db.query(
@@ -476,7 +477,7 @@ router.post('/mock-approve', auth, async (req, res) => {
     // Generate mock wallet ID (safe string manipulation)
     const storeIdShort = store.id.replace(/-/g, '').substring(0, 8);
     const mockWalletId = `MOCK_${storeIdShort}`;
-    const mockWalletLabel = `JARI_${store.name.replace(/[^a-zA-Z0-9]/g, '_')}_TEST`;
+    const mockWalletLabel = `JARI_${storeName.replace(/[^a-zA-Z0-9]/g, '_')}_TEST`;
     
     console.log('🏦 [MOCK APPROVE] Generated wallet:', { mockWalletId, mockWalletLabel });
     
