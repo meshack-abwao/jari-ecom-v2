@@ -375,6 +375,9 @@ export const kycAPI = {
   // Submit for IntaSend review (changes status to submitted_to_intasend)
   submitForReview: () => api.post('/kyc/submit-for-review'),
   
+  // MOCK: Instantly approve KYC for testing (test mode only)
+  mockApprove: () => api.post('/kyc/mock-approve'),
+  
   // Resubmit after rejection
   resubmit: (data) => api.post('/kyc/resubmit', data),
   

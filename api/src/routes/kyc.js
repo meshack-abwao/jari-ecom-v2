@@ -424,6 +424,93 @@ router.post('/reject/:kycId', auth, async (req, res) => {
 });
 
 /**
+ * MOCK: Approve KYC instantly for testing (DEV/SANDBOX ONLY)
+ * POST /api/kyc/mock-approve
+ * Bypasses IntaSend wallet creation, sets test wallet ID
+ */
+router.post('/mock-approve', auth, async (req, res) => {
+  try {
+    // Only allow in test mode
+    if (process.env.INTASEND_TEST !== 'true') {
+      return res.status(403).json({ error: 'Mock approval only available in test mode' });
+    }
+    
+    const userId = req.user.userId;
+    
+    // Get store_id
+    const storeResult = await db.query(
+      'SELECT id, name FROM stores WHERE user_id = $1',
+      [userId]
+    );
+    
+    if (storeResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Store not found' });
+    }
+    
+    const store = storeResult.rows[0];
+    
+    // Check if KYC exists and is submitted
+    const kycResult = await db.query(
+      'SELECT id, status FROM merchant_kyc WHERE store_id = $1',
+      [store.id]
+    );
+    
+    if (kycResult.rows.length === 0) {
+      return res.status(404).json({ error: 'No KYC found. Please submit KYC documents first.' });
+    }
+    
+    const kyc = kycResult.rows[0];
+    
+    if (kyc.status === 'approved') {
+      return res.status(400).json({ error: 'KYC already approved' });
+    }
+    
+    // Generate mock wallet ID
+    const mockWalletId = `MOCK_WALLET_${store.id.substring(0, 8)}`;
+    const mockWalletLabel = `JARI_${store.name.replace(/\s+/g, '_')}_TEST`;
+    
+    // Update KYC status to approved with mock wallet
+    await db.query(
+      `UPDATE merchant_kyc SET
+        status = 'approved',
+        intasend_wallet_id = $1,
+        intasend_wallet_label = $2,
+        approved_at = NOW(),
+        updated_at = NOW()
+      WHERE id = $3`,
+      [mockWalletId, mockWalletLabel, kyc.id]
+    );
+    
+    // Activate M-Pesa STK addon
+    await db.query(
+      `INSERT INTO store_addons (store_id, addon_type, activated_at)
+       VALUES ($1, 'mpesa_stk', NOW())
+       ON CONFLICT (store_id, addon_type) 
+       DO UPDATE SET activated_at = NOW()`,
+      [store.id]
+    );
+    
+    console.log('✅ MOCK KYC APPROVED:', {
+      storeId: store.id,
+      storeName: store.name,
+      walletId: mockWalletId,
+      walletLabel: mockWalletLabel
+    });
+    
+    res.json({
+      success: true,
+      message: '🎉 KYC MOCK APPROVED! (Test Mode)',
+      wallet_id: mockWalletId,
+      wallet_label: mockWalletLabel,
+      note: 'This is a MOCK wallet for testing. Real payments will fail.'
+    });
+  } catch (error) {
+    console.error('Mock approve KYC error:', error);
+    res.status(500).json({ error: 'Failed to mock approve KYC' });
+  }
+});
+
+/**
  * Create support ticket
  * POST /api/kyc/support
  */

@@ -223,6 +223,24 @@ export default function KYCPage() {
     }
   };
 
+  const handleMockApprove = async () => {
+    if (!confirm('🧪 MOCK APPROVE KYC? (Test Mode Only)\n\nThis will instantly approve your KYC without IntaSend review. Use only for testing.')) return;
+    
+    setSubmitting(true);
+    
+    try {
+      const response = await kycAPI.mockApprove();
+      alert(`✅ ${response.data.message}\n\nWallet ID: ${response.data.wallet_id}\n\nM-Pesa STK addon activated!`);
+      loadKYCStatus();
+    } catch (error) {
+      console.error('Mock approve error:', error);
+      const errorMsg = error.response?.data?.error || 'Failed to mock approve';
+      alert(`❌ ${errorMsg}`);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -424,18 +442,40 @@ export default function KYCPage() {
               paddingTop: '24px', 
               borderTop: '1px solid var(--border-color)',
               display: 'flex',
-              justifyContent: 'center',
-              gap: '32px',
-              fontSize: '13px'
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '16px'
             }}>
-              <div>
-                <div style={{ color: 'var(--text-muted)', marginBottom: '4px', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Submitted</div>
-                <div style={{ color: 'var(--text-primary)', fontWeight: '600' }}>{new Date(kycStatus.submitted_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
+              <div style={{ display: 'flex', gap: '32px', fontSize: '13px' }}>
+                <div>
+                  <div style={{ color: 'var(--text-muted)', marginBottom: '4px', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Submitted</div>
+                  <div style={{ color: 'var(--text-primary)', fontWeight: '600' }}>{new Date(kycStatus.submitted_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
+                </div>
+                <div>
+                  <div style={{ color: 'var(--text-muted)', marginBottom: '4px', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Status</div>
+                  <div style={{ color: '#f59e0b', fontWeight: '600' }}>Under Review</div>
+                </div>
               </div>
-              <div>
-                <div style={{ color: 'var(--text-muted)', marginBottom: '4px', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Status</div>
-                <div style={{ color: '#f59e0b', fontWeight: '600' }}>Under Review</div>
-              </div>
+              
+              {/* Mock Approve Button (Test Mode Only) */}
+              <button
+                onClick={handleMockApprove}
+                disabled={submitting}
+                style={{
+                  marginTop: '8px',
+                  padding: '10px 20px',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  background: 'rgba(139, 92, 246, 0.1)',
+                  color: '#8b5cf6',
+                  border: '1px solid rgba(139, 92, 246, 0.3)',
+                  borderRadius: '8px',
+                  cursor: submitting ? 'not-allowed' : 'pointer',
+                  opacity: submitting ? 0.5 : 1
+                }}
+              >
+                🧪 {submitting ? 'Approving...' : 'Mock Approve (Test Mode)'}
+              </button>
             </div>
           )}
         </div>
