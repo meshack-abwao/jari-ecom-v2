@@ -20,7 +20,7 @@ router.get('/', auth, async (req, res, next) => {
     const storeId = storeResult.rows[0].id;
     
     const result = await db.query(
-      `SELECT id, template, status, data, media, sort_order, created_at, updated_at
+      `SELECT id, template, status, data, media, sort_order, checkout_mode, checkout_config, created_at, updated_at
        FROM products 
        WHERE store_id = $1 
        ORDER BY sort_order, created_at DESC`,
@@ -36,11 +36,11 @@ router.get('/', auth, async (req, res, next) => {
 // Create product
 router.post('/', auth, async (req, res, next) => {
   try {
-    const { template, data, media } = req.body;
+    const { template, data, media, checkout_mode, checkout_config } = req.body;
     
-    // Get store ID
+    // Get store ID and default_checkout
     const storeResult = await db.query(
-      'SELECT id FROM stores WHERE user_id = $1',
+      'SELECT id, default_checkout FROM stores WHERE user_id = $1',
       [req.user.userId]
     );
     
@@ -49,17 +49,20 @@ router.post('/', auth, async (req, res, next) => {
     }
     
     const storeId = storeResult.rows[0].id;
+    const defaultCheckout = storeResult.rows[0].default_checkout || 'standard';
     
     // Stringify JSONB fields
     const result = await db.query(
-      `INSERT INTO products (store_id, template, data, media)
-       VALUES ($1, $2, $3::jsonb, $4::jsonb)
+      `INSERT INTO products (store_id, template, data, media, checkout_mode, checkout_config)
+       VALUES ($1, $2, $3::jsonb, $4::jsonb, $5, $6::jsonb)
        RETURNING *`,
       [
         storeId, 
         template || 'quick-decision', 
         JSON.stringify(data || {}), 
-        JSON.stringify(media || [])
+        JSON.stringify(media || []),
+        checkout_mode || defaultCheckout,
+        JSON.stringify(checkout_config || {})
       ]
     );
     
@@ -92,7 +95,7 @@ router.get('/:id', auth, async (req, res, next) => {
 // Update product
 router.put('/:id', auth, async (req, res, next) => {
   try {
-    const { template, status, data, media, sort_order } = req.body;
+    const { template, status, data, media, sort_order, checkout_mode, checkout_config } = req.body;
     
     // Build dynamic update
     const updates = [];
@@ -118,6 +121,14 @@ router.put('/:id', auth, async (req, res, next) => {
     if (sort_order !== undefined) { 
       updates.push(`sort_order = $${idx++}`); 
       values.push(sort_order); 
+    }
+    if (checkout_mode !== undefined) { 
+      updates.push(`checkout_mode = $${idx++}`); 
+      values.push(checkout_mode); 
+    }
+    if (checkout_config !== undefined) { 
+      updates.push(`checkout_config = $${idx++}::jsonb`); 
+      values.push(JSON.stringify(checkout_config)); 
     }
     
     updates.push(`updated_at = NOW()`);
