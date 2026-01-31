@@ -268,27 +268,46 @@ export const mpesaAPI = {
   // Check payment status
   getStatus: (paymentId) => api.get(`/mpesa/status/${paymentId}`),
   
+  // Manual verify and activate payment
+  verify: (paymentId) => api.post(`/mpesa/verify/${paymentId}`),
+  
   // Get payment history
   getHistory: () => api.get('/mpesa/history'),
   
   // Helper: Poll for payment completion
-  pollStatus: async (paymentId, maxAttempts = 30, intervalMs = 2000) => {
+  pollStatus: async (paymentId, maxAttempts = 20, intervalMs = 3000) => {
     for (let i = 0; i < maxAttempts; i++) {
-      const response = await api.get(`/mpesa/status/${paymentId}`);
-      const { status, success } = response.data;
-      
-      if (status === 'completed') {
-        return { success: true, ...response.data };
-      }
-      if (status === 'failed') {
-        return { success: false, ...response.data };
+      try {
+        const response = await api.get(`/mpesa/status/${paymentId}`);
+        const { status, success } = response.data;
+        
+        if (status === 'completed') {
+          return { success: true, ...response.data };
+        }
+        if (status === 'failed') {
+          return { success: false, ...response.data };
+        }
+      } catch (err) {
+        console.log('[Poll] Status check error, retrying...', err.message);
       }
       
       // Still pending, wait and retry
       await new Promise(resolve => setTimeout(resolve, intervalMs));
     }
     
-    return { success: false, status: 'timeout', message: 'Payment verification timed out' };
+    // Final attempt: Try manual verify which queries IntaSend directly
+    try {
+      console.log('[Poll] Timeout reached, trying manual verify...');
+      const verifyResponse = await api.post(`/mpesa/verify/${paymentId}`);
+      if (verifyResponse.data.success) {
+        return { success: true, ...verifyResponse.data };
+      }
+    } catch (err) {
+      console.log('[Poll] Manual verify failed:', err.message);
+    }
+    
+    return { success: false, status: 'timeout', message: 'Payment verification timed out. Please check Add-ons page in a few minutes.' };
+  }
   }
 };
 

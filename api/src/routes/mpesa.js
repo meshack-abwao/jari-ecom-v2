@@ -205,6 +205,89 @@ router.get('/status/:paymentId', auth, async (req, res, next) => {
 });
 
 // ===========================================
+// MANUAL VERIFY & ACTIVATE (for debugging/recovery)
+// ===========================================
+router.post('/verify/:paymentId', auth, async (req, res, next) => {
+  try {
+    const { paymentId } = req.params;
+    
+    // Get payment record
+    const paymentResult = await db.query(
+      `SELECT * FROM platform_payments WHERE id = $1 AND user_id = $2`,
+      [paymentId, req.user.userId]
+    );
+    
+    if (paymentResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Payment not found' });
+    }
+    
+    const payment = paymentResult.rows[0];
+    
+    // If already completed, just return success
+    if (payment.status === 'completed') {
+      return res.json({ success: true, message: 'Already activated', status: 'completed' });
+    }
+    
+    // Query IntaSend for status
+    const invoiceId = payment.checkout_request_id;
+    console.log('[Manual Verify] Checking payment:', paymentId, 'invoice:', invoiceId);
+    
+    if (!invoiceId) {
+      return res.status(400).json({ error: 'No invoice ID found for this payment' });
+    }
+    
+    const statusResponse = await intaSendService.getPaymentStatus(invoiceId);
+    console.log('[Manual Verify] IntaSend response:', statusResponse);
+    
+    // If IntaSend shows success (COMPLETE or CLEARING), activate
+    if (statusResponse.success) {
+      await db.query(
+        `UPDATE platform_payments 
+         SET status = 'completed', 
+             mpesa_receipt_number = $1,
+             completed_at = NOW()
+         WHERE id = $2`,
+        [statusResponse.mpesa_reference, paymentId]
+      );
+      
+      // Activate the purchase
+      await activatePurchase(payment);
+      
+      return res.json({
+        success: true,
+        message: 'Payment verified and activated!',
+        status: 'completed',
+        state: statusResponse.state,
+        mpesaRef: statusResponse.mpesa_reference
+      });
+    }
+    
+    // Still pending
+    if (statusResponse.pending) {
+      return res.json({
+        success: false,
+        message: 'Payment still processing',
+        status: 'pending',
+        state: statusResponse.state
+      });
+    }
+    
+    // Failed
+    return res.json({
+      success: false,
+      message: 'Payment verification failed',
+      status: 'failed',
+      state: statusResponse.state,
+      error: statusResponse.error
+    });
+    
+  } catch (err) {
+    console.error('[Manual Verify] Error:', err);
+    next(err);
+  }
+});
+
+// ===========================================
 // M-PESA CALLBACK (Public endpoint)
 // ===========================================
 router.post('/callback', async (req, res) => {
