@@ -155,14 +155,16 @@ class IntaSendService {
     try {
       const formattedPhone = this.formatPhone(phone_number);
       
+      // IntaSend Collection API uses public_key in body, not Bearer token
       const payload = {
+        public_key: this.publishableKey,
         phone_number: formattedPhone,
         email: email || 'customer@jari.eco',
-        amount: Math.round(amount), // Must be integer
+        amount: Math.round(amount),
         currency: 'KES',
         api_ref: api_ref,
-        narrative: narrative.substring(0, 20), // Limit narrative length
-        method: 'M-PESA' // Changed from 'MPESA-STK-PUSH' to 'M-PESA'
+        narrative: narrative.substring(0, 20),
+        method: 'M-PESA'
       };
       
       // Only add wallet_id if provided (for merchant payments)
@@ -182,7 +184,6 @@ class IntaSendService {
         payload,
         {
           headers: {
-            'Authorization': `Bearer ${this.publishableKey}`,
             'Content-Type': 'application/json'
           }
         }
