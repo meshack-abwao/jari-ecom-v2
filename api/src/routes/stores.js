@@ -25,7 +25,7 @@ router.get('/', auth, async (req, res, next) => {
 // Update store config and/or slug
 router.put('/', auth, async (req, res, next) => {
   try {
-    const { config: newConfig, slug: newSlug } = req.body;
+    const { config: newConfig, slug: newSlug, default_checkout, unlocked_checkouts } = req.body;
     
     // If slug is being updated, check if it's unique
     if (newSlug) {
@@ -38,22 +38,38 @@ router.put('/', auth, async (req, res, next) => {
       }
     }
     
-    // Build update query dynamically
-    let updateQuery;
-    let params;
+    // Build dynamic update parts
+    const setParts = [];
+    const params = [];
+    let paramIndex = 1;
     
-    if (newSlug && newConfig) {
-      updateQuery = `UPDATE stores SET config = config || $1::jsonb, slug = $2 WHERE user_id = $3 RETURNING *`;
-      params = [JSON.stringify(newConfig), newSlug, req.user.userId];
-    } else if (newSlug) {
-      updateQuery = `UPDATE stores SET slug = $1 WHERE user_id = $2 RETURNING *`;
-      params = [newSlug, req.user.userId];
-    } else if (newConfig) {
-      updateQuery = `UPDATE stores SET config = config || $1::jsonb WHERE user_id = $2 RETURNING *`;
-      params = [JSON.stringify(newConfig), req.user.userId];
-    } else {
+    if (newConfig) {
+      setParts.push(`config = config || $${paramIndex}::jsonb`);
+      params.push(JSON.stringify(newConfig));
+      paramIndex++;
+    }
+    if (newSlug) {
+      setParts.push(`slug = $${paramIndex}`);
+      params.push(newSlug);
+      paramIndex++;
+    }
+    if (default_checkout) {
+      setParts.push(`default_checkout = $${paramIndex}`);
+      params.push(default_checkout);
+      paramIndex++;
+    }
+    if (unlocked_checkouts) {
+      setParts.push(`unlocked_checkouts = $${paramIndex}`);
+      params.push(unlocked_checkouts);
+      paramIndex++;
+    }
+    
+    if (setParts.length === 0) {
       return res.status(400).json({ error: 'No data to update' });
     }
+    
+    params.push(req.user.userId);
+    const updateQuery = `UPDATE stores SET ${setParts.join(', ')} WHERE user_id = $${paramIndex} RETURNING *`;
     
     const result = await db.query(updateQuery, params);
     
@@ -84,6 +100,18 @@ router.get('/templates', async (req, res, next) => {
   try {
     const result = await db.query(
       'SELECT * FROM templates WHERE is_active = true ORDER BY sort_order'
+    );
+    res.json(result.rows);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Get available checkout modes
+router.get('/checkout-modes', async (req, res, next) => {
+  try {
+    const result = await db.query(
+      'SELECT * FROM checkout_modes WHERE is_active = true ORDER BY sort_order'
     );
     res.json(result.rows);
   } catch (err) {
