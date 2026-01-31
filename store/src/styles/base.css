@@ -136,7 +136,7 @@ body {
 .minimal-header {
     background: var(--surface);
     border-bottom: 1px solid var(--border);
-    padding: var(--space-sm) var(--space-lg);
+    padding: var(--space-sm) var(--space-md);
     position: sticky;
     top: 0;
     z-index: 101;
@@ -147,9 +147,9 @@ body {
     align-items: center;
     justify-content: space-between;
     gap: var(--space-md);
-    max-width: 1200px;
+    max-width: 600px;
     margin: 0 auto;
-    padding: 0 var(--space-md);
+    padding: 0;
 }
 
 .minimal-header-logo {
