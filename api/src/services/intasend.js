@@ -236,12 +236,17 @@ class IntaSendService {
       const invoice = response.data.invoice || response.data;
       const state = invoice.state || invoice.status;
       
-      console.log('[IntaSend] Payment status:', { invoiceId, state });
+      console.log('[IntaSend] Payment status:', { invoiceId, state, invoice });
       
-      // IntaSend states: PENDING, PROCESSING, COMPLETE, FAILED, CANCELLED
+      // IntaSend states: PENDING, PROCESSING, CLEARING, COMPLETE, FAILED, CANCELLED
+      // CLEARING = payment received from customer, waiting for IntaSend settlement
+      // For user experience, CLEARING should be treated as success (they paid!)
+      const isPending = ['PENDING', 'PROCESSING'].includes(state);
+      const isComplete = state === 'COMPLETE' || state === 'CLEARING';
+      
       return {
-        success: state === 'COMPLETE',
-        pending: state === 'PENDING' || state === 'PROCESSING',
+        success: isComplete,
+        pending: isPending,
         state: state,
         mpesa_reference: invoice.mpesa_reference || invoice.provider_reference,
         amount: invoice.value || invoice.amount
