@@ -131,7 +131,7 @@ body {
 
 /* ===========================================
    MINIMAL HEADER (Product Pages)
-   Clean strip with logo + action buttons
+   Unified bar: Logo + Nav/Breadcrumb + Actions
    =========================================== */
 .minimal-header {
     background: var(--surface);
@@ -146,8 +146,10 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: var(--space-md);
     max-width: 1200px;
     margin: 0 auto;
+    padding: 0 var(--space-md);
 }
 
 .minimal-header-logo {
@@ -157,6 +159,7 @@ body {
     text-decoration: none;
     color: var(--text-primary);
     transition: opacity 0.2s ease;
+    flex-shrink: 0;
 }
 
 .minimal-header-logo:hover {
@@ -164,44 +167,158 @@ body {
 }
 
 .minimal-logo-img {
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid var(--border);
 }
 
 .minimal-logo-text {
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
     background: var(--gradient-primary);
     color: white;
     font-weight: 700;
-    font-size: var(--fs-body);
-    border-radius: 10px;
+    font-size: var(--fs-small);
+    border-radius: 8px;
 }
 
 .minimal-store-name {
-    font-size: var(--fs-body);
+    font-size: var(--fs-small);
     font-weight: 600;
     color: var(--text-primary);
 }
 
+/* Center section: Nav + Breadcrumb */
+.minimal-header-center {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    flex: 1;
+    justify-content: center;
+    min-width: 0;
+    overflow: hidden;
+}
+
+/* Back button in header */
+.mh-back-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    background: var(--bg-gray);
+    border: none;
+    border-radius: 100px;
+    font-size: var(--fs-tiny);
+    font-weight: 500;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.mh-back-btn:hover {
+    background: var(--text-primary);
+    color: white;
+}
+
+.mh-back-btn svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* Prev/Next nav in header */
+.mh-product-nav {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.mh-nav-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.mh-nav-btn:hover:not(.disabled) {
+    background: var(--bg-gray);
+    border-color: var(--text-tertiary);
+}
+
+.mh-nav-btn.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.mh-nav-counter {
+    font-size: var(--fs-tiny);
+    font-weight: 500;
+    color: var(--text-secondary);
+    padding: 0 6px;
+    white-space: nowrap;
+}
+
+/* Breadcrumb in header */
+.mh-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: var(--fs-tiny);
+    color: var(--text-secondary);
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.mh-breadcrumb a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.mh-breadcrumb a:hover {
+    color: var(--text-primary);
+}
+
+.mh-sep {
+    color: var(--border);
+    flex-shrink: 0;
+}
+
+.mh-current {
+    color: var(--text-primary);
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+}
+
+/* Actions - Right */
 .minimal-header-actions {
     display: flex;
     align-items: center;
     gap: var(--space-sm);
+    flex-shrink: 0;
 }
 
 .minimal-action-btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     transition: all 0.2s ease;
     text-decoration: none;
@@ -228,25 +345,53 @@ body {
     transform: scale(1.05);
 }
 
-/* Mobile adjustments for minimal header */
-@media (max-width: 480px) {
-    .minimal-header {
-        padding: var(--space-xs) var(--space-md);
+/* Tablet adjustments */
+@media (max-width: 768px) {
+    .minimal-header-content {
+        padding: 0;
     }
     
     .minimal-store-name {
         display: none;
     }
     
+    .mh-back-btn span {
+        display: none;
+    }
+    
+    .mh-back-btn {
+        padding: 6px 8px;
+    }
+    
+    .mh-breadcrumb {
+        display: none;
+    }
+}
+
+/* Mobile adjustments */
+@media (max-width: 480px) {
+    .minimal-header {
+        padding: var(--space-xs) var(--space-md);
+    }
+    
+    .minimal-header-center {
+        gap: var(--space-sm);
+    }
+    
     .minimal-logo-img,
     .minimal-logo-text {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .minimal-action-btn {
         width: 32px;
         height: 32px;
     }
     
-    .minimal-action-btn {
-        width: 36px;
-        height: 36px;
+    .mh-nav-btn {
+        width: 26px;
+        height: 26px;
     }
 }
 

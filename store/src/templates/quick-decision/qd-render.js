@@ -30,7 +30,6 @@ export function renderQuickDecision(product) {
   const showBackButton = products.length > 1;
   
   return `
-    ${renderBreadcrumb(product)}
     <div class="product-container">
       <div class="product-card">
         ${renderGallery(images)}

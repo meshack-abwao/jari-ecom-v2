@@ -8,7 +8,7 @@ import { state } from '../../state.js';
 import { formatPrice } from '../../shared/utils.js';
 import { renderStories, renderStoryViewer } from '../../shared/media-components.js';
 import { renderProductPolicyLinks, renderProductPolicyModals } from '../../shared/policy-modals.js';
-import { renderBreadcrumb, renderProductNav } from '../../render.js';
+import { renderProductNav } from '../../render.js';
 import { renderRelatedProducts } from '../../shared/related-products.js';
 
 // Dietary tag icons mapping
@@ -42,7 +42,6 @@ export function renderVisualMenu(product) {
   const showBackButton = products.length > 1;
   
   return `
-    ${renderBreadcrumb(product)}
     <div class="product-container template-menu">
       <div class="product-card food-card">
         ${renderMenuGallery(media.images || [])}

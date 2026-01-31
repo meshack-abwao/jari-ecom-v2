@@ -324,7 +324,7 @@ function renderProductView(product) {
   
   app.innerHTML = `
     <a href="#main-content" class="skip-link">Skip to main content</a>
-    ${renderMinimalHeader()}
+    ${renderMinimalHeader(product)}
     <main class="main" id="main-content">
       ${renderSingleProduct(product)}
     </main>

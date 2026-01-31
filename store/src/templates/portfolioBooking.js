@@ -27,8 +27,6 @@ export function renderPortfolioBookingTemplate(product) {
     : null;
 
   return `
-    ${renderBreadcrumb(product)}
-    
     <div class="pbk-container">
       <!-- ==========================================
            SECTION FLOW (Psychology-Based Reading Path)

@@ -35,7 +35,6 @@ export function renderDeepDive(product) {
   const validShowcase = showcaseImages.filter(img => img.url);
   
   return `
-    ${renderBreadcrumb(product)}
     <div class="product-container template-deep-dive">
       
       <!-- STEP 1: DEFINE - Product Header (Title + Rating) -->

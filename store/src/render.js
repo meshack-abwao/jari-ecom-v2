@@ -170,10 +170,10 @@ export function renderHeader() {
 
 // ===========================================
 // MINIMAL HEADER (for Product Pages)
-// Clean strip: Logo + WhatsApp/Call
+// Unified bar: Logo + Breadcrumb/Nav + Actions
 // ===========================================
-export function renderMinimalHeader() {
-  const { store } = state;
+export function renderMinimalHeader(product = null) {
+  const { store, products } = state;
   const logoText = store.logo_text || store.name?.charAt(0) || '🛍️';
   const heroPhotoUrl = store.hero?.photo_url;
   const storeName = store.name || 'Store';
@@ -185,10 +185,26 @@ export function renderMinimalHeader() {
   const whatsappLink = cleanPhone ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(whatsappMessage)}` : '';
   const callLink = cleanPhone ? `tel:${cleanPhone}` : '';
   
+  // Breadcrumb data
+  const productName = product?.data?.name || 'Product';
+  const category = product?.data?.category || null;
+  const categoryInfo = category && store?.categories?.find(c => c.name === category);
+  const categoryEmoji = categoryInfo?.emoji || '';
+  
+  // Product navigation data
+  const currentIndex = products.findIndex(p => p.id === product?.id);
+  const prevProduct = currentIndex > 0 ? products[currentIndex - 1] : null;
+  const nextProduct = currentIndex < products.length - 1 ? products[currentIndex + 1] : null;
+  const total = products.length;
+  const current = currentIndex + 1;
+  const prevSlug = prevProduct?.slug || prevProduct?.id;
+  const nextSlug = nextProduct?.slug || nextProduct?.id;
+  const showNav = product && products.length > 1;
+  
   return `
     <header class="minimal-header">
       <div class="minimal-header-content">
-        <!-- Logo - Left (clickable to go back to collection) -->
+        <!-- Logo - Left -->
         <a href="#" class="minimal-header-logo" onclick="window.showCollection(); return false;" aria-label="Back to ${storeName}">
           ${heroPhotoUrl 
             ? `<img src="${heroPhotoUrl}" alt="${storeName}" class="minimal-logo-img">`
@@ -196,6 +212,49 @@ export function renderMinimalHeader() {
           }
           <span class="minimal-store-name">${storeName}</span>
         </a>
+        
+        <!-- Center: Navigation + Breadcrumb -->
+        ${showNav ? `
+        <div class="minimal-header-center">
+          <!-- Back Button -->
+          <button class="mh-back-btn" onclick="window.showCollection()" aria-label="Back to all products">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M15 18l-6-6 6-6"/>
+            </svg>
+            <span>Back</span>
+          </button>
+          
+          <!-- Prev/Next Nav -->
+          <div class="mh-product-nav">
+            <button class="mh-nav-btn ${!prevProduct ? 'disabled' : ''}" 
+                    onclick="${prevProduct ? `window.viewRelatedProduct('${prevSlug}')` : ''}"
+                    ${!prevProduct ? 'disabled' : ''}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M15 18l-6-6 6-6"/>
+              </svg>
+            </button>
+            <span class="mh-nav-counter">${current}/${total}</span>
+            <button class="mh-nav-btn ${!nextProduct ? 'disabled' : ''}" 
+                    onclick="${nextProduct ? `window.viewRelatedProduct('${nextSlug}')` : ''}"
+                    ${!nextProduct ? 'disabled' : ''}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 18l6-6-6-6"/>
+              </svg>
+            </button>
+          </div>
+          
+          <!-- Breadcrumb Trail -->
+          <nav class="mh-breadcrumb" aria-label="Breadcrumb">
+            <a href="#" onclick="window.showCollection(); return false;">${storeName}</a>
+            <span class="mh-sep">›</span>
+            ${category ? `
+              <a href="#" onclick="window.filterByCategory('${category}'); return false;">${categoryEmoji} ${category}</a>
+              <span class="mh-sep">›</span>
+            ` : ''}
+            <span class="mh-current">${productName}</span>
+          </nav>
+        </div>
+        ` : ''}
         
         <!-- Actions - Right -->
         <div class="minimal-header-actions">

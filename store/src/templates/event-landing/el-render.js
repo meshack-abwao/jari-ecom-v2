@@ -40,7 +40,6 @@ export function renderEventLanding(product) {
   }
   
   return `
-    ${renderBreadcrumb(product)}
     <div class="product-container">
       <div class="product-card">
         ${renderGallery(media.images || [])}
