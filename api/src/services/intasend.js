@@ -218,11 +218,15 @@ class IntaSendService {
    */
   async getPaymentStatus(invoiceId) {
     try {
-      const response = await axios.get(
-        `${this.baseURL}/payment/collection/${invoiceId}/`,
+      // IntaSend status API uses POST with public_key and invoice_id in body
+      const response = await axios.post(
+        `${this.baseURL}/payment/status/`,
+        {
+          public_key: this.publishableKey,
+          invoice_id: invoiceId
+        },
         {
           headers: {
-            'Authorization': `Bearer ${this.secretKey}`,
             'Content-Type': 'application/json'
           }
         }
@@ -230,6 +234,8 @@ class IntaSendService {
       
       const invoice = response.data.invoice || response.data;
       const state = invoice.state || invoice.status;
+      
+      console.log('[IntaSend] Payment status:', { invoiceId, state });
       
       // IntaSend states: PENDING, PROCESSING, COMPLETE, FAILED, CANCELLED
       return {
@@ -240,7 +246,12 @@ class IntaSendService {
         amount: invoice.value || invoice.amount
       };
     } catch (error) {
-      console.error('Get payment status failed:', error.response?.data || error.message);
+      console.error('[IntaSend] Get payment status failed:', {
+        invoiceId,
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message
+      });
       return {
         success: false,
         pending: false,
