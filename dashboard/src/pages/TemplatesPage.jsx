@@ -551,7 +551,7 @@ export default function TemplatesPage() {
         </div>
       )}
 
-      {/* Unlock Modal - Payment Coming Soon */}
+      {/* Unlock Modal - M-Pesa Payment */}
       {showUnlockModal && templateToUnlock && (
         <div style={styles.modalOverlay} onClick={() => setShowUnlockModal(false)}>
           <div style={styles.modal} className="glass-card" onClick={e => e.stopPropagation()}>
