@@ -174,24 +174,24 @@ body {
 }
 
 .minimal-logo-img {
-    width: 32px;
-    height: 32px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid var(--border);
 }
 
 .minimal-logo-text {
-    width: 32px;
-    height: 32px;
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
     background: var(--gradient-primary);
     color: white;
     font-weight: 700;
-    font-size: var(--fs-small);
-    border-radius: 8px;
+    font-size: var(--fs-body);
+    border-radius: 10px;
 }
 
 .minimal-store-name {
@@ -432,8 +432,8 @@ body {
     
     .minimal-logo-img,
     .minimal-logo-text {
-        width: 28px;  /* Slightly smaller on mobile */
-        height: 28px;
+        width: 36px;
+        height: 36px;
     }
     
     .minimal-action-btn {
