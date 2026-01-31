@@ -27,7 +27,7 @@ const AVAILABLE_ADDONS = [
     id: 'whatsapp_auto', 
     name: 'WhatsApp Automation', 
     description: 'Send automatic order confirmations, shipping updates, and follow-ups via WhatsApp.', 
-    price: 800 
+    price: 10 
   },
   { 
     id: 'advanced_analytics', 
