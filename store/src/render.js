@@ -8,7 +8,8 @@ import { renderEventLanding as renderEventLandingTemplate } from './templates/ev
 // ===========================================
 // BREADCRUMB NAVIGATION
 // Kalbach: Location breadcrumbs show position in hierarchy
-// Apple: Unified sticky pill with back button
+// Apple: Unified sticky pill with back button + center nav
+// 3-column layout: [Back] [Prev/Next] [Breadcrumb]
 // ===========================================
 export function renderBreadcrumb(product = null) {
   const { store, products } = state;
@@ -24,6 +25,15 @@ export function renderBreadcrumb(product = null) {
   const categoryInfo = category && store?.categories?.find(c => c.name === category);
   const categoryEmoji = categoryInfo?.emoji || '';
   
+  // Product navigation data (for center section)
+  const currentIndex = products.findIndex(p => p.id === product.id);
+  const prevProduct = currentIndex > 0 ? products[currentIndex - 1] : null;
+  const nextProduct = currentIndex < products.length - 1 ? products[currentIndex + 1] : null;
+  const total = products.length;
+  const current = currentIndex + 1;
+  const prevSlug = prevProduct?.slug || prevProduct?.id;
+  const nextSlug = nextProduct?.slug || nextProduct?.id;
+  
   return `
     <div class="store-breadcrumb-wrapper">
       <div class="store-breadcrumb-pill" role="navigation" aria-label="Store navigation">
@@ -34,6 +44,29 @@ export function renderBreadcrumb(product = null) {
           </svg>
           <span>Back</span>
         </button>
+        
+        <!-- Product Nav - Center -->
+        <nav class="breadcrumb-product-nav" aria-label="Product navigation">
+          <button class="breadcrumb-nav-btn ${!prevProduct ? 'disabled' : ''}" 
+                  onclick="${prevProduct ? `window.viewRelatedProduct('${prevSlug}')` : ''}"
+                  ${!prevProduct ? 'disabled aria-disabled="true"' : ''}
+                  aria-label="Previous product">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M15 18l-6-6 6-6"/>
+            </svg>
+            <span>Prev</span>
+          </button>
+          <span class="breadcrumb-nav-counter">${current} of ${total}</span>
+          <button class="breadcrumb-nav-btn ${!nextProduct ? 'disabled' : ''}" 
+                  onclick="${nextProduct ? `window.viewRelatedProduct('${nextSlug}')` : ''}"
+                  ${!nextProduct ? 'disabled aria-disabled="true"' : ''}
+                  aria-label="Next product">
+            <span>Next</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 18l6-6-6-6"/>
+            </svg>
+          </button>
+        </nav>
         
         <!-- Breadcrumb Trail - Right -->
         <nav class="breadcrumb-trail" aria-label="Breadcrumb">
