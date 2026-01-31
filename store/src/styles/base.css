@@ -842,25 +842,26 @@ body {
 /* Store Breadcrumb - Unified Sticky Pill (Kalbach + Apple Design) */
 .store-breadcrumb-wrapper {
     position: sticky;
-    top: 0;
+    top: 12px;  /* Floaty effect - offset from top */
     z-index: 100;
     padding: var(--space-md) var(--space-lg);
-    background: linear-gradient(to bottom, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.9) 100%);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background: transparent;  /* Let pill have the background */
 }
 
 .store-breadcrumb-pill {
     display: grid;
     grid-template-columns: auto 1fr auto;
     align-items: center;
-    gap: var(--space-lg);
+    gap: var(--space-xl);  /* More spacing between sections */
     padding: var(--space-sm) var(--space-lg);
-    background: var(--surface);
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--border);
     border-radius: 100px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-    max-width: fit-content;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    max-width: 100%;
+    width: fit-content;
     margin: 0 auto;
 }
 
@@ -1012,19 +1013,17 @@ body {
 @media (max-width: 480px) {
     .store-breadcrumb-wrapper {
         padding: var(--space-sm) var(--space-md);
+        top: 8px;  /* Floaty on mobile too */
     }
     
     .store-breadcrumb-pill {
-        padding: var(--space-xs);
-        gap: var(--space-xs);
-    }
-    
-    .breadcrumb-back {
         padding: var(--space-xs) var(--space-sm);
-        font-size: var(--fs-tiny);
+        gap: var(--space-sm);
+        grid-template-columns: auto 1fr;  /* Remove back button column */
     }
     
-    .breadcrumb-back span {
+    /* Hide back button on mobile - logo serves this purpose */
+    .breadcrumb-back {
         display: none;
     }
     
