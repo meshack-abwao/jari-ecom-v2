@@ -134,9 +134,11 @@ body {
    Unified bar: Logo + Nav/Breadcrumb + Actions
    =========================================== */
 .minimal-header {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: var(--space-sm) var(--space-lg);
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    padding: var(--space-sm) 20px;
     position: sticky;
     top: 0;
     z-index: 101;
@@ -149,7 +151,7 @@ body {
     gap: var(--space-md);
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 var(--space-md);
+    padding: 0 20px;
 }
 
 .minimal-header-logo {
@@ -193,15 +195,20 @@ body {
     color: var(--text-primary);
 }
 
-/* Center section: Nav + Breadcrumb */
+/* Center section: Nav + Breadcrumb - Pill container */
 .minimal-header-center {
     display: flex;
     align-items: center;
-    gap: var(--space-md);
+    gap: var(--space-sm);
     flex: 1;
     justify-content: center;
     min-width: 0;
     overflow: hidden;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 6px 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 /* Back button in header */
@@ -371,27 +378,32 @@ body {
 /* Mobile adjustments */
 @media (max-width: 480px) {
     .minimal-header {
-        padding: var(--space-xs) var(--space-md);
+        padding: var(--space-sm) var(--space-md);
+    }
+    
+    .minimal-header-content {
+        padding: 0 8px;
     }
     
     .minimal-header-center {
-        gap: var(--space-sm);
+        gap: 6px;
+        padding: 8px 10px;
     }
     
     .minimal-logo-img,
     .minimal-logo-text {
-        width: 28px;
-        height: 28px;
-    }
-    
-    .minimal-action-btn {
         width: 32px;
         height: 32px;
     }
     
+    .minimal-action-btn {
+        width: 36px;
+        height: 36px;
+    }
+    
     .mh-nav-btn {
-        width: 26px;
-        height: 26px;
+        width: 28px;
+        height: 28px;
     }
 }
 
