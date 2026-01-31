@@ -136,10 +136,10 @@ body {
    =========================================== */
 .minimal-header {
     position: sticky;
-    top: 12px;  /* Floaty effect */
+    top: 16px;  /* More floaty effect */
     z-index: 101;
-    padding: 0 var(--space-lg);
-    margin: 0 var(--space-md);
+    padding: 0 var(--space-xl);  /* More breathing space from edges */
+    margin: 0 var(--space-lg);
 }
 
 .minimal-header-content {
@@ -373,7 +373,7 @@ body {
     }
     
     .minimal-header-content {
-        padding: var(--space-xs) var(--space-sm);
+        padding: var(--space-sm) var(--space-md);
     }
     
     .minimal-store-name {
@@ -395,20 +395,22 @@ body {
     .minimal-header-center {
         grid-template-columns: auto auto;
         gap: var(--space-sm);
+        max-width: none;  /* Remove golden ratio constraint on tablet */
     }
 }
 
 /* Mobile adjustments */
 @media (max-width: 480px) {
     .minimal-header {
-        padding: 0 var(--space-sm);
-        top: 8px;
-        margin: 0 var(--space-xs);
+        padding: 0;
+        top: 10px;
+        margin: 0 var(--space-md);  /* More breathing space from edges */
     }
     
     .minimal-header-content {
-        padding: var(--space-xs) var(--space-sm);
-        gap: var(--space-sm);
+        padding: var(--space-sm) var(--space-md);
+        gap: var(--space-md);
+        justify-content: space-between;
     }
     
     /* Hide back button on mobile - logo serves this purpose */
@@ -419,7 +421,9 @@ body {
     .minimal-header-center {
         grid-template-columns: 1fr;  /* Only nav centered */
         gap: var(--space-xs);
-        padding: 6px 12px;
+        padding: 6px 16px;
+        max-width: none;  /* Remove golden ratio, let it fit content */
+        flex: 0 0 auto;  /* Don't stretch */
     }
     
     .mh-product-nav {
@@ -428,8 +432,8 @@ body {
     
     .minimal-logo-img,
     .minimal-logo-text {
-        width: 32px;
-        height: 32px;
+        width: 28px;  /* Slightly smaller on mobile */
+        height: 28px;
     }
     
     .minimal-action-btn {
