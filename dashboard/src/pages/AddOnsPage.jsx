@@ -149,8 +149,7 @@ export default function AddOnsPage() {
       
       if (result.success) {
         setPaymentStatus('success');
-        // Activate the addon
-        await subscriptionsAPI.activateAddon(selectedAddOn.id, result.mpesaRef);
+        // Addon is already activated by the webhook/backend - just refresh UI
         
         setTimeout(() => {
           setShowCheckout(false);
