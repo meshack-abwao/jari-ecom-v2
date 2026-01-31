@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { subscriptionsAPI, mpesaAPI, kycAPI } from '../api/client';
+import { subscriptionsAPI, mpesaAPI, kycAPI, settingsAPI } from '../api/client';
 import { Check, Zap, X, ChevronDown, ChevronUp, MessageCircle, CreditCard, BarChart3, Headphones, Loader, Shield, AlertCircle } from 'lucide-react';
 
 // Add-on icons mapping
@@ -24,13 +24,27 @@ export default function AddOnsPage() {
   const [kycStatus, setKycStatus] = useState(null);
   const [selectedAddOn, setSelectedAddOn] = useState(null);
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [defaultBillingPhone, setDefaultBillingPhone] = useState('');
   const [processing, setProcessing] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [expandedCard, setExpandedCard] = useState(null);
 
   useEffect(() => {
     loadSubscriptionData();
+    loadBillingPhone();
   }, []);
+
+  // Load billing phone from settings
+  const loadBillingPhone = async () => {
+    try {
+      const response = await settingsAPI.getAll();
+      const config = response.data?.config || response.data?.settings || {};
+      const mpesaNumber = config.mpesa_number || '';
+      setDefaultBillingPhone(mpesaNumber);
+    } catch (error) {
+      console.error('Failed to load billing phone:', error);
+    }
+  };
 
   const loadSubscriptionData = async () => {
     try {

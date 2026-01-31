@@ -149,13 +149,26 @@ export default function ProductsPage() {
   const [selectedBundle, setSelectedBundle] = useState(null);
   const [showCardPaymentModal, setShowCardPaymentModal] = useState(false);
   const [cardPaymentPhone, setCardPaymentPhone] = useState('');
+  const [defaultBillingPhone, setDefaultBillingPhone] = useState('');
   
   // Template management state (Phase C2)
   const [availableTemplates, setAvailableTemplates] = useState([]);
   const [showUnlockModal, setShowUnlockModal] = useState(false);
   const [templateToUnlock, setTemplateToUnlock] = useState(null);
 
-  useEffect(() => { loadProducts(); loadStoreInfo(); loadCategories(); loadCardBalance(); loadAvailableTemplates(); }, []);
+  useEffect(() => { loadProducts(); loadStoreInfo(); loadCategories(); loadCardBalance(); loadAvailableTemplates(); loadBillingPhone(); }, []);
+
+  // Load billing phone for payments
+  const loadBillingPhone = async () => {
+    try {
+      const response = await settingsAPI.getAll();
+      const config = response.data?.config || response.data?.settings || {};
+      const mpesaNumber = config.mpesa_number || '';
+      setDefaultBillingPhone(mpesaNumber);
+    } catch (error) {
+      console.error('Failed to load billing phone:', error);
+    }
+  };
 
   // ===========================================
   // CATEGORIES
@@ -259,6 +272,7 @@ export default function ProductsPage() {
 
   const handleSelectBundle = (bundle) => {
     setSelectedBundle(bundle);
+    setCardPaymentPhone(defaultBillingPhone); // Pre-fill with saved billing phone
     setShowCardPaymentModal(true);
   };
 
@@ -355,6 +369,7 @@ export default function ProductsPage() {
     // Check if template is locked
     if (template && !template.unlocked) {
       setTemplateToUnlock(template);
+      window.unlockPhoneNumber = defaultBillingPhone; // Pre-fill with saved billing phone
       setShowUnlockModal(true);
       return;
     }
@@ -369,6 +384,7 @@ export default function ProductsPage() {
       console.error('Failed to change template:', error);
       if (error.response?.data?.requiresUnlock) {
         setTemplateToUnlock(availableTemplates.find(t => t.id === newTemplateId));
+        window.unlockPhoneNumber = defaultBillingPhone; // Pre-fill with saved billing phone
         setShowUnlockModal(true);
       } else {
         alert('Failed to change template');
@@ -883,6 +899,7 @@ export default function ProductsPage() {
                           } else {
                             // Show unlock modal for locked templates
                             setTemplateToUnlock({ id: key, ...config });
+                            window.unlockPhoneNumber = defaultBillingPhone; // Pre-fill with saved billing phone
                             setShowUnlockModal(true);
                           }
                         }}
@@ -1996,6 +2013,7 @@ export default function ProductsPage() {
                 <input
                   type="tel"
                   placeholder="e.g. 0712345678"
+                  defaultValue={defaultBillingPhone}
                   className="dashboard-input"
                   style={{ width: '100%', padding: '14px', fontSize: '16px', textAlign: 'center' }}
                   onChange={(e) => window.unlockPhoneNumber = e.target.value}

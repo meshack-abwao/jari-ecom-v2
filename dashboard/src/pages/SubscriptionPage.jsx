@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { subscriptionsAPI, mpesaAPI } from '../api/client';
+import { subscriptionsAPI, mpesaAPI, settingsAPI } from '../api/client';
 import { Check, X, CreditCard, Loader, Crown, Zap, Calendar, AlertCircle } from 'lucide-react';
 
 export default function SubscriptionPage() {
@@ -7,6 +7,7 @@ export default function SubscriptionPage() {
   const [loading, setLoading] = useState(true);
   const [showPayment, setShowPayment] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [defaultBillingPhone, setDefaultBillingPhone] = useState('');
   const [processing, setProcessing] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [selectedMonths, setSelectedMonths] = useState(1);
@@ -15,7 +16,20 @@ export default function SubscriptionPage() {
 
   useEffect(() => {
     loadSubscription();
+    loadBillingPhone();
   }, []);
+
+  // Load billing phone from settings
+  const loadBillingPhone = async () => {
+    try {
+      const response = await settingsAPI.getAll();
+      const config = response.data?.config || response.data?.settings || {};
+      const mpesaNumber = config.mpesa_number || '';
+      setDefaultBillingPhone(mpesaNumber);
+    } catch (error) {
+      console.error('Failed to load billing phone:', error);
+    }
+  };
 
   const loadSubscription = async () => {
     try {
@@ -154,7 +168,7 @@ export default function SubscriptionPage() {
         </div>
         
         {!isActive && (
-          <button onClick={() => setShowPayment(true)} className="btn btn-primary" style={styles.subscribeBtn}>
+          <button onClick={() => { setPhoneNumber(defaultBillingPhone); setShowPayment(true); }} className="btn btn-primary" style={styles.subscribeBtn}>
             <Zap size={18} />
             {isExpired ? 'Subscribe Now' : 'Upgrade to Pro'}
           </button>
@@ -198,7 +212,7 @@ export default function SubscriptionPage() {
               <Calendar size={16} />
               Renews on {new Date(subscription.subscriptionExpires).toLocaleDateString()}
             </p>
-            <button onClick={() => setShowPayment(true)} style={styles.renewBtn}>
+            <button onClick={() => { setPhoneNumber(defaultBillingPhone); setShowPayment(true); }} style={styles.renewBtn}>
               Extend Subscription
             </button>
           </div>
