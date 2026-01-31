@@ -131,24 +131,55 @@ class IntaSendService {
   }
   
   /**
+   * Format phone number to 254XXXXXXXXX format
+   */
+  formatPhone(phone) {
+    if (!phone) return phone;
+    let cleaned = phone.toString().replace(/[\s\-\+]/g, '');
+    if (cleaned.startsWith('0')) {
+      cleaned = '254' + cleaned.substring(1);
+    } else if (cleaned.startsWith('7') || cleaned.startsWith('1')) {
+      cleaned = '254' + cleaned;
+    } else if (cleaned.startsWith('+254')) {
+      cleaned = cleaned.substring(1);
+    }
+    return cleaned;
+  }
+
+  /**
    * Initiate M-Pesa STK Push to merchant wallet
    * @param {Object} params - Payment parameters
    * @returns {Promise<Object>} Payment initiation result
    */
   async mpesaStkPush({ wallet_id, phone_number, email, amount, api_ref, narrative = 'Purchase' }) {
     try {
+      const formattedPhone = this.formatPhone(phone_number);
+      
+      const payload = {
+        phone_number: formattedPhone,
+        email: email || 'customer@jari.eco',
+        amount: Math.round(amount), // Must be integer
+        currency: 'KES',
+        api_ref: api_ref,
+        narrative: narrative.substring(0, 20), // Limit narrative length
+        method: 'M-PESA' // Changed from 'MPESA-STK-PUSH' to 'M-PESA'
+      };
+      
+      // Only add wallet_id if provided (for merchant payments)
+      if (wallet_id) {
+        payload.wallet_id = wallet_id;
+      }
+      
+      console.log('[IntaSend] STK Push request:', {
+        url: `${this.baseURL}/payment/collection/`,
+        phone: formattedPhone,
+        amount,
+        api_ref
+      });
+
       const response = await axios.post(
         `${this.baseURL}/payment/collection/`,
-        {
-          wallet_id: wallet_id, // Routes payment to merchant wallet
-          phone_number: phone_number,
-          email: email,
-          amount: amount,
-          currency: 'KES',
-          api_ref: api_ref,
-          narrative: narrative,
-          method: 'MPESA-STK-PUSH'
-        },
+        payload,
         {
           headers: {
             'Authorization': `Bearer ${this.publishableKey}`,
@@ -157,17 +188,21 @@ class IntaSendService {
         }
       );
       
-      console.log(`✅ STK Push initiated: ${api_ref}`);
+      console.log(`✅ STK Push initiated: ${api_ref}`, response.data);
       
       return {
         success: true,
-        invoice_id: response.data.invoice.id,
-        state: response.data.invoice.state,
-        amount: response.data.invoice.value,
-        phone_number: response.data.invoice.account
+        invoice_id: response.data.invoice?.id || response.data.id,
+        state: response.data.invoice?.state || response.data.state,
+        amount: response.data.invoice?.value || response.data.value,
+        phone_number: response.data.invoice?.account || formattedPhone
       };
     } catch (error) {
-      console.error('STK Push failed:', error.response?.data || error.message);
+      console.error('[IntaSend] STK Push failed:', {
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message
+      });
       return {
         success: false,
         error: error.response?.data || error.message
