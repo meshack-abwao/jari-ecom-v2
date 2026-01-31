@@ -137,6 +137,23 @@ export default function SettingsPage() {
       return;
     }
     
+    // Warning if domain already exists - prevent accidental changes
+    if (domainSettings.customDomain && domainSettings.customDomain !== domainInput.trim()) {
+      const confirmed = window.confirm(
+        `⚠️ WARNING: You are about to change your domain settings!\n\n` +
+        `Current domain: ${domainSettings.customDomain}\n` +
+        `New domain: ${domainInput.trim()}\n\n` +
+        `This will:\n` +
+        `• Remove your current domain configuration\n` +
+        `• Require new DNS setup and verification\n` +
+        `• Temporarily make your store unavailable on the old domain\n\n` +
+        `Are you sure you want to proceed?`
+      );
+      if (!confirmed) {
+        return;
+      }
+    }
+    
     setDomainLoading(true);
     setDomainError('');
     setDomainSuccess('');
@@ -537,7 +554,34 @@ export default function SettingsPage() {
 
               {/* Domain Input */}
               <div style={styles.formGroup}>
-                <label style={styles.label}>{domainSettings.customDomain ? 'CHANGE DOMAIN' : 'YOUR DOMAIN'}</label>
+                <label style={styles.label}>
+                  {domainSettings.customDomain && domainSettings.domainVerified ? (
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      🔒 DOMAIN LOCKED
+                      <span style={{ fontSize: '10px', color: 'var(--text-secondary)', fontWeight: 'normal' }}>(verified & protected)</span>
+                    </span>
+                  ) : domainSettings.customDomain ? 'CHANGE DOMAIN' : 'YOUR DOMAIN'}
+                </label>
+                
+                {/* Warning banner for verified domains */}
+                {domainSettings.customDomain && domainSettings.domainVerified && (
+                  <div style={{ 
+                    marginBottom: '12px', 
+                    padding: '10px 14px', 
+                    background: 'rgba(245, 158, 11, 0.08)', 
+                    border: '1px solid rgba(245, 158, 11, 0.3)', 
+                    borderRadius: '8px',
+                    fontSize: '12px',
+                    color: '#b45309',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}>
+                    <AlertCircle size={16} />
+                    <span>Domain settings are locked to prevent accidental changes. To modify, you'll need to confirm the change.</span>
+                  </div>
+                )}
+                
                 <div style={{ display: 'flex', gap: '8px' }}>
                   <input
                     type="text"
@@ -545,7 +589,13 @@ export default function SettingsPage() {
                     onChange={(e) => setDomainInput(e.target.value.toLowerCase())}
                     placeholder="shop.yourdomain.com or yourdomain.com"
                     className="dashboard-input"
-                    style={{ flex: 1 }}
+                    style={{ 
+                      flex: 1,
+                      ...(domainSettings.customDomain && domainSettings.domainVerified ? {
+                        background: 'var(--bg-tertiary)',
+                        color: 'var(--text-secondary)'
+                      } : {})
+                    }}
                   />
                   <button type="button" onClick={handleDomainSetup} disabled={domainLoading || !domainInput.trim()} style={{ padding: '12px 20px', background: domainInput.trim() ? 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)' : 'var(--bg-tertiary)', color: domainInput.trim() ? 'white' : 'var(--text-secondary)', border: 'none', borderRadius: '8px', cursor: domainInput.trim() ? 'pointer' : 'not-allowed', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '6px' }}>
                     {domainLoading ? <Loader size={16} className="spin" /> : <Plus size={16} />}
