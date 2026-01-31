@@ -74,6 +74,7 @@ router.post('/stk-push', auth, async (req, res, next) => {
     
     // Update payment with IntaSend invoice ID (store in checkout_request_id for now)
     // Note: invoice_id is the IntaSend tracking ID we use for status queries
+    console.log('[Payment] Storing invoice_id:', stkResponse.invoice_id, 'for paymentId:', paymentId);
     await db.query(
       `UPDATE platform_payments 
        SET checkout_request_id = $1
@@ -127,8 +128,28 @@ router.get('/status/:paymentId', auth, async (req, res, next) => {
     
     // Query IntaSend for current status using invoice ID (stored in checkout_request_id)
     const invoiceId = payment.checkout_request_id;
-    if (invoiceId) {
+    console.log('[Payment] Status check - invoiceId:', invoiceId, 'paymentId:', paymentId);
+    
+    if (!invoiceId) {
+      return res.json({
+        success: false,
+        status: payment.status || 'pending',
+        message: 'No invoice ID stored yet'
+      });
+    }
+    
+    try {
       const statusResponse = await intaSendService.getPaymentStatus(invoiceId);
+      console.log('[Payment] IntaSend status response:', statusResponse);
+      
+      if (statusResponse.error) {
+        // IntaSend API error - return current DB status
+        return res.json({
+          success: false,
+          status: payment.status || 'pending',
+          message: 'Checking payment status...'
+        });
+      }
       
       if (statusResponse.pending) {
         return res.json({
@@ -160,6 +181,14 @@ router.get('/status/:paymentId', auth, async (req, res, next) => {
         status: newStatus,
         mpesaRef: statusResponse.mpesa_reference,
         message: statusResponse.state
+      });
+    } catch (statusErr) {
+      console.error('[Payment] Status check error:', statusErr);
+      // Return current DB status on error
+      return res.json({
+        success: false,
+        status: payment.status || 'pending',
+        message: 'Checking payment status...'
       });
     }
     
