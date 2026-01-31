@@ -155,6 +155,11 @@ class IntaSendService {
     try {
       const formattedPhone = this.formatPhone(phone_number);
       
+      // Webhook URL for IntaSend to notify us of payment status
+      const webhookUrl = process.env.API_URL 
+        ? `${process.env.API_URL}/api/mpesa/intasend-webhook`
+        : 'https://jari-ecom-v2-production.up.railway.app/api/mpesa/intasend-webhook';
+      
       // IntaSend Collection API uses public_key in body, not Bearer token
       const payload = {
         public_key: this.publishableKey,
@@ -164,7 +169,8 @@ class IntaSendService {
         currency: 'KES',
         api_ref: api_ref,
         narrative: narrative.substring(0, 20),
-        method: 'M-PESA'
+        method: 'M-PESA',
+        webhook_url: webhookUrl  // Tell IntaSend where to send payment updates
       };
       
       // Only add wallet_id if provided (for merchant payments)
@@ -177,6 +183,7 @@ class IntaSendService {
         phone: formattedPhone,
         amount,
         api_ref,
+        webhookUrl,
         payload: JSON.stringify(payload)
       });
 
