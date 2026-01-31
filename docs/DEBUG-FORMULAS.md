@@ -1438,3 +1438,277 @@ constructor() {
 ```
 
 ---
+
+
+## FORMULA 36: Build Fails Due to Syntax Error (Jan 31, 2026)
+
+**Problem:** Netlify deploys old cached version, new features don't appear
+
+**Symptom:** User sees old "Coming Soon" modal even after code changes
+
+**Cause:** Syntax error in JS file prevents build completion
+
+**Example Error:**
+```
+error during build:
+[vite:define] Transform failed with 1 error:
+C:/path/to/client.js:312:0: ERROR: Unexpected "}"
+```
+
+**Debug Steps:**
+1. Run local build: `cd dashboard && npm run build`
+2. Check for syntax errors in output
+3. Look for duplicate closing braces `}` or missing brackets
+
+**Common Cause - Incomplete Edit:**
+```javascript
+// ❌ Bug: Duplicate closing brace
+    return { success: false };
+  }
+  }  // <-- Extra brace from incomplete edit
+};
+
+// ✅ Fixed
+    return { success: false };
+  }
+};
+```
+
+**Prevention:** Always run `npm run build` locally before pushing
+
+---
+
+## FORMULA 37: CSS Floaty/Glassmorphic Header Design (Jan 31, 2026)
+
+**Goal:** Apple-inspired floating header with blur effect
+
+**Key CSS Properties:**
+```css
+.header {
+    position: sticky;
+    top: 16px;                              /* Creates "floaty" offset */
+    z-index: 101;
+    margin: 0 var(--space-lg);              /* Side margins */
+}
+
+.header-content {
+    background: rgba(255, 255, 255, 0.92);  /* Semi-transparent */
+    backdrop-filter: blur(20px);            /* Glassmorphic blur */
+    -webkit-backdrop-filter: blur(20px);    /* Safari support */
+    border-radius: 100px;                   /* Pill shape */
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08); /* Soft shadow */
+    padding: var(--space-sm) var(--space-lg);
+}
+```
+
+**Golden Ratio Sizing:**
+```css
+.inner-element {
+    max-width: 61.8%;   /* φ / (1+φ) ≈ 0.618 */
+    margin: 0 auto;
+}
+```
+
+**Mobile Adjustments:**
+```css
+@media (max-width: 480px) {
+    .header {
+        top: 10px;
+        margin: 0 var(--space-sm);
+    }
+    
+    .header-content {
+        padding: 10px 16px;
+    }
+}
+```
+
+---
+
+## FORMULA 38: Domain Settings Protection Pattern (Jan 31, 2026)
+
+**Problem:** Users accidentally reset domain settings when saving other settings
+
+**Solution 1 - Isolate Domain from Main Save:**
+Domain settings should have their own API endpoints:
+- `domainsAPI.setup()` - Add/update domain
+- `domainsAPI.verify()` - Verify DNS
+- `domainsAPI.remove()` - Remove domain
+
+Main `handleSave()` should NOT include domain fields.
+
+**Solution 2 - Warning Popup Before Change:**
+```javascript
+const handleDomainSetup = async () => {
+  // Warning if domain already exists
+  if (domainSettings.customDomain && 
+      domainSettings.customDomain !== domainInput.trim()) {
+    const confirmed = window.confirm(
+      `⚠️ WARNING: You are about to change your domain settings!\n\n` +
+      `Current domain: ${domainSettings.customDomain}\n` +
+      `New domain: ${domainInput.trim()}\n\n` +
+      `This will:\n` +
+      `• Remove your current domain configuration\n` +
+      `• Require new DNS setup and verification\n\n` +
+      `Are you sure you want to proceed?`
+    );
+    if (!confirmed) return;
+  }
+  // ... proceed with domain setup
+};
+```
+
+**Solution 3 - Visual Lock Indicator:**
+```jsx
+<label>
+  {domainSettings.domainVerified ? (
+    <span>🔒 DOMAIN LOCKED (verified & protected)</span>
+  ) : 'YOUR DOMAIN'}
+</label>
+
+{domainSettings.domainVerified && (
+  <div className="warning-banner">
+    <AlertCircle size={16} />
+    Domain settings are locked to prevent accidental changes.
+  </div>
+)}
+```
+
+---
+
+## FORMULA 39: Grid Layout with 3-Column Alignment (Jan 31, 2026)
+
+**Goal:** Left-aligned, centered, and right-aligned content in same row
+
+**CSS Grid Solution:**
+```css
+.container {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.left-item {
+    justify-self: start;
+}
+
+.center-item {
+    justify-self: center;
+}
+
+.right-item {
+    justify-self: end;
+}
+```
+
+**Mobile Simplification (hide elements):**
+```css
+@media (max-width: 480px) {
+    .container {
+        grid-template-columns: 1fr;  /* Single column */
+    }
+    
+    .left-item {
+        display: none;  /* Hide if redundant */
+    }
+    
+    .center-item {
+        justify-self: center;
+    }
+}
+```
+
+---
+
+## FORMULA 40: Logo/Icon Sizing Consistency (Jan 31, 2026)
+
+**Problem:** Logo appears too small or unbalanced across screen sizes
+
+**Solution - Define explicit sizes per breakpoint:**
+```css
+/* Desktop */
+.logo-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+    .logo-img {
+        width: 36px;
+        height: 36px;
+    }
+}
+```
+
+**Text Logo Fallback:**
+```css
+.logo-text {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--gradient-primary);
+    color: white;
+    font-weight: 700;
+    font-size: var(--fs-body);  /* Larger for visibility */
+    border-radius: 10px;
+}
+```
+
+---
+
+## QUICK REFERENCE: IntaSend Payment Checklist
+
+When debugging IntaSend M-Pesa payments:
+
+1. ✅ **Auth:** Use `public_key` in request BODY (not Bearer token)
+2. ✅ **Phone:** Format as `254XXXXXXXXX` (no + prefix)
+3. ✅ **Webhook:** `invoice_id` is at TOP LEVEL (not nested)
+4. ✅ **Status:** Treat `CLEARING` as success
+5. ✅ **Activation:** Let webhook activate, don't call from frontend
+6. ✅ **Polling:** POST to `/payment/status/` with `public_key` + `invoice_id`
+
+---
+
+## QUICK REFERENCE: CSS Design System
+
+```css
+/* Spacing Scale (8px base) */
+--space-xs: 4px;
+--space-sm: 8px;
+--space-md: 16px;
+--space-lg: 24px;
+--space-xl: 32px;
+
+/* Border Radius */
+--radius-sm: 8px;
+--radius-md: 12px;
+--radius-lg: 16px;
+--radius-full: 100px;  /* Pills */
+
+/* Logo Sizes */
+Desktop: 40px × 40px
+Mobile: 36px × 36px
+
+/* Golden Ratio */
+Inner element: max-width: 61.8%
+
+/* Floaty Header */
+Desktop: top: 16px
+Mobile: top: 10px
+
+/* Glassmorphic Effect */
+background: rgba(255, 255, 255, 0.92);
+backdrop-filter: blur(20px);
+box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+```
+
+---
+
+**Last Updated:** January 31, 2026
+**Total Formulas:** 40
