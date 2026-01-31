@@ -21,7 +21,7 @@ const AVAILABLE_ADDONS = [
     id: 'mpesa_stk', 
     name: 'M-Pesa STK Push', 
     description: 'Accept M-Pesa payments with one-tap STK Push. Customers pay instantly without leaving your store.', 
-    price: 300 
+    price: 5 
   },
   { 
     id: 'whatsapp_auto', 
