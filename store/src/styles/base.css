@@ -577,12 +577,13 @@ body {
     grid-template-columns: auto 1fr auto;
     align-items: center;
     gap: var(--space-lg);
-    padding: var(--space-xs);
-    background: transparent;
-    border: none;
-    border-radius: var(--radius-full);
-    box-shadow: none;
-    max-width: 100%;
+    padding: var(--space-sm) var(--space-lg);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    max-width: fit-content;
+    margin: 0 auto;
 }
 
 /* Back Button - Left side */
@@ -593,7 +594,7 @@ body {
     padding: var(--space-sm) var(--space-lg);
     background: var(--bg-gray);
     border: none;
-    border-radius: var(--radius-full);
+    border-radius: 100px;
     font-size: var(--fs-small);
     font-weight: 500;
     color: var(--text-primary);
@@ -628,7 +629,7 @@ body {
     padding: var(--space-xs) var(--space-md);
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: var(--radius-full);
+    border-radius: 100px;
     font-size: var(--fs-small);
     font-weight: 500;
     color: var(--text-secondary);
