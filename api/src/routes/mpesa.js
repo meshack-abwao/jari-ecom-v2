@@ -387,23 +387,35 @@ router.post('/intasend-webhook', async (req, res) => {
   try {
     console.log('[IntaSend Webhook] Received:', JSON.stringify(req.body, null, 2));
     
-    const { invoice, state, api_ref, mpesa_reference } = req.body;
+    // IntaSend webhook payload has invoice_id at top level (not nested)
+    const { invoice_id, state, api_ref, mpesa_reference, challenge } = req.body;
     
-    // Find payment by api_ref or invoice_id
+    // Log for debugging
+    console.log('[IntaSend Webhook] Parsed:', { invoice_id, state, api_ref, mpesa_reference });
+    
+    // Find payment by invoice_id (stored in checkout_request_id) or by api_ref
     let paymentResult = await db.query(
-      'SELECT * FROM platform_payments WHERE checkout_request_id = $1 OR intasend_invoice_id = $2',
-      [api_ref, invoice?.id || invoice]
+      'SELECT * FROM platform_payments WHERE checkout_request_id = $1 OR checkout_request_id = $2',
+      [invoice_id, api_ref]
     );
     
     if (paymentResult.rows.length === 0) {
-      console.log('[IntaSend Webhook] Payment not found for:', { api_ref, invoice });
+      console.log('[IntaSend Webhook] Payment not found for:', { invoice_id, api_ref });
       return res.json({ status: 'ok' });
     }
     
     const payment = paymentResult.rows[0];
+    console.log('[IntaSend Webhook] Found payment:', payment.id, 'current status:', payment.status);
     
-    // IntaSend states: PENDING, PROCESSING, COMPLETE, FAILED, CANCELLED
-    if (state === 'COMPLETE') {
+    // Skip if already completed
+    if (payment.status === 'completed') {
+      console.log('[IntaSend Webhook] Payment already completed, skipping');
+      return res.json({ status: 'ok' });
+    }
+    
+    // IntaSend states: PENDING, PROCESSING, CLEARING, COMPLETE, FAILED, CANCELLED
+    // Treat CLEARING as complete for user experience (money received)
+    if (state === 'COMPLETE' || state === 'CLEARING') {
       await db.query(
         `UPDATE platform_payments 
          SET status = 'completed', 
@@ -417,7 +429,8 @@ router.post('/intasend-webhook', async (req, res) => {
       console.log('[IntaSend Webhook] Payment completed:', {
         paymentId: payment.id,
         mpesaRef: mpesa_reference,
-        amount: payment.amount
+        amount: payment.amount,
+        state
       });
       
       // Activate the purchase
@@ -435,6 +448,8 @@ router.post('/intasend-webhook', async (req, res) => {
         paymentId: payment.id,
         state
       });
+    } else {
+      console.log('[IntaSend Webhook] Payment still processing:', state);
     }
     
     res.json({ status: 'ok' });
