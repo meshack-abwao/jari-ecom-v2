@@ -176,7 +176,8 @@ class IntaSendService {
         url: `${this.baseURL}/payment/collection/`,
         phone: formattedPhone,
         amount,
-        api_ref
+        api_ref,
+        payload: JSON.stringify(payload)
       });
 
       const response = await axios.post(
