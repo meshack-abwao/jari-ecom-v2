@@ -200,13 +200,13 @@ body {
     color: var(--text-primary);
 }
 
-/* Center section: Nav + Breadcrumb - Inner pill */
+/* Center section: Nav + Breadcrumb - Inner pill (Golden Ratio sizing) */
+/* Golden ratio: outer ~62%, inner ~38% of available space */
 .minimal-header-center {
     display: grid;
     grid-template-columns: auto 1fr auto;
     align-items: center;
     gap: var(--space-md);
-    flex: 1;
     min-width: 0;
     overflow: hidden;
     background: var(--surface);
@@ -214,6 +214,10 @@ body {
     border-radius: 100px;
     padding: 6px 16px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    /* Golden ratio: ~61.8% of parent width max */
+    max-width: 61.8%;
+    margin: 0 auto;
+    flex: 0 1 auto;
 }
 
 /* Back button - Left aligned */
