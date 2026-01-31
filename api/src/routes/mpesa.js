@@ -72,12 +72,13 @@ router.post('/stk-push', auth, async (req, res, next) => {
       });
     }
     
-    // Update payment with IntaSend invoice ID
+    // Update payment with IntaSend invoice ID (store in checkout_request_id for now)
+    // Note: invoice_id is the IntaSend tracking ID we use for status queries
     await db.query(
       `UPDATE platform_payments 
-       SET checkout_request_id = $1, intasend_invoice_id = $2 
-       WHERE id = $3`,
-      [apiRef, stkResponse.invoice_id, paymentId]
+       SET checkout_request_id = $1
+       WHERE id = $2`,
+      [stkResponse.invoice_id, paymentId]
     );
     
     res.json({
@@ -124,8 +125,8 @@ router.get('/status/:paymentId', auth, async (req, res, next) => {
       });
     }
     
-    // Query IntaSend for current status using invoice ID
-    const invoiceId = payment.intasend_invoice_id || payment.checkout_request_id;
+    // Query IntaSend for current status using invoice ID (stored in checkout_request_id)
+    const invoiceId = payment.checkout_request_id;
     if (invoiceId) {
       const statusResponse = await intaSendService.getPaymentStatus(invoiceId);
       
