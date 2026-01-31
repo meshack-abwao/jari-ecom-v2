@@ -280,7 +280,10 @@ export default function ProductsPage() {
   const [processing, setProcessing] = useState(false);
   
   const handleCardPurchase = async () => {
-    if (!selectedBundle || !cardPaymentPhone) {
+    if (!selectedBundle) return;
+    
+    const phone = cardPaymentPhone || defaultBillingPhone;
+    if (!phone) {
       alert('Please enter your M-Pesa phone number');
       return;
     }
@@ -290,7 +293,7 @@ export default function ProductsPage() {
     try {
       // Initiate STK Push
       const response = await mpesaAPI.stkPush(
-        cardPaymentPhone,
+        phone,
         selectedBundle.price,
         'cards',
         selectedBundle.id,
@@ -298,46 +301,29 @@ export default function ProductsPage() {
       );
       
       if (!response.data.success) {
-        alert('❌ Payment failed to initiate');
+        alert('❌ Payment failed to initiate: ' + (response.data.error || 'Unknown error'));
         setProcessing(false);
         return;
       }
       
-      alert(`📱 STK Push sent to ${cardPaymentPhone}! Enter your M-Pesa PIN.`);
+      alert(`📱 STK Push sent! Enter your M-Pesa PIN on your phone.`);
       
-      // Poll for payment status
-      const paymentId = response.data.paymentId;
-      const pollInterval = setInterval(async () => {
-        try {
-          const result = await mpesaAPI.getStatus(paymentId);
-          
-          if (result.data.status === 'completed') {
-            clearInterval(pollInterval);
-            alert('✅ Payment successful! Cards added to your balance.');
-            setShowCardPaymentModal(false);
-            setSelectedBundle(null);
-            setCardPaymentPhone('');
-            setProcessing(false);
-            loadCardBalance(); // Refresh card balance
-          } else if (result.data.status === 'failed') {
-            clearInterval(pollInterval);
-            alert('❌ Payment failed. Please try again.');
-            setProcessing(false);
-          }
-        } catch (pollError) {
-          console.error('Poll error:', pollError);
-        }
-      }, 3000); // Poll every 3 seconds
+      // Poll for payment status using the improved method
+      const result = await mpesaAPI.pollStatus(response.data.paymentId);
       
-      // Stop polling after 60 seconds
-      setTimeout(() => {
-        clearInterval(pollInterval);
-        setProcessing(false);
-      }, 60000);
-      
+      if (result.success) {
+        alert('✅ Payment successful! Cards added to your balance.');
+        setShowCardPaymentModal(false);
+        setSelectedBundle(null);
+        setCardPaymentPhone('');
+        loadCardBalance(); // Refresh card balance
+      } else {
+        alert(result.message || '❌ Payment was not completed. Please try again.');
+      }
     } catch (error) {
-      console.error('Card purchase error:', error);
+      console.error('Payment error:', error);
       alert('❌ Payment failed. Please try again.');
+    } finally {
       setProcessing(false);
     }
   };
@@ -2035,7 +2021,7 @@ export default function ProductsPage() {
         </div>
       )}
 
-      {/* Card Purchase Payment Modal - Coming Soon */}
+      {/* Card Purchase Payment Modal - Actual M-Pesa Payment */}
       {showCardPaymentModal && selectedBundle && (
         <div style={{ ...styles.modalOverlay, zIndex: 2100 }} onClick={() => { setShowCardPaymentModal(false); setSelectedBundle(null); }}>
           <div style={{ ...styles.modal, maxWidth: '420px' }} className="glass-card" onClick={e => e.stopPropagation()}>
@@ -2071,24 +2057,37 @@ export default function ProductsPage() {
                 </div>
               </div>
               
-              {/* Coming Soon Notice */}
-              <div style={{ padding: '20px', background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '12px', marginBottom: '20px' }}>
-                <div style={{ fontSize: '24px', marginBottom: '8px' }}>🚧</div>
-                <h4 style={{ fontSize: '16px', fontWeight: '600', color: '#f59e0b', marginBottom: '8px' }}>Payment Coming Soon</h4>
-                <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
-                  M-Pesa and IntaSend integration is being configured. Card purchases will be available shortly.
+              {/* M-Pesa Phone Input */}
+              <div style={{ marginBottom: '20px', textAlign: 'left' }}>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: 'var(--text-secondary)', marginBottom: '8px' }}>
+                  M-Pesa Phone Number
+                </label>
+                <input
+                  type="tel"
+                  value={cardPaymentPhone}
+                  onChange={(e) => setCardPaymentPhone(e.target.value)}
+                  placeholder="0712345678"
+                  style={{ width: '100%', padding: '14px', fontSize: '16px', border: '1px solid var(--border-color)', borderRadius: '12px', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}
+                />
+                <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '6px' }}>
+                  You'll receive an STK push to enter your M-Pesa PIN
                 </p>
               </div>
               
               <button 
-                onClick={() => { setShowCardPaymentModal(false); setSelectedBundle(null); }} 
-                style={{ width: '100%', padding: '14px', fontSize: '16px', background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: '12px', color: 'var(--text-primary)', fontWeight: '600', cursor: 'pointer' }}
+                onClick={handleCardPurchase}
+                disabled={processing}
+                style={{ width: '100%', padding: '14px', fontSize: '16px', background: processing ? 'var(--bg-secondary)' : 'var(--accent-color)', border: 'none', borderRadius: '12px', color: 'white', fontWeight: '600', cursor: processing ? 'not-allowed' : 'pointer' }}
               >
-                Got it
+                {processing ? '⏳ Processing...' : `Pay KES ${selectedBundle.price.toLocaleString()} via M-Pesa`}
               </button>
-              <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '12px' }}>
-                Contact support for early access
-              </p>
+              
+              <button 
+                onClick={() => { setShowCardPaymentModal(false); setSelectedBundle(null); }} 
+                style={{ width: '100%', padding: '12px', fontSize: '14px', background: 'transparent', border: '1px solid var(--border-color)', borderRadius: '12px', color: 'var(--text-secondary)', fontWeight: '500', cursor: 'pointer', marginTop: '12px' }}
+              >
+                Cancel
+              </button>
             </div>
           </div>
         </div>

@@ -21,19 +21,19 @@ const AVAILABLE_ADDONS = [
     id: 'mpesa_stk', 
     name: 'M-Pesa STK Push', 
     description: 'Accept M-Pesa payments with one-tap STK Push. Customers pay instantly without leaving your store.', 
-    price: 10 
+    price: 300 
   },
   { 
     id: 'whatsapp_auto', 
     name: 'WhatsApp Automation', 
     description: 'Send automatic order confirmations, shipping updates, and follow-ups via WhatsApp.', 
-    price: 10 
+    price: 800 
   },
   { 
     id: 'advanced_analytics', 
     name: 'Advanced Analytics', 
     description: 'Deep insights into customer behavior, product performance, and revenue trends.', 
-    price: 10 
+    price: 600 
   },
   { 
     id: 'priority_support', 

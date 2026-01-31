@@ -1205,3 +1205,236 @@ normalizeDomain('lanixkenya.com')      // → 'lanixkenya.com'
 - Both www and non-www should resolve to same IP
 
 ---
+
+
+## FORMULA 29: IntaSend M-Pesa Integration (Jan 31, 2026)
+
+**Problem:** M-Pesa STK Push returns 400/500 errors
+
+**Root Cause:** Using wrong API (Safaricom Daraja) instead of IntaSend Collection API
+
+**Key Differences:**
+
+| Aspect | Safaricom Daraja (Wrong) | IntaSend (Correct) |
+|--------|--------------------------|-------------------|
+| Auth | Bearer token in header | `public_key` in body |
+| Endpoint | `/mpesa/stkpush/v1/` | `/payment/collection/` |
+| Status Check | GET with query params | POST with `public_key` + `invoice_id` in body |
+| Credentials | Consumer Key/Secret, Passkey | Secret Key, Publishable Key |
+
+**Correct IntaSend STK Push:**
+```javascript
+const payload = {
+  public_key: process.env.INTASEND_PUBLISHABLE_KEY,  // In body, NOT header!
+  phone_number: '254712345678',  // Format: 254XXXXXXXXX
+  email: 'customer@example.com',
+  amount: Math.round(amount),  // Integer, min 10 KES
+  currency: 'KES',
+  api_ref: 'JARI-ADD-123',
+  narrative: 'Addon Purchase',  // Max 20 chars
+  method: 'M-PESA',
+  webhook_url: 'https://your-api.com/api/mpesa/intasend-webhook'
+};
+
+const response = await axios.post(
+  'https://sandbox.intasend.com/api/v1/payment/collection/',
+  payload,
+  { headers: { 'Content-Type': 'application/json' } }  // NO Bearer token
+);
+```
+
+**Correct IntaSend Status Check:**
+```javascript
+// POST, not GET! With public_key in body
+const response = await axios.post(
+  'https://sandbox.intasend.com/api/v1/payment/status/',
+  {
+    public_key: process.env.INTASEND_PUBLISHABLE_KEY,
+    invoice_id: 'INV_XXXXXXX'
+  },
+  { headers: { 'Content-Type': 'application/json' } }
+);
+```
+
+---
+
+## FORMULA 30: IntaSend Webhook Payload (Jan 31, 2026)
+
+**Problem:** Webhook received but payment not found in database
+
+**Cause:** Parsing webhook payload incorrectly
+
+**IntaSend Webhook Payload Structure:**
+```json
+{
+  "invoice_id": "BRZKGPR",      // Top-level, NOT nested!
+  "state": "COMPLETE",          // PENDING, PROCESSING, CLEARING, COMPLETE, FAILED
+  "provider": "M-PESA",
+  "api_ref": "JARI-ADD-123",    // Your reference
+  "mpesa_reference": "ABC123",  // M-Pesa receipt
+  "value": "100.00",
+  "challenge": "your-secret"
+}
+```
+
+**Wrong Parsing:**
+```javascript
+const { invoice, state } = req.body;
+const invoiceId = invoice?.id;  // ❌ WRONG - invoice_id is at top level
+```
+
+**Correct Parsing:**
+```javascript
+const { invoice_id, state, api_ref, mpesa_reference } = req.body;
+// invoice_id is directly available, not nested!
+```
+
+**Payment Lookup:**
+```javascript
+// Find by invoice_id (stored in checkout_request_id)
+const payment = await db.query(
+  'SELECT * FROM platform_payments WHERE checkout_request_id = $1',
+  [invoice_id]
+);
+```
+
+---
+
+## FORMULA 31: IntaSend Payment States (Jan 31, 2026)
+
+**Problem:** Payment times out even though user paid
+
+**Cause:** Not handling all IntaSend states correctly
+
+**IntaSend State Flow:**
+```
+PENDING → PROCESSING → CLEARING → COMPLETE
+                    ↘ FAILED
+                    ↘ CANCELLED
+```
+
+**Key Insight:** `CLEARING` means money received, waiting for settlement. Treat as success!
+
+```javascript
+const isPending = ['PENDING', 'PROCESSING'].includes(state);
+const isComplete = state === 'COMPLETE' || state === 'CLEARING';  // ✅ Include CLEARING!
+
+if (isComplete) {
+  // Activate purchase - user has paid!
+}
+```
+
+---
+
+## FORMULA 32: IntaSend Webhook Configuration (Jan 31, 2026)
+
+**Problem:** Payments complete but webhook never received
+
+**Two ways to configure webhooks:**
+
+**1. Per-request webhook (in STK push payload):**
+```javascript
+const payload = {
+  // ... other fields
+  webhook_url: 'https://your-api.com/api/mpesa/intasend-webhook'
+};
+```
+
+**2. Global webhook in IntaSend Dashboard:**
+1. Go to IntaSend Dashboard → Settings → Webhooks
+2. Set Endpoint: `https://your-api.com/api/mpesa/intasend-webhook`
+3. Check "Collection event" ✅
+4. Save changes
+
+**Test webhook endpoint:**
+```bash
+curl -X POST https://your-api.com/api/mpesa/intasend-webhook \
+  -H "Content-Type: application/json" \
+  -d '{"invoice_id":"TEST","state":"COMPLETE","api_ref":"TEST-123"}'
+```
+
+---
+
+## FORMULA 33: Phone Number Formatting for M-Pesa (Jan 31, 2026)
+
+**Problem:** STK Push fails with invalid phone number
+
+**IntaSend requires:** `254XXXXXXXXX` format (no + prefix, no spaces)
+
+```javascript
+function formatPhone(phone) {
+  if (!phone) return phone;
+  let cleaned = phone.toString().replace(/[\s\-\+]/g, '');
+  
+  if (cleaned.startsWith('0')) {
+    cleaned = '254' + cleaned.substring(1);  // 0712... → 254712...
+  } else if (cleaned.startsWith('7') || cleaned.startsWith('1')) {
+    cleaned = '254' + cleaned;  // 712... → 254712...
+  } else if (cleaned.startsWith('+254')) {
+    cleaned = cleaned.substring(1);  // +254... → 254...
+  }
+  
+  return cleaned;  // Returns: 254XXXXXXXXX
+}
+```
+
+---
+
+## FORMULA 34: Redundant API Calls After Webhook (Jan 31, 2026)
+
+**Problem:** Console shows 404 error after successful payment
+
+**Cause:** Frontend tries to activate addon via separate API call, but webhook already did it
+
+**Error:**
+```
+POST /api/subscriptions/addon 404 (Not Found)
+```
+
+**Fix:** Remove redundant activation call from frontend:
+```javascript
+// ❌ WRONG - Don't call activateAddon after payment
+if (result.success) {
+  await subscriptionsAPI.activateAddon(addonId, mpesaRef);  // Remove this!
+  setPaymentStatus('success');
+}
+
+// ✅ CORRECT - Webhook already activated it
+if (result.success) {
+  setPaymentStatus('success');
+  loadSubscriptionData();  // Just refresh UI
+}
+```
+
+---
+
+## FORMULA 35: IntaSend Environment Variables (Jan 31, 2026)
+
+**Required Railway Environment Variables:**
+```bash
+INTASEND_TEST=true                           # false for production
+INTASEND_SECRET_KEY=ISSecretKey_test_...     # From IntaSend dashboard
+INTASEND_PUBLISHABLE_KEY=ISPubKey_test_...   # From IntaSend dashboard
+```
+
+**Optional (has defaults):**
+```bash
+INTASEND_BASE_URL=https://sandbox.intasend.com/api/v1  # Sandbox
+# Production: https://payment.intasend.com/api/v1
+```
+
+**Check credentials in service:**
+```javascript
+constructor() {
+  this.isTest = process.env.INTASEND_TEST === 'true';
+  this.baseURL = process.env.INTASEND_BASE_URL || 'https://sandbox.intasend.com/api/v1';
+  this.secretKey = process.env.INTASEND_SECRET_KEY;
+  this.publishableKey = process.env.INTASEND_PUBLISHABLE_KEY;
+  
+  if (!this.secretKey || !this.publishableKey) {
+    console.warn('⚠️ IntaSend credentials not configured');
+  }
+}
+```
+
+---

@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { templatesAPI } from '../api/client';
+import { templatesAPI, mpesaAPI, settingsAPI } from '../api/client';
 import { 
   Check, ChevronRight, ShoppingBag, Calendar, Utensils, Search, Ticket, 
-  Lock, Unlock, X, CreditCard, HelpCircle, Layers, Package, Zap, BookOpen
+  Lock, Unlock, X, CreditCard, HelpCircle, Layers, Package, Zap, BookOpen,
+  Phone, Loader
 } from 'lucide-react';
 
 // ===========================================
@@ -230,14 +231,30 @@ export default function TemplatesPage() {
   const [showUnlockModal, setShowUnlockModal] = useState(false);
   const [templateToUnlock, setTemplateToUnlock] = useState(null);
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [defaultBillingPhone, setDefaultBillingPhone] = useState('');
   const [showExplainer, setShowExplainer] = useState(false);
   const [showTemplateModal, setShowTemplateModal] = useState(false);
   const [viewingTemplate, setViewingTemplate] = useState(null);
+  const [processing, setProcessing] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState(null); // 'initiating', 'waiting', 'success', 'failed'
   const navigate = useNavigate();
 
   useEffect(() => {
     loadTemplates();
+    loadBillingPhone();
   }, []);
+
+  // Load billing phone from settings
+  const loadBillingPhone = async () => {
+    try {
+      const response = await settingsAPI.getAll();
+      const config = response.data?.config || {};
+      const mpesaNumber = config.mpesa_number || '';
+      setDefaultBillingPhone(mpesaNumber);
+    } catch (error) {
+      console.error('Failed to load billing phone:', error);
+    }
+  };
 
   const loadTemplates = async () => {
     try {
@@ -267,15 +284,59 @@ export default function TemplatesPage() {
     setShowUnlockModal(true);
   };
 
-  // Payment coming soon - no fake success
+  // Payment for template unlock
   const handleUnlockTemplate = async () => {
     if (!templateToUnlock) return;
     
-    alert('🚧 Payment Coming Soon!\n\nM-Pesa and IntaSend integration is being configured. Template purchases will be available shortly.\n\nContact support for early access.');
+    const phone = phoneNumber || defaultBillingPhone;
+    if (!phone) {
+      alert('Please enter your M-Pesa phone number');
+      return;
+    }
     
-    setShowUnlockModal(false);
-    setTemplateToUnlock(null);
-    setPhoneNumber('');
+    setProcessing(true);
+    setPaymentStatus('initiating');
+    
+    try {
+      // Initiate M-Pesa STK Push
+      const response = await mpesaAPI.stkPush(
+        phone,
+        templateToUnlock.price,
+        'theme',
+        templateToUnlock.slug,
+        templateToUnlock.name
+      );
+      
+      if (!response.data.success) {
+        throw new Error(response.data.error || 'Failed to initiate payment');
+      }
+      
+      setPaymentStatus('waiting');
+      
+      // Poll for payment status
+      const result = await mpesaAPI.pollStatus(response.data.paymentId);
+      
+      if (result.success) {
+        setPaymentStatus('success');
+        // Template is already activated by webhook - just refresh UI
+        
+        setTimeout(() => {
+          setShowUnlockModal(false);
+          setPhoneNumber('');
+          setPaymentStatus(null);
+          loadTemplates();
+        }, 2000);
+      } else {
+        setPaymentStatus('failed');
+        alert(result.message || 'Payment was not completed');
+      }
+    } catch (error) {
+      console.error('Payment error:', error);
+      setPaymentStatus('failed');
+      alert('Payment failed. Please try again.');
+    } finally {
+      setProcessing(false);
+    }
   };
 
   const handleUseTemplate = (template) => {
@@ -521,24 +582,73 @@ export default function TemplatesPage() {
                 KES {templateToUnlock.price.toLocaleString()}
               </div>
               
-              {/* Coming Soon Notice */}
-              <div style={{ padding: '20px', background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '12px', marginBottom: '20px' }}>
-                <div style={{ fontSize: '24px', marginBottom: '8px' }}>🚧</div>
-                <h4 style={{ fontSize: '16px', fontWeight: '600', color: '#f59e0b', marginBottom: '8px' }}>Payment Coming Soon</h4>
-                <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
-                  M-Pesa and IntaSend integration is being configured. Template purchases will be available shortly.
-                </p>
-              </div>
+              {/* Payment Form or Status */}
+              {paymentStatus === 'success' ? (
+                <div style={{ padding: '20px', background: 'rgba(34, 197, 94, 0.1)', border: '1px solid rgba(34, 197, 94, 0.3)', borderRadius: '12px', marginBottom: '20px' }}>
+                  <div style={{ fontSize: '48px', marginBottom: '12px' }}>✅</div>
+                  <h4 style={{ fontSize: '18px', fontWeight: '600', color: '#22c55e', marginBottom: '8px' }}>Template Unlocked!</h4>
+                  <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>You can now use this template for your products.</p>
+                </div>
+              ) : paymentStatus === 'failed' ? (
+                <div style={{ padding: '20px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '12px', marginBottom: '20px' }}>
+                  <div style={{ fontSize: '48px', marginBottom: '12px' }}>❌</div>
+                  <h4 style={{ fontSize: '18px', fontWeight: '600', color: '#ef4444', marginBottom: '8px' }}>Payment Failed</h4>
+                  <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Please try again or contact support.</p>
+                </div>
+              ) : paymentStatus === 'waiting' ? (
+                <div style={{ padding: '20px', background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.3)', borderRadius: '12px', marginBottom: '20px' }}>
+                  <Loader size={32} style={{ animation: 'spin 1s linear infinite', color: '#3b82f6', marginBottom: '12px' }} />
+                  <h4 style={{ fontSize: '16px', fontWeight: '600', color: '#3b82f6', marginBottom: '8px' }}>Waiting for M-Pesa PIN...</h4>
+                  <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Check your phone and enter your PIN to complete payment.</p>
+                </div>
+              ) : (
+                <>
+                  {/* Phone Input */}
+                  <div style={{ marginBottom: '20px', textAlign: 'left' }}>
+                    <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: 'var(--text-secondary)', marginBottom: '8px' }}>
+                      M-Pesa Phone Number
+                    </label>
+                    <div style={{ position: 'relative' }}>
+                      <Phone size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+                      <input
+                        type="tel"
+                        value={phoneNumber || defaultBillingPhone}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        placeholder="0712345678"
+                        style={{ width: '100%', padding: '14px 14px 14px 44px', fontSize: '16px', border: '1px solid var(--border-color)', borderRadius: '12px', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}
+                      />
+                    </div>
+                    <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '6px' }}>
+                      You'll receive an STK push to enter your M-Pesa PIN
+                    </p>
+                  </div>
+                  
+                  <button 
+                    onClick={handleUnlockTemplate}
+                    disabled={processing}
+                    style={{ width: '100%', padding: '14px', fontSize: '16px', background: processing ? 'var(--bg-secondary)' : 'var(--accent-color)', border: 'none', borderRadius: '12px', color: 'white', fontWeight: '600', cursor: processing ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                  >
+                    {processing ? (
+                      <>
+                        <Loader size={18} style={{ animation: 'spin 1s linear infinite' }} />
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <CreditCard size={18} />
+                        Pay KES {templateToUnlock.price.toLocaleString()} via M-Pesa
+                      </>
+                    )}
+                  </button>
+                </>
+              )}
               
               <button 
-                onClick={() => setShowUnlockModal(false)} 
-                style={{ width: '100%', padding: '14px', fontSize: '16px', background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: '12px', color: 'var(--text-primary)', fontWeight: '600', cursor: 'pointer' }}
+                onClick={() => { setShowUnlockModal(false); setPaymentStatus(null); setPhoneNumber(''); }} 
+                style={{ width: '100%', padding: '12px', fontSize: '14px', background: 'transparent', border: '1px solid var(--border-color)', borderRadius: '12px', color: 'var(--text-secondary)', fontWeight: '500', cursor: 'pointer', marginTop: '12px' }}
               >
-                Got it
+                {paymentStatus === 'success' ? 'Close' : 'Cancel'}
               </button>
-              <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '12px' }}>
-                Contact support for early access
-              </p>
             </div>
           </div>
         </div>
