@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import mpesaService from '../config/mpesa.js';
+import intaSendService from '../services/intasend.js';
 import { auth } from '../middleware/auth.js';
 import db from '../config/database.js';
 
@@ -21,7 +21,7 @@ router.post('/stk-push', auth, async (req, res, next) => {
 
     // Get user's store
     const storeResult = await db.query(
-      'SELECT id, name FROM stores WHERE user_id = $1',
+      'SELECT id, config FROM stores WHERE user_id = $1',
       [req.user.userId]
     );
     
@@ -30,6 +30,7 @@ router.post('/stk-push', auth, async (req, res, next) => {
     }
     
     const store = storeResult.rows[0];
+    const storeName = store.config?.storeName || store.config?.name || 'Store';
     
     // Generate account reference based on payment type
     const accountRef = `JARI-${type.toUpperCase().substring(0, 3)}-${store.id}`;
@@ -45,19 +46,24 @@ router.post('/stk-push', auth, async (req, res, next) => {
     
     const paymentId = paymentResult.rows[0].id;
     
-    // Initiate STK Push
-    const stkResponse = await mpesaService.stkPush(
-      phone,
-      amount,
-      accountRef,
-      `Jari ${type}`
-    );
+    // Generate API reference for tracking
+    const apiRef = `JARI-${type.toUpperCase().substring(0, 3)}-${paymentId}`;
+    
+    // Initiate STK Push via IntaSend (platform payments go to Jari's master wallet)
+    // Note: For platform payments, we don't specify a wallet_id - it goes to Jari's main account
+    const stkResponse = await intaSendService.mpesaStkPush({
+      phone_number: phone,
+      email: `${store.id}@jari.eco`, // Placeholder email
+      amount: amount,
+      api_ref: apiRef,
+      narrative: `Jari ${itemName || type}`
+    });
     
     if (!stkResponse.success) {
       // Update payment as failed
       await db.query(
         'UPDATE platform_payments SET status = $1, error_message = $2 WHERE id = $3',
-        ['failed', stkResponse.error, paymentId]
+        ['failed', JSON.stringify(stkResponse.error), paymentId]
       );
       
       return res.status(400).json({ 
@@ -66,18 +72,19 @@ router.post('/stk-push', auth, async (req, res, next) => {
       });
     }
     
-    // Update payment with checkout request ID
+    // Update payment with IntaSend invoice ID
     await db.query(
       `UPDATE platform_payments 
-       SET checkout_request_id = $1, merchant_request_id = $2 
+       SET checkout_request_id = $1, intasend_invoice_id = $2 
        WHERE id = $3`,
-      [stkResponse.checkoutRequestId, stkResponse.merchantRequestId, paymentId]
+      [apiRef, stkResponse.invoice_id, paymentId]
     );
     
     res.json({
       success: true,
       paymentId,
-      checkoutRequestId: stkResponse.checkoutRequestId,
+      invoiceId: stkResponse.invoice_id,
+      checkoutRequestId: apiRef,
       message: 'STK Push sent. Please check your phone and enter M-Pesa PIN.'
     });
     
@@ -117,9 +124,10 @@ router.get('/status/:paymentId', auth, async (req, res, next) => {
       });
     }
     
-    // Query M-Pesa for current status
-    if (payment.checkout_request_id) {
-      const statusResponse = await mpesaService.queryStatus(payment.checkout_request_id);
+    // Query IntaSend for current status using invoice ID
+    const invoiceId = payment.intasend_invoice_id || payment.checkout_request_id;
+    if (invoiceId) {
+      const statusResponse = await intaSendService.getPaymentStatus(invoiceId);
       
       if (statusResponse.pending) {
         return res.json({
@@ -132,8 +140,13 @@ router.get('/status/:paymentId', auth, async (req, res, next) => {
       // Update payment status based on query
       const newStatus = statusResponse.success ? 'completed' : 'failed';
       await db.query(
-        'UPDATE platform_payments SET status = $1, result_desc = $2 WHERE id = $3',
-        [newStatus, statusResponse.resultDesc, paymentId]
+        `UPDATE platform_payments 
+         SET status = $1, 
+             result_desc = $2,
+             mpesa_receipt_number = $3,
+             completed_at = CASE WHEN $1 = 'completed' THEN NOW() ELSE NULL END
+         WHERE id = $4`,
+        [newStatus, statusResponse.state, statusResponse.mpesa_reference, paymentId]
       );
       
       // If successful, activate the purchase
@@ -144,7 +157,8 @@ router.get('/status/:paymentId', auth, async (req, res, next) => {
       return res.json({
         success: statusResponse.success,
         status: newStatus,
-        message: statusResponse.resultDesc
+        mpesaRef: statusResponse.mpesa_reference,
+        message: statusResponse.state
       });
     }
     
@@ -250,6 +264,71 @@ router.post('/callback', async (req, res) => {
     console.error('[M-Pesa Callback] Error:', err);
     // Still respond with success to prevent retries
     res.json({ ResultCode: 0, ResultDesc: 'Accepted' });
+  }
+});
+
+// ===========================================
+// INTASEND WEBHOOK (Public endpoint)
+// ===========================================
+router.post('/intasend-webhook', async (req, res) => {
+  try {
+    console.log('[IntaSend Webhook] Received:', JSON.stringify(req.body, null, 2));
+    
+    const { invoice, state, api_ref, mpesa_reference } = req.body;
+    
+    // Find payment by api_ref or invoice_id
+    let paymentResult = await db.query(
+      'SELECT * FROM platform_payments WHERE checkout_request_id = $1 OR intasend_invoice_id = $2',
+      [api_ref, invoice?.id || invoice]
+    );
+    
+    if (paymentResult.rows.length === 0) {
+      console.log('[IntaSend Webhook] Payment not found for:', { api_ref, invoice });
+      return res.json({ status: 'ok' });
+    }
+    
+    const payment = paymentResult.rows[0];
+    
+    // IntaSend states: PENDING, PROCESSING, COMPLETE, FAILED, CANCELLED
+    if (state === 'COMPLETE') {
+      await db.query(
+        `UPDATE platform_payments 
+         SET status = 'completed', 
+             mpesa_receipt_number = $1, 
+             result_desc = $2,
+             completed_at = NOW()
+         WHERE id = $3`,
+        [mpesa_reference, state, payment.id]
+      );
+      
+      console.log('[IntaSend Webhook] Payment completed:', {
+        paymentId: payment.id,
+        mpesaRef: mpesa_reference,
+        amount: payment.amount
+      });
+      
+      // Activate the purchase
+      await activatePurchase(payment);
+      
+    } else if (state === 'FAILED' || state === 'CANCELLED') {
+      await db.query(
+        `UPDATE platform_payments 
+         SET status = 'failed', result_desc = $1 
+         WHERE id = $2`,
+        [state, payment.id]
+      );
+      
+      console.log('[IntaSend Webhook] Payment failed:', {
+        paymentId: payment.id,
+        state
+      });
+    }
+    
+    res.json({ status: 'ok' });
+    
+  } catch (err) {
+    console.error('[IntaSend Webhook] Error:', err);
+    res.json({ status: 'ok' });
   }
 });
 

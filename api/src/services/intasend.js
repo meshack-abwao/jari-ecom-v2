@@ -174,6 +174,44 @@ class IntaSendService {
       };
     }
   }
+
+  /**
+   * Query payment/invoice status
+   * @param {string} invoiceId - IntaSend invoice ID
+   * @returns {Promise<Object>} Payment status
+   */
+  async getPaymentStatus(invoiceId) {
+    try {
+      const response = await axios.get(
+        `${this.baseURL}/payment/collection/${invoiceId}/`,
+        {
+          headers: {
+            'Authorization': `Bearer ${this.secretKey}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      
+      const invoice = response.data.invoice || response.data;
+      const state = invoice.state || invoice.status;
+      
+      // IntaSend states: PENDING, PROCESSING, COMPLETE, FAILED, CANCELLED
+      return {
+        success: state === 'COMPLETE',
+        pending: state === 'PENDING' || state === 'PROCESSING',
+        state: state,
+        mpesa_reference: invoice.mpesa_reference || invoice.provider_reference,
+        amount: invoice.value || invoice.amount
+      };
+    } catch (error) {
+      console.error('Get payment status failed:', error.response?.data || error.message);
+      return {
+        success: false,
+        pending: false,
+        error: error.response?.data || error.message
+      };
+    }
+  }
 }
 
 export default new IntaSendService();
