@@ -132,26 +132,31 @@ body {
 /* ===========================================
    MINIMAL HEADER (Product Pages)
    Unified bar: Logo + Nav/Breadcrumb + Actions
+   Floaty glassmorphic design with rounded corners
    =========================================== */
 .minimal-header {
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-    padding: var(--space-sm) 20px;
     position: sticky;
-    top: 0;
+    top: 12px;  /* Floaty effect */
     z-index: 101;
+    padding: 0 var(--space-lg);
+    margin: 0 var(--space-md);
 }
 
 .minimal-header-content {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: var(--space-md);
+    gap: var(--space-lg);
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 20px;
+    padding: var(--space-sm) var(--space-md);
+    /* Glassmorphic pill container */
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 100px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
 }
 
 .minimal-header-logo {
@@ -195,23 +200,23 @@ body {
     color: var(--text-primary);
 }
 
-/* Center section: Nav + Breadcrumb - Pill container */
+/* Center section: Nav + Breadcrumb - Inner pill */
 .minimal-header-center {
-    display: flex;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
     align-items: center;
-    gap: var(--space-sm);
+    gap: var(--space-md);
     flex: 1;
-    justify-content: center;
     min-width: 0;
     overflow: hidden;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 100px;
-    padding: 6px 12px;
+    padding: 6px 16px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
-/* Back button in header */
+/* Back button - Left aligned */
 .mh-back-btn {
     display: flex;
     align-items: center;
@@ -227,6 +232,7 @@ body {
     transition: all 0.2s ease;
     white-space: nowrap;
     flex-shrink: 0;
+    justify-self: start;
 }
 
 .mh-back-btn:hover {
@@ -239,12 +245,14 @@ body {
     height: 14px;
 }
 
-/* Prev/Next nav in header */
+/* Prev/Next nav in header - Dead center */
 .mh-product-nav {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 4px;
     flex-shrink: 0;
+    justify-self: center;
 }
 
 .mh-nav-btn {
@@ -278,7 +286,7 @@ body {
     white-space: nowrap;
 }
 
-/* Breadcrumb in header */
+/* Breadcrumb in header - Right aligned */
 .mh-breadcrumb {
     display: flex;
     align-items: center;
@@ -287,6 +295,7 @@ body {
     color: var(--text-secondary);
     overflow: hidden;
     white-space: nowrap;
+    justify-self: end;
 }
 
 .mh-breadcrumb a {
@@ -354,8 +363,13 @@ body {
 
 /* Tablet adjustments */
 @media (max-width: 768px) {
+    .minimal-header {
+        top: 8px;
+        margin: 0 var(--space-sm);
+    }
+    
     .minimal-header-content {
-        padding: 0;
+        padding: var(--space-xs) var(--space-sm);
     }
     
     .minimal-store-name {
@@ -373,21 +387,39 @@ body {
     .mh-breadcrumb {
         display: none;
     }
+    
+    .minimal-header-center {
+        grid-template-columns: auto auto;
+        gap: var(--space-sm);
+    }
 }
 
 /* Mobile adjustments */
 @media (max-width: 480px) {
     .minimal-header {
-        padding: var(--space-sm) var(--space-md);
+        padding: 0 var(--space-sm);
+        top: 8px;
+        margin: 0 var(--space-xs);
     }
     
     .minimal-header-content {
-        padding: 0 8px;
+        padding: var(--space-xs) var(--space-sm);
+        gap: var(--space-sm);
+    }
+    
+    /* Hide back button on mobile - logo serves this purpose */
+    .mh-back-btn {
+        display: none;
     }
     
     .minimal-header-center {
-        gap: 6px;
-        padding: 8px 10px;
+        grid-template-columns: 1fr;  /* Only nav centered */
+        gap: var(--space-xs);
+        padding: 6px 12px;
+    }
+    
+    .mh-product-nav {
+        justify-self: center;
     }
     
     .minimal-logo-img,
