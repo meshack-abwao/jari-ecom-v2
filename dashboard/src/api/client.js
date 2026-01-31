@@ -308,7 +308,6 @@ export const mpesaAPI = {
     
     return { success: false, status: 'timeout', message: 'Payment verification timed out. Please check Add-ons page in a few minutes.' };
   }
-  }
 };
 
 // ===========================================
