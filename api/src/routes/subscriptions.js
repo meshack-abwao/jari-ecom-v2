@@ -33,7 +33,7 @@ const AVAILABLE_ADDONS = [
     id: 'advanced_analytics', 
     name: 'Advanced Analytics', 
     description: 'Deep insights into customer behavior, product performance, and revenue trends.', 
-    price: 600 
+    price: 10 
   },
   { 
     id: 'priority_support', 
