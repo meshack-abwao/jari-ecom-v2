@@ -1,6 +1,6 @@
 import { fetchStore } from './api.js';
 import { state, setState, getSlug, getProductId, setProductId, setCustomDomainSlug, getProductSlug } from './state.js';
-import { renderHeader, renderProductsGrid, renderSingleProduct, renderFooter, renderError } from './render.js';
+import { renderHeader, renderMinimalHeader, renderProductsGrid, renderSingleProduct, renderFooter, renderError } from './render.js';
 import { renderCheckoutModal, initCheckout, openCheckout } from './checkout.js';
 import { initPixel, pixel } from './pixel.js';
 import { initPortfolioBookingHandlers } from './templates/portfolioBookingHandlers.js';
@@ -324,7 +324,7 @@ function renderProductView(product) {
   
   app.innerHTML = `
     <a href="#main-content" class="skip-link">Skip to main content</a>
-    ${renderHeader()}
+    ${renderMinimalHeader()}
     <main class="main" id="main-content">
       ${renderSingleProduct(product)}
     </main>
