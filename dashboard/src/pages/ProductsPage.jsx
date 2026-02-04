@@ -63,7 +63,7 @@ const getInitialFormData = () => ({
   stock: 999,
   category: '',
   
-  // Checkout mode (decoupled from template)
+  // Checkout mode (decoupled from template) - default overridden by store setting
   checkout_mode: 'standard',
   checkout_config: {},
   
@@ -130,6 +130,7 @@ export default function ProductsPage() {
   const [editingProduct, setEditingProduct] = useState(null);
   const [storeUrl, setStoreUrl] = useState('');
   const [storeSlug, setStoreSlug] = useState('');
+  const [storeDefaultCheckout, setStoreDefaultCheckout] = useState('standard');
   
   // Categories feature
   const [categories, setCategories] = useState([]);
@@ -243,6 +244,10 @@ export default function ProductsPage() {
           : 'https://jarisolutionsecom.store';
         setStoreUrl(`${baseUrl}?store=${store.slug}`);
       }
+      // Capture store-level default checkout for new products
+      if (store?.default_checkout) {
+        setStoreDefaultCheckout(store.default_checkout);
+      }
     } catch (error) { 
       console.error('Failed to load store info:', error); 
     }
@@ -338,6 +343,8 @@ export default function ProductsPage() {
     //   handleBuyCards();
     //   return;
     // }
+    // Pre-fill checkout_mode from store default
+    setFormData(prev => ({ ...prev, checkout_mode: storeDefaultCheckout || 'standard' }));
     setShowModal(true);
   };
 
