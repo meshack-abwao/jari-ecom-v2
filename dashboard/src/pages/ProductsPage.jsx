@@ -142,7 +142,7 @@ export default function ProductsPage() {
   const [selectedTemplate, setSelectedTemplate] = useState(searchParams.get('template') || 'quick-decision');
   const [formData, setFormData] = useState(getInitialFormData());
   const [expandedSections, setExpandedSections] = useState({
-    basic: true, gallery: false, stories: false, testimonials: false,
+    basic: true, gallery: false, stories: false, testimonials: false, checkout: true,
     packages: false, dietary: false, addons: false, specifications: false, whatsIncluded: false, showcase: false, warranty: false, eventDetails: false, tickets: false, policies: false
   });
   
@@ -650,7 +650,7 @@ export default function ProductsPage() {
     setEditingProduct(null);
     setSelectedTemplate('quick-decision');
     setShowModal(false);
-    setExpandedSections({ basic: true, gallery: false, stories: false, testimonials: false,
+    setExpandedSections({ basic: true, gallery: false, stories: false, testimonials: false, checkout: true,
       packages: false, dietary: false, addons: false, specifications: false, whatsIncluded: false, showcase: false, warranty: false, eventDetails: false, tickets: false, policies: false });
   };
 
@@ -934,6 +934,52 @@ export default function ProductsPage() {
                   })}
                 </div>
                 <p style={styles.templateDesc}>{templateConfig?.description}</p>
+              </div>
+
+              {/* CHECKOUT MODE SELECTOR */}
+              <div style={styles.section}>
+                <SectionHeader section="checkout" title="Checkout Mode" icon="🛒" />
+                {expandedSections.checkout && (
+                  <div style={styles.sectionContent}>
+                    <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '13px', marginBottom: '12px' }}>
+                      How should customers buy this product? This controls the CTA button and checkout flow.
+                    </p>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '10px' }}>
+                      {[
+                        { value: 'standard', label: '🛒 Buy Now', desc: 'Standard add-to-cart checkout' },
+                        { value: 'booking', label: '📅 Book & Pay', desc: 'Calendar-based booking' },
+                        { value: 'inquiry', label: '💬 Get Quote', desc: 'WhatsApp inquiry first' },
+                        { value: 'reservation', label: '🔖 Reserve', desc: 'Reserve with deposit' },
+                        { value: 'event', label: '🎫 Get Tickets', desc: 'Event ticket purchase' },
+                      ].map(mode => (
+                        <div
+                          key={mode.value}
+                          onClick={() => updateField('checkout_mode', mode.value)}
+                          style={{
+                            padding: '12px',
+                            borderRadius: '12px',
+                            border: formData.checkout_mode === mode.value
+                              ? '2px solid var(--accent-color)'
+                              : '1px solid rgba(255,255,255,0.1)',
+                            background: formData.checkout_mode === mode.value
+                              ? 'rgba(139, 92, 246, 0.15)'
+                              : 'rgba(255,255,255,0.04)',
+                            cursor: 'pointer',
+                            textAlign: 'center',
+                            transition: 'all 0.2s ease',
+                          }}
+                        >
+                          <div style={{ fontSize: '16px', fontWeight: '600', color: '#fff', marginBottom: '4px' }}>
+                            {mode.label}
+                          </div>
+                          <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)' }}>
+                            {mode.desc}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* BASIC INFO */}
