@@ -3,7 +3,7 @@ import { settingsAPI, domainsAPI } from '../api/client';
 import { 
   Save, Check, Crown, Palette, Type, ChevronDown, ChevronUp, 
   ExternalLink, Plus, Trash2, Image, FileText, Star, Globe, Wallet,
-  Link2, CheckCircle, AlertCircle, Loader, Copy, RefreshCw
+  Link2, CheckCircle, AlertCircle, Loader, Copy, RefreshCw, ShoppingBag
 } from 'lucide-react';
 import ImageUploader from '../components/ImageUploader';
 
@@ -51,6 +51,7 @@ export default function SettingsPage() {
     payment: false,
     hero: false,
     testimonials: false,
+    checkout: false,
     policies: false,
     theme: true,
   });
@@ -103,6 +104,9 @@ export default function SettingsPage() {
     privacyPolicy: '',
     termsOfService: '',
     refundPolicy: '',
+    // Checkout defaults
+    defaultCheckout: 'standard',
+    unlockedCheckouts: ['standard'],
   });
 
   useEffect(() => { loadSettings(); loadThemes(); loadDomainSettings(); }, []);
@@ -278,6 +282,9 @@ export default function SettingsPage() {
         privacyPolicy: config.privacy_policy || config.privacyPolicy || '',
         termsOfService: config.terms_of_service || config.termsOfService || '',
         refundPolicy: config.refund_policy || config.refundPolicy || '',
+        // Checkout defaults (store-level columns, not in config)
+        defaultCheckout: store?.default_checkout || 'standard',
+        unlockedCheckouts: store?.unlocked_checkouts || ['standard'],
       });
 
       if (store?.slug) {
@@ -347,6 +354,8 @@ export default function SettingsPage() {
         privacy_policy: storeSettings.privacyPolicy,
         terms_of_service: storeSettings.termsOfService,
         refund_policy: storeSettings.refundPolicy,
+        // Checkout defaults (store-level columns)
+        default_checkout: storeSettings.defaultCheckout,
       }, storeSettings.slug || null);
       
       // Update store URL after save if slug was set
@@ -970,6 +979,60 @@ export default function SettingsPage() {
                   </button>
                 </>
               )}
+            </div>
+          )}
+        </div>
+
+        {/* ========== DEFAULT CHECKOUT MODE ========== */}
+        <div style={styles.card} className="glass-card">
+          <div style={styles.sectionHeader} onClick={() => toggleSection('checkout')}>
+            <div style={styles.sectionTitle}>
+              <ShoppingBag size={20} style={{ color: 'var(--accent-color)' }} />
+              Default Checkout
+            </div>
+            <ChevronDown size={20} style={{ 
+              transform: expandedSections.checkout ? 'rotate(180deg)' : 'none',
+              transition: 'transform 0.2s',
+              color: 'var(--text-muted)'
+            }} />
+          </div>
+          {expandedSections.checkout && (
+            <div style={styles.sectionContent}>
+              <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '13px', marginBottom: '16px' }}>
+                Set the default checkout mode for new products. You can override this per product.
+              </p>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '10px' }}>
+                {[
+                  { value: 'standard', label: '🛒 Buy Now' },
+                  { value: 'booking', label: '📅 Book & Pay' },
+                  { value: 'inquiry', label: '💬 Get Quote' },
+                  { value: 'reservation', label: '🔖 Reserve' },
+                  { value: 'event', label: '🎫 Get Tickets' },
+                ].map(mode => (
+                  <div
+                    key={mode.value}
+                    onClick={() => setStoreSettings({ ...storeSettings, defaultCheckout: mode.value })}
+                    style={{
+                      padding: '12px',
+                      borderRadius: '12px',
+                      border: storeSettings.defaultCheckout === mode.value
+                        ? '2px solid var(--accent-color)'
+                        : '1px solid rgba(255,255,255,0.1)',
+                      background: storeSettings.defaultCheckout === mode.value
+                        ? 'rgba(139, 92, 246, 0.15)'
+                        : 'rgba(255,255,255,0.04)',
+                      cursor: 'pointer',
+                      textAlign: 'center',
+                      fontWeight: '600',
+                      fontSize: '14px',
+                      color: '#fff',
+                      transition: 'all 0.2s ease',
+                    }}
+                  >
+                    {mode.label}
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>
