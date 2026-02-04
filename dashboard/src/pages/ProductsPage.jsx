@@ -1987,6 +1987,23 @@ export default function ProductsPage() {
                     </select>
                   </div>
                   
+                  {/* Checkout Mode Badge */}
+                  {product.checkout_mode && product.checkout_mode !== 'standard' && (
+                    <span style={{
+                      display: 'inline-block',
+                      padding: '2px 8px',
+                      borderRadius: '100px',
+                      fontSize: '11px',
+                      fontWeight: '600',
+                      marginTop: '4px',
+                      background: 'rgba(139, 92, 246, 0.15)',
+                      color: 'var(--accent-color)',
+                      border: '1px solid rgba(139, 92, 246, 0.3)',
+                    }}>
+                      {{ booking: '📅 Booking', inquiry: '💬 Inquiry', reservation: '🔖 Reserve', event: '🎫 Event' }[product.checkout_mode] || product.checkout_mode}
+                    </span>
+                  )}
+
                   <p style={styles.productDesc}>{data.description || 'No description'}</p>
                   <div style={styles.productFooter}>
                     <div>
