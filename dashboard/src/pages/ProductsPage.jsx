@@ -63,6 +63,10 @@ const getInitialFormData = () => ({
   stock: 999,
   category: '',
   
+  // Checkout mode (decoupled from template)
+  checkout_mode: 'standard',
+  checkout_config: {},
+  
   // Gallery (most templates)
   images: ['', '', '', '', '', ''],
   
@@ -457,6 +461,8 @@ export default function ProductsPage() {
       // Build V2 JSONB structure
       const productPayload = {
         template: selectedTemplate,
+        checkout_mode: formData.checkout_mode || 'standard',
+        checkout_config: formData.checkout_config || {},
         status: 'active',
         data: {
           name: formData.name,
@@ -547,6 +553,9 @@ export default function ProductsPage() {
     
     setFormData({
       ...getInitialFormData(),
+      // Checkout mode (decoupled)
+      checkout_mode: product.checkout_mode || 'standard',
+      checkout_config: product.checkout_config || {},
       // Basic
       name: data.name || '',
       description: data.description || '',
