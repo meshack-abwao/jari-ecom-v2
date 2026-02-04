@@ -404,6 +404,16 @@ export const kycAPI = {
 };
 
 // ===========================================
+// CHECKOUTS API
+// ===========================================
+export const checkoutsAPI = {
+  getUnlocked: () => api.get('/checkouts/unlocked'),
+  unlock: (data) => api.post('/checkouts/unlock', data),
+  getHistory: () => api.get('/checkouts/history'),
+  getModes: () => api.get('/store/checkout-modes'),
+};
+
+// ===========================================
 // LEGACY API (for backwards compatibility)
 // ===========================================
 export const legacyApi = {
