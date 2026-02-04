@@ -91,8 +91,11 @@ export const ordersAPI = {
 export const settingsAPI = {
   getAll: () => api.get('/store'),
   update: (settingsData, slug = null) => {
-    const payload = { config: settingsData };
+    // Extract store-level columns that go outside config
+    const { default_checkout, ...configData } = settingsData;
+    const payload = { config: configData };
     if (slug) payload.slug = slug;
+    if (default_checkout) payload.default_checkout = default_checkout;
     return api.put('/store', payload);
   },
   updateSlug: (slug) => api.put('/store', { slug }),
